@@ -46,7 +46,8 @@ class NDFauxBevel(bpy.types.Operator):
     
 
     def add_weighted_normal_modifer(self, context):
-        weighted = context.object.modifiers.new("ND — Weighted Normal", 'WEIGHTED_NORMAL')
+        wn = context.object.modifiers.new("ND — Weighted Normal", 'WEIGHTED_NORMAL')
+        wn.weight = 100
 
 
     def adjust_bevel_width(self, amount):

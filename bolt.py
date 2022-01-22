@@ -5,7 +5,7 @@ from math import radians
 
 class NDBolt(bpy.types.Operator):
     """Adds a bolt using the 3D cursor position & rotation"""
-    bl_idname = "nd.bolt"
+    bl_idname = "ND_OT_bolt"
     bl_label = "Bolt (& Hole Cutter)"
     bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
 

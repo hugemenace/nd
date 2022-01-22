@@ -3,9 +3,9 @@ import bmesh
 from math import radians
 
 
-class NDBolt(bpy.types.Operator):
+class ND_OT_bolt(bpy.types.Operator):
     """Adds a bolt using the 3D cursor position & rotation"""
-    bl_idname = "ND_OT_bolt"
+    bl_idname = "nd.bolt"
     bl_label = "Bolt (& Hole Cutter)"
     bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
 
@@ -39,6 +39,14 @@ class NDBolt(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        return self.handle_modal(context)
+    
+
+    def execute(self, context):
+        return self.handle_modal(context)
+
+
+    def handle_modal(self, context):
         self.add_object(context)
         self.add_screw_x_modifier()
         self.add_screw_z_modifer()
@@ -50,7 +58,7 @@ class NDBolt(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-    
+
 
     def add_object(self, context):
         mesh = bpy.data.meshes.new("ND — Bolt")
@@ -136,16 +144,16 @@ class NDBolt(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(NDBolt.bl_idname, text=NDBolt.bl_label)
+    self.layout.operator(ND_OT_bolt.bl_idname, text=ND_OT_bolt.bl_label)
 
 
 def register():
-    bpy.utils.register_class(NDBolt)
+    bpy.utils.register_class(ND_OT_bolt)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(NDBolt)
+    bpy.utils.unregister_class(ND_OT_bolt)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 

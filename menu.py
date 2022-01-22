@@ -2,9 +2,9 @@ import bpy
 
 keys = []
 
-class NDMenu(bpy.types.Menu):
-    bl_label = "HugeMenace ND"
-    bl_idname = "HM_MT_nd"
+class ND_MT_menu(bpy.types.Menu):
+    bl_label = "HugeMenace — ND"
+    bl_idname = "nd.menu"
 
 
     def draw(self, context):
@@ -17,16 +17,16 @@ class NDMenu(bpy.types.Menu):
 
 def draw_item(self, context):
     layout = self.layout
-    layout.menu(NDMenu.bl_idname)
+    layout.menu(ND_MT_menu.bl_idname)
 
 
 def register():
-    bpy.utils.register_class(NDMenu)
+    bpy.utils.register_class(ND_MT_menu)
     bpy.types.INFO_HT_header.append(draw_item)
    
     keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name = "3D View", space_type = 'VIEW_3D')
     entry = keymap.keymap_items.new("wm.call_menu", 'TWO', 'PRESS', shift = True)
-    entry.properties.name = "HM_MT_nd"
+    entry.properties.name = "nd.menu"
 
     keys.append((keymap, entry))
 
@@ -37,7 +37,7 @@ def unregister():
 
     keys.clear()
 
-    bpy.utils.unregister_class(NDMenu)
+    bpy.utils.unregister_class(ND_MT_menu)
     bpy.types.INFO_HT_header.remove(draw_item)
 
 

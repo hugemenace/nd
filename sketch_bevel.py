@@ -1,9 +1,9 @@
 import bpy
 
 
-class NDSketchBevel(bpy.types.Operator):
+class ND_OT_sketch_bevel(bpy.types.Operator):
     """Adds a vertex group based bevel and weld modifier"""
-    bl_idname = "ND_OT_sketch_bevel"
+    bl_idname = "nd.sketch_bevel"
     bl_label = "Sketch Bevel"
     bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
 
@@ -31,6 +31,14 @@ class NDSketchBevel(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        return self.handle_modal(context)
+    
+
+    def execute(self, context):
+        return self.handle_modal(context)
+
+
+    def handle_modal(self, context):
         if context.object and context.object.type == 'MESH' and context.mode == 'EDIT_MESH' and context.object.data.total_vert_sel > 0:
             self.add_vertex_group(context)
             self.add_bevel_modifier(context)
@@ -71,16 +79,16 @@ class NDSketchBevel(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(NDSketchBevel.bl_idname, text=NDSketchBevel.bl_label)
+    self.layout.operator(ND_OT_sketch_bevel.bl_idname, text=ND_OT_sketch_bevel.bl_label)
 
 
 def register():
-    bpy.utils.register_class(NDSketchBevel)
+    bpy.utils.register_class(ND_OT_sketch_bevel)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(NDSketchBevel)
+    bpy.utils.unregister_class(ND_OT_sketch_bevel)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
 
 

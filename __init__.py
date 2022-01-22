@@ -7,7 +7,7 @@ bl_info = {
     "description": "Non-destructive operations, tools, and workflows.",
     "warning": "",
     "doc_url": "https://hugemenace.co",
-    "category": "Object"
+    "category": "3D View"
 }
 
 from . import bolt 

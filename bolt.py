@@ -53,8 +53,8 @@ class NDBolt(bpy.types.Operator):
     
 
     def add_object(self, context):
-        mesh = bpy.data.meshes.new("ND Bolt")
-        obj = bpy.data.objects.new("ND Bolt", mesh)
+        mesh = bpy.data.meshes.new("ND — Bolt")
+        obj = bpy.data.objects.new("ND — Bolt", mesh)
         bpy.data.collections[context.collection.name].objects.link(obj)
         bm = bmesh.new()
         bm.verts.new()
@@ -129,7 +129,7 @@ class NDBolt(bpy.types.Operator):
             targets = [o for o in context.selected_objects if not (o == self.obj)]
 
             for target in targets:
-                boolean = target.modifiers.new("ND Bolt Cutter", 'BOOLEAN')
+                boolean = target.modifiers.new("ND — Bolt Hole", 'BOOLEAN')
                 boolean.object = self.obj
         else:
             self.obj.display_type = 'SOLID'

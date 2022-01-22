@@ -9,3 +9,20 @@ bl_info = {
     "doc_url": "https://hugemenace.co",
     "category": "Object"
 }
+
+from . import bolt 
+from . import faux_bevel
+from . import sketch_bevel
+from . import ui_panel
+
+def register():
+    bolt.register()
+    faux_bevel.register()
+    sketch_bevel.register()
+    ui_panel.register()
+
+def unregister():
+    bolt.unregister()
+    faux_bevel.unregister()
+    sketch_bevel.unregister()
+    ui_panel.unregister()

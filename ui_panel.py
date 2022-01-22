@@ -1,7 +1,7 @@
 import bpy
 
 
-class NDPanel(bpy.types.Panel):
+class NDUIPanel(bpy.types.Panel):
     bl_label = "ND"
     bl_idname = "PT_nd"
     bl_space_type = 'VIEW_3D'
@@ -42,11 +42,11 @@ class NDPanel(bpy.types.Panel):
         
         
 def register():
-    bpy.utils.register_class(NDPanel)
+    bpy.utils.register_class(NDUIPanel)
 
 
 def unregister():
-    bpy.utils.unregister_class(NDPanel)
+    bpy.utils.unregister_class(NDUIPanel)
 
 
 if __name__ == "__main__":

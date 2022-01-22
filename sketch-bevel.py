@@ -3,8 +3,8 @@ import bpy
 
 class NDSketchBevel(bpy.types.Operator):
     """Adds a vertex group based bevel and weld modifier"""
-    bl_idname = "nd.vgroup_bevel"
-    bl_label = "ND Sketch Bevel & Weld"
+    bl_idname = "nd.sketch_bevel"
+    bl_label = "Sketch Bevel"
     bl_options = {'GRAB_CURSOR', 'BLOCKING'}
 
 

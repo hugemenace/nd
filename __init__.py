@@ -28,4 +28,4 @@ def unregister():
     faux_bevel.unregister()
     sketch_bevel.unregister()
     ui_panel.unregister()
-    menu.register()
+    menu.unregister()

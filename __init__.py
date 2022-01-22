@@ -1,10 +1,10 @@
 bl_info = {
-    "name": "ND",
+    "name": "HugeMenace — ND",
     "author": "HugeMenace",
     "version": (0, 0, 1),
     "blender": (3, 0, 0),
-    "location": "HugeMance ND — N Panel",
-    "description": "Non-destructive operations, tools, and workflows.",
+    "location": "N Panel, Shift + 2",
+    "description": "Non-destructive operations, tools, and generators.",
     "warning": "",
     "doc_url": "https://hugemenace.co",
     "category": "3D View"

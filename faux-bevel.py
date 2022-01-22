@@ -7,7 +7,7 @@ class NDFauxBevel(bpy.types.Operator):
     """Adds a single segment bevel and a weighted normal modifier"""
     bl_idname = "nd.faux_bevel"
     bl_label = "Faux Bevel"
-    bl_options = {'GRAB_CURSOR', 'BLOCKING'}
+    bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
 
 
     def modal(self, context, event):

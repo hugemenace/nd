@@ -169,7 +169,7 @@ class ND_OT_bolt(bpy.types.Operator):
     
 
     def add_displace_modifier(self):
-        displace = self.obj.modifiers.new("ND — Displace", 'DISPLACE')
+        displace = self.obj.modifiers.new("ND — Offset", 'DISPLACE')
         displace.mid_level = 0.5
         displace.strength = self.offset
         
@@ -177,7 +177,7 @@ class ND_OT_bolt(bpy.types.Operator):
     
 
     def add_solidify_modifier(self):
-        solidify = self.obj.modifiers.new("ND — Solidify", 'SOLIDIFY')
+        solidify = self.obj.modifiers.new("ND — Thickness", 'SOLIDIFY')
         solidify.thickness = self.thickness
         solidify.offset = 1
 

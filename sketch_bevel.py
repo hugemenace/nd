@@ -1,42 +1,56 @@
 import bpy
 import bmesh
+from bpy.props import IntProperty
 
 
 class ND_OT_sketch_bevel(bpy.types.Operator):
-    """Adds a vertex group based bevel and weld modifier"""
     bl_idname = "nd.sketch_bevel"
     bl_label = "Sketch Bevel"
-    bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
-
+    bl_description = "Adds a vertex group bevel and weld modifier"
+    bl_options = {'UNDO'}
 
     def modal(self, context, event):
-        if event.type == 'MOUSEMOVE':
-            factor = 0.001 if event.shift else 0.01
-            self.adjust_bevel_width(event.mouse_x * factor)
+        width_factor = 0.001 if event.shift else 0.01
+        segment_factor = 1 if event.shift else 2
+
+        if event.type == 'WHEELUPMOUSE':
+            if event.alt:
+                self.segments = 2 if self.segments == 1 else self.segments + segment_factor
+            else:
+                self.width += width_factor
         
-        elif event.type == 'WHEELUPMOUSE':
-            self.adjust_bevel_segments(1)
-            
         elif event.type == 'WHEELDOWNMOUSE':
-            self.adjust_bevel_segments(-1)
+            if event.alt:
+                self.segments = max(1, self.segments - segment_factor)
+            else:
+                self.width = max(0, self.width - width_factor)
 
         elif event.type == 'LEFTMOUSE':
-            self.add_weld_modifier(context)
+            self.finish(context)
 
             return {'FINISHED'}
 
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            self.revert(context)
+
             return {'CANCELLED'}
+
+        self.operate(context)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
-        return self.handle_modal(context)
-    
+        self.segments = 1
+        self.width = 0.001
 
-    def execute(self, context):
-        return self.handle_modal(context)
+        self.add_vertex_group(context)
+        self.add_bevel_modifier(context)
+
+        context.window_manager.modal_handler_add(self)
+
+        return {'RUNNING_MODAL'}
+
 
     @classmethod
     def poll(cls, context):
@@ -44,44 +58,50 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
             mesh = bmesh.from_edit_mesh(context.object.data)
             return len([vert for vert in mesh.verts if vert.select]) >= 1
 
-    def handle_modal(self, context):
-        self.add_vertex_group(context)
-        self.add_bevel_modifier(context)
-
-        context.window_manager.modal_handler_add(self)
-        return {'RUNNING_MODAL'}
-
 
     def add_vertex_group(self, context):
-        context.object.vertex_groups.new(name = "ND — Bevel")
+        vgroup = context.object.vertex_groups.new(name="ND — Bevel")
         bpy.ops.object.vertex_group_assign()
-    
+
+        self.vgroup = vgroup
+
 
     def add_bevel_modifier(self, context):
-        bevel = context.object.modifiers.new("ND — Sketch Bevel", type = 'BEVEL')
+        bevel = context.object.modifiers.new("ND — Sketch Bevel", type='BEVEL')
         bevel.affect = 'VERTICES'
         bevel.limit_method = 'VGROUP'
-        bevel.vertex_group = context.object.vertex_groups[-1].name
-        bevel.segments = 8
+        bevel.vertex_group = self.vgroup.name
+        bevel.segments = self.segments
+        bevel.width = self.width
 
         self.bevel = bevel
     
 
     def add_weld_modifier(self, context):
-        weld = context.object.modifiers.new("ND — Weld", type = 'WELD')
+        weld = context.object.modifiers.new("ND — Weld", type='WELD')
         weld.merge_threshold = 0.00001
 
-
-    def adjust_bevel_width(self, width):
-        self.bevel.width = width
+        self.weld = weld
 
 
-    def adjust_bevel_segments(self, amount):
-        self.bevel.segments += amount
+    def operate(self, context):
+        self.bevel.width = self.width
+        self.bevel.segments = self.segments
+
+
+    def finish(self, context):
+        self.add_weld_modifier(context)
+    
+
+    def revert(self, context):
+        bpy.ops.object.modifier_remove(modifier=self.bevel.name)
+        context.object.vertex_groups.remove(self.vgroup)
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_sketch_bevel.bl_idname, text=ND_OT_sketch_bevel.bl_label)
+    self.layout.operator(
+        ND_OT_sketch_bevel.bl_idname, 
+        text=ND_OT_sketch_bevel.bl_label)
 
 
 def register():

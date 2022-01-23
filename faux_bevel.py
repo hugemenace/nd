@@ -4,45 +4,37 @@ from math import radians
 
 
 class ND_OT_faux_bevel(bpy.types.Operator):
-    """Adds a single segment bevel and a weighted normal modifier"""
     bl_idname = "nd.faux_bevel"
     bl_label = "Faux Bevel"
-    bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
+    bl_description = "Adds a single segment bevel and a weighted normal modifier"
+    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
+        width_factor = 0.0001 if event.shift else 0.001
+
         if event.type == 'WHEELUPMOUSE':
-            step = 0.0001 if event.shift else 0.001
-            self.adjust_bevel_width(step)
+            self.bevel_width += width_factor
             
         elif event.type == 'WHEELDOWNMOUSE':
-            step = 0.0001 if event.shift else 0.001
-            self.adjust_bevel_width(-step)
+            self.bevel_width = max(0, self.bevel_width - width_factor)
         
         elif event.type == 'LEFTMOUSE':
             return {'FINISHED'}
 
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            self.revert(context)
+
             return {'CANCELLED'}
+
+        self.operate(context)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
-        return self.handle_modal(context)
-    
+        self.bevel_width = 0.001
 
-    def execute(self, context):
-        return self.handle_modal(context)
-
-
-    @classmethod
-    def poll(cls, context):
-        if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1
-
-
-    def handle_modal(self, context):
         self.add_bevel_modifier(context)
         self.add_weighted_normal_modifer(context)
 
@@ -51,10 +43,16 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
+    @classmethod
+    def poll(cls, context):
+        if context.mode == 'OBJECT':
+            return len(context.selected_objects) == 1
+
+
     def add_bevel_modifier(self, context):
         bevel = context.object.modifiers.new("ND — Bevel", 'BEVEL')
         bevel.segments = 1
-        bevel.width = 0
+        bevel.width = self.bevel_width
 
         self.bevel = bevel
     
@@ -63,9 +61,16 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         wn = context.object.modifiers.new("ND — Weighted Normal", 'WEIGHTED_NORMAL')
         wn.weight = 100
 
+        self.wn = wn
 
-    def adjust_bevel_width(self, amount):
-        self.bevel.width += amount
+
+    def operate(self, context):
+        self.bevel.width = self.bevel_width
+
+
+    def revert(self, context):
+        bpy.ops.object.modifier_remove(modifier=self.bevel.name)
+        bpy.ops.object.modifier_remove(modifier=self.wn.name)
 
 
 def menu_func(self, context):

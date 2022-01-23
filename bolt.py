@@ -4,54 +4,58 @@ from math import radians
 
 
 class ND_OT_bolt(bpy.types.Operator):
-    """Adds a bolt using the 3D cursor position & rotation"""
     bl_idname = "nd.bolt"
     bl_label = "Bolt (& Hole Cutter)"
-    bl_options = {'REGISTER', 'UNDO', 'GRAB_CURSOR', 'BLOCKING'}
+    bl_description = "Adds a bolt using the 3D cursor position & rotation"
+    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
-        if event.type == 'MOUSEMOVE':
-            factor = 0.001 if event.shift else 0.01
-            
-            if event.alt:
-                self.solidify.thickness = max(0, event.mouse_x * factor)
-            elif event.ctrl:
-                self.displace.strength = event.mouse_x * factor
-            else:
-                self.screwX.screw_offset = max(0, event.mouse_x * factor)
+        offset_factor = 0.001 if event.shift else 0.01
+        radius_factor = 0.001 if event.shift else 0.01
+        thickness_factor = 0.001 if event.shift else 0.01
         
-        elif event.type == 'WHEELUPMOUSE':
-            self.adjust_segments(1)
-            
+        if event.type == 'WHEELUPMOUSE':
+            if event.alt and event.ctrl:
+                self.offset += offset_factor
+            elif event.alt:
+                self.radius += radius_factor
+            elif event.ctrl:
+                self.thickness += thickness_factor
+            else:
+                self.segments += 1
+
         elif event.type == 'WHEELDOWNMOUSE':
-            self.adjust_segments(-1)
+            if event.alt and event.ctrl:
+                self.offset -= offset_factor
+            elif event.alt:
+                self.radius = max(0, self.radius - radius_factor)
+            elif event.ctrl:
+                self.thickness = max(0, self.thickness - thickness_factor)
+            else:
+                self.segments = max(3, self.segments - 1)
 
         elif event.type == 'LEFTMOUSE':
-            self.handle_optional_boolean_ops(context)
+            self.finish(context)
             
             return {'FINISHED'}
 
         elif event.type in {'RIGHTMOUSE', 'ESC'}:
+            self.revert(context)
+
             return {'CANCELLED'}
+
+        self.operate(context)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
-        return self.handle_modal(context)
-    
+        self.segments = 3
+        self.radius = 0.02
+        self.thickness = 0.02
+        self.offset = 0
 
-    def execute(self, context):
-        return self.handle_modal(context)
-
-
-    @classmethod
-    def poll(cls, context):
-        return context.mode == 'OBJECT'
-
-
-    def handle_modal(self, context):
         self.add_object(context)
         self.add_screw_x_modifier()
         self.add_screw_z_modifer()
@@ -63,6 +67,11 @@ class ND_OT_bolt(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
+    
+
+    @classmethod
+    def poll(cls, context):
+        return context.mode == 'OBJECT'
 
 
     def add_object(self, context):
@@ -86,7 +95,7 @@ class ND_OT_bolt(bpy.types.Operator):
         screwX = self.obj.modifiers.new("ND — Radius", 'SCREW')
         screwX.axis = 'X'
         screwX.angle = 0
-        screwX.screw_offset = 1
+        screwX.screw_offset = self.radius
         screwX.steps = 1
         screwX.render_steps = 1
         screwX.use_merge_vertices = True
@@ -97,8 +106,8 @@ class ND_OT_bolt(bpy.types.Operator):
     def add_screw_z_modifer(self):
         screwZ = self.obj.modifiers.new("ND — Segments", 'SCREW')
         screwZ.axis = 'Z'
-        screwZ.steps = 32
-        screwZ.render_steps = 32
+        screwZ.steps = self.segments
+        screwZ.render_steps = self.segments
         screwZ.use_merge_vertices = True
 
         self.screwZ = screwZ
@@ -113,19 +122,22 @@ class ND_OT_bolt(bpy.types.Operator):
         decimate = self.obj.modifiers.new("ND — Decimate", 'DECIMATE')
         decimate.decimate_type = 'DISSOLVE'
         decimate.angle_limit = radians(.25)
+        decimate.show_viewport = False if self.segments <= 3 else True
+
+        self.decimate = decimate
     
 
     def add_displace_modifier(self):
         displace = self.obj.modifiers.new("ND — Displace", 'DISPLACE')
         displace.mid_level = 0.5
-        displace.strength = 0
+        displace.strength = self.offset
         
         self.displace = displace
     
 
     def add_solidify_modifier(self):
         solidify = self.obj.modifiers.new("ND — Solidify", 'SOLIDIFY')
-        solidify.thickness = 0.50
+        solidify.thickness = self.thickness
         solidify.offset = 1
 
         self.solidify = solidify
@@ -146,6 +158,30 @@ class ND_OT_bolt(bpy.types.Operator):
                 boolean.object = self.obj
         else:
             self.obj.display_type = 'SOLID'
+
+
+    def operate(self, context):
+        self.decimate.show_viewport = False if self.segments <= 3 else True
+        self.screwX.screw_offset = self.radius
+        self.screwZ.steps = self.segments
+        self.screwZ.render_steps = self.segments
+        self.solidify.thickness = self.thickness
+        self.displace.strength = self.offset
+
+
+    def finish(self, context):
+        self.handle_optional_boolean_ops(context)
+        self.select_bolt(context)
+    
+
+    def select_bolt(self, context):
+        bpy.ops.object.select_all(action='DESELECT')
+        self.obj.select_set(True)
+
+
+    def revert(self, context):
+        self.select_bolt(context)
+        bpy.ops.object.delete()
 
 
 def menu_func(self, context):

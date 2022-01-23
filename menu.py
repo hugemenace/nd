@@ -10,6 +10,7 @@ class ND_MT_menu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+        layout.operator_context = 'INVOKE_DEFAULT'
         layout.operator("nd.sketch_bevel", icon = 'MOD_BEVEL')
         layout.operator("nd.faux_bevel", icon = 'MOD_BEVEL')
         layout.separator()

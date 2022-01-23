@@ -140,6 +140,7 @@ class ND_OT_bolt(bpy.types.Operator):
         screwX.steps = 1
         screwX.render_steps = 1
         screwX.use_merge_vertices = True
+        screwX.merge_threshold = 0.0001
 
         self.screwX = screwX
     
@@ -150,6 +151,7 @@ class ND_OT_bolt(bpy.types.Operator):
         screwZ.steps = self.segments
         screwZ.render_steps = self.segments
         screwZ.use_merge_vertices = True
+        screwZ.merge_threshold = 0.0001
 
         self.screwZ = screwZ
 

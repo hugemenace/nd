@@ -156,11 +156,6 @@ class ND_OT_bolt(bpy.types.Operator):
         self.screwZ = screwZ
 
 
-    def adjust_segments(self, amount):
-        self.screwZ.steps = max(3, self.screwZ.steps + amount)
-        self.screwZ.render_steps = max(3, self.screwZ.render_steps + amount)
-
-
     def add_decimate_modifier(self):
         decimate = self.obj.modifiers.new("ND — Decimate", 'DECIMATE')
         decimate.decimate_type = 'DISSOLVE'

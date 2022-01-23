@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import blf
 from math import radians
 
 
@@ -14,6 +15,9 @@ class ND_OT_bolt(bpy.types.Operator):
         offset_factor = 0.001 if event.shift else 0.01
         radius_factor = 0.001 if event.shift else 0.01
         thickness_factor = 0.001 if event.shift else 0.01
+
+        self.mouse_x = event.mouse_x
+        self.mouse_y = event.mouse_y
         
         if event.type == 'WHEELUPMOUSE':
             if event.alt and event.ctrl:
@@ -45,12 +49,18 @@ class ND_OT_bolt(bpy.types.Operator):
 
             return {'CANCELLED'}
 
+        elif event.type in {'MIDDLEMOUSE'} or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
+            return {'PASS_THROUGH'}
+
         self.operate(context)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.mouse_x = 0
+        self.mouse_y = 0
+
         self.segments = 3
         self.radius = 0.02
         self.thickness = 0.02
@@ -64,10 +74,41 @@ class ND_OT_bolt(bpy.types.Operator):
         self.add_solidify_modifier()
         self.align_object_to_3d_cursor(context)
 
+        self.register_draw_handler(context)
+
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
     
+
+    def register_draw_handler(self, context):
+        handler = bpy.app.driver_namespace.get('nd_draw_bolt')
+
+        if not handler:
+            handler = bpy.types.SpaceView3D.draw_handler_add(draw_text_callback, (self, context), 'WINDOW', 'POST_PIXEL')
+            dns = bpy.app.driver_namespace
+            dns['nd_draw_bolt'] = handler
+
+            self.redraw_regions(context)
+
+    
+    def unregister_draw_handler(self, context):
+        handler = bpy.app.driver_namespace.get('nd_draw_bolt')
+
+        if handler:
+            bpy.types.SpaceView3D.draw_handler_remove(handler, 'WINDOW')
+            del bpy.app.driver_namespace['nd_draw_bolt']
+
+            self.redraw_regions(context)
+
+
+    def redraw_regions(self, context):
+        for area in context.window.screen.areas:
+            if area.type == 'VIEW_3D':
+                for region in area.regions:
+                    if region.type == 'WINDOW':
+                        region.tag_redraw()
+
 
     @classmethod
     def poll(cls, context):
@@ -169,19 +210,73 @@ class ND_OT_bolt(bpy.types.Operator):
         self.displace.strength = self.offset
 
 
-    def finish(self, context):
-        self.handle_optional_boolean_ops(context)
-        self.select_bolt(context)
-    
-
     def select_bolt(self, context):
         bpy.ops.object.select_all(action='DESELECT')
         self.obj.select_set(True)
 
 
+    def finish(self, context):
+        self.handle_optional_boolean_ops(context)
+        self.select_bolt(context)
+        self.unregister_draw_handler(context)
+
+
     def revert(self, context):
         self.select_bolt(context)
         bpy.ops.object.delete()
+        self.unregister_draw_handler(context)
+
+
+def draw_text_callback(self, context):
+    cursor_offset_x = 20
+    cursor_offset_y = -100
+    
+    blf.size(0, 24, 72)
+    blf.color(0, 1.0, 0.529, 0.216, 1.0)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y, 0)
+    blf.draw(0, "ND — Bolt")
+
+    blf.size(0, 16, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 1.0)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 25, 0)
+    blf.draw(0, "Segments: {}".format(self.segments))
+
+    blf.size(0, 11, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 0.3)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 40, 0)
+    blf.draw(0, "(±1)")
+    
+    blf.size(0, 16, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 1.0)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 65, 0)
+    blf.draw(0, "Radius: {0:.0f}mm".format(self.radius * 1000))
+
+    blf.size(0, 11, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 0.3)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 80, 0)
+    blf.draw(0, "Alt (±10mm)  |  Shift + Alt (±1mm)")
+
+    blf.size(0, 16, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 1.0)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 105, 0)
+    blf.draw(0, "Thickness: {0:.0f}mm".format(self.thickness * 1000))
+
+    blf.size(0, 11, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 0.3)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 120, 0)
+    blf.draw(0, "Ctrl (±10mm)  |  Shift + Ctrl (±1mm)")
+
+    blf.size(0, 16, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 1.0)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 145, 0)
+    blf.draw(0, "Offset: {0:.3f}".format(self.offset))
+
+    blf.size(0, 11, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 0.3)
+    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 160, 0)
+    blf.draw(0, "Ctrl + Alt (±0.01)  |  Shift + Ctrl + Alt (±0.001)")
+
+    self.redraw_regions(context)
 
 
 def menu_func(self, context):

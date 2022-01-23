@@ -36,6 +36,12 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         return self.handle_modal(context)
 
 
+    @classmethod
+    def poll(cls, context):
+        if context.mode == 'OBJECT':
+            return len(context.selected_objects) == 1
+
+
     def handle_modal(self, context):
         self.add_bevel_modifier(context)
         self.add_weighted_normal_modifer(context)

@@ -1,4 +1,5 @@
 import bpy
+import bmesh
 
 
 class ND_OT_sketch_bevel(bpy.types.Operator):
@@ -37,17 +38,18 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
     def execute(self, context):
         return self.handle_modal(context)
 
+    @classmethod
+    def poll(cls, context):
+        if context.mode == 'EDIT_MESH':
+            mesh = bmesh.from_edit_mesh(context.object.data)
+            return len([vert for vert in mesh.verts if vert.select]) >= 1
 
     def handle_modal(self, context):
-        if context.object and context.object.type == 'MESH' and context.mode == 'EDIT_MESH' and context.object.data.total_vert_sel > 0:
-            self.add_vertex_group(context)
-            self.add_bevel_modifier(context)
+        self.add_vertex_group(context)
+        self.add_bevel_modifier(context)
 
-            context.window_manager.modal_handler_add(self)
-            return {'RUNNING_MODAL'}
-        else:
-            self.report({'WARNING'}, "No active object, could not finish")
-            return {'CANCELLED'}
+        context.window_manager.modal_handler_add(self)
+        return {'RUNNING_MODAL'}
 
 
     def add_vertex_group(self, context):

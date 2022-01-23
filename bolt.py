@@ -46,6 +46,11 @@ class ND_OT_bolt(bpy.types.Operator):
         return self.handle_modal(context)
 
 
+    @classmethod
+    def poll(cls, context):
+        return context.mode == 'OBJECT'
+
+
     def handle_modal(self, context):
         self.add_object(context)
         self.add_screw_x_modifier()

@@ -4,7 +4,7 @@ from . import bl_info
 keys = []
 
 class ND_MT_menu(bpy.types.Menu):
-    bl_label = "HugeMenace — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "nd.menu"
 
 

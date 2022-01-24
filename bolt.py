@@ -222,7 +222,7 @@ def draw_text_callback(self):
         "Segments: {}".format(self.segments), 
         "(±1)", 
         active=(not self.key_ctrl and not self.key_alt), 
-        alt_mode=(not self.key_ctrl and not self.key_alt and self.key_shift))
+        alt_mode=False)
 
     draw_property(
         self, 

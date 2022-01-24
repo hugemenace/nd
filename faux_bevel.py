@@ -1,7 +1,7 @@
 import bpy
 import bmesh
-import blf
 from math import radians
+from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, redraw_regions
 
 
 class ND_OT_faux_bevel(bpy.types.Operator):
@@ -14,10 +14,10 @@ class ND_OT_faux_bevel(bpy.types.Operator):
     def modal(self, context, event):
         width_factor = 0.0001 if event.shift else 0.001
 
-        self.mouse_x = event.mouse_x
-        self.mouse_y = event.mouse_y
+        if event.type == 'MOUSEMOVE':
+            update_overlay(self, context, event)
 
-        if event.type == 'WHEELUPMOUSE':
+        elif event.type == 'WHEELUPMOUSE':
             self.width += width_factor
             
         elif event.type == 'WHEELDOWNMOUSE':
@@ -50,40 +50,12 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         self.add_bevel_modifier(context)
         self.add_weighted_normal_modifer(context)
 
-        self.register_draw_handler(context)
+        init_overlay(self, event)
+        register_draw_handler(self, draw_text_callback, "nd_draw_faux_bevel")
 
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    def register_draw_handler(self, context):
-        handler = bpy.app.driver_namespace.get('nd_draw_faux_bevel')
-
-        if not handler:
-            handler = bpy.types.SpaceView3D.draw_handler_add(draw_text_callback, (self, context), 'WINDOW', 'POST_PIXEL')
-            dns = bpy.app.driver_namespace
-            dns['nd_draw_faux_bevel'] = handler
-
-            self.redraw_regions(context)
-
-    
-    def unregister_draw_handler(self, context):
-        handler = bpy.app.driver_namespace.get('nd_draw_faux_bevel')
-
-        if handler:
-            bpy.types.SpaceView3D.draw_handler_remove(handler, 'WINDOW')
-            del bpy.app.driver_namespace['nd_draw_faux_bevel']
-
-            self.redraw_regions(context)
-
-
-    def redraw_regions(self, context):
-        for area in context.window.screen.areas:
-            if area.type == 'VIEW_3D':
-                for region in area.regions:
-                    if region.type == 'WINDOW':
-                        region.tag_redraw()
 
 
     @classmethod
@@ -112,35 +84,20 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 
     def finish(self, context):
-        self.unregister_draw_handler(context)
+        unregister_draw_handler(self, "nd_draw_faux_bevel")
 
 
     def revert(self, context):
         bpy.ops.object.modifier_remove(modifier=self.bevel.name)
         bpy.ops.object.modifier_remove(modifier=self.wn.name)
-        self.unregister_draw_handler(context)
+        unregister_draw_handler(self, "nd_draw_faux_bevel")
 
 
-def draw_text_callback(self, context):
-    cursor_offset_x = 20
-    cursor_offset_y = -100
+def draw_text_callback(self):
+    draw_header(self, "ND — Faux Bevel")
+    draw_property(self, "Width: {0:.1f}mm".format(self.width * 1000), "(±1mm)  |  Shift (±0.1mm)")
 
-    blf.size(0, 24, 72)
-    blf.color(0, 1.0, 0.529, 0.216, 1.0)
-    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y, 0)
-    blf.draw(0, "ND — Faux Bevel")
-    
-    blf.size(0, 16, 72)
-    blf.color(0, 1.0, 1.0, 1.0, 1.0)
-    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 25, 0)
-    blf.draw(0, "Width: {0:.1f}mm".format(self.width * 1000))
-    
-    blf.size(0, 11, 72)
-    blf.color(0, 1.0, 1.0, 1.0, 0.3)
-    blf.position(0, self.mouse_x + cursor_offset_x, self.mouse_y + cursor_offset_y - 40, 0)
-    blf.draw(0, "(±1mm)  |  Shift (±0.1mm)")
-
-    self.redraw_regions(context)
+    redraw_regions()
 
 
 def menu_func(self, context):

@@ -14,6 +14,8 @@ class ND_OT_faux_bevel(bpy.types.Operator):
     def modal(self, context, event):
         width_factor = 0.0001 if event.shift else 0.001
 
+        self.key_shift = event.shift
+
         if event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
 
@@ -46,6 +48,8 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         self.mouse_y = 0
 
         self.width = 0.001
+
+        self.key_shift = False
 
         self.add_bevel_modifier(context)
         self.add_weighted_normal_modifer(context)
@@ -95,7 +99,13 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 def draw_text_callback(self):
     draw_header(self, "ND — Faux Bevel")
-    draw_property(self, "Width: {0:.1f}mm".format(self.width * 1000), "(±1mm)  |  Shift (±0.1mm)")
+    
+    draw_property(
+        self, 
+        "Width: {0:.1f}mm".format(self.width * 1000), 
+        "(±1mm)  |  Shift (±0.1mm)",
+        active=True,
+        alt_mode=self.key_shift)
 
     redraw_regions()
 

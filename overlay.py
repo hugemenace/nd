@@ -73,15 +73,29 @@ def draw_header(self, content):
     self.property_step = 0
 
 
-def draw_property(self, property_content, metadata_content):
+def draw_property(self, property_content, metadata_content, active=False, alt_mode=False):
+    blf.size(0, 28, 72)
+    
+    if active:
+        blf.color(0, 0.216, 0.686, 1.0, 1.0)
+    else:
+        blf.color(0, 1.0, 1.0, 1.0, 0.1)
+    
+    blf.position(0, self.overlay_x, self.overlay_y - (38 + (self.property_spacer * self.property_step)), 0)
+    
+    if alt_mode:
+        blf.draw(0, "◑")
+    else:
+        blf.draw(0, "●")
+
     blf.size(0, 16, 72)
     blf.color(0, 1.0, 1.0, 1.0, 1.0)
-    blf.position(0, self.overlay_x, self.overlay_y - (25 + (self.property_spacer * self.property_step)), 0)
+    blf.position(0, self.overlay_x + 25, self.overlay_y - (25 + (self.property_spacer * self.property_step)), 0)
     blf.draw(0, property_content)
     
     blf.size(0, 11, 72)
     blf.color(0, 1.0, 1.0, 1.0, 0.3)
-    blf.position(0, self.overlay_x, self.overlay_y - (40 + (self.property_spacer * self.property_step)), 0)
+    blf.position(0, self.overlay_x + 25, self.overlay_y - (40 + (self.property_spacer * self.property_step)), 0)
     blf.draw(0, metadata_content)
 
     self.property_step += 1

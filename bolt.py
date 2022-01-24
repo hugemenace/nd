@@ -16,6 +16,10 @@ class ND_OT_bolt(bpy.types.Operator):
         radius_factor = 0.001 if event.shift else 0.01
         thickness_factor = 0.001 if event.shift else 0.01
 
+        self.key_shift = event.shift
+        self.key_alt = event.alt
+        self.key_ctrl = event.ctrl
+
         if event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
         
@@ -65,6 +69,10 @@ class ND_OT_bolt(bpy.types.Operator):
         self.radius = 0.02
         self.thickness = 0.02
         self.offset = 0
+
+        self.key_shift = False
+        self.key_alt = False
+        self.key_ctrl = False
 
         self.add_object(context)
         self.add_screw_x_modifier()
@@ -198,10 +206,34 @@ class ND_OT_bolt(bpy.types.Operator):
 
 def draw_text_callback(self):
     draw_header(self, "ND — Bolt")
-    draw_property(self, "Segments: {}".format(self.segments), "(±1)")
-    draw_property(self, "Radius: {0:.0f}mm".format(self.radius * 1000), "Alt (±10mm)  |  Shift + Alt (±1mm)")
-    draw_property(self, "Thickness: {0:.0f}mm".format(self.thickness * 1000), "Ctrl (±10mm)  |  Shift + Ctrl (±1mm)")
-    draw_property(self, "Offset: {0:.3f}".format(self.offset), "Ctrl + Alt (±0.01)  |  Shift + Ctrl + Alt (±0.001)")
+
+    draw_property(
+        self, 
+        "Segments: {}".format(self.segments), 
+        "(±1)", 
+        active=(not self.key_ctrl and not self.key_alt), 
+        alt_mode=(not self.key_ctrl and not self.key_alt and self.key_shift))
+
+    draw_property(
+        self, 
+        "Radius: {0:.0f}mm".format(self.radius * 1000), 
+        "Alt (±10mm)  |  Shift + Alt (±1mm)", 
+        active=(not self.key_ctrl and self.key_alt), 
+        alt_mode=(not self.key_ctrl and self.key_alt and self.key_shift))
+
+    draw_property(
+        self, 
+        "Thickness: {0:.0f}mm".format(self.thickness * 1000), 
+        "Ctrl (±10mm)  |  Shift + Ctrl (±1mm)", 
+        active=(self.key_ctrl and not self.key_alt), 
+        alt_mode=(self.key_ctrl and not self.key_alt and self.key_shift))
+
+    draw_property(
+        self, 
+        "Offset: {0:.3f}".format(self.offset), 
+        "Ctrl + Alt (±0.01)  |  Shift + Ctrl + Alt (±0.001)", 
+        active=(self.key_ctrl and self.key_alt), 
+        alt_mode=(self.key_ctrl and self.key_alt and self.key_shift))
 
     redraw_regions()
 

@@ -14,6 +14,9 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
         width_factor = 0.001 if event.shift else 0.01
         segment_factor = 1 if event.shift else 2
 
+        self.key_shift = event.shift
+        self.key_alt = event.alt
+
         if event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
         
@@ -50,6 +53,9 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
     def invoke(self, context, event):
         self.segments = 1
         self.width = 0.001
+
+        self.key_shift = False
+        self.key_alt = False
 
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
@@ -112,8 +118,20 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
 
 def draw_text_callback(self):
     draw_header(self, "ND — Sketch Bevel")
-    draw_property(self, "Segments: {}".format(self.segments), "(±2)  |  Shift (±1)")
-    draw_property(self, "Width: {0:.0f}mm".format(self.width * 1000), "Alt (±10mm)  |  Shift + Alt (±1mm)")
+
+    draw_property(
+        self, 
+        "Segments: {}".format(self.segments), 
+        "(±2)  |  Shift (±1)",
+        active=(not self.key_alt),
+        alt_mode=(self.key_shift and not self.key_alt))
+
+    draw_property(
+        self, 
+        "Width: {0:.0f}mm".format(self.width * 1000), 
+        "Alt (±10mm)  |  Shift + Alt (±1mm)",
+        active=(self.key_alt),
+        alt_mode=(self.key_shift and self.key_alt))
 
     redraw_regions()
 

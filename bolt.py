@@ -81,6 +81,7 @@ class ND_OT_bolt(bpy.types.Operator):
         self.add_displace_modifier()
         self.add_solidify_modifier()
         self.align_object_to_3d_cursor(context)
+        self.set_cutter_visibility(context)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback, "nd_draw_bolt")
@@ -108,9 +109,15 @@ class ND_OT_bolt(bpy.types.Operator):
         bpy.ops.object.shade_smooth()
         obj.data.use_auto_smooth = True
         obj.data.auto_smooth_angle = radians(30)
-
+        
         self.obj = obj
     
+
+    def set_cutter_visibility(self, context):
+        if len(context.selected_objects) > 1:
+            self.obj.show_in_front = True
+            self.obj.color[3] = 0.2
+
 
     def add_screw_x_modifier(self):
         screwX = self.obj.modifiers.new("ND — Radius", 'SCREW')
@@ -169,6 +176,9 @@ class ND_OT_bolt(bpy.types.Operator):
     def handle_optional_boolean_ops(self, context):
         if len(context.selected_objects) > 1:
             self.obj.display_type = 'WIRE'
+            self.obj.show_in_front = False
+            self.obj.color[3] = 1.0
+
             targets = [o for o in context.selected_objects if not (o == self.obj)]
 
             for target in targets:

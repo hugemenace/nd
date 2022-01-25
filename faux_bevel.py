@@ -51,6 +51,7 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
         self.key_shift = False
 
+        self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
         self.add_weighted_normal_modifer(context)
 
@@ -66,6 +67,11 @@ class ND_OT_faux_bevel(bpy.types.Operator):
     def poll(cls, context):
         if context.mode == 'OBJECT':
             return len(context.selected_objects) == 1
+
+
+    def add_smooth_shading(self, context):
+        context.object.data.use_auto_smooth = True
+        context.object.data.auto_smooth_angle = radians(30)
 
 
     def add_bevel_modifier(self, context):

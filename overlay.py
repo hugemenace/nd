@@ -69,7 +69,7 @@ def draw_header(self, content):
     blf.size(0, 24, 72)
     blf.color(0, 1.0, 0.529, 0.216, 1.0)
     blf.position(0, self.overlay_x, self.overlay_y, 0)
-    blf.draw(0, content)
+    blf.draw(0, "ND — " + content)
 
     self.line_step = 0
 

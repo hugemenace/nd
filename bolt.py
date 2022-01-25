@@ -215,7 +215,7 @@ class ND_OT_bolt(bpy.types.Operator):
 
 
 def draw_text_callback(self):
-    draw_header(self, "ND — Bolt")
+    draw_header(self, self.bl_label)
 
     draw_property(
         self, 

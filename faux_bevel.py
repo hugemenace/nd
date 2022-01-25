@@ -104,7 +104,7 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 
 def draw_text_callback(self):
-    draw_header(self, "ND — Faux Bevel")
+    draw_header(self, self.bl_label)
     
     draw_property(
         self, 

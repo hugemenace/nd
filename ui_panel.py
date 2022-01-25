@@ -47,7 +47,7 @@ class ND_PT_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.view_alignment")
+        row.operator("nd.new_sketch", icon='IMAGE_RGB_ALPHA')
         
         
 def register():

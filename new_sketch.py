@@ -4,10 +4,10 @@ from . overlay import update_overlay, init_overlay, register_draw_handler, unreg
 from . utils import averaged_vector, set_3d_cursor, create_rotation_matrix_from_face
 
 
-class ND_OT_view_alignment(bpy.types.Operator):
-    bl_idname = "nd.view_alignment"
-    bl_label = "View Alignment"
-    bl_description = "Orientates the view so it is looking directly at a face"
+class ND_OT_new_sketch(bpy.types.Operator):
+    bl_idname = "nd.new_sketch"
+    bl_label = "New Sketch"
+    bl_description = "Orientates the view so it is looking directly at a face, ready for a new sketch"
     bl_options = {'UNDO'}
 
 
@@ -38,7 +38,7 @@ class ND_OT_view_alignment(bpy.types.Operator):
         self.prepare_face_selection_mode(context)
 
         init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback, "nd_draw_view_alignment")
+        register_draw_handler(self, draw_text_callback, "nd_draw_new_sketch")
 
         context.window_manager.modal_handler_add(self)
 
@@ -85,7 +85,7 @@ class ND_OT_view_alignment(bpy.types.Operator):
 
 
     def set_face_transform_orientation(self):
-        bpy.ops.transform.create_orientation(name="ND — View Plane", use=True)
+        bpy.ops.transform.create_orientation(name="ND — Sketch Plane", use=True)
 
 
     def finish(self, context):
@@ -98,30 +98,30 @@ class ND_OT_view_alignment(bpy.types.Operator):
     def revert(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.delete()
-        unregister_draw_handler(self, "nd_draw_view_alignment")
+        unregister_draw_handler(self, "nd_draw_new_sketch")
     
 
 def draw_text_callback(self):
-    draw_header(self, "ND — View Plane")
+    draw_header(self, self.bl_label)
 
     draw_hint(self, "Select a single face", "Press space to confirm")
 
 
 def menu_func(self, context):
     self.layout.operator(
-        ND_OT_view_alignment.bl_idname, 
-        text=ND_OT_view_alignment.bl_label)
+        ND_OT_new_sketch.bl_idname, 
+        text=ND_OT_new_sketch.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_view_alignment)
+    bpy.utils.register_class(ND_OT_new_sketch)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_view_alignment)
+    bpy.utils.unregister_class(ND_OT_new_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, "nd_draw_view_alignment")
+    unregister_draw_handler(self, "nd_draw_new_sketch")
 
 
 if __name__ == "__main__":

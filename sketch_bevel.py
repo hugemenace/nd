@@ -117,7 +117,7 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
 
 
 def draw_text_callback(self):
-    draw_header(self, "ND — Sketch Bevel")
+    draw_header(self, self.bl_label)
 
     draw_property(
         self, 

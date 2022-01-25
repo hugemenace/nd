@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from math import radians
-from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, redraw_regions
+from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 
 
 class ND_OT_faux_bevel(bpy.types.Operator):
@@ -35,7 +35,7 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif event.type in {'MIDDLEMOUSE'} or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
+        elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
             return {'PASS_THROUGH'}
 
         self.operate(context)
@@ -107,8 +107,6 @@ def draw_text_callback(self):
         active=True,
         alt_mode=self.key_shift)
 
-    redraw_regions()
-
 
 def menu_func(self, context):
     self.layout.operator(ND_OT_faux_bevel.bl_idname, text=ND_OT_faux_bevel.bl_label)
@@ -122,6 +120,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_faux_bevel)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
+    unregister_draw_handler(self, "nd_draw_faux_bevel")
 
 
 if __name__ == "__main__":

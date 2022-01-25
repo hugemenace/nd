@@ -15,6 +15,8 @@ class ND_MT_menu(bpy.types.Menu):
         layout.operator("nd.faux_bevel", icon = 'MOD_BEVEL')
         layout.separator()
         layout.operator("nd.bolt", icon = 'GHOST_ENABLED')
+        layout.separator()
+        layout.operator("nd.view_alignment", icon = 'ASSET_MANAGER')
 
 
 def draw_item(self, context):

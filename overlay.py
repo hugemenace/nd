@@ -35,8 +35,8 @@ def init_overlay(self, event):
     self.overlay_offset_x = 25
     self.overlay_offset_y = -15
 
-    self.property_step = 0
-    self.property_spacer = 40
+    self.line_step = 0
+    self.line_spacer = 40
     
     self.region_offset_x = event.mouse_x - event.mouse_region_x
     self.region_offset_y = event.mouse_y - event.mouse_region_y
@@ -63,6 +63,7 @@ def update_overlay(self, context, event):
     if event.mouse_region_y >= context.region.height - 1:
         context.window.cursor_warp(event.mouse_x, self.region_offset_y + region_buffer)
 
+    redraw_regions()
 
 def draw_header(self, content):
     blf.size(0, 24, 72)
@@ -70,7 +71,7 @@ def draw_header(self, content):
     blf.position(0, self.overlay_x, self.overlay_y, 0)
     blf.draw(0, content)
 
-    self.property_step = 0
+    self.line_step = 0
 
 
 def draw_property(self, property_content, metadata_content, active=False, alt_mode=False):
@@ -81,7 +82,7 @@ def draw_property(self, property_content, metadata_content, active=False, alt_mo
     else:
         blf.color(0, 1.0, 1.0, 1.0, 0.1)
     
-    blf.position(0, self.overlay_x, self.overlay_y - (38 + (self.property_spacer * self.property_step)), 0)
+    blf.position(0, self.overlay_x, self.overlay_y - (38 + (self.line_spacer * self.line_step)), 0)
     
     if alt_mode:
         blf.draw(0, "◑")
@@ -90,12 +91,32 @@ def draw_property(self, property_content, metadata_content, active=False, alt_mo
 
     blf.size(0, 16, 72)
     blf.color(0, 1.0, 1.0, 1.0, 1.0)
-    blf.position(0, self.overlay_x + 25, self.overlay_y - (25 + (self.property_spacer * self.property_step)), 0)
+    blf.position(0, self.overlay_x + 25, self.overlay_y - (25 + (self.line_spacer * self.line_step)), 0)
     blf.draw(0, property_content)
     
     blf.size(0, 11, 72)
     blf.color(0, 1.0, 1.0, 1.0, 0.3)
-    blf.position(0, self.overlay_x + 25, self.overlay_y - (40 + (self.property_spacer * self.property_step)), 0)
+    blf.position(0, self.overlay_x + 25, self.overlay_y - (40 + (self.line_spacer * self.line_step)), 0)
     blf.draw(0, metadata_content)
 
-    self.property_step += 1
+    self.line_step += 1
+
+
+def draw_hint(self, hint_content, metadata_content):
+    blf.size(0, 22, 72)
+    
+    blf.color(0, 1.0, 1.0, 1.0, 0.5)
+    blf.position(0, self.overlay_x - 3, self.overlay_y - (36 + (self.line_spacer * self.line_step)), 0)
+    blf.draw(0, "◈")
+
+    blf.size(0, 16, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 1.0)
+    blf.position(0, self.overlay_x + 25, self.overlay_y - (25 + (self.line_spacer * self.line_step)), 0)
+    blf.draw(0, hint_content)
+    
+    blf.size(0, 11, 72)
+    blf.color(0, 1.0, 1.0, 1.0, 0.3)
+    blf.position(0, self.overlay_x + 25, self.overlay_y - (40 + (self.line_spacer * self.line_step)), 0)
+    blf.draw(0, metadata_content)
+
+    self.line_step += 1

@@ -40,6 +40,14 @@ class ND_PT_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.bolt")
+
+        box = layout.box()
+        box.label(text="Utilities", icon='ASSET_MANAGER')
+        column = box.column()
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.view_alignment")
         
         
 def register():

@@ -2,23 +2,23 @@ import bpy
 import blf
 
 
-def register_draw_handler(self, callback, name):
-    handler = bpy.app.driver_namespace.get(name)
+def register_draw_handler(self, callback):
+    handler = bpy.app.driver_namespace.get(self.bl_idname)
 
     if not handler:
         handler = bpy.types.SpaceView3D.draw_handler_add(callback, (self, ), 'WINDOW', 'POST_PIXEL')
         dns = bpy.app.driver_namespace
-        dns[name] = handler
+        dns[self.bl_idname] = handler
 
         redraw_regions()
 
 
-def unregister_draw_handler(self, name):
-    handler = bpy.app.driver_namespace.get(name)
+def unregister_draw_handler(self):
+    handler = bpy.app.driver_namespace.get(self.bl_idname)
 
     if handler:
         bpy.types.SpaceView3D.draw_handler_remove(handler, 'WINDOW')
-        del bpy.app.driver_namespace[name]
+        del bpy.app.driver_namespace[self.bl_idname]
 
         redraw_regions()
 
@@ -65,11 +65,11 @@ def update_overlay(self, context, event):
 
     redraw_regions()
 
-def draw_header(self, content):
+def draw_header(self):
     blf.size(0, 24, 72)
     blf.color(0, 1.0, 0.529, 0.216, 1.0)
     blf.position(0, self.overlay_x, self.overlay_y, 0)
-    blf.draw(0, "ND — " + content)
+    blf.draw(0, "ND — " + self.bl_label)
 
     self.line_step = 0
 

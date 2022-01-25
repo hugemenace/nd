@@ -61,7 +61,7 @@ class ND_OT_thickener(bpy.types.Operator):
         self.add_solidify_modifier(context)
 
         init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback, "nd_draw_thickener")
+        register_draw_handler(self, draw_text_callback)
 
         context.window_manager.modal_handler_add(self)
 
@@ -94,16 +94,16 @@ class ND_OT_thickener(bpy.types.Operator):
 
 
     def finish(self, context):
-        unregister_draw_handler(self, "nd_draw_thickener")
+        unregister_draw_handler(self)
 
 
     def revert(self, context):
         bpy.ops.object.modifier_remove(modifier=self.solidify.name)
-        unregister_draw_handler(self, "nd_draw_thickener")
+        unregister_draw_handler(self)
 
 
 def draw_text_callback(self):
-    draw_header(self, self.bl_label)
+    draw_header(self)
     
     draw_property(
         self, 
@@ -132,7 +132,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_thickener)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, "nd_draw_thickener")
+    unregister_draw_handler(self, ND_OT_thickener.bl_label)
 
 
 if __name__ == "__main__":

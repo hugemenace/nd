@@ -38,7 +38,7 @@ class ND_OT_new_sketch(bpy.types.Operator):
         self.prepare_face_selection_mode(context)
 
         init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback, "nd_draw_new_sketch")
+        register_draw_handler(self, draw_text_callback)
 
         context.window_manager.modal_handler_add(self)
 
@@ -98,19 +98,17 @@ class ND_OT_new_sketch(bpy.types.Operator):
     def revert(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.delete()
-        unregister_draw_handler(self, "nd_draw_new_sketch")
+        unregister_draw_handler(self)
     
 
 def draw_text_callback(self):
-    draw_header(self, self.bl_label)
+    draw_header(self)
 
     draw_hint(self, "Select a single face", "Press space to confirm")
 
 
 def menu_func(self, context):
-    self.layout.operator(
-        ND_OT_new_sketch.bl_idname, 
-        text=ND_OT_new_sketch.bl_label)
+    self.layout.operator(ND_OT_new_sketch.bl_idname, text=ND_OT_new_sketch.bl_label)
 
 
 def register():
@@ -121,7 +119,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_new_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, "nd_draw_new_sketch")
+    unregister_draw_handler(self)
 
 
 if __name__ == "__main__":

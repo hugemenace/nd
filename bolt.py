@@ -84,7 +84,7 @@ class ND_OT_bolt(bpy.types.Operator):
         self.set_cutter_visibility(context)
 
         init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback, "nd_draw_bolt")
+        register_draw_handler(self, draw_text_callback)
 
         context.window_manager.modal_handler_add(self)
 
@@ -205,17 +205,17 @@ class ND_OT_bolt(bpy.types.Operator):
     def finish(self, context):
         self.handle_optional_boolean_ops(context)
         self.select_bolt(context)
-        unregister_draw_handler(self, "nd_draw_bolt")
+        unregister_draw_handler(self)
 
 
     def revert(self, context):
         self.select_bolt(context)
         bpy.ops.object.delete()
-        unregister_draw_handler(self, "nd_draw_bolt")
+        unregister_draw_handler(self)
 
 
 def draw_text_callback(self):
-    draw_header(self, self.bl_label)
+    draw_header(self)
 
     draw_property(
         self, 
@@ -258,7 +258,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_bolt)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, "nd_draw_bolt")
+    unregister_draw_handler(self)
 
 
 if __name__ == "__main__":

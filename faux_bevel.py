@@ -44,9 +44,6 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        self.mouse_x = 0
-        self.mouse_y = 0
-
         self.width = 0.001
 
         self.key_shift = False
@@ -70,6 +67,7 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 
     def add_smooth_shading(self, context):
+        bpy.ops.object.shade_smooth()
         context.object.data.use_auto_smooth = True
         context.object.data.auto_smooth_angle = radians(30)
 

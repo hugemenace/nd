@@ -17,6 +17,7 @@ class ND_MT_menu(bpy.types.Menu):
         layout.operator("nd.bolt", icon = 'GHOST_ENABLED')
         layout.separator()
         layout.operator("nd.new_sketch", icon = 'IMAGE_RGB_ALPHA')
+        layout.operator("nd.thickener", icon = 'MOD_SOLIDIFY')
 
 
 def draw_item(self, context):

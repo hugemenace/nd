@@ -17,6 +17,7 @@ from . import bolt
 from . import faux_bevel
 from . import sketch_bevel
 from . import new_sketch
+from . import thickener
 from . import ui_panel
 from . import menu
 
@@ -29,6 +30,7 @@ def register():
     importlib.reload(faux_bevel)
     importlib.reload(sketch_bevel)
     importlib.reload(new_sketch)
+    importlib.reload(thickener)
     importlib.reload(ui_panel)
     importlib.reload(menu)
     
@@ -36,6 +38,7 @@ def register():
     faux_bevel.register()
     sketch_bevel.register()
     new_sketch.register()
+    thickener.register()
     ui_panel.register()
     menu.register()
 
@@ -45,5 +48,6 @@ def unregister():
     faux_bevel.unregister()
     sketch_bevel.unregister()
     new_sketch.unregister()
+    thickener.unregister()
     ui_panel.unregister()
     menu.unregister()

@@ -24,6 +24,9 @@ class ND_OT_new_sketch(bpy.types.Operator):
 
             return {'FINISHED'}
 
+        elif event.shift and event.type == 'D' and event.value == 'PRESS':
+            return {'PASS_THROUGH'}
+
         elif event.alt and event.type == 'Z' and event.value == 'PRESS':
             return {'PASS_THROUGH'}
 

@@ -12,13 +12,20 @@ class ND_OT_new_sketch(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        if event.type == 'MOUSEMOVE':
+        if not self.pin_overlay and event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
+        
+        elif event.type == 'P' and event.value == 'PRESS':
+            self.pin_overlay = not self.pin_overlay
+            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=280, lines=1)
 
         elif event.type == 'SPACE':
             self.finish(context)
 
             return {'FINISHED'}
+
+        elif event.alt and event.type == 'Z' and event.value == 'PRESS':
+            return {'PASS_THROUGH'}
 
         elif event.type in {'LEFTMOUSE', 'E', 'G', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'} or event.ctrl:
             return {'PASS_THROUGH'}
@@ -40,6 +47,7 @@ class ND_OT_new_sketch(bpy.types.Operator):
 
         self.start_sketch_editing(context)
 
+        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 

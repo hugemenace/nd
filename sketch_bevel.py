@@ -17,8 +17,12 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
         self.key_shift = event.shift
         self.key_alt = event.alt
 
-        if event.type == 'MOUSEMOVE':
+        if not self.pin_overlay and event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
+        
+        elif event.type == 'P' and event.value == 'PRESS':
+            self.pin_overlay = not self.pin_overlay
+            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=300, lines=2)
         
         elif event.type == 'WHEELUPMOUSE':
             if event.alt:
@@ -60,6 +64,7 @@ class ND_OT_sketch_bevel(bpy.types.Operator):
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
 
+        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 

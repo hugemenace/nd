@@ -16,8 +16,12 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
         self.key_shift = event.shift
 
-        if event.type == 'MOUSEMOVE':
+        if not self.pin_overlay and event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
+        
+        elif event.type == 'P' and event.value == 'PRESS':
+            self.pin_overlay = not self.pin_overlay
+            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=270, lines=1)
 
         elif event.type == 'WHEELUPMOUSE':
             self.width += width_factor
@@ -52,6 +56,7 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         self.add_bevel_modifier(context)
         self.add_weighted_normal_modifer(context)
 
+        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 

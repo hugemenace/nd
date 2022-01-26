@@ -45,9 +45,13 @@ def init_overlay(self, event):
     self.overlay_y = event.mouse_y - self.region_offset_y + self.overlay_offset_y
 
 
-def update_overlay(self, context, event):
+def update_overlay(self, context, event, pinned=False, x_offset=400, lines=1):
     self.overlay_x = event.mouse_x - self.region_offset_x + self.overlay_offset_x
     self.overlay_y = event.mouse_y - self.region_offset_y + self.overlay_offset_y
+
+    if pinned:
+        self.overlay_x = context.region.width - x_offset
+        self.overlay_y = 45 + (lines * self.line_spacer)
 
     region_buffer = 5
 

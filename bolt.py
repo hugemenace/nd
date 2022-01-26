@@ -21,8 +21,12 @@ class ND_OT_bolt(bpy.types.Operator):
         self.key_alt = event.alt
         self.key_ctrl = event.ctrl
 
-        if event.type == 'MOUSEMOVE':
+        if not self.pin_overlay and event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
+        
+        elif event.type == 'P' and event.value == 'PRESS':
+            self.pin_overlay = not self.pin_overlay
+            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=375, lines=4)
         
         elif event.type == 'WHEELUPMOUSE':
             if event.alt and event.ctrl:
@@ -85,6 +89,7 @@ class ND_OT_bolt(bpy.types.Operator):
         self.add_solidify_modifier()
         self.set_cutter_visibility(context)
 
+        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 

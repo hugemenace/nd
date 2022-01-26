@@ -12,8 +12,12 @@ class ND_OT_view_align(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        if event.type == 'MOUSEMOVE':
+        if not self.pin_overlay and event.type == 'MOUSEMOVE':
             update_overlay(self, context, event)
+        
+        elif event.type == 'P' and event.value == 'PRESS':
+            self.pin_overlay = not self.pin_overlay
+            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=270, lines=1)
 
         elif event.type == 'LEFTMOUSE':
             return {'PASS_THROUGH'}
@@ -37,6 +41,7 @@ class ND_OT_view_align(bpy.types.Operator):
     def invoke(self, context, event):
         self.prepare_face_selection_mode(context)
 
+        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 

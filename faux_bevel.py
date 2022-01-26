@@ -12,7 +12,7 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        width_factor = 0.0001 if event.shift else 0.001
+        width_factor = (self.base_width_factor / 10.0) if event.shift else self.base_width_factor
 
         self.key_shift = event.shift
 
@@ -22,6 +22,12 @@ class ND_OT_faux_bevel(bpy.types.Operator):
         elif event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
             update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=270, lines=1)
+
+        elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
+            self.base_width_factor = min(1, self.base_width_factor * 10.0)
+
+        elif event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS':
+            self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
 
         elif event.type == 'WHEELUPMOUSE':
             self.width += width_factor
@@ -48,6 +54,8 @@ class ND_OT_faux_bevel(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        self.base_width_factor = 0.001
+        
         self.width = 0.001
 
         self.key_shift = False
@@ -110,9 +118,9 @@ def draw_text_callback(self):
     draw_header(self)
     
     draw_property(
-        self, 
+        self,
         "Width: {0:.1f}mm".format(self.width * 1000), 
-        "(±1mm)  |  Shift (±0.1mm)",
+        "Alt (±{0:.1f}mm)  |  Shift (±{1:.1f}mm)".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=True,
         alt_mode=self.key_shift)
 

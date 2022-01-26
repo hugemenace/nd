@@ -12,7 +12,7 @@ class ND_OT_thickener(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        thickness_factor = 0.0001 if event.shift else 0.001
+        thickness_factor = (self.base_thickness_factor / 10.0) if event.shift else self.base_thickness_factor
 
         self.key_shift = event.shift
         self.key_alt = event.alt
@@ -23,6 +23,12 @@ class ND_OT_thickener(bpy.types.Operator):
         elif event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
             update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=260, lines=2)
+
+        elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
+            self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
+
+        elif event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS':
+            self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
 
         elif event.type == 'WHEELUPMOUSE':
             if event.alt:
@@ -55,6 +61,8 @@ class ND_OT_thickener(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        self.base_thickness_factor = 0.001
+
         self.thickness = 0.001
         self.offset = 0
 
@@ -113,7 +121,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Thickness: {0:.1f}mm".format(self.thickness * 1000), 
-        "(±1mm)  |  Shift (±0.1mm)",
+        "(±{0:.1f}mm)  |  Shift + (±{1:.1f}mm)".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
         active=(not self.key_alt),
         alt_mode=(self.key_shift and not self.key_alt))
 

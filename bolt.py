@@ -13,9 +13,9 @@ class ND_OT_bolt(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        offset_factor = 0.001 if event.shift else 0.01
-        radius_factor = 0.001 if event.shift else 0.01
-        thickness_factor = 0.001 if event.shift else 0.01
+        offset_factor = (self.base_offset_factor / 10.0) if event.shift else self.base_offset_factor
+        radius_factor = (self.base_radius_factor / 10.0) if event.shift else self.base_radius_factor
+        thickness_factor = (self.base_thickness_factor / 10.0) if event.shift else self.base_thickness_factor
         segment_factor = 1 if event.shift else 2
 
         self.key_shift = event.shift
@@ -28,6 +28,22 @@ class ND_OT_bolt(bpy.types.Operator):
         elif event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
             update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=375, lines=4)
+
+        elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
+            if event.alt and event.ctrl:
+                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
+            elif event.alt:
+                self.base_radius_factor = min(1, self.base_radius_factor * 10.0)
+            elif event.ctrl:
+                self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
+
+        elif event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS':
+            if event.alt and event.ctrl:
+                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
+            elif event.alt:
+                self.base_radius_factor = max(0.001, self.base_radius_factor / 10.0)
+            elif event.ctrl:
+                self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
         
         elif event.type == 'WHEELUPMOUSE':
             if event.alt and event.ctrl:
@@ -68,6 +84,10 @@ class ND_OT_bolt(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        self.base_offset_factor = 0.001
+        self.base_radius_factor = 0.001
+        self.base_thickness_factor = 0.001
+
         self.mouse_x = 0
         self.mouse_y = 0
 
@@ -213,21 +233,21 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Radius: {0:.0f}mm".format(self.radius * 1000), 
-        "Alt (±10mm)  |  Shift + Alt (±1mm)", 
+        "Alt (±{0:.1f}mm)  |  Shift + Alt (±{1:.1f}mm)".format(self.base_radius_factor * 1000, (self.base_radius_factor / 10) * 1000),
         active=(not self.key_ctrl and self.key_alt), 
         alt_mode=(not self.key_ctrl and self.key_alt and self.key_shift))
 
     draw_property(
         self, 
         "Thickness: {0:.0f}mm".format(self.thickness * 1000), 
-        "Ctrl (±10mm)  |  Shift + Ctrl (±1mm)", 
+        "Ctrl (±{0:.1f}mm)  |  Shift + Ctrl (±{1:.1f}mm)".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
         active=(self.key_ctrl and not self.key_alt), 
         alt_mode=(self.key_ctrl and not self.key_alt and self.key_shift))
 
     draw_property(
         self, 
         "Offset: {0:.3f}".format(self.offset), 
-        "Ctrl + Alt (±0.01)  |  Shift + Ctrl + Alt (±0.001)", 
+        "Ctrl + Alt (±{0:.1f}mm)  |  Shift + Ctrl + Alt (±{1:.1f}mm)".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=(self.key_ctrl and self.key_alt), 
         alt_mode=(self.key_ctrl and self.key_alt and self.key_shift))
 

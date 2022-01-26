@@ -4,10 +4,10 @@ from . overlay import update_overlay, init_overlay, register_draw_handler, unreg
 from . utils import averaged_vector, set_3d_cursor, create_rotation_matrix_from_face
 
 
-class ND_OT_new_sketch(bpy.types.Operator):
-    bl_idname = "nd.new_sketch"
-    bl_label = "New Sketch"
-    bl_description = "Orientates the view so it is looking directly at a face, ready for a new sketch"
+class ND_OT_view_align(bpy.types.Operator):
+    bl_idname = "nd.view_align"
+    bl_label = "View Align"
+    bl_description = "Orientates the view so it is looking directly at a face, sets the 3D cursor, and adds a custom transform orientation."
     bl_options = {'UNDO'}
 
 
@@ -85,7 +85,7 @@ class ND_OT_new_sketch(bpy.types.Operator):
 
 
     def set_face_transform_orientation(self):
-        bpy.ops.transform.create_orientation(name="ND — Sketch Plane", use=True)
+        bpy.ops.transform.create_orientation(name="ND — " + ND_OT_view_align.bl_label, use=True)
 
 
     def finish(self, context):
@@ -108,16 +108,16 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_new_sketch.bl_idname, text=ND_OT_new_sketch.bl_label)
+    self.layout.operator(ND_OT_view_align.bl_idname, text=ND_OT_view_align.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_new_sketch)
+    bpy.utils.register_class(ND_OT_view_align)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_new_sketch)
+    bpy.utils.unregister_class(ND_OT_view_align)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler(self)
 

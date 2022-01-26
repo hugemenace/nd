@@ -104,7 +104,7 @@ class ND_OT_view_align(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(self, "Select a single face", "Press space to confirm")
+    draw_hint(self, "Select a single face...", "Press space to confirm")
 
 
 def menu_func(self, context):

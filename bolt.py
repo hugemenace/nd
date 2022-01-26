@@ -16,6 +16,7 @@ class ND_OT_bolt(bpy.types.Operator):
         offset_factor = 0.001 if event.shift else 0.01
         radius_factor = 0.001 if event.shift else 0.01
         thickness_factor = 0.001 if event.shift else 0.01
+        segment_factor = 1 if event.shift else 2
 
         self.key_shift = event.shift
         self.key_alt = event.alt
@@ -36,7 +37,7 @@ class ND_OT_bolt(bpy.types.Operator):
             elif event.ctrl:
                 self.thickness += thickness_factor
             else:
-                self.segments += 1
+                self.segments = 4 if self.segments == 3 else self.segments + segment_factor
 
         elif event.type == 'WHEELDOWNMOUSE':
             if event.alt and event.ctrl:
@@ -46,7 +47,7 @@ class ND_OT_bolt(bpy.types.Operator):
             elif event.ctrl:
                 self.thickness = max(0, self.thickness - thickness_factor)
             else:
-                self.segments = max(3, self.segments - 1)
+                self.segments = max(3, self.segments - segment_factor)
 
         elif event.type == 'LEFTMOUSE':
             self.finish(context)
@@ -205,7 +206,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Segments: {}".format(self.segments), 
-        "(±1)", 
+        "(±2)  |  Shift (±1)",
         active=(not self.key_ctrl and not self.key_alt), 
         alt_mode=False)
 

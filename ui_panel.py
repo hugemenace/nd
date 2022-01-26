@@ -52,6 +52,10 @@ class ND_PT_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.thickener", icon='MOD_SOLIDIFY')
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.new_sketch", icon='GREASEPENCIL')
         
         
 def register():

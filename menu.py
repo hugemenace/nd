@@ -11,13 +11,14 @@ class ND_MT_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.sketch_bevel", icon = 'MOD_BEVEL')
-        layout.operator("nd.faux_bevel", icon = 'MOD_BEVEL')
+        layout.operator("nd.sketch_bevel", icon='MOD_BEVEL')
+        layout.operator("nd.faux_bevel", icon='MOD_BEVEL')
         layout.separator()
-        layout.operator("nd.bolt", icon = 'GHOST_ENABLED')
+        layout.operator("nd.bolt", icon='GHOST_ENABLED')
         layout.separator()
-        layout.operator("nd.view_align", icon = 'FACESEL')
-        layout.operator("nd.thickener", icon = 'MOD_SOLIDIFY')
+        layout.operator("nd.view_align", icon='FACESEL')
+        layout.operator("nd.thickener", icon='MOD_SOLIDIFY')
+        layout.operator("nd.new_sketch", icon='GREASEPENCIL')
 
 
 def draw_item(self, context):
@@ -29,7 +30,7 @@ def register():
     bpy.utils.register_class(ND_MT_menu)
     bpy.types.INFO_HT_header.append(draw_item)
    
-    keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name = "3D View", space_type = 'VIEW_3D')
+    keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
     entry = keymap.keymap_items.new("wm.call_menu", 'TWO', 'PRESS', shift = True)
     entry.properties.name = "nd.menu"
 

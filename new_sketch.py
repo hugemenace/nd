@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
-from . utils import add_single_vertex_object
+from . utils import add_single_vertex_object, align_object_to_3d_cursor
 
 
 class ND_OT_new_sketch(bpy.types.Operator):
@@ -36,6 +36,7 @@ class ND_OT_new_sketch(bpy.types.Operator):
 
     def invoke(self, context, event):
         add_single_vertex_object(self, context, "Sketch")
+        align_object_to_3d_cursor(self, context)
 
         self.start_sketch_editing(context)
 

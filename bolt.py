@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from math import radians
 from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from . utils import add_single_vertex_object
+from . utils import add_single_vertex_object, align_object_to_3d_cursor
 
 
 class ND_OT_bolt(bpy.types.Operator):
@@ -76,13 +76,13 @@ class ND_OT_bolt(bpy.types.Operator):
         self.key_ctrl = False
 
         add_single_vertex_object(self, context, "Bolt")
+        align_object_to_3d_cursor(self, context)
 
         self.add_screw_x_modifier()
         self.add_screw_z_modifer()
         self.add_decimate_modifier()
         self.add_displace_modifier()
         self.add_solidify_modifier()
-        self.align_object_to_3d_cursor(context)
         self.set_cutter_visibility(context)
 
         init_overlay(self, event)
@@ -152,11 +152,6 @@ class ND_OT_bolt(bpy.types.Operator):
 
         self.solidify = solidify
     
-
-    def align_object_to_3d_cursor(self, context):
-        self.obj.location = context.scene.cursor.location
-        self.obj.rotation_euler = context.scene.cursor.rotation_euler
-        
 
     def handle_optional_boolean_ops(self, context):
         if len(context.selected_objects) > 1:

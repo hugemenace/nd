@@ -53,3 +53,8 @@ def add_single_vertex_object(self, context, name):
     obj.data.auto_smooth_angle = radians(30)
     
     self.obj = obj
+
+
+def align_object_to_3d_cursor(self, context):
+    self.obj.location = context.scene.cursor.location
+    self.obj.rotation_euler = context.scene.cursor.rotation_euler

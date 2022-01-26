@@ -1,4 +1,6 @@
 import bpy
+import bmesh
+from math import radians
 from mathutils import Vector, Matrix
 
 
@@ -35,3 +37,19 @@ def set_3d_cursor(location, rotation):
     else:
         cursor.rotation_euler = rotation.to_euler(cursor.rotation_mode)
 
+
+def add_single_vertex_object(self, context, name):
+    mesh = bpy.data.meshes.new("ND — " + name)
+    obj = bpy.data.objects.new("ND — " + name, mesh)
+    bpy.data.collections[context.collection.name].objects.link(obj)
+    bm = bmesh.new()
+    bm.verts.new()
+    bm.to_mesh(mesh)
+    bm.free()
+    obj.select_set(True)
+    context.view_layer.objects.active = obj
+    bpy.ops.object.shade_smooth()
+    obj.data.use_auto_smooth = True
+    obj.data.auto_smooth_angle = radians(30)
+    
+    self.obj = obj

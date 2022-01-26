@@ -2,6 +2,7 @@ import bpy
 import bmesh
 from math import radians
 from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from . utils import add_single_vertex_object
 
 
 class ND_OT_bolt(bpy.types.Operator):
@@ -74,7 +75,8 @@ class ND_OT_bolt(bpy.types.Operator):
         self.key_alt = False
         self.key_ctrl = False
 
-        self.add_object(context)
+        add_single_vertex_object(self, context, "Bolt")
+
         self.add_screw_x_modifier()
         self.add_screw_z_modifer()
         self.add_decimate_modifier()
@@ -95,23 +97,6 @@ class ND_OT_bolt(bpy.types.Operator):
     def poll(cls, context):
         return context.mode == 'OBJECT'
 
-
-    def add_object(self, context):
-        mesh = bpy.data.meshes.new("ND — Bolt")
-        obj = bpy.data.objects.new("ND — Bolt", mesh)
-        bpy.data.collections[context.collection.name].objects.link(obj)
-        bm = bmesh.new()
-        bm.verts.new()
-        bm.to_mesh(mesh)
-        bm.free()
-        obj.select_set(True)
-        context.view_layer.objects.active = obj
-        bpy.ops.object.shade_smooth()
-        obj.data.use_auto_smooth = True
-        obj.data.auto_smooth_angle = radians(30)
-        
-        self.obj = obj
-    
 
     def set_cutter_visibility(self, context):
         if len(context.selected_objects) > 1:

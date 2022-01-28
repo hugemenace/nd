@@ -117,13 +117,13 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
 
     def finish(self, context):
         self.add_weld_modifier(context)
-        unregister_draw_handler(self)
+        unregister_draw_handler()
     
 
     def revert(self, context):
         bpy.ops.object.modifier_remove(modifier=self.bevel.name)
         context.object.vertex_groups.remove(self.vgroup)
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
 def draw_text_callback(self):
@@ -156,7 +156,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_vertex_bevel)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self)
+    unregister_draw_handler()
 
 
 if __name__ == "__main__":

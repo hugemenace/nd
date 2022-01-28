@@ -148,13 +148,13 @@ class ND_OT_screw(bpy.types.Operator):
 
 
     def finish(self, context):
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
     def revert(self, context):
         bpy.ops.object.modifier_remove(modifier=self.screw.name)
         bpy.ops.object.modifier_remove(modifier=self.displace.name)
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
 def draw_text_callback(self):

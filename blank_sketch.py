@@ -73,7 +73,7 @@ class ND_OT_blank_sketch(bpy.types.Operator):
         bpy.ops.mesh.remove_doubles(threshold=0.001)
         bpy.ops.mesh.edge_face_add()
 
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
     def revert(self, context):
@@ -82,7 +82,7 @@ class ND_OT_blank_sketch(bpy.types.Operator):
         self.obj.select_set(True)
         bpy.ops.object.delete()
 
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
 def draw_text_callback(self):
@@ -103,7 +103,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_blank_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self)
+    unregister_draw_handler()
 
 
 if __name__ == "__main__":

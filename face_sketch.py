@@ -136,7 +136,7 @@ class ND_OT_face_sketch(bpy.types.Operator):
         if self.face_operation_mode == 0:
             bpy.ops.object.delete()
 
-        unregister_draw_handler(self)
+        unregister_draw_handler()
     
 
 def draw_text_callback(self):
@@ -164,7 +164,7 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_face_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self)
+    unregister_draw_handler()
 
 
 if __name__ == "__main__":

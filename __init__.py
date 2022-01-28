@@ -11,6 +11,7 @@ bl_info = {
 }
 
 import importlib
+from . overlay import unregister_draw_handler
 from . import overlay
 from . import utils
 from . import bolt 
@@ -50,6 +51,8 @@ def register():
 
 
 def unregister():
+    unregister_draw_handler()
+    
     bolt.unregister()
     weighted_normal_bevel.unregister()
     vertex_bevel.unregister()

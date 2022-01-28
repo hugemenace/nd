@@ -104,12 +104,12 @@ class ND_OT_solidify(bpy.types.Operator):
 
 
     def finish(self, context):
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
     def revert(self, context):
         bpy.ops.object.modifier_remove(modifier=self.solidify.name)
-        unregister_draw_handler(self)
+        unregister_draw_handler()
 
 
 def draw_text_callback(self):

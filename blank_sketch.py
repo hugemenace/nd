@@ -1,7 +1,7 @@
 import bpy
 import bmesh
-from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
-from . utils import add_single_vertex_object, align_object_to_3d_cursor
+from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
+from . utils import add_single_vertex_object, align_object_to_3d_cursor, capture_modifier_keys
 
 
 class ND_OT_blank_sketch(bpy.types.Operator):
@@ -12,15 +12,19 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        if event.type == 'P' and event.value == 'PRESS':
-            self.pin_overlay = not self.pin_overlay
+        capture_modifier_keys(self, event)
 
-        elif event.type == 'SPACE':
+        if self.key_toggle_pin_overlay:
+            toggle_pin_overlay(self)
+
+        elif self.key_confirm_alternative:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif event.shift and event.type == 'D' and event.value == 'PRESS':
+        # Pass through useful common vertex manipulation shortcuts //...
+
+        elif self.key_shift and event.type == 'D' and event.value == 'PRESS':
             return {'PASS_THROUGH'}
 
         elif event.alt and event.type == 'Z' and event.value == 'PRESS':
@@ -29,15 +33,17 @@ class ND_OT_blank_sketch(bpy.types.Operator):
         elif event.type in {'LEFTMOUSE', 'E', 'G', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'} or event.ctrl:
             return {'PASS_THROUGH'}
 
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+        # ...//
+
+        elif self.key_cancel:
             self.revert(context)
 
             return {'CANCELLED'}
 
-        elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
+        elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=280, lines=1)
+        update_overlay(self, context, event, x_offset=280, lines=1)
 
         return {'RUNNING_MODAL'}
 
@@ -48,7 +54,8 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
         self.start_sketch_editing(context)
 
-        self.pin_overlay = False
+        capture_modifier_keys(self)
+
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -104,7 +111,3 @@ def unregister():
     bpy.utils.unregister_class(ND_OT_blank_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler()
-
-
-if __name__ == "__main__":
-    register()

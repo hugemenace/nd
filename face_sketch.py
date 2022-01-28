@@ -1,8 +1,8 @@
 import bpy
 import bmesh
 from math import radians
-from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
-from . utils import averaged_vector, set_3d_cursor, create_rotation_matrix_from_face
+from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
+from . utils import averaged_vector, set_3d_cursor, create_rotation_matrix_from_face, capture_modifier_keys
 
 
 class ND_OT_face_sketch(bpy.types.Operator):
@@ -13,36 +13,36 @@ class ND_OT_face_sketch(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        self.key_alt = event.alt
+        capture_modifier_keys(self, event)
 
-        if event.type == 'P' and event.value == 'PRESS':
-            self.pin_overlay = not self.pin_overlay
+        if self.key_toggle_pin_overlay:
+            toggle_pin_overlay(self)
 
-        elif event.type == 'WHEELUPMOUSE':
-            if event.alt:
+        elif self.key_step_up:
+            if self.key_alt:
                 self.face_operation_mode = (self.face_operation_mode + 1) % 2
             
-        elif event.type == 'WHEELDOWNMOUSE':
-            if event.alt:
+        elif self.key_step_down:
+            if self.key_alt:
                 self.face_operation_mode = (self.face_operation_mode - 1) % 2
 
-        elif event.type == 'LEFTMOUSE':
+        elif self.key_confirm:
             return {'PASS_THROUGH'}
         
-        elif event.type == 'SPACE':
+        elif self.key_confirm_alternative:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+        elif self.key_cancel:
             self.clean_up(context)
 
             return {'CANCELLED'}
         
-        elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
+        elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=320, lines=2)
+        update_overlay(self, context, event, x_offset=320, lines=2)
 
         return {'RUNNING_MODAL'}
 
@@ -50,11 +50,8 @@ class ND_OT_face_sketch(bpy.types.Operator):
     def invoke(self, context, event):
         self.face_operation_mode = 0 # Sketch Only (0), Extract & Sketch (1)
 
-        self.key_alt = False
-
         self.prepare_face_selection_mode(context)
 
-        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -148,7 +145,7 @@ def draw_text_callback(self):
         self,
         "Face Mode: {0}".format(['Sketch Only', 'Extract & Sketch'][self.face_operation_mode]),
         "Alt (Sketch Only, Extract & Sketch)",
-        active=(self.key_alt),
+        active=self.key_alt,
         alt_mode=False)
 
 
@@ -165,7 +162,3 @@ def unregister():
     bpy.utils.unregister_class(ND_OT_face_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler()
-
-
-if __name__ == "__main__":
-    register()

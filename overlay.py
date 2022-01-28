@@ -2,11 +2,11 @@ import bpy
 import blf
 
 
-def register_draw_handler(self, callback):
+def register_draw_handler(cls, callback):
     handler = bpy.app.driver_namespace.get('nd.overlay')
 
     if not handler:
-        handler = bpy.types.SpaceView3D.draw_handler_add(callback, (self, ), 'WINDOW', 'POST_PIXEL')
+        handler = bpy.types.SpaceView3D.draw_handler_add(callback, (cls, ), 'WINDOW', 'POST_PIXEL')
         dns = bpy.app.driver_namespace
         dns['nd.overlay'] = handler
 
@@ -31,54 +31,59 @@ def redraw_regions():
                     region.tag_redraw()
 
 
-def init_overlay(self, event):
-    self.overlay_offset_x = 25
-    self.overlay_offset_y = -15
+def toggle_pin_overlay(cls):
+    cls.pin_overlay = not cls.pin_overlay
 
-    self.line_step = 0
-    self.line_spacer = 40
+def init_overlay(cls, event):
+    cls.overlay_offset_x = 25
+    cls.overlay_offset_y = -15
+
+    cls.line_step = 0
+    cls.line_spacer = 40
     
-    self.region_offset_x = event.mouse_x - event.mouse_region_x
-    self.region_offset_y = event.mouse_y - event.mouse_region_y
+    cls.region_offset_x = event.mouse_x - event.mouse_region_x
+    cls.region_offset_y = event.mouse_y - event.mouse_region_y
 
-    self.overlay_x = event.mouse_x - self.region_offset_x + self.overlay_offset_x
-    self.overlay_y = event.mouse_y - self.region_offset_y + self.overlay_offset_y
+    cls.overlay_x = event.mouse_x - cls.region_offset_x + cls.overlay_offset_x
+    cls.overlay_y = event.mouse_y - cls.region_offset_y + cls.overlay_offset_y
+
+    cls.pin_overlay = False
 
 
-def update_overlay(self, context, event, pinned=False, x_offset=400, lines=1):
-    self.overlay_x = event.mouse_x - self.region_offset_x + self.overlay_offset_x
-    self.overlay_y = event.mouse_y - self.region_offset_y + self.overlay_offset_y
+def update_overlay(cls, context, event, x_offset=400, lines=1):
+    cls.overlay_x = event.mouse_x - cls.region_offset_x + cls.overlay_offset_x
+    cls.overlay_y = event.mouse_y - cls.region_offset_y + cls.overlay_offset_y
 
-    if pinned:
-        self.overlay_x = context.region.width - x_offset
-        self.overlay_y = 45 + (lines * self.line_spacer)
+    if cls.pin_overlay:
+        cls.overlay_x = context.region.width - x_offset
+        cls.overlay_y = 45 + (lines * cls.line_spacer)
 
     region_buffer = 5
 
     if event.mouse_region_x <= 0:
-        context.window.cursor_warp(context.region.width + self.region_offset_x - region_buffer, event.mouse_y)
+        context.window.cursor_warp(context.region.width + cls.region_offset_x - region_buffer, event.mouse_y)
     
     if event.mouse_region_x >= context.region.width - 1:
-        context.window.cursor_warp(self.region_offset_x + region_buffer, event.mouse_y)
+        context.window.cursor_warp(cls.region_offset_x + region_buffer, event.mouse_y)
     
     if event.mouse_region_y <= 0:
-        context.window.cursor_warp(event.mouse_x, context.region.height + self.region_offset_y - region_buffer)
+        context.window.cursor_warp(event.mouse_x, context.region.height + cls.region_offset_y - region_buffer)
     
     if event.mouse_region_y >= context.region.height - 1:
-        context.window.cursor_warp(event.mouse_x, self.region_offset_y + region_buffer)
+        context.window.cursor_warp(event.mouse_x, cls.region_offset_y + region_buffer)
 
     redraw_regions()
 
-def draw_header(self):
+def draw_header(cls):
     blf.size(0, 24, 72)
     blf.color(0, 1.0, 0.529, 0.216, 1.0)
-    blf.position(0, self.overlay_x, self.overlay_y, 0)
-    blf.draw(0, "ND — " + self.bl_label)
+    blf.position(0, cls.overlay_x, cls.overlay_y, 0)
+    blf.draw(0, "ND — " + cls.bl_label)
 
-    self.line_step = 0
+    cls.line_step = 0
 
 
-def draw_property(self, property_content, metadata_content, active=False, alt_mode=False):
+def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False):
     blf.size(0, 28, 72)
     
     if active:
@@ -86,7 +91,7 @@ def draw_property(self, property_content, metadata_content, active=False, alt_mo
     else:
         blf.color(0, 1.0, 1.0, 1.0, 0.1)
     
-    blf.position(0, self.overlay_x, self.overlay_y - (38 + (self.line_spacer * self.line_step)), 0)
+    blf.position(0, cls.overlay_x, cls.overlay_y - (38 + (cls.line_spacer * cls.line_step)), 0)
     
     if alt_mode:
         blf.draw(0, "◑")
@@ -95,32 +100,32 @@ def draw_property(self, property_content, metadata_content, active=False, alt_mo
 
     blf.size(0, 16, 72)
     blf.color(0, 1.0, 1.0, 1.0, 1.0)
-    blf.position(0, self.overlay_x + 25, self.overlay_y - (25 + (self.line_spacer * self.line_step)), 0)
+    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (25 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, property_content)
     
     blf.size(0, 11, 72)
     blf.color(0, 1.0, 1.0, 1.0, 0.3)
-    blf.position(0, self.overlay_x + 25, self.overlay_y - (40 + (self.line_spacer * self.line_step)), 0)
+    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (40 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)
 
-    self.line_step += 1
+    cls.line_step += 1
 
 
-def draw_hint(self, hint_content, metadata_content):
+def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 22, 72)
     
     blf.color(0, 1.0, 1.0, 1.0, 0.5)
-    blf.position(0, self.overlay_x - 3, self.overlay_y - (36 + (self.line_spacer * self.line_step)), 0)
+    blf.position(0, cls.overlay_x - 3, cls.overlay_y - (36 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, "◈")
 
     blf.size(0, 16, 72)
     blf.color(0, 1.0, 1.0, 1.0, 1.0)
-    blf.position(0, self.overlay_x + 25, self.overlay_y - (25 + (self.line_spacer * self.line_step)), 0)
+    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (25 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, hint_content)
     
     blf.size(0, 11, 72)
     blf.color(0, 1.0, 1.0, 1.0, 0.3)
-    blf.position(0, self.overlay_x + 25, self.overlay_y - (40 + (self.line_spacer * self.line_step)), 0)
+    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (40 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)
 
-    self.line_step += 1
+    cls.line_step += 1

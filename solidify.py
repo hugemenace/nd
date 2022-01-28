@@ -1,8 +1,8 @@
 import bpy
 import bmesh
 from math import radians
-from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-
+from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from . utils import capture_modifier_keys
 
 class ND_OT_solidify(bpy.types.Operator):
     bl_idname = "nd.solidify"
@@ -12,59 +12,57 @@ class ND_OT_solidify(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        thickness_factor = (self.base_thickness_factor / 10.0) if event.shift else self.base_thickness_factor
-        offset_factor = (self.base_offset_factor / 10.0) if event.shift else self.base_offset_factor
+        capture_modifier_keys(self, event)
 
-        self.key_shift = event.shift
-        self.key_alt = event.alt
-        self.key_ctrl = event.ctrl
+        thickness_factor = (self.base_thickness_factor / 10.0) if self.key_shift else self.base_thickness_factor
+        offset_factor = (self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor
 
-        if event.type == 'P' and event.value == 'PRESS':
-            self.pin_overlay = not self.pin_overlay
+        if self.key_toggle_pin_overlay:
+            toggle_pin_overlay(self)
 
-        elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
-            if event.ctrl:
+        elif self.key_increase_factor:
+            if self.key_ctrl:
                 self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
-            else:
+            elif self.key_no_modifiers:
                 self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
 
-        elif event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS':
-            if event.ctrl:
+        elif self.key_decrease_factor:
+            if self.key_ctrl:
                 self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
-            else:
+            elif self.key_no_modifiers:
                self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
 
-        elif event.type == 'WHEELUPMOUSE':
-            if event.alt:
+        elif self.key_step_up:
+            if self.key_alt:
                 self.weighting = min(1, self.weighting + 1)
-            elif event.ctrl:
+            elif self.key_ctrl:
                 self.offset += offset_factor
-            else:
+            elif self.key_no_modifiers:
                 self.thickness += thickness_factor
             
-        elif event.type == 'WHEELDOWNMOUSE':
-            if event.alt:
+        elif self.key_step_down:
+            if self.key_alt:
                 self.weighting = max(-1, self.weighting - 1)
-            elif event.ctrl:
+            elif self.key_ctrl:
                 self.offset -= offset_factor
-            else:
+            elif self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - thickness_factor)
         
-        elif event.type == 'LEFTMOUSE':
+        elif self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+        elif self.key_cancel:
             self.revert(context)
 
             return {'CANCELLED'}
 
-        elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
+        elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         self.operate(context)
-        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=300, lines=3)
+        update_overlay(self, context, event, x_offset=300, lines=3)
 
         return {'RUNNING_MODAL'}
 
@@ -77,15 +75,12 @@ class ND_OT_solidify(bpy.types.Operator):
         self.weighting = 0
         self.offset = 0
 
-        self.key_shift = False
-        self.key_alt = False
-        self.key_ctrl = False
+        capture_modifier_keys(self)
 
         self.add_smooth_shading(context)
         self.add_displace_modifier(context)
         self.add_solidify_modifier(context)
 
-        self.pin_overlay = False
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -139,27 +134,27 @@ class ND_OT_solidify(bpy.types.Operator):
 
 def draw_text_callback(self):
     draw_header(self)
-    
+
     draw_property(
         self, 
         "Thickness: {0:.1f}mm".format(self.thickness * 1000), 
         "(±{0:.1f}mm)  |  Shift + (±{1:.1f}mm)".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
-        active=(not self.key_alt and not self.key_ctrl),
-        alt_mode=(self.key_shift and not self.key_alt and not self.key_ctrl))
+        active=self.key_no_modifiers,
+        alt_mode=self.key_shift_no_modifiers)
 
     draw_property(
         self, 
         "Offset: {}".format(['Negative', 'Neutral', 'Positive'][1 + self.weighting]),
         "Alt (Negative, Neutral, Positive)",
-        active=(self.key_alt and not self.key_ctrl),
+        active=self.key_alt,
         alt_mode=False)
 
     draw_property(
         self, 
         "Offset: {0:.1f}mm".format(self.offset * 1000), 
         "Ctrl (±{0:.1f}mm)  |  Shift + Ctrl (±{1:.1f}mm)".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
-        active=(not self.key_alt and self.key_ctrl),
-        alt_mode=(self.key_shift and not self.key_alt and self.key_ctrl))
+        active=self.key_ctrl,
+        alt_mode=self.key_shift_ctrl)
 
 
 def menu_func(self, context):
@@ -175,7 +170,3 @@ def unregister():
     bpy.utils.unregister_class(ND_OT_solidify)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler(self, ND_OT_solidify.bl_label)
-
-
-if __name__ == "__main__":
-    register()

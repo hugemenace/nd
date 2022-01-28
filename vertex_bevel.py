@@ -1,7 +1,7 @@
 import bpy
 import bmesh
-from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-
+from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from . utils import capture_modifier_keys
 
 class ND_OT_vertex_bevel(bpy.types.Operator):
     bl_idname = "nd.vertex_bevel"
@@ -11,48 +11,47 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        width_factor = (self.base_width_factor / 10.0) if event.shift else self.base_width_factor
-        segment_factor = 1 if event.shift else 2
+        capture_modifier_keys(self, event)
 
-        self.key_shift = event.shift
-        self.key_alt = event.alt
+        width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
+        segment_factor = 1 if self.key_shift else 2
 
-        if event.type == 'P' and event.value == 'PRESS':
-            self.pin_overlay = not self.pin_overlay
+        if self.key_toggle_pin_overlay:
+            toggle_pin_overlay(self)
 
-        elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
+        elif self.key_increase_factor:
             self.base_width_factor = min(1, self.base_width_factor * 10.0)
 
-        elif event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS':
+        elif self.key_decrease_factor:
             self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
         
-        elif event.type == 'WHEELUPMOUSE':
-            if event.alt:
+        elif self.key_step_up:
+            if self.key_alt:
                 self.width += width_factor
-            else:
+            elif self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
         
-        elif event.type == 'WHEELDOWNMOUSE':
-            if event.alt:
+        elif self.key_step_down:
+            if self.key_alt:
                 self.width = max(0, self.width - width_factor)
-            else:
+            elif self.key_no_modifiers:
                 self.segments = max(1, self.segments - segment_factor)
 
-        elif event.type == 'LEFTMOUSE':
+        elif self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif event.type in {'RIGHTMOUSE', 'ESC'}:
+        elif self.key_cancel:
             self.revert(context)
 
             return {'CANCELLED'}
         
-        elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
+        elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         self.operate(context)
-        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=300, lines=2)
+        update_overlay(self, context, event, x_offset=300, lines=2)
 
         return {'RUNNING_MODAL'}
 
@@ -63,13 +62,11 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         self.segments = 1
         self.width = 0.001
 
-        self.key_shift = False
-        self.key_alt = False
-
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
 
-        self.pin_overlay = False
+        capture_modifier_keys(self)
+
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -133,15 +130,15 @@ def draw_text_callback(self):
         self, 
         "Segments: {}".format(self.segments), 
         "(±2)  |  Shift (±1)",
-        active=(not self.key_alt),
-        alt_mode=(self.key_shift and not self.key_alt))
+        active=self.key_no_modifiers,
+        alt_mode=self.key_shift_no_modifiers)
 
     draw_property(
         self, 
         "Width: {0:.1f}mm".format(self.width * 1000), 
         "Alt (±{0:.1f}mm)  |  Shift + Alt (±{1:.1f}mm)".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
-        active=(self.key_alt),
-        alt_mode=(self.key_shift and self.key_alt))
+        active=self.key_alt,
+        alt_mode=self.key_shift_alt)
 
 
 def menu_func(self, context):
@@ -157,7 +154,3 @@ def unregister():
     bpy.utils.unregister_class(ND_OT_vertex_bevel)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler()
-
-
-if __name__ == "__main__":
-    register()

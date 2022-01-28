@@ -19,7 +19,7 @@ class ND_MT_menu(bpy.types.Menu):
         layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
         layout.operator("nd.screw", icon='MOD_SCREW')
         layout.separator()
-        layout.operator("nd.bolt", icon='MESH_CYLINDER')
+        layout.operator("nd.ring_and_bolt", icon='MESH_CYLINDER')
 
 
 def draw_item(self, context):

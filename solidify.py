@@ -13,28 +13,40 @@ class ND_OT_solidify(bpy.types.Operator):
 
     def modal(self, context, event):
         thickness_factor = (self.base_thickness_factor / 10.0) if event.shift else self.base_thickness_factor
+        offset_factor = (self.base_offset_factor / 10.0) if event.shift else self.base_offset_factor
 
         self.key_shift = event.shift
         self.key_alt = event.alt
+        self.key_ctrl = event.ctrl
 
         if event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
 
         elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
-            self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
+            if event.ctrl:
+                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
+            else:
+                self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
 
         elif event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS':
-            self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
+            if event.ctrl:
+                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
+            else:
+               self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
 
         elif event.type == 'WHEELUPMOUSE':
             if event.alt:
-                self.offset = min(1, self.offset + 1)
+                self.weighting = min(1, self.weighting + 1)
+            elif event.ctrl:
+                self.offset += offset_factor
             else:
                 self.thickness += thickness_factor
             
         elif event.type == 'WHEELDOWNMOUSE':
             if event.alt:
-                self.offset = max(-1, self.offset - 1)
+                self.weighting = max(-1, self.weighting - 1)
+            elif event.ctrl:
+                self.offset -= offset_factor
             else:
                 self.thickness = max(0, self.thickness - thickness_factor)
         
@@ -52,21 +64,25 @@ class ND_OT_solidify(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         self.operate(context)
-        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=260, lines=2)
+        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=300, lines=3)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
         self.base_thickness_factor = 0.001
+        self.base_offset_factor = 0.001
 
         self.thickness = 0.001
+        self.weighting = 0
         self.offset = 0
 
         self.key_shift = False
         self.key_alt = False
+        self.key_ctrl = False
 
         self.add_smooth_shading(context)
+        self.add_displace_modifier(context)
         self.add_solidify_modifier(context)
 
         self.pin_overlay = False
@@ -90,17 +106,25 @@ class ND_OT_solidify(bpy.types.Operator):
         context.object.data.auto_smooth_angle = radians(30)
 
 
+    def add_displace_modifier(self, context):
+        displace = context.object.modifiers.new("ND — Offset", 'DISPLACE')
+        displace.strength = self.offset
+
+        self.displace = displace
+
+
     def add_solidify_modifier(self, context):
-        solidify = context.object.modifiers.new("ND — solidify", 'SOLIDIFY')
+        solidify = context.object.modifiers.new("ND — Thickness", 'SOLIDIFY')
         solidify.thickness = self.thickness
-        solidify.offset = self.offset
+        solidify.offset = self.weighting
 
         self.solidify = solidify
     
 
     def operate(self, context):
         self.solidify.thickness = self.thickness
-        self.solidify.offset = self.offset
+        self.solidify.offset = self.weighting
+        self.displace.strength = self.offset
 
 
     def finish(self, context):
@@ -108,6 +132,7 @@ class ND_OT_solidify(bpy.types.Operator):
 
 
     def revert(self, context):
+        bpy.ops.object.modifier_remove(modifier=self.displace.name)
         bpy.ops.object.modifier_remove(modifier=self.solidify.name)
         unregister_draw_handler()
 
@@ -119,15 +144,22 @@ def draw_text_callback(self):
         self, 
         "Thickness: {0:.1f}mm".format(self.thickness * 1000), 
         "(±{0:.1f}mm)  |  Shift + (±{1:.1f}mm)".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
-        active=(not self.key_alt),
-        alt_mode=(self.key_shift and not self.key_alt))
+        active=(not self.key_alt and not self.key_ctrl),
+        alt_mode=(self.key_shift and not self.key_alt and not self.key_ctrl))
 
     draw_property(
         self, 
-        "Offset: {}".format(self.offset), 
-        "Alt (±1)",
-        active=(self.key_alt),
+        "Offset: {}".format(['Negative', 'Neutral', 'Positive'][1 + self.weighting]),
+        "Alt (Negative, Neutral, Positive)",
+        active=(self.key_alt and not self.key_ctrl),
         alt_mode=False)
+
+    draw_property(
+        self, 
+        "Offset: {0:.1f}mm".format(self.offset * 1000), 
+        "Ctrl (±{0:.1f}mm)  |  Shift + Ctrl (±{1:.1f}mm)".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        active=(not self.key_alt and self.key_ctrl),
+        alt_mode=(self.key_shift and not self.key_alt and self.key_ctrl))
 
 
 def menu_func(self, context):

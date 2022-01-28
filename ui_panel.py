@@ -59,7 +59,7 @@ class ND_PT_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.bolt", icon='MESH_CYLINDER')
+        row.operator("nd.ring_and_bolt", icon='MESH_CYLINDER')
         
         
 def register():

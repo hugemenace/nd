@@ -14,7 +14,7 @@ import importlib
 from . overlay import unregister_draw_handler
 from . import overlay
 from . import utils
-from . import bolt 
+from . import ring_and_bolt 
 from . import weighted_normal_bevel
 from . import vertex_bevel
 from . import face_sketch
@@ -29,7 +29,7 @@ def register():
     importlib.reload(overlay)
     importlib.reload(utils)
     
-    importlib.reload(bolt)
+    importlib.reload(ring_and_bolt)
     importlib.reload(weighted_normal_bevel)
     importlib.reload(vertex_bevel)
     importlib.reload(face_sketch)
@@ -39,7 +39,7 @@ def register():
     importlib.reload(ui_panel)
     importlib.reload(menu)
     
-    bolt.register()
+    ring_and_bolt.register()
     weighted_normal_bevel.register()
     vertex_bevel.register()
     face_sketch.register()
@@ -53,7 +53,7 @@ def register():
 def unregister():
     unregister_draw_handler()
     
-    bolt.unregister()
+    ring_and_bolt.unregister()
     weighted_normal_bevel.unregister()
     vertex_bevel.unregister()
     face_sketch.unregister()

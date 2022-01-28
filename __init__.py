@@ -18,6 +18,7 @@ from . import faux_bevel
 from . import sketch_bevel
 from . import view_align
 from . import thickener
+from . import spinner
 from . import new_sketch
 from . import ui_panel
 from . import menu
@@ -32,6 +33,7 @@ def register():
     importlib.reload(sketch_bevel)
     importlib.reload(view_align)
     importlib.reload(thickener)
+    importlib.reload(spinner)
     importlib.reload(new_sketch)
     importlib.reload(ui_panel)
     importlib.reload(menu)
@@ -41,6 +43,7 @@ def register():
     sketch_bevel.register()
     view_align.register()
     thickener.register()
+    spinner.register()
     new_sketch.register()
     ui_panel.register()
     menu.register()
@@ -52,6 +55,7 @@ def unregister():
     sketch_bevel.unregister()
     view_align.unregister()
     thickener.unregister()
+    spinner.unregister()
     new_sketch.unregister()
     ui_panel.unregister()
     menu.unregister()

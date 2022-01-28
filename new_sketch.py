@@ -61,7 +61,8 @@ class ND_OT_new_sketch(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.mode == 'OBJECT'
+        if context.mode == 'OBJECT':
+            return len(context.selected_objects) == 0
 
 
     def start_sketch_editing(self, context):

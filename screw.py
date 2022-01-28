@@ -4,9 +4,9 @@ from math import radians
 from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 
 
-class ND_OT_spinner(bpy.types.Operator):
-    bl_idname = "nd.spinner"
-    bl_label = "Spinner"
+class ND_OT_screw(bpy.types.Operator):
+    bl_idname = "nd.screw"
+    bl_label = "Screw"
     bl_description = "Adds a screw modifier tuned for converting a sketch into a cylindrical object"
     bl_options = {'UNDO'}
 
@@ -194,18 +194,18 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_spinner.bl_idname, text=ND_OT_spinner.bl_label)
+    self.layout.operator(ND_OT_screw.bl_idname, text=ND_OT_screw.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_spinner)
+    bpy.utils.register_class(ND_OT_screw)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_spinner)
+    bpy.utils.unregister_class(ND_OT_screw)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, ND_OT_spinner.bl_label)
+    unregister_draw_handler(self, ND_OT_screw.bl_label)
 
 
 if __name__ == "__main__":

@@ -14,11 +14,11 @@ import importlib
 from . import overlay
 from . import utils
 from . import bolt 
-from . import faux_bevel
+from . import weighted_normal_bevel
 from . import vertex_bevel
 from . import face_sketch
-from . import thickener
-from . import spinner
+from . import solidify
+from . import screw
 from . import blank_sketch
 from . import ui_panel
 from . import menu
@@ -29,21 +29,21 @@ def register():
     importlib.reload(utils)
     
     importlib.reload(bolt)
-    importlib.reload(faux_bevel)
+    importlib.reload(weighted_normal_bevel)
     importlib.reload(vertex_bevel)
     importlib.reload(face_sketch)
-    importlib.reload(thickener)
-    importlib.reload(spinner)
+    importlib.reload(solidify)
+    importlib.reload(screw)
     importlib.reload(blank_sketch)
     importlib.reload(ui_panel)
     importlib.reload(menu)
     
     bolt.register()
-    faux_bevel.register()
+    weighted_normal_bevel.register()
     vertex_bevel.register()
     face_sketch.register()
-    thickener.register()
-    spinner.register()
+    solidify.register()
+    screw.register()
     blank_sketch.register()
     ui_panel.register()
     menu.register()
@@ -51,11 +51,11 @@ def register():
 
 def unregister():
     bolt.unregister()
-    faux_bevel.unregister()
+    weighted_normal_bevel.unregister()
     vertex_bevel.unregister()
     face_sketch.unregister()
-    thickener.unregister()
-    spinner.unregister()
+    solidify.unregister()
+    screw.unregister()
     blank_sketch.unregister()
     ui_panel.unregister()
     menu.unregister()

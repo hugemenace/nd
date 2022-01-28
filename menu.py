@@ -15,9 +15,9 @@ class ND_MT_menu(bpy.types.Menu):
         layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
         layout.operator("nd.vertex_bevel", icon='MOD_BEVEL')
         layout.separator()
-        layout.operator("nd.faux_bevel", icon='MOD_BEVEL')
-        layout.operator("nd.thickener", icon='MOD_SOLIDIFY')
-        layout.operator("nd.spinner", icon='MOD_SCREW')
+        layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
+        layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
+        layout.operator("nd.screw", icon='MOD_SCREW')
         layout.separator()
         layout.operator("nd.bolt", icon='MESH_CYLINDER')
 

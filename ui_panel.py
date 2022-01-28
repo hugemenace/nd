@@ -43,15 +43,15 @@ class ND_PT_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.faux_bevel", icon='MOD_BEVEL')
+        row.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.thickener", icon='MOD_SOLIDIFY')
+        row.operator("nd.solidify", icon='MOD_SOLIDIFY')
         
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.spinner", icon='MOD_SCREW')
+        row.operator("nd.screw", icon='MOD_SCREW')
 
         box = layout.box()
         box.label(text="Generators", icon='GHOST_ENABLED')

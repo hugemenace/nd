@@ -11,14 +11,15 @@ class ND_MT_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.sketch_bevel", icon='MOD_BEVEL')
-        layout.operator("nd.faux_bevel", icon='MOD_BEVEL')
-        layout.separator()
-        layout.operator("nd.bolt", icon='GHOST_ENABLED')
-        layout.separator()
         layout.operator("nd.view_align", icon='FACESEL')
-        layout.operator("nd.thickener", icon='MOD_SOLIDIFY')
         layout.operator("nd.new_sketch", icon='GREASEPENCIL')
+        layout.operator("nd.sketch_bevel", icon='MOD_BEVEL')
+        layout.separator()
+        layout.operator("nd.faux_bevel", icon='MOD_BEVEL')
+        layout.operator("nd.thickener", icon='MOD_SOLIDIFY')
+        layout.operator("nd.spinner", icon='MOD_SCREW')
+        layout.separator()
+        layout.operator("nd.bolt", icon='MESH_CYLINDER')
 
 
 def draw_item(self, context):

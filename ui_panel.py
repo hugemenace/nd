@@ -22,27 +22,7 @@ class ND_PT_ui_panel(bpy.types.Panel):
         row.operator("wm.url_open", text="YouTube", icon='FILE_MOVIE').url = "https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg"
 
         box = layout.box()
-        box.label(text="Bevels", icon='MOD_BEVEL')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.sketch_bevel")
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.faux_bevel")
-        
-        box = layout.box()
-        box.label(text="Generators", icon='GHOST_ENABLED')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bolt")
-
-        box = layout.box()
-        box.label(text="Utilities", icon='ASSET_MANAGER')
+        box.label(text="Sketching", icon='GREASEPENCIL')
         column = box.column()
 
         row = column.row(align=True)
@@ -51,11 +31,35 @@ class ND_PT_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.thickener", icon='MOD_SOLIDIFY')
+        row.operator("nd.new_sketch", icon='GREASEPENCIL')
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.new_sketch", icon='GREASEPENCIL')
+        row.operator("nd.sketch_bevel", icon='MOD_BEVEL')
+
+        box = layout.box()
+        box.label(text="Power Mods", icon='MODIFIER')
+        column = box.column()
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.faux_bevel", icon='MOD_BEVEL')
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.thickener", icon='MOD_SOLIDIFY')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.spinner", icon='MOD_SCREW')
+
+        box = layout.box()
+        box.label(text="Generators", icon='GHOST_ENABLED')
+        column = box.column()
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.bolt", icon='MESH_CYLINDER')
         
         
 def register():

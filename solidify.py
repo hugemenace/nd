@@ -17,12 +17,8 @@ class ND_OT_solidify(bpy.types.Operator):
         self.key_shift = event.shift
         self.key_alt = event.alt
 
-        if not self.pin_overlay and event.type == 'MOUSEMOVE':
-            update_overlay(self, context, event)
-        
-        elif event.type == 'P' and event.value == 'PRESS':
+        if event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
-            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=260, lines=2)
 
         elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
             self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
@@ -56,6 +52,7 @@ class ND_OT_solidify(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         self.operate(context)
+        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=260, lines=2)
 
         return {'RUNNING_MODAL'}
 

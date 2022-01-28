@@ -22,12 +22,8 @@ class ND_OT_bolt(bpy.types.Operator):
         self.key_alt = event.alt
         self.key_ctrl = event.ctrl
 
-        if not self.pin_overlay and event.type == 'MOUSEMOVE':
-            update_overlay(self, context, event)
-        
-        elif event.type == 'P' and event.value == 'PRESS':
+        if event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
-            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=375, lines=4)
 
         elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
             if event.alt and event.ctrl:
@@ -77,8 +73,9 @@ class ND_OT_bolt(bpy.types.Operator):
 
         elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
             return {'PASS_THROUGH'}
-
+        
         self.operate(context)
+        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=375, lines=4)
 
         return {'RUNNING_MODAL'}
 

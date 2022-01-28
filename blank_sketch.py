@@ -12,12 +12,8 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
 
     def modal(self, context, event):
-        if not self.pin_overlay and event.type == 'MOUSEMOVE':
-            update_overlay(self, context, event)
-        
-        elif event.type == 'P' and event.value == 'PRESS':
+        if event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
-            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=280, lines=1)
 
         elif event.type == 'SPACE':
             self.finish(context)
@@ -40,6 +36,8 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
         elif event.type == 'MIDDLEMOUSE' or (event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF'):
             return {'PASS_THROUGH'}
+
+        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=280, lines=1)
 
         return {'RUNNING_MODAL'}
 

@@ -16,12 +16,8 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
         self.key_shift = event.shift
 
-        if not self.pin_overlay and event.type == 'MOUSEMOVE':
-            update_overlay(self, context, event)
-        
-        elif event.type == 'P' and event.value == 'PRESS':
+        if event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
-            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=270, lines=1)
 
         elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
             self.base_width_factor = min(1, self.base_width_factor * 10.0)
@@ -49,6 +45,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         self.operate(context)
+        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=270, lines=1)
 
         return {'RUNNING_MODAL'}
 

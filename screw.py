@@ -20,12 +20,8 @@ class ND_OT_screw(bpy.types.Operator):
         self.key_alt = event.alt
         self.key_ctrl = event.ctrl
 
-        if not self.pin_overlay and event.type == 'MOUSEMOVE':
-            update_overlay(self, context, event)
-        
-        elif event.type == 'P' and event.value == 'PRESS':
+        if event.type == 'P' and event.value == 'PRESS':
             self.pin_overlay = not self.pin_overlay
-            update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=360, lines=4)
 
         elif event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS':
             if event.alt and event.ctrl:
@@ -47,7 +43,6 @@ class ND_OT_screw(bpy.types.Operator):
                 self.angle = min(360, self.angle + angle_factor)
             else:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
-                
             
         elif event.type == 'WHEELDOWNMOUSE':
             if event.alt and event.ctrl:
@@ -76,6 +71,7 @@ class ND_OT_screw(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         self.operate(context)
+        update_overlay(self, context, event, pinned=self.pin_overlay, x_offset=360, lines=4)
 
         return {'RUNNING_MODAL'}
 

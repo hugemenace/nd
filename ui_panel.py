@@ -27,15 +27,15 @@ class ND_PT_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.view_align", icon='FACESEL')
+        row.operator("nd.face_sketch", icon='FACESEL')
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.new_sketch", icon='GREASEPENCIL')
+        row.operator("nd.blank_sketch", icon='GREASEPENCIL')
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.sketch_bevel", icon='MOD_BEVEL')
+        row.operator("nd.vertex_bevel", icon='MOD_BEVEL')
 
         box = layout.box()
         box.label(text="Power Mods", icon='MODIFIER')

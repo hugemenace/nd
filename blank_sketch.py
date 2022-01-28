@@ -4,9 +4,9 @@ from . overlay import update_overlay, init_overlay, register_draw_handler, unreg
 from . utils import add_single_vertex_object, align_object_to_3d_cursor
 
 
-class ND_OT_new_sketch(bpy.types.Operator):
-    bl_idname = "nd.new_sketch"
-    bl_label = "New Sketch"
+class ND_OT_blank_sketch(bpy.types.Operator):
+    bl_idname = "nd.blank_sketch"
+    bl_label = "Blank Sketch"
     bl_description = "Helps with vertex-extrude based sketching"
     bl_options = {'UNDO'}
 
@@ -94,16 +94,16 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_new_sketch.bl_idname, text=ND_OT_new_sketch.bl_label)
+    self.layout.operator(ND_OT_blank_sketch.bl_idname, text=ND_OT_blank_sketch.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_new_sketch)
+    bpy.utils.register_class(ND_OT_blank_sketch)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_new_sketch)
+    bpy.utils.unregister_class(ND_OT_blank_sketch)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler(self)
 

@@ -11,9 +11,9 @@ class ND_MT_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.view_align", icon='FACESEL')
-        layout.operator("nd.new_sketch", icon='GREASEPENCIL')
-        layout.operator("nd.sketch_bevel", icon='MOD_BEVEL')
+        layout.operator("nd.face_sketch", icon='FACESEL')
+        layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
+        layout.operator("nd.vertex_bevel", icon='MOD_BEVEL')
         layout.separator()
         layout.operator("nd.faux_bevel", icon='MOD_BEVEL')
         layout.operator("nd.thickener", icon='MOD_SOLIDIFY')

@@ -3,9 +3,9 @@ import bmesh
 from . overlay import update_overlay, init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 
 
-class ND_OT_sketch_bevel(bpy.types.Operator):
-    bl_idname = "nd.sketch_bevel"
-    bl_label = "Sketch Bevel"
+class ND_OT_vertex_bevel(bpy.types.Operator):
+    bl_idname = "nd.vertex_bevel"
+    bl_label = "Vertex Bevel"
     bl_description = "Adds a vertex group bevel and weld modifier"
     bl_options = {'UNDO'}
 
@@ -148,16 +148,16 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_sketch_bevel.bl_idname, text=ND_OT_sketch_bevel.bl_label)
+    self.layout.operator(ND_OT_vertex_bevel.bl_idname, text=ND_OT_vertex_bevel.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_sketch_bevel)
+    bpy.utils.register_class(ND_OT_vertex_bevel)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_sketch_bevel)
+    bpy.utils.unregister_class(ND_OT_vertex_bevel)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler(self)
 

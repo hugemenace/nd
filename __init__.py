@@ -15,11 +15,11 @@ from . import overlay
 from . import utils
 from . import bolt 
 from . import faux_bevel
-from . import sketch_bevel
-from . import view_align
+from . import vertex_bevel
+from . import face_sketch
 from . import thickener
 from . import spinner
-from . import new_sketch
+from . import blank_sketch
 from . import ui_panel
 from . import menu
 
@@ -30,21 +30,21 @@ def register():
     
     importlib.reload(bolt)
     importlib.reload(faux_bevel)
-    importlib.reload(sketch_bevel)
-    importlib.reload(view_align)
+    importlib.reload(vertex_bevel)
+    importlib.reload(face_sketch)
     importlib.reload(thickener)
     importlib.reload(spinner)
-    importlib.reload(new_sketch)
+    importlib.reload(blank_sketch)
     importlib.reload(ui_panel)
     importlib.reload(menu)
     
     bolt.register()
     faux_bevel.register()
-    sketch_bevel.register()
-    view_align.register()
+    vertex_bevel.register()
+    face_sketch.register()
     thickener.register()
     spinner.register()
-    new_sketch.register()
+    blank_sketch.register()
     ui_panel.register()
     menu.register()
 
@@ -52,10 +52,10 @@ def register():
 def unregister():
     bolt.unregister()
     faux_bevel.unregister()
-    sketch_bevel.unregister()
-    view_align.unregister()
+    vertex_bevel.unregister()
+    face_sketch.unregister()
     thickener.unregister()
     spinner.unregister()
-    new_sketch.unregister()
+    blank_sketch.unregister()
     ui_panel.unregister()
     menu.unregister()

@@ -1,0 +1,8 @@
+{
+    "bumpFiles": [
+        {
+            "filename": "__init__.py",
+            "updater": "addon-version-updater.js"
+        }
+    ]
+}

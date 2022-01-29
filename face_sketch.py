@@ -50,6 +50,8 @@ class ND_OT_face_sketch(bpy.types.Operator):
 
         self.prepare_face_selection_mode(context)
 
+        capture_modifier_keys(self)
+        
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 

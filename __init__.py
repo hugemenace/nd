@@ -1,7 +1,7 @@
 bl_info = {
     "name": "HugeMenace — ND",
     "author": "HugeMenace",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (3, 0, 0),
     "location": "N Panel, Shift + 2",
     "description": "Non-destructive operations, tools, and generators.",

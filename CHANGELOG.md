@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/hugemenace/blender-nd-addon/compare/v1.0.0...v1.1.0) (2022-01-29)
+
+
+### Features
+
+* add face extraction mode to view_align operator and rename it to face_sketch, rename new_sketch to blank_sketch, and sketch_bevel to vertex_bevel ([2a04917](https://github.com/hugemenace/blender-nd-addon/commit/2a04917434605c20c5264c188b7c1b5acb2164a6))
+* rename operators - spinner to screw, thickener to solidfiy, and faux_bevel to weighted_normal_bevel ([c7e4d2c](https://github.com/hugemenace/blender-nd-addon/commit/c7e4d2c14466151aa5b6607087cf318da02f28f7))
+* split offset and thickness modifiers from bolt operator in favour of solidy operator usage, add ring functionality to bolt operator, rename bolt to ring_and_bolt ([4585823](https://github.com/hugemenace/blender-nd-addon/commit/4585823c4093102c3df0d93f99f79fe104902012))
+
+
+### Bug Fixes
+
+* add invalid face selection error handling for face_sketch operator ([32a491a](https://github.com/hugemenace/blender-nd-addon/commit/32a491a4ac374e74eadf7c78a86e22fc1bdcf104))
+* ensure update_overlay function is called after every event type ([c5d59b0](https://github.com/hugemenace/blender-nd-addon/commit/c5d59b091d73702bc648511459574812136cab16))
+* fix ring_and_bolt parameters and parameter names to more appropriately represent their behaviour ([6ee7a6b](https://github.com/hugemenace/blender-nd-addon/commit/6ee7a6bee3d0c1576104df8dc4bacff9d06f6018))
+* update solidify weighting parameter name ([5586b69](https://github.com/hugemenace/blender-nd-addon/commit/5586b6981d7314710aa602fa191867730f73c913))
+
 ## 1.0.0 (2022-01-28)
 
 

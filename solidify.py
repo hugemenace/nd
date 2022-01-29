@@ -68,7 +68,7 @@ class ND_OT_solidify(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        self.base_thickness_factor = 0.001
+        self.base_thickness_factor = 0.01
         self.base_offset_factor = 0.001
 
         self.thickness = 0.001

@@ -83,6 +83,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     def add_bevel_modifier(self, context):
         bevel = context.object.modifiers.new("ND — Bevel", 'BEVEL')
         bevel.segments = 1
+        bevel.offset_type = 'WIDTH'
         bevel.width = self.width
 
         self.bevel = bevel

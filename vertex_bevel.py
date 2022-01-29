@@ -93,6 +93,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         bevel = context.object.modifiers.new("ND — Sketch Bevel", type='BEVEL')
         bevel.affect = 'VERTICES'
         bevel.limit_method = 'VGROUP'
+        bevel.offset_type = 'WIDTH'
         bevel.vertex_group = self.vgroup.name
         bevel.segments = self.segments
         bevel.width = self.width

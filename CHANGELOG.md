@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/hugemenace/nd/compare/v1.1.0...v1.1.1) (2022-01-29)
+
+
+### Bug Fixes
+
+* add missing capture_modifier_keys function call to invoke method on face_sketch operator ([573d0d2](https://github.com/hugemenace/nd/commit/573d0d2c8246001b68512aecd7d9cc133e660d14))
+* remove hardcoded mm suffix on all operator overlay parameter labels ([c5a253e](https://github.com/hugemenace/nd/commit/c5a253ef59ed262c1fc378b22adaa21b65ef87f8))
+* set starting width parameter to 0 on vertex_bevel operator ([130f8ef](https://github.com/hugemenace/nd/commit/130f8ef2d941d023e24dd3a310e68c961c2d5dd0))
+
 ## [1.1.0](https://github.com/hugemenace/nd/compare/v1.0.0...v1.1.0) (2022-01-29)
 
 

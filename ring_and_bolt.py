@@ -170,15 +170,15 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Inner Radius: {0:.1f}mm".format(self.inner_radius * 1000), 
-        "Alt (±{0:.1f}mm)  |  Shift + Alt (±{1:.1f}mm)".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
+        "Inner Radius: {0:.1f}".format(self.inner_radius * 1000), 
+        "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
         active=self.key_alt, 
         alt_mode=self.key_shift_alt)
 
     draw_property(
         self, 
-        "Width: {0:.1f}mm".format(self.width * 2000),
-        "Ctrl (±{0:.1f}mm)  |  Shift + Ctrl (±{1:.1f}mm)".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
+        "Width: {0:.1f}".format(self.width * 2000),
+        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_ctrl, 
         alt_mode=self.key_shift_ctrl)
 

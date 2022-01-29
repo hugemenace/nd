@@ -135,8 +135,8 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Width: {0:.1f}mm".format(self.width * 1000), 
-        "Alt (±{0:.1f}mm)  |  Shift + Alt (±{1:.1f}mm)".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
+        "Width: {0:.1f}".format(self.width * 1000), 
+        "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_alt,
         alt_mode=self.key_shift_alt)
 

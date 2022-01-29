@@ -180,7 +180,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Offset: {0:.3f}".format(self.offset),
-        "Ctrl + Alt (±{0:.1f}mm)  |  Shift + Ctrl + Alt (±{1:.1f}mm)".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        "Ctrl + Alt (±{0:.1f})  |  Shift + Ctrl + Alt (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt)
 

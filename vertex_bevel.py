@@ -60,7 +60,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         self.base_width_factor = 0.01
 
         self.segments = 1
-        self.width = 0.001
+        self.width = 0
 
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)

@@ -15,7 +15,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        radius_factor = (self.base_radius_factor / 10.0) if self.key_shift else self.base_radius_factor
+        inner_radius_factor = (self.base_inner_radius_factor / 10.0) if self.key_shift else self.base_inner_radius_factor
         width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
         segment_factor = 1 if self.key_shift else 2
 
@@ -24,19 +24,19 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
         elif self.key_increase_factor:
             if self.key_alt:
-                self.base_radius_factor = min(1, self.base_radius_factor * 10.0)
+                self.base_inner_radius_factor = min(1, self.base_inner_radius_factor * 10.0)
             elif self.key_ctrl:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
 
         elif self.key_decrease_factor:
             if self.key_alt:
-                self.base_radius_factor = max(0.001, self.base_radius_factor / 10.0)
+                self.base_inner_radius_factor = max(0.001, self.base_inner_radius_factor / 10.0)
             elif self.key_ctrl:
                 self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
         
         elif self.key_step_up:
             if self.key_alt:
-                self.radius += radius_factor
+                self.inner_radius += inner_radius_factor
             elif self.key_ctrl:
                 self.width += width_factor
             elif self.key_no_modifiers:
@@ -44,7 +44,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
         elif self.key_step_down:
             if self.key_alt:
-                self.radius = max(0, self.radius - radius_factor)
+                self.inner_radius = max(0, self.inner_radius - inner_radius_factor)
             elif self.key_ctrl:
                 self.width = max(0, self.width - width_factor)
             elif self.key_no_modifiers:
@@ -70,11 +70,11 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        self.base_radius_factor = 0.001
+        self.base_inner_radius_factor = 0.001
         self.base_width_factor = 0.001
 
         self.segments = 3
-        self.radius = 0
+        self.inner_radius = 0
         self.width = 0.05
 
         bpy.ops.object.select_all(action='DESELECT')
@@ -104,7 +104,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
     def add_displace_modifier(self):
         displace = self.obj.modifiers.new("ND — Radius", 'DISPLACE')
         displace.mid_level = 0.5
-        displace.strength = self.radius
+        displace.strength = self.inner_radius
         displace.direction = 'X'
         displace.space = 'LOCAL'
         
@@ -139,7 +139,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         self.screwX.screw_offset = self.width
         self.screwZ.steps = self.segments
         self.screwZ.render_steps = self.segments
-        self.displace.strength = self.radius
+        self.displace.strength = self.inner_radius
 
 
     def select_ring_and_bolt(self, context):
@@ -170,14 +170,14 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Radius: {0:.1f}mm".format(self.radius * 1000), 
-        "Alt (±{0:.1f}mm)  |  Shift + Alt (±{1:.1f}mm)".format(self.base_radius_factor * 1000, (self.base_radius_factor / 10) * 1000),
+        "Inner Radius: {0:.1f}mm".format(self.inner_radius * 1000), 
+        "Alt (±{0:.1f}mm)  |  Shift + Alt (±{1:.1f}mm)".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
         active=self.key_alt, 
         alt_mode=self.key_shift_alt)
 
     draw_property(
         self, 
-        "Width: {0:.1f}mm".format(self.width * 1000), 
+        "Width: {0:.1f}mm".format(self.width * 2000),
         "Ctrl (±{0:.1f}mm)  |  Shift + Ctrl (±{1:.1f}mm)".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_ctrl, 
         alt_mode=self.key_shift_ctrl)

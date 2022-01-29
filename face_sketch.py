@@ -30,9 +30,7 @@ class ND_OT_face_sketch(bpy.types.Operator):
             return {'PASS_THROUGH'}
         
         elif self.key_confirm_alternative:
-            self.finish(context)
-
-            return {'FINISHED'}
+            return self.finish(context)
 
         elif self.key_cancel:
             self.clean_up(context)
@@ -118,19 +116,34 @@ class ND_OT_face_sketch(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='SELECT')
 
 
+    def has_invalid_face_selection(self, context):
+        mesh = bmesh.from_edit_mesh(context.object.data)
+        selected_faces = [f for f in mesh.faces if f.select]
+
+        return len(selected_faces) != 1
+
+
     def finish(self, context):
+        if self.has_invalid_face_selection(context):
+            self.clean_up(context, force=True)
+            self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single face is selected. Please try again.")
+
+            return {'CANCELLED'}
+
         self.isolate_face(context)
         self.prepare_face_sketch(context)
         self.clean_up(context)
 
+        return {'FINISHED'}
+
     
-    def clean_up(self, context):
+    def clean_up(self, context, force=False):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
         context.object.show_in_front = False
 
-        if self.face_operation_mode == 0:
+        if force or self.face_operation_mode == 0:
             bpy.ops.object.delete()
 
         unregister_draw_handler()

@@ -26,6 +26,9 @@ class ND_OT_face_sketch(bpy.types.Operator):
             if self.key_alt:
                 self.face_operation_mode = (self.face_operation_mode - 1) % 2
 
+        elif event.type == 'F' and event.value == 'PRESS':
+            return {'PASS_THROUGH'}
+
         elif self.key_confirm:
             return {'PASS_THROUGH'}
         

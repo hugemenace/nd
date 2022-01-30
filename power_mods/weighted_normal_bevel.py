@@ -4,6 +4,7 @@ from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 
+
 class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     bl_idname = "nd.weighted_normal_bevel"
     bl_label = "WN Bevel"

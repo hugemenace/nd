@@ -34,6 +34,7 @@ def redraw_regions():
 def toggle_pin_overlay(cls):
     cls.pin_overlay = not cls.pin_overlay
 
+
 def init_overlay(cls, event):
     cls.overlay_offset_x = 25
     cls.overlay_offset_y = -15
@@ -73,6 +74,7 @@ def update_overlay(cls, context, event, x_offset=400, lines=1):
         context.window.cursor_warp(event.mouse_x, cls.region_offset_y + region_buffer)
 
     redraw_regions()
+
 
 def draw_header(cls):
     blf.size(0, 24, 72)

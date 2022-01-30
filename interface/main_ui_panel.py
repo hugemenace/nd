@@ -20,7 +20,7 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.5
         row.operator("wm.url_open", text="Website", icon='HOME').url = "https://docs.nd.hugemenace.co"
-        row.operator("wm.url_open", text="YouTube", icon='FILE_MOVIE').url = "https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg"
+        row.operator("wm.url_open", text="YouTube", icon='FILE_MOVIE').url = "https://www.youtube.com/watch?v=bg4qpt2hkHg&list=PLZmp_NXXf0kDj5wSa3VpftsNx62YNXEc6"
 
         box = layout.box()
         box.label(text="Sketching", icon='GREASEPENCIL')

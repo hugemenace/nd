@@ -10,7 +10,7 @@ class ND_OT_name_sync(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return len(context.selected_objects) == 1
+        return len(context.selected_objects) >= 1
 
 
     def execute(self, context):

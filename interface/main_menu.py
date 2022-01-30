@@ -46,5 +46,5 @@ def unregister():
 
     keys.clear()
 
-    bpy.utils.unregister_class(ND_MT_menu)
+    bpy.utils.unregister_class(ND_MT_main_menu)
     bpy.types.INFO_HT_header.remove(draw_item)

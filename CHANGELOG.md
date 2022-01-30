@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/hugemenace/nd/compare/v1.1.1...v1.2.0) (2022-01-30)
+
+
+### Features
+
+* add name_sync operator and new ND Utils UI panel ([dfcc13d](https://github.com/hugemenace/nd/commit/dfcc13d72f422df27de1eb4fe7ba0eae5f0d11bf))
+* add set_lod_suffix operator ([3e9cdb1](https://github.com/hugemenace/nd/commit/3e9cdb16be816b797a90f9ceeda3ba79ac794cf5))
+* allow F key passthrough on face_sketch operator ([a8e4e3a](https://github.com/hugemenace/nd/commit/a8e4e3a88545d487a38f56f61f48110594460e74))
+
+
+### Bug Fixes
+
+* clear custom split normals on extracted faces in face_sketch operator ([f33ac67](https://github.com/hugemenace/nd/commit/f33ac673496afbe60f2b11a2ae4a497b744f5aaa))
+* ensure clean up method in face_sketch operator removes extracted face when the operation is cancelled ([17cb5e1](https://github.com/hugemenace/nd/commit/17cb5e1c19840481074b06f25ef0288b3604c955))
+* fix incorrect class name unregister call in main_menu.py ([b11a97b](https://github.com/hugemenace/nd/commit/b11a97b8bbe6947276e33c0de915ef9a57ba0e59))
+* fix poll method qualifier in name_sync operator ([8c5f585](https://github.com/hugemenace/nd/commit/8c5f5850ad3b062a38b75d6e4d7e0132e18d8048))
+* set the bevel modifier offset type to 'width' for the vertex_bevel, and weighted_normal_bevel operators ([9b561aa](https://github.com/hugemenace/nd/commit/9b561aa4745009894043d3e1fb0eec3543df576a))
+
 ### [1.1.1](https://github.com/hugemenace/nd/compare/v1.1.0...v1.1.1) (2022-01-29)
 
 

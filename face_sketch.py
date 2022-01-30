@@ -119,6 +119,7 @@ class ND_OT_face_sketch(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='INVERT')
         bpy.ops.mesh.delete(type='FACE')
         bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.customdata_custom_splitnormals_clear()
 
 
     def has_invalid_face_selection(self, context):

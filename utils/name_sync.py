@@ -3,7 +3,7 @@ import bpy
 
 class ND_OT_name_sync(bpy.types.Operator):
     bl_idname = "nd.name_sync"
-    bl_label = "Name Sync"
+    bl_label = "Name & Data Sync"
     bl_description = "Updates all data names to match their corresponding object names"
     bl_options = {'UNDO'}
 

@@ -1,11 +1,11 @@
 import bpy
-from . import bl_info
+from .. import bl_info
 
 keys = []
 
-class ND_MT_menu(bpy.types.Menu):
+class ND_MT_main_menu(bpy.types.Menu):
     bl_label = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
-    bl_idname = "nd.menu"
+    bl_idname = "ND_MT_main_menu"
 
 
     def draw(self, context):
@@ -24,16 +24,16 @@ class ND_MT_menu(bpy.types.Menu):
 
 def draw_item(self, context):
     layout = self.layout
-    layout.menu(ND_MT_menu.bl_idname)
+    layout.menu(ND_MT_main_menu.bl_idname)
 
 
 def register():
-    bpy.utils.register_class(ND_MT_menu)
+    bpy.utils.register_class(ND_MT_main_menu)
     bpy.types.INFO_HT_header.append(draw_item)
    
     keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
     entry = keymap.keymap_items.new("wm.call_menu", 'TWO', 'PRESS', shift = True)
-    entry.properties.name = "nd.menu"
+    entry.properties.name = "nd.main_menu"
 
     keys.append((keymap, entry))
 

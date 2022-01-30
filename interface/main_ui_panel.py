@@ -1,13 +1,14 @@
 import bpy
-from . import bl_info
+from .. import bl_info
 
 
-class ND_PT_ui_panel(bpy.types.Panel):
+class ND_PT_main_ui_panel(bpy.types.Panel):
     bl_label = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
-    bl_idname = "nd.ui_panel"
+    bl_idname = "ND_PT_main_ui_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "HugeMenace"
+
 
     def draw(self, context):
         layout = self.layout
@@ -63,11 +64,11 @@ class ND_PT_ui_panel(bpy.types.Panel):
         
         
 def register():
-    bpy.utils.register_class(ND_PT_ui_panel)
+    bpy.utils.register_class(ND_PT_main_ui_panel)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_PT_ui_panel)
+    bpy.utils.unregister_class(ND_PT_main_ui_panel)
 
 
 if __name__ == "__main__":

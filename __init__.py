@@ -10,36 +10,30 @@ bl_info = {
     "category": "3D View"
 }
 
-from . import ui_panel
-from . import menu
+
 from . import lib
+from . import interface
 from . import sketching
 from . import power_mods
 from . import generators
 
 
+registerables = (
+    interface,
+    sketching,
+    power_mods,
+    generators,
+)
+
+
 def register():
     lib.reload()
 
-    importlib.reload(ui_panel)
-    importlib.reload(menu)
-
-    sketching.reload()
-    power_mods.reload()
-    generators.reload()
-    
-    ui_panel.register()
-    menu.register()
-
-    sketching.register()
-    power_mods.register()
-    generators.register()
+    for registerable in registerables:
+        registerable.reload()
+        registerable.register()
 
 
 def unregister():
-    ui_panel.unregister()
-    menu.unregister()
-
-    sketching.unregister()
-    power_mods.unregister()
-    generators.unregister()
+    for registerable in registerables:
+        registerable.unregister()

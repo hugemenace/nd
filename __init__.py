@@ -10,55 +10,36 @@ bl_info = {
     "category": "3D View"
 }
 
-import importlib
-from . overlay import unregister_draw_handler
-from . import overlay
-from . import utils
-from . import ring_and_bolt 
-from . import weighted_normal_bevel
-from . import vertex_bevel
-from . import face_sketch
-from . import solidify
-from . import screw
-from . import blank_sketch
 from . import ui_panel
 from . import menu
+from . import lib
+from . import sketching
+from . import power_mods
+from . import generators
 
 
 def register():
-    importlib.reload(overlay)
-    importlib.reload(utils)
-    
-    importlib.reload(ring_and_bolt)
-    importlib.reload(weighted_normal_bevel)
-    importlib.reload(vertex_bevel)
-    importlib.reload(face_sketch)
-    importlib.reload(solidify)
-    importlib.reload(screw)
-    importlib.reload(blank_sketch)
+    lib.reload()
+
     importlib.reload(ui_panel)
     importlib.reload(menu)
+
+    sketching.reload()
+    power_mods.reload()
+    generators.reload()
     
-    ring_and_bolt.register()
-    weighted_normal_bevel.register()
-    vertex_bevel.register()
-    face_sketch.register()
-    solidify.register()
-    screw.register()
-    blank_sketch.register()
     ui_panel.register()
     menu.register()
 
+    sketching.register()
+    power_mods.register()
+    generators.register()
+
 
 def unregister():
-    unregister_draw_handler()
-    
-    ring_and_bolt.unregister()
-    weighted_normal_bevel.unregister()
-    vertex_bevel.unregister()
-    face_sketch.unregister()
-    solidify.unregister()
-    screw.unregister()
-    blank_sketch.unregister()
     ui_panel.unregister()
     menu.unregister()
+
+    sketching.unregister()
+    power_mods.unregister()
+    generators.unregister()

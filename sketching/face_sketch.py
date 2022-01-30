@@ -1,8 +1,9 @@
 import bpy
 import bmesh
-from math import radians
-from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
-from . utils import averaged_vector, set_3d_cursor, create_rotation_matrix_from_face, capture_modifier_keys
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
+from .. lib.math import averaged_vector, create_rotation_matrix_from_face
+from .. lib.viewport import set_3d_cursor
+from .. lib.events import capture_modifier_keys
 
 
 class ND_OT_face_sketch(bpy.types.Operator):

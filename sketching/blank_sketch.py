@@ -1,7 +1,8 @@
 import bpy
 import bmesh
-from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
-from . utils import add_single_vertex_object, align_object_to_3d_cursor, capture_modifier_keys
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
+from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
+from .. lib.events import capture_modifier_keys
 
 
 class ND_OT_blank_sketch(bpy.types.Operator):

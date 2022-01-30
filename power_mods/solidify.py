@@ -1,8 +1,8 @@
 import bpy
 import bmesh
 from math import radians
-from . overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from . utils import capture_modifier_keys
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.events import capture_modifier_keys
 
 class ND_OT_solidify(bpy.types.Operator):
     bl_idname = "nd.solidify"

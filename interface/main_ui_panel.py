@@ -3,7 +3,7 @@ from .. import bl_info
 
 
 class ND_PT_main_ui_panel(bpy.types.Panel):
-    bl_label = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "ND v%s — Core" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_PT_main_ui_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

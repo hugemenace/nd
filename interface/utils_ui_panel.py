@@ -14,7 +14,7 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
         layout = self.layout
         
         box = layout.box()
-        box.label(text="Scene Management", icon='SCENE_DATA')
+        box.label(text="Object Names", icon='SCENE_DATA')
         column = box.column()
 
         row = column.row(align=True)

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/hugemenace/nd/compare/v1.2.0...v1.2.1) (2022-01-30)
+
+
+### Bug Fixes
+
+* fix broken keymap entry property name for main menu after name change ([3cf72cb](https://github.com/hugemenace/nd/commit/3cf72cb2a8339764263d6e1d1fc30657cc607905))
+* use more reliable collection objects link call for operators creating single vertex objects ([58d433a](https://github.com/hugemenace/nd/commit/58d433aea8242ae2a629f7750b4c9d09df80b378))
+
 ## [1.2.0](https://github.com/hugemenace/nd/compare/v1.1.1...v1.2.0) (2022-01-30)
 
 

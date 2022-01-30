@@ -48,7 +48,3 @@ def unregister():
 
     bpy.utils.unregister_class(ND_MT_menu)
     bpy.types.INFO_HT_header.remove(draw_item)
-
-
-if __name__ == "__main__":
-    register()

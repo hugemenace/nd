@@ -35,7 +35,7 @@ def register():
    
     keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
     entry = keymap.keymap_items.new("wm.call_menu", 'TWO', 'PRESS', shift = True)
-    entry.properties.name = "nd.main_menu"
+    entry.properties.name = "ND_MT_main_menu"
 
     keys.append((keymap, entry))
 

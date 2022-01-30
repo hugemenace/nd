@@ -16,6 +16,7 @@ from . import interface
 from . import sketching
 from . import power_mods
 from . import generators
+from . import utils
 
 
 registerables = (
@@ -23,6 +24,7 @@ registerables = (
     sketching,
     power_mods,
     generators,
+    utils,
 )
 
 

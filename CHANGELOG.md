@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/hugemenace/nd/compare/v1.2.1...v1.3.0) (2022-01-31)
+
+
+### Features
+
+* add a dynamic relationship between inner radius and width parameters, for more predictive results, and better ring generation ([03b15f6](https://github.com/hugemenace/nd/commit/03b15f6bf2d313581fcbfe21d859d850393e9adc))
+
+
+### Bug Fixes
+
+* enforce 0.0001 minimum width for weighted normal bevel, and add WN prefix to bevel modifier name for better recognition ([2831254](https://github.com/hugemenace/nd/commit/2831254258916f1143e9246a7bb1efdea5c3411a))
+
 ### [1.2.1](https://github.com/hugemenace/nd/compare/v1.2.0...v1.2.1) (2022-01-30)
 
 

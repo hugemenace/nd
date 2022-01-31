@@ -46,8 +46,9 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         elif self.key_step_down:
             if self.key_alt:
                 self.inner_radius = max(0, self.inner_radius - inner_radius_factor)
+                self.width = max(self.inner_radius * -0.5, self.width)
             elif self.key_ctrl:
-                self.width = max(0, self.width - width_factor)
+                self.width = max(self.inner_radius * -0.5, self.width - width_factor)
             elif self.key_no_modifiers:
                 self.segments = max(3, self.segments - segment_factor)
 
@@ -132,6 +133,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         screwZ.render_steps = self.segments
         screwZ.use_merge_vertices = True
         screwZ.merge_threshold = 0.0001
+        screwZ.use_normal_calculate = True
 
         self.screwZ = screwZ
 
@@ -178,7 +180,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Width: {0:.1f}".format(self.width * 2000),
+        "{0}: {1:.1f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 2000),
         "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_ctrl, 
         alt_mode=self.key_shift_ctrl)

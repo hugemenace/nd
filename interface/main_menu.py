@@ -22,6 +22,8 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.screw", icon='MOD_SCREW')
         layout.separator()
         layout.operator("nd.ring_and_bolt", icon='MESH_CYLINDER')
+        layout.separator()
+        layout.menu("ND_MT_utils_menu", icon='PLUGIN')
 
 
 def draw_item(self, context):

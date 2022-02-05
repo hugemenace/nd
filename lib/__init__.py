@@ -4,6 +4,7 @@ from . import math
 from . import objects
 from . import overlay
 from . import viewport
+from . import assets
 
 
 def reload():
@@ -12,5 +13,6 @@ def reload():
     importlib.reload(objects)
     importlib.reload(overlay)
     importlib.reload(viewport)
+    importlib.reload(assets)
 
     overlay.unregister_draw_handler()

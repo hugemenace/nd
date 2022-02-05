@@ -148,6 +148,14 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
         self.screwZ = screwZ
 
+    
+    def add_decimate_modifier(self):
+        decimate = self.obj.modifiers.new("ND — Decimate", 'DECIMATE')
+        decimate.decimate_type = 'DISSOLVE'
+        decimate.angle_limit = radians(1)
+        
+        self.decimate = decimate
+
 
     def operate(self, context):
         self.screwX.screw_offset = self.width
@@ -163,6 +171,10 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
     def finish(self, context):
         self.select_ring_and_bolt(context)
+
+        if self.segments > 3:
+            self.add_decimate_modifier()
+
         unregister_draw_handler()
 
 

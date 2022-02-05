@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from math import radians
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 
 
@@ -19,8 +19,15 @@ class ND_OT_screw(bpy.types.Operator):
         angle_factor = 1 if self.key_shift else 10
         offset_factor = (self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor
 
+        if self.key_toggle_operator_passthrough:
+            toggle_operator_passthrough(self)
+
         if self.key_toggle_pin_overlay:
             toggle_pin_overlay(self)
+
+        if self.operator_passthrough:
+            self.update_overlay_wrapper(context, event)
+            return {'PASS_THROUGH'}
 
         elif self.key_increase_factor:
             if self.key_ctrl_alt:
@@ -70,9 +77,13 @@ class ND_OT_screw(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         self.operate(context)
-        update_overlay(self, context, event, x_offset=360, lines=4)
+        self.update_overlay_wrapper(context, event)
 
         return {'RUNNING_MODAL'}
+
+    
+    def update_overlay_wrapper(self, context, event):
+        update_overlay(self, context, event, x_offset=340, lines=4)
 
 
     def invoke(self, context, event):

@@ -9,6 +9,7 @@ def capture_modifier_keys(cls, event=None):
     cls.key_shift =False if event is None else event.shift
     cls.key_shift_no_modifiers = False if event is None else event.shift and cls.key_no_modifiers
     cls.key_toggle_pin_overlay = False if event is None else event.type == 'P' and event.value == 'PRESS'
+    cls.key_toggle_operator_passthrough = False if event is None else event.type == 'BACK_SLASH' and event.value == 'PRESS'
     cls.key_increase_factor = False if event is None else event.type in {'PLUS', 'EQUAL', 'NUMPAD_PLUS'} and event.value == 'PRESS'
     cls.key_decrease_factor = False if event is None else event.type in {'MINUS', 'NUMPAD_MINUS'} and event.value == 'PRESS'
     cls.key_step_up = False if event is None else event.type == 'WHEELUPMOUSE'

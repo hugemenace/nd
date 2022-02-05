@@ -1,6 +1,6 @@
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys
 
@@ -15,8 +15,15 @@ class ND_OT_blank_sketch(bpy.types.Operator):
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
+        if self.key_toggle_operator_passthrough:
+            toggle_operator_passthrough(self)
+
         if self.key_toggle_pin_overlay:
             toggle_pin_overlay(self)
+
+        if self.operator_passthrough:
+            self.update_overlay_wrapper(context, event)
+            return {'PASS_THROUGH'}
 
         elif self.key_confirm_alternative:
             self.finish(context)
@@ -44,9 +51,13 @@ class ND_OT_blank_sketch(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        update_overlay(self, context, event, x_offset=280, lines=1)
+        self.update_overlay_wrapper(context, event)
 
         return {'RUNNING_MODAL'}
+
+
+    def update_overlay_wrapper(self, context, event):
+        update_overlay(self, context, event, x_offset=280, lines=1)
 
 
     def invoke(self, context, event):

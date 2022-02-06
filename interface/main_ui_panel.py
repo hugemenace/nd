@@ -61,6 +61,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.ring_and_bolt", icon='MESH_CYLINDER')
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.screw_head", icon='CANCEL')
         
         
 def register():

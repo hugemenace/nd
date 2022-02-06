@@ -9,8 +9,8 @@ from .. lib.assets import get_asset_path
 from .. lib.objects import align_object_to_3d_cursor
 
 
-class ND_OT_bolt_and_screw_head(bpy.types.Operator):
-    bl_idname = "nd.bolt_and_screw_head"
+class ND_OT_screw_head(bpy.types.Operator):
+    bl_idname = "nd.screw_head"
     bl_label = "Screw Head"
     bl_description = "Quickly create a variety of common bolt and screw heads"
     bl_options = {'UNDO'}
@@ -82,11 +82,11 @@ class ND_OT_bolt_and_screw_head(bpy.types.Operator):
 
     
     def update_overlay_wrapper(self, context, event):
-        update_overlay(self, context, event, x_offset=270, lines=3)
+        update_overlay(self, context, event, x_offset=290, lines=3)
 
 
     def invoke(self, context, event):
-        self.base_offset_factor = 0.001
+        self.base_offset_factor = 0.01
         self.base_scale_factor = 0.01
 
         self.head_type_index = 0
@@ -95,7 +95,7 @@ class ND_OT_bolt_and_screw_head(bpy.types.Operator):
 
         self.target_object = context.active_object if len(context.selected_objects) > 0 else None
 
-        filepath = get_asset_path('bolt_and_screw_heads')
+        filepath = get_asset_path('screw_heads')
         with bpy.data.libraries.load(filepath) as (data_from, data_to):
             data_to.objects = data_from.objects
         
@@ -166,7 +166,6 @@ class ND_OT_bolt_and_screw_head(bpy.types.Operator):
         else:
             bpy.ops.object.modifier_remove(modifier=self.displace.name)
 
-        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
         name = "ND — {} Head".format(re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", self.obj.name))
@@ -210,15 +209,15 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_bolt_and_screw_head.bl_idname, text=ND_OT_bolt_and_screw_head.bl_label)
+    self.layout.operator(ND_OT_screw_head.bl_idname, text=ND_OT_screw_head.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_bolt_and_screw_head)
+    bpy.utils.register_class(ND_OT_screw_head)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_bolt_and_screw_head)
+    bpy.utils.unregister_class(ND_OT_screw_head)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler()

@@ -26,6 +26,28 @@ class ND_OT_geo_lift(bpy.types.Operator):
 
             return {'CANCELLED'}
 
+        elif self.key_step_up:
+            if self.key_alt:
+                self.selection_type = (self.selection_type + 1) % 3
+                self.set_selection_mode(context)
+            
+        elif self.key_step_down:
+            if self.key_alt:
+                self.selection_type = (self.selection_type - 1) % 3
+                self.set_selection_mode(context)
+        
+        elif self.key_one:
+            self.selection_type = 0
+            self.set_selection_mode(context)
+
+        elif self.key_two:
+            self.selection_type = 1
+            self.set_selection_mode(context)
+
+        elif self.key_three:
+            self.selection_type = 2
+            self.set_selection_mode(context)
+
         elif self.operator_passthrough:
             self.update_overlay_wrapper(context, event)
             
@@ -46,10 +68,12 @@ class ND_OT_geo_lift(bpy.types.Operator):
 
     
     def update_overlay_wrapper(self, context, event):
-        update_overlay(self, context, event, x_offset=320, lines=1)
+        update_overlay(self, context, event, x_offset=260, lines=2)
 
 
     def invoke(self, context, event):
+        self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
+
         self.prepare_face_selection_mode(context)
 
         capture_modifier_keys(self)
@@ -68,6 +92,11 @@ class ND_OT_geo_lift(bpy.types.Operator):
             return len(context.selected_objects) == 1
 
 
+    def set_selection_mode(self, context):
+        bpy.ops.mesh.select_all(action='DESELECT')
+        context.tool_settings.mesh_select_mode = (self.selection_type == 0, self.selection_type == 1, self.selection_type == 2)
+
+
     def prepare_face_selection_mode(self, context):
         bpy.ops.object.duplicate()
 
@@ -82,7 +111,8 @@ class ND_OT_geo_lift(bpy.types.Operator):
         bm.to_mesh(context.object.data)
         bm.free()
 
-        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={'VERT', 'EDGE', 'FACE'})
+        mode = ['VERT', 'EDGE', 'FACE'][self.selection_type]
+        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
 
         context.object.name = 'ND — Geo Lift'
         context.object.data.name = 'ND — Geo Lift'
@@ -95,7 +125,30 @@ class ND_OT_geo_lift(bpy.types.Operator):
         bpy.ops.mesh.customdata_custom_splitnormals_clear()
 
 
+    def has_invalid_selection(self, context):
+        mesh = bmesh.from_edit_mesh(context.object.data)
+
+        selected_vertices = len([v for v in mesh.verts if v.select])
+        selected_edges = len([e for e in mesh.edges if e.select])
+        selected_faces = len([f for f in mesh.faces if f.select])
+
+        if self.selection_type == 0:
+            return selected_vertices < 1
+        elif self.selection_type == 1:
+            return selected_edges < 1
+        elif self.selection_type == 2:
+            return selected_faces < 1
+
+        return False
+
+
     def finish(self, context):
+        if self.has_invalid_selection(context):
+            self.clean_up(context)
+            self.report({'ERROR_INVALID_INPUT'}, "Ensure at least a single peice of geometry is selected.")
+
+            return {'CANCELLED'}
+
         self.isolate_geometry(context)
         self.clean_up(context, remove_lifted_geometry=False)
 
@@ -118,6 +171,13 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_hint(self, "Select geometry...", "Press space to confirm")
+
+    draw_property(
+        self,
+        "Selection Type: {0}".format(['Vertex', 'Edge', 'Face'][self.selection_type]),
+        "Alt / 1,2,3 (Vertex, Edge, Face)",
+        active=self.key_alt,
+        alt_mode=False)
 
 
 def menu_func(self, context):

@@ -64,20 +64,6 @@ def update_overlay(cls, context, event, x_offset=400, lines=1):
         cls.overlay_x = context.region.width - x_offset
         cls.overlay_y = 45 + (lines * cls.line_spacer)
 
-    region_buffer = 5
-
-    if event.mouse_region_x <= 0:
-        context.window.cursor_warp(context.region.width + cls.region_offset_x - region_buffer, event.mouse_y)
-    
-    if event.mouse_region_x >= context.region.width - 1:
-        context.window.cursor_warp(cls.region_offset_x + region_buffer, event.mouse_y)
-    
-    if event.mouse_region_y <= 0:
-        context.window.cursor_warp(event.mouse_x, context.region.height + cls.region_offset_y - region_buffer)
-    
-    if event.mouse_region_y >= context.region.height - 1:
-        context.window.cursor_warp(event.mouse_x, cls.region_offset_y + region_buffer)
-
     redraw_regions()
 
 

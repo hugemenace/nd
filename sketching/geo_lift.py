@@ -73,6 +73,7 @@ class ND_OT_geo_lift(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
+        self.register_mode()
 
         self.prepare_face_selection_mode(context)
 
@@ -92,9 +93,14 @@ class ND_OT_geo_lift(bpy.types.Operator):
             return len(context.selected_objects) == 1
 
 
+    def register_mode(self):
+        self.mode = ['VERT', 'EDGE', 'FACE'][self.selection_type]
+
+
     def set_selection_mode(self, context):
         bpy.ops.mesh.select_all(action='DESELECT')
         context.tool_settings.mesh_select_mode = (self.selection_type == 0, self.selection_type == 1, self.selection_type == 2)
+        self.register_mode()
 
 
     def prepare_face_selection_mode(self, context):
@@ -111,8 +117,7 @@ class ND_OT_geo_lift(bpy.types.Operator):
         bm.to_mesh(context.object.data)
         bm.free()
 
-        mode = ['VERT', 'EDGE', 'FACE'][self.selection_type]
-        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
+        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={self.mode})
 
         context.object.name = 'ND — Geo Lift'
         context.object.data.name = 'ND — Geo Lift'
@@ -120,7 +125,7 @@ class ND_OT_geo_lift(bpy.types.Operator):
     
     def isolate_geometry(self, context):
         bpy.ops.mesh.select_all(action='INVERT')
-        bpy.ops.mesh.delete(type='VERT')
+        bpy.ops.mesh.delete(type=self.mode)
         bpy.ops.mesh.select_all(action='SELECT')
         bpy.ops.mesh.customdata_custom_splitnormals_clear()
 

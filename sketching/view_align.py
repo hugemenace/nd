@@ -212,7 +212,7 @@ class ND_OT_view_align(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(self, "Select geometry to look at...", "Press space to confirm")
+    draw_hint(self, "Select geometry...", "Press space to confirm")
 
     draw_property(
         self,

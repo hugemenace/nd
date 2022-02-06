@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/hugemenace/nd/compare/v1.4.0...v1.5.0) (2022-02-06)
+
+
+### Features
+
+* add screw head generator ([c91ac08](https://github.com/hugemenace/nd/commit/c91ac08220824ada9b6f7dfd1c43e24ff7775dec))
+* add toggleable "halt" mode to all operators, allowing event / keybinding passthrough ([1ec0942](https://github.com/hugemenace/nd/commit/1ec0942a279607a130fa3165dab36aec039b7c0a))
+
+
+### Bug Fixes
+
+* add planar decimate modifier to ring_and_bolt objects if the segment count is greater than 3 ([d92dc02](https://github.com/hugemenace/nd/commit/d92dc02724bea7eb411596fca42047a51cb6bc22))
+
 ## [1.4.0](https://github.com/hugemenace/nd/compare/v1.3.0...v1.4.0) (2022-02-04)
 
 

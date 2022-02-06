@@ -55,7 +55,7 @@ class ND_OT_screw_head(bpy.types.Operator):
             
         elif self.key_step_down:
             if self.key_no_modifiers:
-                self.head_type_index = self.head_type_index - 1 if self.head_type_index > 0 else len(self.objects) - 1
+                self.head_type_index = (self.head_type_index - 1) % len(self.objects)
                 self.update_head_type(context)
             elif self.key_alt:
                 self.offset -= offset_factor

@@ -15,6 +15,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         capture_modifier_keys(self, event)
 
         width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
+        profile_factor = (self.base_profile_factor / 10.0) if self.key_shift else self.base_profile_factor
         segment_factor = 1 if self.key_shift else 2
 
         if self.key_toggle_operator_passthrough:
@@ -28,20 +29,30 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         elif self.key_increase_factor:
-            self.base_width_factor = min(1, self.base_width_factor * 10.0)
+            if self.key_alt:
+                self.base_width_factor = min(1, self.base_width_factor * 10.0)
+            elif self.key_ctrl:
+                self.base_profile_factor = min(1, self.base_profile_factor * 10.0)
 
         elif self.key_decrease_factor:
-            self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
+            if self.key_alt:
+                self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
+            elif self.key_ctrl:
+                self.base_profile_factor = max(0.001, self.base_profile_factor / 10.0)
         
         elif self.key_step_up:
             if self.key_alt:
                 self.width += width_factor
+            elif self.key_ctrl:
+                self.profile = min(1, self.profile + profile_factor)
             elif self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
         
         elif self.key_step_down:
             if self.key_alt:
                 self.width = max(0, self.width - width_factor)
+            elif self.key_ctrl:
+                self.profile = max(0, self.profile - profile_factor)
             elif self.key_no_modifiers:
                 self.segments = max(1, self.segments - segment_factor)
 
@@ -65,14 +76,16 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
 
     
     def update_overlay_wrapper(self, context, event):
-        update_overlay(self, context, event, x_offset=300, lines=2)
+        update_overlay(self, context, event, x_offset=300, lines=3)
 
 
     def invoke(self, context, event):
         self.base_width_factor = 0.01
+        self.base_profile_factor = 0.1
 
         self.segments = 1
         self.width = 0
+        self.profile = 0.5
 
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
@@ -109,6 +122,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         bevel.vertex_group = self.vgroup.name
         bevel.segments = self.segments
         bevel.width = self.width
+        bevel.profile = self.profile
 
         self.bevel = bevel
     
@@ -123,6 +137,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
     def operate(self, context):
         self.bevel.width = self.width
         self.bevel.segments = self.segments
+        self.bevel.profile = self.profile
 
 
     def finish(self, context):
@@ -152,6 +167,13 @@ def draw_text_callback(self):
         "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_alt,
         alt_mode=self.key_shift_alt)
+    
+    draw_property(
+        self, 
+        "Profile: {0:.2f}".format(self.profile),
+        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_profile_factor, self.base_profile_factor / 10),
+        active=self.key_ctrl,
+        alt_mode=self.key_shift_ctrl)
 
 
 def menu_func(self, context):

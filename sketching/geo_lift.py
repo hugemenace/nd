@@ -118,6 +118,7 @@ class ND_OT_geo_lift(bpy.types.Operator):
         bm.free()
 
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={self.mode})
+        bpy.ops.mesh.select_all(action='DESELECT')
 
         context.object.name = 'ND — Geo Lift'
         context.object.data.name = 'ND — Geo Lift'

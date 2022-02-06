@@ -113,6 +113,7 @@ class ND_OT_view_align(bpy.types.Operator):
 
         mode = ['VERT', 'EDGE', 'FACE'][self.selection_type]
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
+        bpy.ops.mesh.select_all(action='DESELECT')
 
         context.object.name = 'ND — View Align'
         context.object.data.name = 'ND — View Align'

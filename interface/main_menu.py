@@ -13,7 +13,8 @@ class ND_MT_main_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.face_sketch", icon='FACESEL')
+        layout.operator("nd.view_align", icon='ORIENTATION_VIEW')
+        layout.operator("nd.geo_lift", icon='FACESEL')
         layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
         layout.operator("nd.vertex_bevel", icon='MOD_BEVEL')
         layout.separator()

@@ -28,7 +28,11 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.face_sketch", icon='FACESEL')
+        row.operator("nd.geo_lift", icon='FACESEL')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.view_align", icon='ORIENTATION_VIEW')
 
         row = column.row(align=True)
         row.scale_y = 1.2

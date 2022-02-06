@@ -12,7 +12,7 @@ from .. lib.objects import align_object_to_3d_cursor
 class ND_OT_screw_head(bpy.types.Operator):
     bl_idname = "nd.screw_head"
     bl_label = "Screw Head"
-    bl_description = "Quickly create a variety of common bolt and screw heads"
+    bl_description = "Quickly create a variety of common screw heads"
     bl_options = {'UNDO'}
 
 

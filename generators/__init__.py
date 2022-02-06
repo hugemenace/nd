@@ -16,5 +16,3 @@ def register():
 def unregister():
     ring_and_bolt.unregister()
     screw_head.unregister()
-
-    

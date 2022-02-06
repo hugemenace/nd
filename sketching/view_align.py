@@ -19,11 +19,17 @@ class ND_OT_view_align(bpy.types.Operator):
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
 
-        if self.key_toggle_pin_overlay:
+        elif self.key_toggle_pin_overlay:
             toggle_pin_overlay(self)
 
-        if self.operator_passthrough:
+        elif self.key_cancel:
+            self.clean_up(context)
+
+            return {'CANCELLED'}
+
+        elif self.operator_passthrough:
             self.update_overlay_wrapper(context, event)
+
             return {'PASS_THROUGH'}
 
         elif self.key_step_up:
@@ -54,11 +60,6 @@ class ND_OT_view_align(bpy.types.Operator):
         elif self.key_confirm_alternative:
             return self.finish(context)
 
-        elif self.key_cancel:
-            self.clean_up(context)
-
-            return {'CANCELLED'}
-        
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 

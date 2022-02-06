@@ -18,35 +18,23 @@ class ND_OT_blank_sketch(bpy.types.Operator):
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
 
-        if self.key_toggle_pin_overlay:
+        elif self.key_toggle_pin_overlay:
             toggle_pin_overlay(self)
 
-        if self.operator_passthrough:
+        elif self.key_cancel:
+            self.revert(context)
+
+            return {'CANCELLED'}
+
+        elif self.operator_passthrough:
             self.update_overlay_wrapper(context, event)
+            
             return {'PASS_THROUGH'}
 
         elif self.key_confirm_alternative:
             self.finish(context)
 
             return {'FINISHED'}
-
-        # Pass through useful common vertex manipulation shortcuts //...
-
-        elif self.key_shift and event.type == 'D' and event.value == 'PRESS':
-            return {'PASS_THROUGH'}
-
-        elif event.alt and event.type == 'Z' and event.value == 'PRESS':
-            return {'PASS_THROUGH'}
-
-        elif event.type in {'LEFTMOUSE', 'E', 'G', 'WHEELUPMOUSE', 'WHEELDOWNMOUSE'} or event.ctrl:
-            return {'PASS_THROUGH'}
-
-        # ...//
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
 
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}

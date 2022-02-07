@@ -4,6 +4,10 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys
 
 
+mod_bevel = "Bevel — ND VB"
+mod_weld = "Weld — ND VB"
+
+
 class ND_OT_vertex_bevel(bpy.types.Operator):
     bl_idname = "nd.vertex_bevel"
     bl_label = "Vertex Bevel"
@@ -116,7 +120,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.object.modifiers.new("ND — Sketch Bevel", type='BEVEL')
+        bevel = context.object.modifiers.new(mod_bevel, type='BEVEL')
         bevel.affect = 'VERTICES'
         bevel.limit_method = 'VGROUP'
         bevel.offset_type = 'WIDTH'
@@ -129,7 +133,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
     
 
     def add_weld_modifier(self, context):
-        weld = context.object.modifiers.new("ND — Weld", type='WELD')
+        weld = context.object.modifiers.new(mod_weld, type='WELD')
         weld.merge_threshold = 0.00001
 
         self.weld = weld

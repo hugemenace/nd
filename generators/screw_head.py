@@ -9,6 +9,9 @@ from .. lib.assets import get_asset_path
 from .. lib.objects import align_object_to_3d_cursor
 
 
+mod_displace = "Offset — ND SH"
+
+
 class ND_OT_screw_head(bpy.types.Operator):
     bl_idname = "nd.screw_head"
     bl_label = "Screw Head"
@@ -144,7 +147,7 @@ class ND_OT_screw_head(bpy.types.Operator):
 
 
     def add_displace_modifier(self, context):
-        displace = self.obj.modifiers.new("ND — Offset", 'DISPLACE')
+        displace = self.obj.modifiers.new(mod_displace, 'DISPLACE')
         displace.strength = self.offset
         displace.direction = 'Z'
         displace.space = 'LOCAL'

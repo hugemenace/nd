@@ -142,10 +142,9 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         self.screwX = mods[mod_screw_1]
         self.screwZ = mods[mod_screw_2]
 
-        self.width = self.screwX.screw_offset
-        self.segments = self.screwZ.steps
-        self.segments = self.screwZ.render_steps
-        self.inner_radius = self.displace.strength
+        self.segments_prev = self.segments = self.screwZ.steps
+        self.inner_radius_prev = self.inner_radius = self.displace.strength
+        self.width_prev = self.width = self.screwX.screw_offset
 
         self.obj = context.active_object
 
@@ -237,6 +236,12 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
             bpy.ops.object.delete()
         elif self.had_decimate_mod or self.segments > 3:
             self.add_decimate_modifier()
+
+        if self.summoned:
+            self.screwX.screw_offset = self.width_prev
+            self.screwZ.steps = self.segments_prev
+            self.screwZ.render_steps = self.segments_prev
+            self.displace.strength = self.inner_radius_prev
             
         unregister_draw_handler()
 

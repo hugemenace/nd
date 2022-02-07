@@ -1,8 +1,13 @@
 import bpy
 import bmesh
-from math import radians
+from math import radians, degrees
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+
+
+mod_displace = "Offset — ND SCR"
+mod_screw = "Screw — ND SCR"
+mod_summon_list = [mod_displace, mod_screw]
 
 
 class ND_OT_screw(bpy.types.Operator):
@@ -90,15 +95,17 @@ class ND_OT_screw(bpy.types.Operator):
     def invoke(self, context, event):
         self.base_offset_factor = 0.01
 
-        self.screw_axis = 2 # X (0), Y (1), Z (2)
-        self.offset_axis = 1 # X (0), Y (1), Z (2)
-        self.segments = 3
-        self.angle = 360
-        self.offset = 0
+        if len(context.selected_objects) == 1:
+            mods = context.active_object.modifiers
+            mod_names = list(map(lambda x: x.name, mods))
+            previous_op = all(m in mod_names for m in mod_summon_list)
 
-        self.add_smooth_shading(context)
-        self.add_displace_modifier(context)
-        self.add_screw_modifier(context)
+            if previous_op:
+                self.summon_old_operator(context, mods)
+            else:
+                self.prepare_new_operator(context)
+        else:
+            self.prepare_new_operator(context)
 
         capture_modifier_keys(self)
 
@@ -116,6 +123,34 @@ class ND_OT_screw(bpy.types.Operator):
             return len(context.selected_objects) == 1
 
 
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
+        self.screw_axis = 2 # X (0), Y (1), Z (2)
+        self.offset_axis = 1 # X (0), Y (1), Z (2)
+        self.segments = 3
+        self.angle = 360
+        self.offset = 0
+
+        self.add_smooth_shading(context)
+        self.add_displace_modifier(context)
+        self.add_screw_modifier(context)
+
+
+    def summon_old_operator(self, context, mods):
+        self.summoned = True
+
+        self.displace = mods[mod_displace]
+        self.screw = mods[mod_screw]
+
+        self.offset_prev = self.offset = self.displace.strength
+        self.offset_axis_prev = self.offset_axis = {'X': 0, 'Y': 1, 'Z': 2}[self.displace.direction]
+        self.screw_axis_prev = self.screw_axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
+        self.segments_prev = self.segments = self.screw.steps
+        self.segments_prev = self.segments = self.screw.render_steps
+        self.angle_prev = self.angle = degrees(self.screw.angle)
+
+
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
         context.object.data.use_auto_smooth = True
@@ -123,7 +158,7 @@ class ND_OT_screw(bpy.types.Operator):
 
 
     def add_displace_modifier(self, context):
-        displace = context.object.modifiers.new("ND — Offset", 'DISPLACE')
+        displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0.5
         displace.strength = self.offset
         displace.space = 'LOCAL'
@@ -133,7 +168,7 @@ class ND_OT_screw(bpy.types.Operator):
 
 
     def add_screw_modifier(self, context):
-        screw = context.object.modifiers.new("ND — Screw", 'SCREW')
+        screw = context.object.modifiers.new(mod_screw, 'SCREW')
         screw.angle = radians(self.angle)
         screw.screw_offset = 0
         screw.axis = ['X', 'Y', 'Z'][self.screw_axis]
@@ -148,7 +183,6 @@ class ND_OT_screw(bpy.types.Operator):
     def operate(self, context):
         self.displace.strength = self.offset
         self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis]
-
         self.screw.axis = ['X', 'Y', 'Z'][self.screw_axis]
         self.screw.steps = self.segments
         self.screw.render_steps = self.segments
@@ -160,8 +194,18 @@ class ND_OT_screw(bpy.types.Operator):
 
 
     def revert(self, context):
-        bpy.ops.object.modifier_remove(modifier=self.screw.name)
-        bpy.ops.object.modifier_remove(modifier=self.displace.name)
+        if not self.summoned:
+            bpy.ops.object.modifier_remove(modifier=self.screw.name)
+            bpy.ops.object.modifier_remove(modifier=self.displace.name)
+
+        if self.summoned:
+            self.displace.strength = self.displace.strength_prev
+            self.displace.direction = self.displace.direction_prev
+            self.screw.axis = self.screw.axis_prev
+            self.screw.steps = self.screw.steps_prev
+            self.screw.render_steps = self.screw.render_steps_prev
+            self.screw.angle = self.screw.angle_prev
+
         unregister_draw_handler()
 
 

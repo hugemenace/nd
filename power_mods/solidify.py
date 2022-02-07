@@ -5,6 +5,11 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys
 
 
+mod_displace = "Offset — ND SOL"
+mod_solidify = "Thickness — ND SOL"
+mod_summon_list = [mod_displace, mod_solidify]
+
+
 class ND_OT_solidify(bpy.types.Operator):
     bl_idname = "nd.solidify"
     bl_label = "Solidify"
@@ -84,15 +89,19 @@ class ND_OT_solidify(bpy.types.Operator):
         self.base_thickness_factor = 0.01
         self.base_offset_factor = 0.001
 
-        self.thickness = 0.001
-        self.weighting = 0
-        self.offset = 0
+        if len(context.selected_objects) == 1:
+            mods = context.active_object.modifiers
+            mod_names = list(map(lambda x: x.name, mods))
+            previous_op = all(m in mod_names for m in mod_summon_list)
+
+            if previous_op:
+                self.summon_old_operator(context, mods)
+            else:
+                self.prepare_new_operator(context)
+        else:
+            self.prepare_new_operator(context)
 
         capture_modifier_keys(self)
-
-        self.add_smooth_shading(context)
-        self.add_displace_modifier(context)
-        self.add_solidify_modifier(context)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -107,6 +116,29 @@ class ND_OT_solidify(bpy.types.Operator):
         if context.mode == 'OBJECT':
             return len(context.selected_objects) == 1
 
+    
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
+        self.thickness = 0.001
+        self.weighting = 0
+        self.offset = 0
+
+        self.add_smooth_shading(context)
+        self.add_displace_modifier(context)
+        self.add_solidify_modifier(context)
+
+
+    def summon_old_operator(self, context, mods):
+        self.summoned = True
+
+        self.solidify = mods[mod_solidify]
+        self.displace = mods[mod_displace]
+
+        self.thickness_prev = self.thickness = self.solidify.thickness
+        self.weighting_prev = self.weighting = self.solidify.offset
+        self.offset_prev = self.offset = self.displace.strength
+
 
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
@@ -115,14 +147,14 @@ class ND_OT_solidify(bpy.types.Operator):
 
 
     def add_displace_modifier(self, context):
-        displace = context.object.modifiers.new("ND — Offset", 'DISPLACE')
+        displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
         displace.strength = self.offset
 
         self.displace = displace
 
 
     def add_solidify_modifier(self, context):
-        solidify = context.object.modifiers.new("ND — Thickness", 'SOLIDIFY')
+        solidify = context.object.modifiers.new(mod_solidify, 'SOLIDIFY')
         solidify.thickness = self.thickness
         solidify.offset = self.weighting
 
@@ -140,8 +172,15 @@ class ND_OT_solidify(bpy.types.Operator):
 
 
     def revert(self, context):
-        bpy.ops.object.modifier_remove(modifier=self.displace.name)
-        bpy.ops.object.modifier_remove(modifier=self.solidify.name)
+        if not self.summoned:
+            bpy.ops.object.modifier_remove(modifier=self.displace.name)
+            bpy.ops.object.modifier_remove(modifier=self.solidify.name)
+
+        if self.summoned:
+            self.solidify.thickness = self.thickness_prev
+            self.solidify.offset = self.weighting_prev
+            self.displace.strength = self.offset_prev
+        
         unregister_draw_handler()
 
 

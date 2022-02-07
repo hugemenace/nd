@@ -5,6 +5,11 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys
 
 
+mod_bevel = "Bevel — ND WNB"
+mod_wn = "Weighted Normal — ND WNB"
+mod_summon_list = [mod_bevel, mod_wn]
+
+
 class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     bl_idname = "nd.weighted_normal_bevel"
     bl_label = "WN Bevel"
@@ -65,12 +70,19 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.base_width_factor = 0.001
-        self.width = 0.001
 
-        self.add_smooth_shading(context)
-        self.add_bevel_modifier(context)
-        self.add_weighted_normal_modifer(context)
-        
+        if len(context.selected_objects) == 1:
+            mods = context.active_object.modifiers
+            mod_names = list(map(lambda x: x.name, mods))
+            previous_op = all(m in mod_names for m in mod_summon_list)
+
+            if previous_op:
+                self.summon_old_operator(context, mods)
+            else:
+                self.prepare_new_operator(context)
+        else:
+            self.prepare_new_operator(context)
+
         capture_modifier_keys(self)
 
         init_overlay(self, event)
@@ -87,6 +99,25 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
             return len(context.selected_objects) == 1
 
 
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
+        self.width = 0.001
+
+        self.add_smooth_shading(context)
+        self.add_bevel_modifier(context)
+        self.add_weighted_normal_modifer(context)
+
+
+    def summon_old_operator(self, context, mods):
+        self.summoned = True
+
+        self.bevel = mods[mod_bevel]
+        self.wn = mods[mod_wn]
+
+        self.width_prev = self.width = self.bevel.width
+
+
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
         context.object.data.use_auto_smooth = True
@@ -94,7 +125,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.object.modifiers.new("ND — WN Bevel", 'BEVEL')
+        bevel = context.object.modifiers.new(mod_bevel, 'BEVEL')
         bevel.segments = 1
         bevel.offset_type = 'WIDTH'
         bevel.width = self.width
@@ -103,7 +134,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     
 
     def add_weighted_normal_modifer(self, context):
-        wn = context.object.modifiers.new("ND — Weighted Normal", 'WEIGHTED_NORMAL')
+        wn = context.object.modifiers.new(mod_wn, 'WEIGHTED_NORMAL')
         wn.weight = 100
 
         self.wn = wn
@@ -118,8 +149,13 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
 
     def revert(self, context):
-        bpy.ops.object.modifier_remove(modifier=self.bevel.name)
-        bpy.ops.object.modifier_remove(modifier=self.wn.name)
+        if not self.summoned:
+            bpy.ops.object.modifier_remove(modifier=self.bevel.name)
+            bpy.ops.object.modifier_remove(modifier=self.wn.name)
+
+        if self.summoned:
+            self.bevel.width = self.width_prev
+
         unregister_draw_handler()
 
 

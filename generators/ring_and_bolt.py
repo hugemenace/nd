@@ -6,6 +6,13 @@ from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys
 
 
+mod_displace = "Radius — ND R&B"
+mod_screw_1 = "Width — ND R&B"
+mod_screw_2 = "Segments — ND R&B"
+mod_decimate = "Decimate — ND R&B"
+mod_summon_list = [mod_displace, mod_screw_1, mod_screw_2]
+
+
 class ND_OT_ring_and_bolt(bpy.types.Operator):
     bl_idname = "nd.ring_and_bolt"
     bl_label = "Ring & Bolt"
@@ -87,6 +94,31 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         self.base_inner_radius_factor = 0.001
         self.base_width_factor = 0.001
 
+        if len(context.selected_objects) == 1:
+            mods = context.active_object.modifiers
+            mod_names = list(map(lambda x: x.name, mods))
+            previous_op = all(m in mod_names for m in mod_summon_list)
+
+            if previous_op:
+                self.summon_old_operator(context, mods)
+            else:
+                self.prepare_new_operator(context)
+        else:
+            self.prepare_new_operator(context)
+        
+        capture_modifier_keys(self)
+
+        init_overlay(self, event)
+        register_draw_handler(self, draw_text_callback)
+
+        context.window_manager.modal_handler_add(self)
+
+        return {'RUNNING_MODAL'}
+    
+
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
         self.segments = 3
         self.inner_radius = 0
         self.width = 0.05
@@ -100,15 +132,23 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         self.add_screw_x_modifier()
         self.add_screw_z_modifer()
 
-        capture_modifier_keys(self)
-
-        init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback)
-
-        context.window_manager.modal_handler_add(self)
-
-        return {'RUNNING_MODAL'}
     
+    def summon_old_operator(self, context, mods):
+        self.summoned = True
+
+        self.try_remove_decimate_modifier(context)
+
+        self.displace = mods[mod_displace]
+        self.screwX = mods[mod_screw_1]
+        self.screwZ = mods[mod_screw_2]
+
+        self.width = self.screwX.screw_offset
+        self.segments = self.screwZ.steps
+        self.segments = self.screwZ.render_steps
+        self.inner_radius = self.displace.strength
+
+        self.obj = context.active_object
+
 
     @classmethod
     def poll(cls, context):
@@ -116,7 +156,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
 
     def add_displace_modifier(self):
-        displace = self.obj.modifiers.new("ND — Radius", 'DISPLACE')
+        displace = self.obj.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0.5
         displace.strength = self.inner_radius
         displace.direction = 'X'
@@ -126,7 +166,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
 
     def add_screw_x_modifier(self):
-        screwX = self.obj.modifiers.new("ND — Width", 'SCREW')
+        screwX = self.obj.modifiers.new(mod_screw_1, 'SCREW')
         screwX.axis = 'X'
         screwX.angle = 0
         screwX.screw_offset = self.width
@@ -139,7 +179,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
     
 
     def add_screw_z_modifer(self):
-        screwZ = self.obj.modifiers.new("ND — Segments", 'SCREW')
+        screwZ = self.obj.modifiers.new(mod_screw_2, 'SCREW')
         screwZ.axis = 'Z'
         screwZ.steps = self.segments
         screwZ.render_steps = self.segments
@@ -151,11 +191,22 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
     
     def add_decimate_modifier(self):
-        decimate = self.obj.modifiers.new("ND — Decimate", 'DECIMATE')
+        decimate = self.obj.modifiers.new(mod_decimate, 'DECIMATE')
         decimate.decimate_type = 'DISSOLVE'
         decimate.angle_limit = radians(1)
         
         self.decimate = decimate
+
+
+    def try_remove_decimate_modifier(self, context):
+        self.had_decimate_mod = False
+
+        try:
+            mod = context.active_object.modifiers[mod_decimate]
+            context.active_object.modifiers.remove(mod)
+            self.had_decimate_mod = True
+        except:
+            self.had_decimate_mod = False
 
 
     def operate(self, context):
@@ -171,7 +222,8 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
 
     def finish(self, context):
-        self.select_ring_and_bolt(context)
+        if not self.summoned:
+            self.select_ring_and_bolt(context)
 
         if self.segments > 3:
             self.add_decimate_modifier()
@@ -180,8 +232,12 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
 
     def revert(self, context):
-        self.select_ring_and_bolt(context)
-        bpy.ops.object.delete()
+        if not self.summoned:
+            self.select_ring_and_bolt(context)
+            bpy.ops.object.delete()
+        elif self.had_decimate_mod or self.segments > 3:
+            self.add_decimate_modifier()
+            
         unregister_draw_handler()
 
 

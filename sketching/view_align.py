@@ -151,12 +151,19 @@ class ND_OT_view_align(bpy.types.Operator):
 
 
     def prepare_view_align(self, context):
+        mesh = bmesh.from_edit_mesh(context.object.data)
+        world_matrix = context.object.matrix_world
+
+        if self.selection_type == 0:
+            selected_vertices = len([v for v in mesh.verts if v.select])
+            if selected_vertices == 3:
+                bpy.ops.mesh.edge_face_add()
+                context.tool_settings.mesh_select_mode = (False, False, True)
+                self.selection_type = 2
+
         bpy.ops.view3d.view_axis(type='TOP', align_active=True)
         
         self.set_custom_transform_orientation()
-
-        mesh = bmesh.from_edit_mesh(context.object.data)
-        world_matrix = context.object.matrix_world
 
         if self.selection_type == 0:
             (location, rotation) = self.set_3d_cursor_to_vertex(mesh, world_matrix)
@@ -177,7 +184,7 @@ class ND_OT_view_align(bpy.types.Operator):
         selected_faces = len([f for f in mesh.faces if f.select])
 
         if self.selection_type == 0:
-            return selected_vertices != 1
+            return selected_vertices != 1 and selected_vertices != 3
         elif self.selection_type == 1:
             return selected_edges != 1
         elif self.selection_type == 2:
@@ -189,7 +196,10 @@ class ND_OT_view_align(bpy.types.Operator):
     def finish(self, context):
         if self.has_invalid_selection(context):
             self.clean_up(context)
-            self.report({'ERROR_INVALID_INPUT'}, "Ensure a single peice of geometry is selected.")
+            if self.selection_type == 0:
+                self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
+            else:
+                self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single edge or face is selected.")
 
             return {'CANCELLED'}
 

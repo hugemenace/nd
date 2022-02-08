@@ -26,6 +26,14 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
         row.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').suffix = 'LOW'
         row.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').suffix = 'HIGH'
 
+        box = layout.box()
+        box.label(text="Object TRS", icon='ORIENTATION_GIMBAL')
+        column = box.column()
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
+
         
 def register():
     bpy.utils.register_class(ND_PT_utils_ui_panel)

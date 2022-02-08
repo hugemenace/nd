@@ -120,7 +120,7 @@ class ND_OT_solidify(bpy.types.Operator):
     def prepare_new_operator(self, context):
         self.summoned = False
 
-        self.thickness = 0.001
+        self.thickness = 0.02
         self.weighting = 0
         self.offset = 0
 

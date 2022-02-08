@@ -196,7 +196,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Weighting: {}".format(['Negative', 'Neutral', 'Positive'][1 + self.weighting]),
+        "Weighting: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
         "Alt (Negative, Neutral, Positive)",
         active=self.key_alt,
         alt_mode=False)

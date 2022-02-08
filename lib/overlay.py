@@ -68,18 +68,28 @@ def update_overlay(cls, context, event, x_offset=400, lines=1):
 
 
 def draw_header(cls):
+    is_summoned = getattr(cls, "summoned", False)
+
     if cls.operator_passthrough:
         blf.size(0, 12, 72)
-        blf.color(0, .933, 0.231, 0.169, 1.0)
+        blf.color(0, 238/255, 59/255, 43/255, 1.0)
         blf.position(0, cls.overlay_x + 1, cls.overlay_y + 26, 0)
-        blf.draw(0, "HALTED")
+        blf.draw(0, "PAUSE")
+
+    if is_summoned and not cls.operator_passthrough:
+        blf.size(0, 12, 72)
+        blf.color(0, 82/255, 224/255, 82/255, 1.0)
+        blf.position(0, cls.overlay_x + 1, cls.overlay_y + 26, 0)
+        blf.draw(0, "RECALL")
 
     blf.size(0, 24, 72)
 
     if cls.operator_passthrough:
-        blf.color(0, .933, 0.231, 0.169, 1.0)
+        blf.color(0, 238/255, 59/255, 43/255, 1.0)
+    elif is_summoned and not cls.operator_passthrough:
+        blf.color(0, 82/255, 224/255, 82/255, 1.0)
     else:
-        blf.color(0, 1.0, 0.529, 0.216, 1.0)
+        blf.color(0, 255/255, 135/255, 55/255, 1.0)
 
     blf.position(0, cls.overlay_x, cls.overlay_y, 0)
     blf.draw(0, "ND — " + cls.bl_label)
@@ -91,11 +101,11 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.size(0, 28, 72)
     
     if cls.operator_passthrough:
-        blf.color(0, 1.0, 1.0, 1.0, 0.2)
+        blf.color(0, 255/255, 255/255, 255/255, 0.2)
     elif active:
-        blf.color(0, 0.216, 0.686, 1.0, 1.0)
+        blf.color(0, 55/255, 174/255, 255/255, 1.0)
     else:
-        blf.color(0, 1.0, 1.0, 1.0, 0.1)
+        blf.color(0, 255/255, 255/255, 255/255, 0.1)
     
     blf.position(0, cls.overlay_x, cls.overlay_y - (38 + (cls.line_spacer * cls.line_step)), 0)
     
@@ -107,9 +117,9 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.size(0, 16, 72)
 
     if cls.operator_passthrough:
-        blf.color(0, 1.0, 1.0, 1.0, 0.2)
+        blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
-        blf.color(0, 1.0, 1.0, 1.0, 1.0)
+        blf.color(0, 255/255, 255/255, 255/255, 1.0)
 
     blf.position(0, cls.overlay_x + 25, cls.overlay_y - (25 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, property_content)
@@ -117,9 +127,9 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.size(0, 11, 72)
     
     if cls.operator_passthrough:
-        blf.color(0, 1.0, 1.0, 1.0, 0.2)
+        blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
-        blf.color(0, 1.0, 1.0, 1.0, 0.3)
+        blf.color(0, 255/255, 255/255, 255/255, 0.3)
 
     blf.position(0, cls.overlay_x + 25, cls.overlay_y - (40 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)
@@ -131,9 +141,9 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 22, 72)
     
     if cls.operator_passthrough:
-        blf.color(0, 1.0, 1.0, 1.0, 0.2)
+        blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
-        blf.color(0, 1.0, 1.0, 1.0, 0.5)
+        blf.color(0, 255/255, 255/255, 255/255, 0.5)
 
     blf.position(0, cls.overlay_x - 3, cls.overlay_y - (36 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, "◈")
@@ -141,9 +151,9 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 16, 72)
 
     if cls.operator_passthrough:
-        blf.color(0, 1.0, 1.0, 1.0, 0.2)
+        blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
-        blf.color(0, 1.0, 1.0, 1.0, 1.0)
+        blf.color(0, 255/255, 255/255, 255/255, 1.0)
 
     blf.position(0, cls.overlay_x + 25, cls.overlay_y - (25 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, hint_content)
@@ -151,9 +161,9 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 11, 72)
     
     if cls.operator_passthrough:
-        blf.color(0, 1.0, 1.0, 1.0, 0.2)
+        blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
-        blf.color(0, 1.0, 1.0, 1.0, 0.3)
+        blf.color(0, 255/255, 255/255, 255/255, 0.3)
 
     blf.position(0, cls.overlay_x + 25, cls.overlay_y - (40 + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)

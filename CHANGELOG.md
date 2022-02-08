@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/hugemenace/nd/compare/v1.5.0...v1.6.0) (2022-02-08)
+
+
+### Features
+
+* add 3 point view-plane creation via vertex select mode in view_align operator ([3406bd3](https://github.com/hugemenace/nd/commit/3406bd34e4c54ae35556caa8fb894cec66c1d914))
+* add profile parameter to vertex bevel ([e9ecf35](https://github.com/hugemenace/nd/commit/e9ecf352c137202059c1f379a73ab301a3422b3f))
+* add set_origin utility operator ([f271de7](https://github.com/hugemenace/nd/commit/f271de7a090ec38bf1df65b7d2a0ba8721491541))
+* add summon behaviour to screw, solidify, and wn_bevel operators ([2464274](https://github.com/hugemenace/nd/commit/2464274a8e50486513189d79505c1bca8ababa92))
+* add summon feature to ring_and_bolt operator ([b7f1ed7](https://github.com/hugemenace/nd/commit/b7f1ed77e3798371df8abc5f5accf20fe7ae7b6f))
+* split face_sketch operator into geo_lift and view_align, with improvements in each respectively ([9b8d2d4](https://github.com/hugemenace/nd/commit/9b8d2d49569800f4909cad3c4add5b3c9e0402e8))
+
+
+### Bug Fixes
+
+* add vert, edge, face specific selection mode to geo_lift operator ([9e91e06](https://github.com/hugemenace/nd/commit/9e91e06083ac69571c57ba73f758ac1a23817889))
+* ensure all target geometry is deselected when first entering geo_lift, or view_align operators ([83bc45d](https://github.com/hugemenace/nd/commit/83bc45d0a23d02619f79957d01b197b08a2ad27e))
+* ensure cancel keybind cancels all operators, particularily while in halt mode ([126ec13](https://github.com/hugemenace/nd/commit/126ec13c4b4fac28fdcdb5849dba3a9bb6321676))
+* ensure correct leftover geometry is removed based on selection mode in geo_lift operator ([0ea0be0](https://github.com/hugemenace/nd/commit/0ea0be0f9f397a6fe44fb47e21550e38727ef6cf))
+* ensure summoned ring_and_bolt operator reverts back to previous values on cancel ([4dbc91c](https://github.com/hugemenace/nd/commit/4dbc91c51d6eda5f41ce47abf21edf426c792520))
+* fix solidify operator weighting label array index error ([f3eabc8](https://github.com/hugemenace/nd/commit/f3eabc8dab22e5b6b9199c0300fefa56e37e7d81))
+* remove unneeded viewport cursor wrap behaviour ([26a14c6](https://github.com/hugemenace/nd/commit/26a14c63320df2efb0eda4210f8e2488a26d7e05))
+
 ## [1.5.0](https://github.com/hugemenace/nd/compare/v1.4.0...v1.5.0) (2022-02-06)
 
 

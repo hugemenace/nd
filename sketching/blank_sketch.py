@@ -77,7 +77,7 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
     def finish(self, context):
         bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.remove_doubles(threshold=0.001)
+        bpy.ops.mesh.remove_doubles(threshold=0.0001)
         bpy.ops.mesh.edge_face_add()
 
         unregister_draw_handler()

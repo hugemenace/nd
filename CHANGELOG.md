@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/hugemenace/nd/compare/v1.6.0...v1.6.1) (2022-02-18)
+
+
+### Bug Fixes
+
+* reduce remove double vertices threshold in blank_sketch operator ([511d311](https://github.com/hugemenace/nd/commit/511d3116988b72cc332596faef2646b2a86ada07))
+* update scale parameter overlay representation in screw_head operator ([e153004](https://github.com/hugemenace/nd/commit/e1530046feab51c1fd4b070958f9a166ff65da91))
+
 ## [1.6.0](https://github.com/hugemenace/nd/compare/v1.5.0...v1.6.0) (2022-02-08)
 
 

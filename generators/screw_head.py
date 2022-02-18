@@ -198,16 +198,16 @@ def draw_text_callback(self):
         alt_mode=False)
 
     draw_property(
-        self, 
+        self,
         "Offset: {0:.1f}".format(self.offset * 1000), 
         "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_alt,
         alt_mode=self.key_shift_alt)
 
     draw_property(
-        self, 
-        "Scale: {0:.2f}".format(self.scale), 
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_scale_factor, self.base_scale_factor / 10),
+        self,
+        "Scale: {0:.2f}%".format(self.scale * 100),
+        "Ctrl (±{0:.2f}%)  |  Shift + Ctrl (±{1:.2f}%)".format(self.base_scale_factor * 100, (self.base_scale_factor / 10) * 100),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl)
 

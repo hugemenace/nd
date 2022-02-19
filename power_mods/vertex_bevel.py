@@ -6,6 +6,7 @@ from .. lib.events import capture_modifier_keys
 
 mod_bevel = "Bevel — ND VB"
 mod_weld = "Weld — ND VB"
+mod_summon_list = [mod_bevel, mod_weld]
 
 
 class ND_OT_vertex_bevel(bpy.types.Operator):
@@ -130,13 +131,24 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         bevel.profile = self.profile
 
         self.bevel = bevel
+
+        while context.object.modifiers[0].name != self.bevel.name:
+            bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
     
 
     def add_weld_modifier(self, context):
-        weld = context.object.modifiers.new(mod_weld, type='WELD')
-        weld.merge_threshold = 0.00001
+        mods = context.active_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
 
-        self.weld = weld
+        if not previous_op:
+            weld = context.object.modifiers.new(mod_weld, type='WELD')
+            weld.merge_threshold = 0.00001
+
+            self.weld = weld
+
+            while context.object.modifiers[1].name != self.weld.name:
+                bpy.ops.object.modifier_move_up(modifier=self.weld.name)
 
 
     def operate(self, context):

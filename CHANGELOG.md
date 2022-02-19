@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/hugemenace/nd/compare/v1.6.1...v1.7.0) (2022-02-19)
+
+
+### Features
+
+* add smooth operator ([677309e](https://github.com/hugemenace/nd/commit/677309e8b5320c16596a72dc2fbe42b651f7879c))
+
+
+### Bug Fixes
+
+* ensure vertex_bevel operator always places current bevel modifier at the top of the stack, and only creates one weld modifier in total ([00cfd4e](https://github.com/hugemenace/nd/commit/00cfd4ebd47f09c87e6ab00f65d268c7c849371a))
+
 ### [1.6.1](https://github.com/hugemenace/nd/compare/v1.6.0...v1.6.1) (2022-02-18)
 
 

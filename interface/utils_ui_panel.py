@@ -27,12 +27,20 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
         row.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').suffix = 'HIGH'
 
         box = layout.box()
-        box.label(text="Object TRS", icon='ORIENTATION_GIMBAL')
+        box.label(text="Object Transform", icon='ORIENTATION_GIMBAL')
         column = box.column()
 
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
+
+        box = layout.box()
+        box.label(text="Object Properties", icon='MESH_DATA')
+        column = box.column()
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.smooth", icon='MOD_SMOOTH')
 
         
 def register():

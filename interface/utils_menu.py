@@ -15,8 +15,9 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').suffix = 'HIGH'
         layout.separator()
         layout.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
+        layout.separator()
+        layout.operator("nd.smooth", icon='MOD_SMOOTH')
         
-
 
 def draw_item(self, context):
     layout = self.layout

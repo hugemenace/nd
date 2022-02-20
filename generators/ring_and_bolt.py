@@ -196,6 +196,12 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         
         self.decimate = decimate
 
+        all_mods = self.obj.modifiers.values()
+        decimate_index = all_mods.index(self.screwZ) + 1
+
+        while self.obj.modifiers[decimate_index].name != self.decimate.name:
+            bpy.ops.object.modifier_move_up(modifier=self.decimate.name)
+
 
     def try_remove_decimate_modifier(self, context):
         self.had_decimate_mod = False

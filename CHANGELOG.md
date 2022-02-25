@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.1](https://github.com/hugemenace/nd/compare/v1.7.0...v1.7.1) (2022-02-25)
+
+
+### Bug Fixes
+
+* ensure the decimate modifier retains its appropriate position in the stack when recalling the ring_and_bolt operator ([03117a2](https://github.com/hugemenace/nd/commit/03117a2ca804a5fee2935cfa9051c9b0674aac7c))
+
 ## [1.7.0](https://github.com/hugemenace/nd/compare/v1.6.1...v1.7.0) (2022-02-19)
 
 

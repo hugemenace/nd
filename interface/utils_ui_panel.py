@@ -41,6 +41,10 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.smooth", icon='MOD_SMOOTH')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.seams", icon='UV_DATA')
 
         
 def register():

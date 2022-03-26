@@ -17,6 +17,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
         layout.separator()
         layout.operator("nd.smooth", icon='MOD_SMOOTH')
+        layout.operator("nd.seams", icon='UV_DATA')
         
 
 def draw_item(self, context):

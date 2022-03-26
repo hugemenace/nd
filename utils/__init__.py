@@ -3,6 +3,7 @@ from . import name_sync
 from . import set_lod_suffix
 from . import set_origin
 from . import smooth
+from . import seams
 
 
 def reload():
@@ -10,6 +11,7 @@ def reload():
     importlib.reload(set_lod_suffix)
     importlib.reload(set_origin)
     importlib.reload(smooth)
+    importlib.reload(seams)
 
 
 def register():
@@ -17,6 +19,7 @@ def register():
     set_lod_suffix.register()
     set_origin.register()
     smooth.register()
+    seams.register()
 
 
 def unregister():
@@ -24,3 +27,4 @@ def unregister():
     set_lod_suffix.unregister()
     set_origin.unregister()
     smooth.unregister()
+    seams.unregister()

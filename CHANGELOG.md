@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/hugemenace/nd/compare/v1.7.1...v1.8.0) (2022-03-26)
+
+
+### Features
+
+* add interactive UV seams & sharps operator ([a47891a](https://github.com/hugemenace/nd/commit/a47891ab6ce7afe351e74197102501b4f30ec1f8))
+
 ### [1.7.1](https://github.com/hugemenace/nd/compare/v1.7.0...v1.7.1) (2022-02-25)
 
 

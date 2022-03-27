@@ -10,10 +10,10 @@ bl_info = {
     "category": "3D View"
 }
 
+
 import bpy
 from bpy.types import AddonPreferences
 from bpy.props import BoolProperty
-
 from . import lib
 from . import interface
 from . import sketching
@@ -29,6 +29,7 @@ registerables = (
     generators,
     utils,
 )
+
 
 class NDPreferences(AddonPreferences):
     bl_idname = __name__
@@ -48,7 +49,7 @@ def register():
 
     bpy.utils.register_class(NDPreferences)
 
-    lib.preferences.get_preferences().update_available = lib.updates.check_version(bl_info['version'])
+    lib.preferences.get_preferences().update_available = lib.updates.update_available(bl_info['version'])
 
 
 def unregister():

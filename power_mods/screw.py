@@ -199,12 +199,12 @@ class ND_OT_screw(bpy.types.Operator):
             bpy.ops.object.modifier_remove(modifier=self.displace.name)
 
         if self.summoned:
-            self.displace.strength = self.displace.strength_prev
-            self.displace.direction = self.displace.direction_prev
-            self.screw.axis = self.screw.axis_prev
-            self.screw.steps = self.screw.steps_prev
-            self.screw.render_steps = self.screw.render_steps_prev
-            self.screw.angle = self.screw.angle_prev
+            self.displace.strength = self.offset_prev
+            self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis_prev]
+            self.screw.axis = ['X', 'Y', 'Z'][self.screw_axis_prev]
+            self.screw.steps = self.segments_prev
+            self.screw.render_steps = self.segments_prev
+            self.screw.angle = radians(self.angle_prev)
 
         unregister_draw_handler()
 

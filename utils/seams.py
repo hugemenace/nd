@@ -114,6 +114,7 @@ class ND_OT_seams(bpy.types.Operator):
 
         if self.commit_auto_smooth:
             bpy.ops.object.shade_smooth()
+            context.object.data.use_auto_smooth = True
             context.object.data.auto_smooth_angle = radians(self.angle)
 
         unregister_draw_handler()

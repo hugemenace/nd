@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/hugemenace/nd/compare/v1.9.0...v1.10.0) (2022-03-27)
+
+
+### Features
+
+* add version detection, "update available" notification, and Gumroad link to main UI panel ([c70b2ff](https://github.com/hugemenace/nd/commit/c70b2ff54bfc983ff4509e161b26ac1625add138))
+
+
+### Bug Fixes
+
+* fix erroneous unregister_draw_handler calls in screw, solidify, seams, and smooth operators ([02a52d8](https://github.com/hugemenace/nd/commit/02a52d8d4ea5dd706af2787acd25c0aa40db6ba3))
+
 ## [1.9.0](https://github.com/hugemenace/nd/compare/v1.8.0...v1.9.0) (2022-03-27)
 
 

@@ -10,6 +10,9 @@ bl_info = {
     "category": "3D View"
 }
 
+import bpy
+from bpy.types import AddonPreferences
+from bpy.props import BoolProperty
 
 from . import lib
 from . import interface
@@ -27,6 +30,14 @@ registerables = (
     utils,
 )
 
+class NDPreferences(AddonPreferences):
+    bl_idname = __name__
+    
+    update_available: BoolProperty(
+        name="Update Available",
+        default=False,
+    )
+
 
 def register():
     lib.reload()
@@ -35,7 +46,13 @@ def register():
         registerable.reload()
         registerable.register()
 
+    bpy.utils.register_class(NDPreferences)
+
+    lib.preferences.get_preferences().update_available = lib.updates.check_version(bl_info['version'])
+
 
 def unregister():
     for registerable in registerables:
         registerable.unregister()
+
+    bpy.utils.unregister_class(NDPreferences)

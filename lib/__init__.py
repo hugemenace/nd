@@ -5,6 +5,8 @@ from . import objects
 from . import overlay
 from . import viewport
 from . import assets
+from . import updates
+from . import preferences
 
 
 def reload():
@@ -14,5 +16,7 @@ def reload():
     importlib.reload(overlay)
     importlib.reload(viewport)
     importlib.reload(assets)
+    importlib.reload(updates)
+    importlib.reload(preferences)
 
     overlay.unregister_draw_handler()

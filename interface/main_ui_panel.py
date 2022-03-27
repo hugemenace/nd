@@ -1,5 +1,6 @@
 import bpy
 from .. import bl_info
+from .. import lib
 
 
 class ND_PT_main_ui_panel(bpy.types.Panel):
@@ -12,6 +13,14 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+
+        if lib.preferences.get_preferences().update_available:
+            box = layout.box()
+            column = box.column()
+            row = column.row(align=True)
+            row.scale_y = 1.5
+            row.alert = True
+            row.operator("wm.url_open", text="Update Available!", icon='PACKAGE').url = "https://hugemenace.gumroad.com/l/nd-blender-addon"
         
         box = layout.box()
         box.label(text="Documentation", icon='INFO')

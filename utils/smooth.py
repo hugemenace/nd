@@ -116,4 +116,4 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_smooth)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, ND_OT_smooth.bl_label)
+    unregister_draw_handler()

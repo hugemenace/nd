@@ -217,4 +217,4 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_solidify)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, ND_OT_solidify.bl_label)
+    unregister_draw_handler()

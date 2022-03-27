@@ -153,4 +153,4 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_seams)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
-    unregister_draw_handler(self, ND_OT_seams.bl_label)
+    unregister_draw_handler()

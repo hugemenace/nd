@@ -31,7 +31,10 @@ def redraw_regions():
                     region.tag_redraw()
 
 
-def toggle_pin_overlay(cls):
+def toggle_pin_overlay(cls, event):
+    cls.overlay_x = event.mouse_x - cls.region_offset_x + cls.overlay_offset_x
+    cls.overlay_y = event.mouse_y - cls.region_offset_y + cls.overlay_offset_y
+
     cls.pin_overlay = not cls.pin_overlay
 
 
@@ -56,13 +59,10 @@ def init_overlay(cls, event):
     cls.operator_passthrough = False
 
 
-def update_overlay(cls, context, event, x_offset=400, lines=1):
-    cls.overlay_x = event.mouse_x - cls.region_offset_x + cls.overlay_offset_x
-    cls.overlay_y = event.mouse_y - cls.region_offset_y + cls.overlay_offset_y
-
-    if cls.pin_overlay:
-        cls.overlay_x = context.region.width - x_offset
-        cls.overlay_y = 45 + (lines * cls.line_spacer)
+def update_overlay(cls, context, event):
+    if not cls.pin_overlay:
+        cls.overlay_x = event.mouse_x - cls.region_offset_x + cls.overlay_offset_x
+        cls.overlay_y = event.mouse_y - cls.region_offset_y + cls.overlay_offset_y
 
     redraw_regions()
 
@@ -71,26 +71,27 @@ def draw_header(cls):
     is_summoned = getattr(cls, "summoned", False)
 
     if cls.operator_passthrough:
-        blf.size(0, 12, 72)
-        blf.color(0, 238/255, 59/255, 43/255, 1.0)
-        blf.position(0, cls.overlay_x + 1, cls.overlay_y + 26, 0)
-        blf.draw(0, "PAUSE")
-
-    if is_summoned and not cls.operator_passthrough:
-        blf.size(0, 12, 72)
-        blf.color(0, 82/255, 224/255, 82/255, 1.0)
-        blf.position(0, cls.overlay_x + 1, cls.overlay_y + 26, 0)
-        blf.draw(0, "RECALL")
-
-    blf.size(0, 24, 72)
-
-    if cls.operator_passthrough:
         blf.color(0, 238/255, 59/255, 43/255, 1.0)
     elif is_summoned and not cls.operator_passthrough:
         blf.color(0, 82/255, 224/255, 82/255, 1.0)
     else:
         blf.color(0, 255/255, 135/255, 55/255, 1.0)
 
+    if cls.operator_passthrough or is_summoned or cls.pin_overlay:
+        blf.size(0, 11, 72)
+        blf.position(0, cls.overlay_x + 1, cls.overlay_y + 26, 0)
+
+        states = []
+        if cls.operator_passthrough:
+            states.append("PAUSED")
+        if is_summoned:
+            states.append("RECALL")
+        if cls.pin_overlay:
+            states.append("PINNED")
+
+        blf.draw(0, " // ".join(states))
+
+    blf.size(0, 24, 72) 
     blf.position(0, cls.overlay_x, cls.overlay_y, 0)
     blf.draw(0, "ND — " + cls.bl_label)
 

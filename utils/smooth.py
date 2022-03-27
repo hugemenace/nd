@@ -21,7 +21,7 @@ class ND_OT_smooth(bpy.types.Operator):
             toggle_operator_passthrough(self)
 
         elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self)
+            toggle_pin_overlay(self, event)
 
         elif self.key_cancel:
             self.revert(context)
@@ -29,7 +29,7 @@ class ND_OT_smooth(bpy.types.Operator):
             return {'CANCELLED'}
 
         elif self.operator_passthrough:
-            self.update_overlay_wrapper(context, event)
+            update_overlay(self, context, event)
 
             return {'PASS_THROUGH'}
 
@@ -48,13 +48,9 @@ class ND_OT_smooth(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         self.operate(context)
-        self.update_overlay_wrapper(context, event)
+        update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
-
-    
-    def update_overlay_wrapper(self, context, event):
-        update_overlay(self, context, event, x_offset=340, lines=1)
 
 
     def invoke(self, context, event):

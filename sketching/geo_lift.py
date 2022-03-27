@@ -19,7 +19,7 @@ class ND_OT_geo_lift(bpy.types.Operator):
             toggle_operator_passthrough(self)
 
         elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self)
+            toggle_pin_overlay(self, event)
 
         elif self.key_cancel:
             self.clean_up(context)
@@ -49,7 +49,7 @@ class ND_OT_geo_lift(bpy.types.Operator):
             self.set_selection_mode(context)
 
         elif self.operator_passthrough:
-            self.update_overlay_wrapper(context, event)
+            update_overlay(self, context, event)
             
             return {'PASS_THROUGH'}
 
@@ -62,13 +62,9 @@ class ND_OT_geo_lift(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.update_overlay_wrapper(context, event)
+        update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
-
-    
-    def update_overlay_wrapper(self, context, event):
-        update_overlay(self, context, event, x_offset=260, lines=2)
 
 
     def invoke(self, context, event):

@@ -14,6 +14,7 @@ def v3_sum(vectors):
 
     return total
 
+
 def v3_average(vectors):
     return v3_sum(vectors) / len(vectors)
 

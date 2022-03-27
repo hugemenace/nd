@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/hugemenace/nd/compare/v1.8.0...v1.9.0) (2022-03-27)
+
+
+### Features
+
+* replace overlay fixed pin location with pin-in-place functionality ([2763a33](https://github.com/hugemenace/nd/commit/2763a33021e7dd9ed8ea8ccca0ca422553c7f5b5))
+
+
+### Bug Fixes
+
+* ensure seams operator turns on object auto smooth if override is set ([68b58ce](https://github.com/hugemenace/nd/commit/68b58ced069e0b51b6f5d324d812b82435e76600))
+* fix screw operator summon & revert error ([f34b62d](https://github.com/hugemenace/nd/commit/f34b62d6f747e1ab1c611c1cc702a5d649e12a33))
+
 ## [1.8.0](https://github.com/hugemenace/nd/compare/v1.7.1...v1.8.0) (2022-03-26)
 
 

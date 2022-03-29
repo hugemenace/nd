@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/hugemenace/nd/compare/v1.10.0...v1.11.0) (2022-03-29)
+
+
+### Features
+
+* add the 3 core boolean operators, difference, union, and intersect ([ca58b0b](https://github.com/hugemenace/nd/commit/ca58b0b3d0db45d9444c0a75c465e28bf4858992))
+
+
+### Bug Fixes
+
+* swap origin and destination objects in set_origin operator ([8f84279](https://github.com/hugemenace/nd/commit/8f84279bda2cda7243209dbee61c4385cfc44699))
+
 ## [1.10.0](https://github.com/hugemenace/nd/compare/v1.9.0...v1.10.0) (2022-03-27)
 
 

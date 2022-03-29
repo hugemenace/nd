@@ -19,20 +19,20 @@ class ND_OT_set_origin(bpy.types.Operator):
         a, b = context.selected_objects
         reference_obj = a if a.name != context.object.name else b
         
-        (x_dest, y_dest, z_dest) = context.object.location
-        (x_orig, y_orig, z_orig) = reference_obj.location
+        (x_dest, y_dest, z_dest) = reference_obj.location
+        (x_orig, y_orig, z_orig) = context.object.location
 
-        context.object.location = reference_obj.location
+        reference_obj.location = context.object.location
 
-        self.add_displace_modifier(context, 'X', x_dest - x_orig)
-        self.add_displace_modifier(context, 'Y', y_dest - y_orig)
-        self.add_displace_modifier(context, 'Z', z_dest - z_orig)
+        self.add_displace_modifier(reference_obj, 'X', x_dest - x_orig)
+        self.add_displace_modifier(reference_obj, 'Y', y_dest - y_orig)
+        self.add_displace_modifier(reference_obj, 'Z', z_dest - z_orig)
 
         return {'FINISHED'}
 
     
-    def add_displace_modifier(self, context, axis, strength):
-        displace = context.object.modifiers.new("{} Axis Displace — ND".format(axis), 'DISPLACE')
+    def add_displace_modifier(self, reference_obj, axis, strength):
+        displace = reference_obj.modifiers.new("{} Axis Displace — ND".format(axis), 'DISPLACE')
         displace.direction = axis 
         displace.space = 'GLOBAL'
         displace.mid_level = 0

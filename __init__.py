@@ -15,6 +15,7 @@ import bpy
 from bpy.types import AddonPreferences
 from bpy.props import BoolProperty
 from . import lib
+from . import booleans
 from . import interface
 from . import sketching
 from . import power_mods
@@ -23,6 +24,7 @@ from . import utils
 
 
 registerables = (
+    booleans,
     interface,
     sketching,
     power_mods,

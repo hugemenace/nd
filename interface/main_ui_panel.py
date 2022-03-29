@@ -57,6 +57,18 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
+        row.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.bool_vanilla", text="Union", icon='MOD_BOOLEAN').mode = 'UNION'
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.bool_vanilla", text="Intersect", icon='MOD_BOOLEAN').mode = 'INTERSECT'
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
         row.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
 
         row = column.row(align=True)

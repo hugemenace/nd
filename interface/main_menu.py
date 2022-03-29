@@ -18,6 +18,9 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
         layout.operator("nd.vertex_bevel", icon='MOD_BEVEL')
         layout.separator()
+        layout.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
+        layout.operator("nd.bool_vanilla", text="Union", icon='MOD_BOOLEAN').mode = 'UNION'
+        layout.operator("nd.bool_vanilla", text="Intersect", icon='MOD_BOOLEAN').mode = 'INTERSECT'
         layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
         layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
         layout.operator("nd.screw", icon='MOD_SCREW')

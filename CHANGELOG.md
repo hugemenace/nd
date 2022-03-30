@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.11.2](https://github.com/hugemenace/nd/compare/v1.11.1...v1.11.2) (2022-03-30)
+
+
+### Bug Fixes
+
+* ensure ESC key does not cancel paused operators ([01cfa93](https://github.com/hugemenace/nd/commit/01cfa9356c015f5aa7e6b4608c435cd5ca352d91))
+
 ### [1.11.1](https://github.com/hugemenace/nd/compare/v1.11.0...v1.11.1) (2022-03-30)
 
 ## [1.11.0](https://github.com/hugemenace/nd/compare/v1.10.0...v1.11.0) (2022-03-29)

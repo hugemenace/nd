@@ -22,15 +22,15 @@ class ND_OT_view_align(bpy.types.Operator):
         elif self.key_toggle_pin_overlay:
             toggle_pin_overlay(self, event)
 
-        elif self.key_cancel:
-            self.clean_up(context)
-
-            return {'CANCELLED'}
-
         elif self.operator_passthrough:
             update_overlay(self, context, event)
 
             return {'PASS_THROUGH'}
+
+        elif self.key_cancel:
+            self.clean_up(context)
+
+            return {'CANCELLED'}
 
         elif self.key_step_up:
             if self.key_alt:

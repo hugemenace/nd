@@ -21,11 +21,6 @@ class ND_OT_geo_lift(bpy.types.Operator):
         elif self.key_toggle_pin_overlay:
             toggle_pin_overlay(self, event)
 
-        elif self.key_cancel:
-            self.clean_up(context)
-
-            return {'CANCELLED'}
-
         elif self.key_step_up:
             if self.key_alt:
                 self.selection_type = (self.selection_type + 1) % 3
@@ -55,6 +50,11 @@ class ND_OT_geo_lift(bpy.types.Operator):
 
         elif self.key_confirm:
             return {'PASS_THROUGH'}
+
+        elif self.key_cancel:
+            self.clean_up(context)
+
+            return {'CANCELLED'}
         
         elif self.key_confirm_alternative:
             return self.finish(context)

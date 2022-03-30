@@ -28,15 +28,15 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         elif self.key_toggle_pin_overlay:
             toggle_pin_overlay(self, event)
 
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
         elif self.operator_passthrough:
             update_overlay(self, context, event)
 
             return {'PASS_THROUGH'}
+
+        elif self.key_cancel:
+            self.revert(context)
+
+            return {'CANCELLED'}
 
         elif self.key_increase_factor:
             self.base_width_factor = min(1, self.base_width_factor * 10.0)

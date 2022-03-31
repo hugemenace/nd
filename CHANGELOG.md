@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/hugemenace/nd/compare/v1.11.2...v1.12.0) (2022-03-31)
+
+
+### Features
+
+* add boolean slice operator ([722dd8d](https://github.com/hugemenace/nd/commit/722dd8d651a4c98b11ecda8011e8e87f71cd2071))
+* ensure reference and secondary objects in boolean operations are parented to the primary object ([7633792](https://github.com/hugemenace/nd/commit/7633792563919c0f088efcb76c5fa431b50c8d6c))
+* prefix boolean reference object names ([6044792](https://github.com/hugemenace/nd/commit/60447921c2f98109e62f92a7474cdccd8298e821))
+
 ### [1.11.2](https://github.com/hugemenace/nd/compare/v1.11.1...v1.11.2) (2022-03-30)
 
 

@@ -37,6 +37,8 @@ class ND_OT_bool_slice(bpy.types.Operator):
 
         reference_obj.display_type = 'WIRE'
         reference_obj.hide_render = True
+        reference_obj.name = " — ".join(['Bool', reference_obj.name])
+        reference_obj.data.name = reference_obj.name
 
         reference_obj.parent = difference_obj
         intersecting_obj.parent = difference_obj

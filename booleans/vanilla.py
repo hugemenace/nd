@@ -33,6 +33,8 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
         reference_obj.display_type = 'WIRE'
         reference_obj.hide_render = True
 
+        reference_obj.parent = context.object
+
         return {'FINISHED'}
 
     

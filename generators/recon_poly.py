@@ -6,17 +6,17 @@ from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys
 
 
-mod_displace = "Radius — ND R&B"
-mod_screw_1 = "Width — ND R&B"
-mod_screw_2 = "Segments — ND R&B"
-mod_decimate = "Decimate — ND R&B"
+mod_displace = "Radius — ND RCP"
+mod_screw_1 = "Width — ND RCP"
+mod_screw_2 = "Segments — ND RCP"
+mod_decimate = "Decimate — ND RCP"
 mod_summon_list = [mod_displace, mod_screw_1, mod_screw_2]
 
 
-class ND_OT_ring_and_bolt(bpy.types.Operator):
-    bl_idname = "nd.ring_and_bolt"
-    bl_label = "Ring & Bolt"
-    bl_description = "Adds a ring or ring_and_bolt face at the 3D cursor"
+class ND_OT_recon_poly(bpy.types.Operator):
+    bl_idname = "nd.recon_poly"
+    bl_label = "Recon Poly"
+    bl_description = "Adds a regular convex polygon at the 3D cursor"
     bl_options = {'UNDO'}
 
 
@@ -217,14 +217,14 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
         self.displace.strength = self.inner_radius
 
 
-    def select_ring_and_bolt(self, context):
+    def select_recon_poly(self, context):
         bpy.ops.object.select_all(action='DESELECT')
         self.obj.select_set(True)
 
 
     def finish(self, context):
         if not self.summoned:
-            self.select_ring_and_bolt(context)
+            self.select_recon_poly(context)
 
         if self.segments > 3:
             self.add_decimate_modifier()
@@ -234,7 +234,7 @@ class ND_OT_ring_and_bolt(bpy.types.Operator):
 
     def revert(self, context):
         if not self.summoned:
-            self.select_ring_and_bolt(context)
+            self.select_recon_poly(context)
             bpy.ops.object.delete()
         elif self.had_decimate_mod or self.segments > 3:
             self.add_decimate_modifier()
@@ -274,15 +274,15 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_ring_and_bolt.bl_idname, text=ND_OT_ring_and_bolt.bl_label)
+    self.layout.operator(ND_OT_recon_poly.bl_idname, text=ND_OT_recon_poly.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_ring_and_bolt)
+    bpy.utils.register_class(ND_OT_recon_poly)
     bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_ring_and_bolt)
+    bpy.utils.unregister_class(ND_OT_recon_poly)
     bpy.types.VIEW3D_MT_object.remove(menu_func)
     unregister_draw_handler()

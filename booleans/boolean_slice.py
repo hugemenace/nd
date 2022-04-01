@@ -43,6 +43,8 @@ class ND_OT_bool_slice(bpy.types.Operator):
         reference_obj.parent = difference_obj
         intersecting_obj.parent = difference_obj
 
+        reference_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
+        intersecting_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
         return {'FINISHED'}
 
     

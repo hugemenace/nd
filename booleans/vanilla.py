@@ -36,6 +36,7 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
         reference_obj.data.name = reference_obj.name
 
         reference_obj.parent = context.object
+        reference_obj.matrix_parent_inverse = context.object.matrix_world.inverted()
 
         return {'FINISHED'}
 

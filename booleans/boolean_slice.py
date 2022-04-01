@@ -45,6 +45,11 @@ class ND_OT_bool_slice(bpy.types.Operator):
 
         reference_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
         intersecting_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
+
+        bpy.ops.object.select_all(action='DESELECT')
+        reference_obj.select_set(True)
+        bpy.context.view_layer.objects.active = reference_obj
+
         return {'FINISHED'}
 
     

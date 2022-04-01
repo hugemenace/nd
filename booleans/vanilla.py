@@ -38,6 +38,10 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
         reference_obj.parent = context.object
         reference_obj.matrix_parent_inverse = context.object.matrix_world.inverted()
 
+        bpy.ops.object.select_all(action='DESELECT')
+        reference_obj.select_set(True)
+        bpy.context.view_layer.objects.active = reference_obj
+
         return {'FINISHED'}
 
     

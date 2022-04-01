@@ -84,7 +84,7 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.recon_poly", icon='MESH_PLANE')
+        row.operator("nd.recon_poly", icon='SURFACE_NCURVE')
 
         row = column.row(align=True)
         row.scale_y = 1.2

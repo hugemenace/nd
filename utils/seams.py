@@ -136,7 +136,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Sync Auto Smooth: {0}".format("Yes" if self.commit_auto_smooth else "No"),
-        "Yes / No".format(self.base_angle_factor),
+        "Alt (Yes / No)",
         active=self.key_alt,
         alt_mode=False)
 

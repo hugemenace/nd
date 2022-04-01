@@ -224,7 +224,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Selection Type: {0}".format(['Vertex', 'Edge', 'Face'][self.selection_type]),
-        "Alt / 1,2,3 (Vertex, Edge, Face)",
+        "Alt / 1, 2, 3 (Vertex, Edge, Face)",
         active=self.key_alt,
         alt_mode=False)
 

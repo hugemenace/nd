@@ -3,6 +3,7 @@ from . import screw
 from . import solidify
 from . import weighted_normal_bevel
 from . import vertex_bevel
+from . import mirror
 
 
 def reload():
@@ -10,6 +11,7 @@ def reload():
     importlib.reload(solidify)
     importlib.reload(weighted_normal_bevel)
     importlib.reload(vertex_bevel)
+    importlib.reload(mirror)
 
 
 def register():
@@ -17,6 +19,7 @@ def register():
     solidify.register()
     weighted_normal_bevel.register()
     vertex_bevel.register()
+    mirror.register()
 
 
 def unregister():
@@ -24,5 +27,6 @@ def unregister():
     solidify.unregister()
     weighted_normal_bevel.unregister()
     vertex_bevel.unregister()
+    mirror.unregister()
 
     

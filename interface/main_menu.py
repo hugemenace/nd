@@ -22,6 +22,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
         layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
         layout.operator("nd.screw", icon='MOD_SCREW')
+        layout.operator("nd.mirror", icon='MOD_MIRROR')
         layout.separator()
         layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
         layout.operator("nd.screw_head", icon='CANCEL')

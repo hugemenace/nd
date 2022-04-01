@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/hugemenace/nd/compare/v1.13.0...v1.14.0) (2022-04-01)
+
+
+### Features
+
+* add mirror operator ([1196540](https://github.com/hugemenace/nd/commit/11965400980aed2298883fd7d575423fcecaeec3))
+* automatically select and set active the boolean reference object ([8ea087c](https://github.com/hugemenace/nd/commit/8ea087c9c9c5419dbb55dc8d2cb39fa15335d3d9))
+
+
+### Bug Fixes
+
+* ensure that parented objects in all boolean operations have their transforms maintained ([82e58a2](https://github.com/hugemenace/nd/commit/82e58a23b8b1aa02f4a20bb26cdb6f624edceec8))
+
 ## [1.13.0](https://github.com/hugemenace/nd/compare/v1.12.0...v1.13.0) (2022-04-01)
 
 

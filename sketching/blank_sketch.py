@@ -1,6 +1,6 @@
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys
 
@@ -31,6 +31,14 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
             return {'CANCELLED'}
 
+        elif self.key_step_up:
+            if self.key_alt:
+                self.enforce_manifold = not self.enforce_manifold
+            
+        elif self.key_step_down:
+            if self.key_alt:
+                self.enforce_manifold = not self.enforce_manifold
+
         elif self.key_confirm_alternative:
             self.finish(context)
 
@@ -45,6 +53,8 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        self.enforce_manifold = True
+
         add_single_vertex_object(self, context, "Sketch")
         align_object_to_3d_cursor(self, context)
 
@@ -72,9 +82,10 @@ class ND_OT_blank_sketch(bpy.types.Operator):
 
 
     def finish(self, context):
-        bpy.ops.mesh.select_all(action='SELECT')
-        bpy.ops.mesh.remove_doubles(threshold=0.0001)
-        bpy.ops.mesh.edge_face_add()
+        if self.enforce_manifold:
+            bpy.ops.mesh.select_all(action='SELECT')
+            bpy.ops.mesh.remove_doubles(threshold=0.0001)
+            bpy.ops.mesh.edge_face_add()
 
         unregister_draw_handler()
 
@@ -92,6 +103,13 @@ def draw_text_callback(self):
     draw_header(self)
     
     draw_hint(self, "Start sketching...", "Press space to confirm")
+
+    draw_property(
+        self,
+        "Manifold: {}".format('Yes' if self.enforce_manifold else 'No'),
+        "Alt (Yes, No)",
+        active=self.key_alt,
+        alt_mode=False)
 
 
 def menu_func(self, context):

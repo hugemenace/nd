@@ -1,5 +1,6 @@
 import bpy
 import blf
+from . preferences import get_preferences
 
 
 def register_draw_handler(cls, callback):
@@ -47,7 +48,9 @@ def init_overlay(cls, event):
     cls.overlay_offset_y = -15
 
     cls.line_step = 0
-    cls.line_spacer = 40
+    cls.dpi = get_preferences().overlay_dpi
+    cls.dpi_scalar = cls.dpi / 72
+    cls.line_spacer = 40 * cls.dpi_scalar
     
     cls.region_offset_x = event.mouse_x - event.mouse_region_x
     cls.region_offset_y = event.mouse_y - event.mouse_region_y
@@ -78,8 +81,8 @@ def draw_header(cls):
         blf.color(0, 255/255, 135/255, 55/255, 1.0)
 
     if cls.operator_passthrough or is_summoned or cls.pin_overlay:
-        blf.size(0, 11, 72)
-        blf.position(0, cls.overlay_x + 1, cls.overlay_y + 26, 0)
+        blf.size(0, 11, cls.dpi)
+        blf.position(0, cls.overlay_x + (1 * cls.dpi_scalar), cls.overlay_y + (26 * cls.dpi_scalar), 0)
 
         states = []
         if cls.operator_passthrough:
@@ -91,7 +94,7 @@ def draw_header(cls):
 
         blf.draw(0, " // ".join(states))
 
-    blf.size(0, 24, 72) 
+    blf.size(0, 24, cls.dpi) 
     blf.position(0, cls.overlay_x, cls.overlay_y, 0)
     blf.draw(0, "ND — " + cls.bl_label)
 
@@ -99,7 +102,7 @@ def draw_header(cls):
 
 
 def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False):
-    blf.size(0, 28, 72)
+    blf.size(0, 28, cls.dpi)
     
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
@@ -108,65 +111,65 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     else:
         blf.color(0, 255/255, 255/255, 255/255, 0.1)
     
-    blf.position(0, cls.overlay_x, cls.overlay_y - (38 + (cls.line_spacer * cls.line_step)), 0)
+    blf.position(0, cls.overlay_x, cls.overlay_y - ((38 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     
     if alt_mode:
         blf.draw(0, "◑")
     else:
         blf.draw(0, "●")
 
-    blf.size(0, 16, 72)
+    blf.size(0, 16, cls.dpi)
 
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
         blf.color(0, 255/255, 255/255, 255/255, 1.0)
 
-    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (25 + (cls.line_spacer * cls.line_step)), 0)
+    blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((25 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, property_content)
     
-    blf.size(0, 11, 72)
+    blf.size(0, 11, cls.dpi)
     
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
         blf.color(0, 255/255, 255/255, 255/255, 0.3)
 
-    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (40 + (cls.line_spacer * cls.line_step)), 0)
+    blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((40 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)
 
     cls.line_step += 1
 
 
 def draw_hint(cls, hint_content, metadata_content):
-    blf.size(0, 22, 72)
+    blf.size(0, 22, cls.dpi)
     
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
         blf.color(0, 255/255, 255/255, 255/255, 0.5)
 
-    blf.position(0, cls.overlay_x - 3, cls.overlay_y - (36 + (cls.line_spacer * cls.line_step)), 0)
+    blf.position(0, cls.overlay_x - (3 * cls.dpi_scalar), cls.overlay_y - ((36 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, "◈")
 
-    blf.size(0, 16, 72)
+    blf.size(0, 16, cls.dpi)
 
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
         blf.color(0, 255/255, 255/255, 255/255, 1.0)
 
-    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (25 + (cls.line_spacer * cls.line_step)), 0)
+    blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((25 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, hint_content)
     
-    blf.size(0, 11, 72)
+    blf.size(0, 11, cls.dpi)
     
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
     else:
         blf.color(0, 255/255, 255/255, 255/255, 0.3)
 
-    blf.position(0, cls.overlay_x + 25, cls.overlay_y - (40 + (cls.line_spacer * cls.line_step)), 0)
+    blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((40 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)
 
     cls.line_step += 1

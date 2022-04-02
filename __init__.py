@@ -13,7 +13,7 @@ bl_info = {
 
 import bpy
 from bpy.types import AddonPreferences
-from bpy.props import BoolProperty
+from bpy.props import BoolProperty, IntProperty
 from . import lib
 from . import booleans
 from . import interface
@@ -40,6 +40,18 @@ class NDPreferences(AddonPreferences):
         name="Update Available",
         default=False,
     )
+
+    overlay_dpi: IntProperty(
+        name="Overlay DPI",
+        default=72,
+        min=1,
+        max=300,
+        step=1,
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "overlay_dpi")
 
 
 def register():

@@ -82,6 +82,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row.scale_y = 1.2
         row.operator("nd.mirror", icon='MOD_MIRROR')
 
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+
         box = layout.box()
         box.label(text="Generators", icon='GHOST_ENABLED')
         column = box.column()

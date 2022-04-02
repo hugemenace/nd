@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.15.0](https://github.com/hugemenace/nd/compare/v1.14.0...v1.15.0) (2022-04-02)
+
+
+### Features
+
+* add manifold option to blank_sketch operator ([aebd11b](https://github.com/hugemenace/nd/commit/aebd11b90723d69bcb981f9c8820fcbd8abae9c3))
+* add profile_extrude operator ([331f2bb](https://github.com/hugemenace/nd/commit/331f2bbaaa3679387985d521f9be77cf26e47dfe))
+
+
+### Bug Fixes
+
+* ensure solidify modifier uses even offset ([57a5e59](https://github.com/hugemenace/nd/commit/57a5e591f3f0aeee8e64e12b841b92f5fa2998fa))
+
 ## [1.14.0](https://github.com/hugemenace/nd/compare/v1.13.0...v1.14.0) (2022-04-01)
 
 

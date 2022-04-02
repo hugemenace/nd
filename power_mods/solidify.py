@@ -153,6 +153,7 @@ class ND_OT_solidify(bpy.types.Operator):
         solidify = context.object.modifiers.new(mod_solidify, 'SOLIDIFY')
         solidify.thickness = self.thickness
         solidify.offset = self.weighting
+        solidify.use_even_offset = True
 
         self.solidify = solidify
     

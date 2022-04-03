@@ -113,7 +113,7 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     
     blf.position(0, cls.overlay_x, cls.overlay_y - ((38 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     
-    if alt_mode:
+    if not cls.operator_passthrough and alt_mode:
         blf.draw(0, "◑")
     else:
         blf.draw(0, "●")

@@ -172,6 +172,7 @@ class ND_OT_screw(bpy.types.Operator):
         screw.render_steps = self.segments
         screw.use_merge_vertices = True 
         screw.merge_threshold = 0.0001
+        screw.use_normal_calculate = True
 
         self.screw = screw
     

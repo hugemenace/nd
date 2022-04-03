@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/hugemenace/nd/compare/v1.15.0...v1.16.0) (2022-04-03)
+
+
+### Features
+
+* add overlay DPI control to preferences ([479710b](https://github.com/hugemenace/nd/commit/479710b47543791d51326a7f8a0cfc3f53f13724))
+
+
+### Bug Fixes
+
+* ensure overlay option precision mode indicator is inactive when in pause mode ([55ed7ba](https://github.com/hugemenace/nd/commit/55ed7baaa32c52a9a7eef5e16680034c138c0e24))
+* ensure that the screw operator calculates the order of edges for correct normals ([a991db7](https://github.com/hugemenace/nd/commit/a991db74e1cd8239b8c950ba1d70e9365bfa6501))
+
 ## [1.15.0](https://github.com/hugemenace/nd/compare/v1.14.0...v1.15.0) (2022-04-02)
 
 

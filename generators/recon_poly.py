@@ -63,6 +63,8 @@ class ND_OT_recon_poly(bpy.types.Operator):
             elif self.key_no_modifiers:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
 
+            self.dirty = True
+
         elif self.key_step_down:
             if self.key_alt:
                 self.inner_radius = max(0, self.inner_radius - inner_radius_factor)
@@ -72,6 +74,8 @@ class ND_OT_recon_poly(bpy.types.Operator):
             elif self.key_no_modifiers:
                 self.segments = max(3, self.segments - segment_factor)
 
+            self.dirty = True
+
         elif self.key_confirm:
             self.finish(context)
             
@@ -80,13 +84,16 @@ class ND_OT_recon_poly(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
         
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_inner_radius_factor = 0.001
         self.base_width_factor = 0.001
 
@@ -102,6 +109,8 @@ class ND_OT_recon_poly(bpy.types.Operator):
         else:
             self.prepare_new_operator(context)
         
+        self.operate(context)
+
         capture_modifier_keys(self)
 
         init_overlay(self, event)
@@ -153,7 +162,6 @@ class ND_OT_recon_poly(bpy.types.Operator):
     def add_displace_modifier(self):
         displace = self.obj.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0.5
-        displace.strength = self.inner_radius
         displace.direction = 'X'
         displace.space = 'LOCAL'
         
@@ -164,7 +172,6 @@ class ND_OT_recon_poly(bpy.types.Operator):
         screwX = self.obj.modifiers.new(mod_screw_1, 'SCREW')
         screwX.axis = 'X'
         screwX.angle = 0
-        screwX.screw_offset = self.width
         screwX.steps = 1
         screwX.render_steps = 1
         screwX.use_merge_vertices = True
@@ -176,8 +183,6 @@ class ND_OT_recon_poly(bpy.types.Operator):
     def add_screw_z_modifer(self):
         screwZ = self.obj.modifiers.new(mod_screw_2, 'SCREW')
         screwZ.axis = 'Z'
-        screwZ.steps = self.segments
-        screwZ.render_steps = self.segments
         screwZ.use_merge_vertices = True
         screwZ.merge_threshold = 0.0001
         screwZ.use_normal_calculate = True
@@ -215,6 +220,8 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.screwZ.steps = self.segments
         self.screwZ.render_steps = self.segments
         self.displace.strength = self.inner_radius
+
+        self.dirty = False
 
 
     def select_recon_poly(self, context):

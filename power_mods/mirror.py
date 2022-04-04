@@ -36,12 +36,16 @@ class ND_OT_mirror(bpy.types.Operator):
                 self.flip = not self.flip
             else:
                 self.axis = (self.axis + 1) % 3
+
+            self.dirty = True
             
         elif self.key_step_down:
             if self.key_alt:
                 self.flip = not self.flip
             else:
                 self.axis = (self.axis - 1) % 3
+
+            self.dirty = True        
         
         elif self.key_confirm:
             self.finish(context)
@@ -51,13 +55,16 @@ class ND_OT_mirror(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.axis = 0
         self.flip = False
         self.reference_obj = context.active_object
@@ -69,6 +76,7 @@ class ND_OT_mirror(bpy.types.Operator):
             self.mirror_obj = context.active_object
 
         self.add_mirror_modifier()
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -91,12 +99,6 @@ class ND_OT_mirror(bpy.types.Operator):
         mirror.use_clip = True
         mirror.merge_threshold = 0.0001
 
-        for i in range(3):
-            active = self.axis == i
-            mirror.use_axis[i] = active
-            mirror.use_bisect_axis[i] = active
-            mirror.use_bisect_flip_axis[i] = self.flip and active
-
         if self.mirror_obj != None:
             mirror.mirror_object = self.mirror_obj
 
@@ -109,6 +111,8 @@ class ND_OT_mirror(bpy.types.Operator):
             self.mirror.use_axis[i] = active
             self.mirror.use_bisect_axis[i] = active
             self.mirror.use_bisect_flip_axis[i] = self.flip and active
+
+        self.dirty = False
 
 
     def select_reference_obj(self, context):

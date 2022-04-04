@@ -58,6 +58,8 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
                 self.profile = min(1, self.profile + profile_factor)
             elif self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
+            
+            self.dirty = True
         
         elif self.key_step_down:
             if self.key_alt:
@@ -67,6 +69,8 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
             elif self.key_no_modifiers:
                 self.segments = max(1, self.segments - segment_factor)
 
+            self.dirty = True
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -75,13 +79,16 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_width_factor = 0.01
         self.base_profile_factor = 0.1
 
@@ -91,6 +98,8 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
 
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -122,9 +131,6 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         bevel.limit_method = 'VGROUP'
         bevel.offset_type = 'WIDTH'
         bevel.vertex_group = self.vgroup.name
-        bevel.segments = self.segments
-        bevel.width = self.width
-        bevel.profile = self.profile
 
         self.bevel = bevel
 
@@ -151,6 +157,8 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
         self.bevel.width = self.width
         self.bevel.segments = self.segments
         self.bevel.profile = self.profile
+
+        self.dirty = False
 
 
     def finish(self, context):

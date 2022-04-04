@@ -62,6 +62,8 @@ class ND_OT_screw_head(bpy.types.Operator):
             elif self.key_ctrl:
                 self.scale += scale_factor
             
+            self.dirty = True
+            
         elif self.key_step_down:
             if self.key_no_modifiers:
                 self.head_type_index = (self.head_type_index - 1) % len(self.objects)
@@ -70,6 +72,8 @@ class ND_OT_screw_head(bpy.types.Operator):
                 self.offset -= offset_factor
             elif self.key_ctrl:
                 self.scale -= scale_factor
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -79,13 +83,16 @@ class ND_OT_screw_head(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_offset_factor = 0.01
         self.base_scale_factor = 0.01
 
@@ -103,6 +110,8 @@ class ND_OT_screw_head(bpy.types.Operator):
         self.objects = data_to.objects
 
         self.update_head_type(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -144,7 +153,6 @@ class ND_OT_screw_head(bpy.types.Operator):
 
     def add_displace_modifier(self, context):
         displace = self.obj.modifiers.new(mod_displace, 'DISPLACE')
-        displace.strength = self.offset
         displace.direction = 'Z'
         displace.space = 'LOCAL'
 
@@ -154,6 +162,8 @@ class ND_OT_screw_head(bpy.types.Operator):
     def operate(self, context):
         self.displace.strength = self.offset
         self.obj.scale = Vector((self.scale, self.scale, self.scale))
+
+        self.dirty = False
 
 
     def finish(self, context):

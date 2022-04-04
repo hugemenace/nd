@@ -41,6 +41,8 @@ class ND_OT_circular_array(bpy.types.Operator):
                 self.angle = min(360, self.angle + angle_factor)
             else:
                 self.axis = (self.axis + 1) % 3
+
+            self.dirty = True
             
         elif self.key_step_down:
             if self.key_alt:
@@ -49,6 +51,8 @@ class ND_OT_circular_array(bpy.types.Operator):
                 self.angle = max(0, self.angle - angle_factor)
             else:
                 self.axis = (self.axis - 1) % 3
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -57,14 +61,17 @@ class ND_OT_circular_array(bpy.types.Operator):
 
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
+        
+        if self.dirty:
+            self.operate(context)
 
-        self.operate(context)
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.axis = 2
         self.count = 2
         self.angle = 360
@@ -75,6 +82,7 @@ class ND_OT_circular_array(bpy.types.Operator):
 
         self.rotation_snapshot = self.rotator_obj.rotation_euler.copy()
         self.add_array_modifier()
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -94,7 +102,6 @@ class ND_OT_circular_array(bpy.types.Operator):
 
     def add_array_modifier(self):
         array = self.reference_obj.modifiers.new('Circular Array — ND', 'ARRAY')
-        array.count = self.count
         array.use_relative_offset = False
         array.use_object_offset = True
         array.offset_object = self.rotator_obj
@@ -111,6 +118,8 @@ class ND_OT_circular_array(bpy.types.Operator):
         self.rotator_obj.rotation_euler.rotate_axis(rotation_axis, final_rotation)
 
         self.array.count = self.count
+
+        self.dirty = False
 
 
     def select_reference_obj(self, context):

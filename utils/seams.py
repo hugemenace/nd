@@ -38,12 +38,16 @@ class ND_OT_seams(bpy.types.Operator):
                 self.commit_auto_smooth = not self.commit_auto_smooth
             else:
                 self.angle = min(180, self.angle + angle_factor)
+
+            self.dirty = True
             
         elif self.key_step_down:
             if self.key_alt:
                 self.commit_auto_smooth = not self.commit_auto_smooth
             else:
                 self.angle = max(0, self.angle - angle_factor)
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -53,19 +57,24 @@ class ND_OT_seams(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_angle_factor = 15
         self.angle = degrees(context.object.data.auto_smooth_angle)
         self.commit_auto_smooth = False
 
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={'EDGE'})
         bpy.ops.mesh.select_all(action='DESELECT')
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -84,8 +93,6 @@ class ND_OT_seams(bpy.types.Operator):
 
     
     def operate(self, context):
-        print('fuck it')
-        
         self.clear_edges(context)
 
         bpy.ops.mesh.edges_select_sharp(sharpness=radians(self.angle))
@@ -94,6 +101,8 @@ class ND_OT_seams(bpy.types.Operator):
         bpy.ops.mesh.mark_sharp(clear=False)
 
         bpy.ops.mesh.select_all(action='DESELECT')
+
+        self.dirty = False
 
 
     def clear_edges(self, context):

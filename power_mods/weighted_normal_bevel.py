@@ -46,9 +46,13 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
         elif self.key_step_up:
             self.width += width_factor
+
+            self.dirty = True
             
         elif self.key_step_down:
             self.width = max(0.0001, self.width - width_factor)
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -58,13 +62,16 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_width_factor = 0.001
 
         if len(context.selected_objects) == 1:
@@ -78,6 +85,8 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
                 self.prepare_new_operator(context)
         else:
             self.prepare_new_operator(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -124,7 +133,6 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         bevel = context.object.modifiers.new(mod_bevel, 'BEVEL')
         bevel.segments = 1
         bevel.offset_type = 'WIDTH'
-        bevel.width = self.width
 
         self.bevel = bevel
     
@@ -138,6 +146,8 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
     def operate(self, context):
         self.bevel.width = self.width
+
+        self.dirty = False
 
 
     def finish(self, context):

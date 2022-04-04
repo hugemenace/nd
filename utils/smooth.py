@@ -35,9 +35,13 @@ class ND_OT_smooth(bpy.types.Operator):
 
         elif self.key_step_up:
             self.angle = min(180, self.angle + angle_factor)
+
+            self.dirty = True
             
         elif self.key_step_down:
             self.angle = max(0, self.angle - angle_factor)
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -47,17 +51,22 @@ class ND_OT_smooth(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+            
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_angle_factor = 15
         self.angle = 30
 
         self.add_smooth_shading(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -78,11 +87,12 @@ class ND_OT_smooth(bpy.types.Operator):
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
         context.object.data.use_auto_smooth = True
-        context.object.data.auto_smooth_angle = radians(self.angle)
 
 
     def operate(self, context):
         context.object.data.auto_smooth_angle = radians(self.angle)
+
+        self.dirty = False
 
 
     def finish(self, context):

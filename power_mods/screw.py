@@ -60,6 +60,8 @@ class ND_OT_screw(bpy.types.Operator):
                 self.angle = min(360, self.angle + angle_factor)
             else:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
+
+            self.dirty = True
             
         elif self.key_step_down:
             if self.key_ctrl_alt:
@@ -73,6 +75,8 @@ class ND_OT_screw(bpy.types.Operator):
                 self.angle = max(0, self.angle - angle_factor)
             else:
                 self.segments = max(3, self.segments - segment_factor)
+                
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -82,13 +86,16 @@ class ND_OT_screw(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_offset_factor = 0.01
 
         if len(context.selected_objects) == 1:
@@ -102,6 +109,8 @@ class ND_OT_screw(bpy.types.Operator):
                 self.prepare_new_operator(context)
         else:
             self.prepare_new_operator(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -156,20 +165,14 @@ class ND_OT_screw(bpy.types.Operator):
     def add_displace_modifier(self, context):
         displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0.5
-        displace.strength = self.offset
         displace.space = 'LOCAL'
-        displace.direction = ['X', 'Y', 'Z'][self.offset_axis]
         
         self.displace = displace
 
 
     def add_screw_modifier(self, context):
         screw = context.object.modifiers.new(mod_screw, 'SCREW')
-        screw.angle = radians(self.angle)
         screw.screw_offset = 0
-        screw.axis = ['X', 'Y', 'Z'][self.screw_axis]
-        screw.steps = self.segments
-        screw.render_steps = self.segments
         screw.use_merge_vertices = True 
         screw.merge_threshold = 0.0001
         screw.use_normal_calculate = True
@@ -184,6 +187,8 @@ class ND_OT_screw(bpy.types.Operator):
         self.screw.steps = self.segments
         self.screw.render_steps = self.segments
         self.screw.angle = radians(self.angle)
+
+        self.dirty = False
 
 
     def finish(self, context):

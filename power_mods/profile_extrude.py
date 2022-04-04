@@ -50,6 +50,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
                 self.axis = (self.axis + 1) % 3
             elif self.key_no_modifiers:
                 self.extrusion_length += extrude_factor
+
+            self.dirty = True
             
         elif self.key_step_down:
             if self.key_alt:
@@ -58,6 +60,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
                 self.axis = (self.axis - 1) % 3
             elif self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length - extrude_factor)
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -67,13 +71,16 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_extrude_factor = 0.01
 
         if len(context.selected_objects) == 1:
@@ -87,6 +94,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
                 self.prepare_new_operator(context)
         else:
             self.prepare_new_operator(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -147,16 +156,12 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         offset = context.object.modifiers.new(mod_offset, 'DISPLACE')
         offset.space = 'LOCAL'
         offset.mid_level = 0.5
-        offset.direction = ['X', 'Y', 'Z'][self.axis]
-        offset.strength = self.calculate_offset_strength()
 
         self.offset = offset
 
 
     def add_screw_modifier(self, context):
         screw = context.object.modifiers.new(mod_screw, 'SCREW')
-        screw.axis = ['X', 'Y', 'Z'][self.axis]
-        screw.screw_offset = self.extrusion_length
         screw.steps = 0
         screw.render_steps = 0
         screw.angle = 0
@@ -172,6 +177,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         self.screw.screw_offset = self.extrusion_length
         self.offset.direction = axis
         self.offset.strength = self.calculate_offset_strength()
+
+        self.dirty = False
 
 
     def finish(self, context):
@@ -217,8 +224,6 @@ def draw_text_callback(self):
         "Alt (X, Y, Z)",
         active=self.key_ctrl,
         alt_mode=False)
-
-    
 
 
 def menu_func(self, context):

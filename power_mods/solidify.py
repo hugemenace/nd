@@ -58,6 +58,8 @@ class ND_OT_solidify(bpy.types.Operator):
                 self.offset += offset_factor
             elif self.key_no_modifiers:
                 self.thickness += thickness_factor
+
+            self.dirty = True
             
         elif self.key_step_down:
             if self.key_alt:
@@ -66,6 +68,8 @@ class ND_OT_solidify(bpy.types.Operator):
                 self.offset -= offset_factor
             elif self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - thickness_factor)
+
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -75,13 +79,16 @@ class ND_OT_solidify(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        self.operate(context)
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
         self.base_thickness_factor = 0.01
         self.base_offset_factor = 0.001
 
@@ -96,6 +103,8 @@ class ND_OT_solidify(bpy.types.Operator):
                 self.prepare_new_operator(context)
         else:
             self.prepare_new_operator(context)
+
+        self.operate(context)
 
         capture_modifier_keys(self)
 
@@ -144,15 +153,12 @@ class ND_OT_solidify(bpy.types.Operator):
 
     def add_displace_modifier(self, context):
         displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
-        displace.strength = self.offset
 
         self.displace = displace
 
 
     def add_solidify_modifier(self, context):
         solidify = context.object.modifiers.new(mod_solidify, 'SOLIDIFY')
-        solidify.thickness = self.thickness
-        solidify.offset = self.weighting
         solidify.use_even_offset = True
 
         self.solidify = solidify
@@ -162,6 +168,8 @@ class ND_OT_solidify(bpy.types.Operator):
         self.solidify.thickness = self.thickness
         self.solidify.offset = self.weighting
         self.displace.strength = self.offset
+
+        self.dirty = False
 
 
     def finish(self, context):

@@ -1,5 +1,6 @@
 import bpy
 from .. import bl_info
+from .. import lib
 
 
 keys = []
@@ -12,6 +13,11 @@ class ND_MT_main_menu(bpy.types.Menu):
 
     def draw(self, context):
         layout = self.layout
+
+        if lib.preferences.get_preferences().update_available:
+            layout.operator("wm.url_open", text="Update Available!", icon='PACKAGE').url = "https://hugemenace.gumroad.com/l/nd-blender-addon"
+            layout.separator()
+
         layout.operator_context = 'INVOKE_DEFAULT'
         layout.operator("nd.view_align", icon='ORIENTATION_VIEW')
         layout.operator("nd.geo_lift", icon='FACESEL')

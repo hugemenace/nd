@@ -21,6 +21,9 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             row.scale_y = 1.5
             row.alert = True
             row.operator("wm.url_open", text="Update Available!", icon='PACKAGE').url = "https://hugemenace.gumroad.com/l/nd-blender-addon"
+            row = column.row(align=True)
+            row.scale_y = 1.2
+            row.operator("wm.url_open", text="View Changelog", icon='DOCUMENTS').url = "https://docs.nd.hugemenace.co/#/getting-started/changelog"
         
         box = layout.box()
         box.label(text="Documentation", icon='INFO')

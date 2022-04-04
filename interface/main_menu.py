@@ -19,6 +19,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.vertex_bevel", icon='MOD_BEVEL')
         layout.separator()
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
+        layout.operator("nd.bevel", icon='MOD_BEVEL')
         layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
         layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
         layout.operator("nd.screw", icon='MOD_SCREW')

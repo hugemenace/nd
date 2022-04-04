@@ -68,6 +68,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
+        row.operator("nd.bevel", icon='MOD_BEVEL')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
         row.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
 
         row = column.row(align=True)

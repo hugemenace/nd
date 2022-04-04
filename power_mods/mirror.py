@@ -32,10 +32,16 @@ class ND_OT_mirror(bpy.types.Operator):
             return {'CANCELLED'}
 
         elif self.key_step_up:
-            self.axis = (self.axis + 1) % 3
+            if self.key_alt:
+                self.flip = not self.flip
+            else:
+                self.axis = (self.axis + 1) % 3
             
         elif self.key_step_down:
-            self.axis = (self.axis - 1) % 3
+            if self.key_alt:
+                self.flip = not self.flip
+            else:
+                self.axis = (self.axis - 1) % 3
         
         elif self.key_confirm:
             self.finish(context)
@@ -53,15 +59,16 @@ class ND_OT_mirror(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.axis = 0
-        reference_obj = context.active_object
-        mirror_obj = None
+        self.flip = False
+        self.reference_obj = context.active_object
+        self.mirror_obj = None
 
         if len(context.selected_objects) == 2:
             a, b = context.selected_objects
-            reference_obj = a if a.name != context.object.name else b
-            mirror_obj = context.active_object
+            self.reference_obj = a if a.name != context.object.name else b
+            self.mirror_obj = context.active_object
 
-        self.add_mirror_modifier(reference_obj, mirror_obj)
+        self.add_mirror_modifier()
 
         capture_modifier_keys(self)
 
@@ -79,29 +86,45 @@ class ND_OT_mirror(bpy.types.Operator):
             return len(context.selected_objects) > 0 and len(context.selected_objects) <= 2
 
 
-    def add_mirror_modifier(self, reference_obj, mirror_obj):
-        mirror = reference_obj.modifiers.new('Mirror — ND', 'MIRROR')
-        mirror.use_axis[0] = self.axis == 0
+    def add_mirror_modifier(self):
+        mirror = self.reference_obj.modifiers.new('Mirror — ND', 'MIRROR')
         mirror.use_clip = True
         mirror.merge_threshold = 0.0001
 
-        if mirror_obj != None:
-            mirror.mirror_object = mirror_obj
+        for i in range(3):
+            active = self.axis == i
+            mirror.use_axis[i] = active
+            mirror.use_bisect_axis[i] = active
+            mirror.use_bisect_flip_axis[i] = self.flip and active
+
+        if self.mirror_obj != None:
+            mirror.mirror_object = self.mirror_obj
 
         self.mirror = mirror
     
 
     def operate(self, context):
-        self.mirror.use_axis[0] = self.axis == 0
-        self.mirror.use_axis[1] = self.axis == 1
-        self.mirror.use_axis[2] = self.axis == 2
+        for i in range(3):
+            active = self.axis == i
+            self.mirror.use_axis[i] = active
+            self.mirror.use_bisect_axis[i] = active
+            self.mirror.use_bisect_flip_axis[i] = self.flip and active
+
+
+    def select_reference_obj(self, context):
+        bpy.ops.object.select_all(action='DESELECT')
+        self.reference_obj.select_set(True)
+        bpy.context.view_layer.objects.active = self.reference_obj
 
 
     def finish(self, context):
+        self.select_reference_obj(context)
+
         unregister_draw_handler()
 
 
     def revert(self, context):
+        self.select_reference_obj(context)
         bpy.ops.object.modifier_remove(modifier=self.mirror.name)
         
         unregister_draw_handler()
@@ -114,7 +137,14 @@ def draw_text_callback(self):
         self, 
         "Axis: {}".format(['X', 'Y', 'Z'][self.axis]),
         "X, Y, Z",
-        active=True,
+        active=self.key_no_modifiers,
+        alt_mode=False)
+
+    draw_property(
+        self, 
+        "Flipped: {}".format('Yes' if self.flip else 'No'),
+        "Alt (Yes, No)",
+        active=self.key_alt,
         alt_mode=False)
 
 

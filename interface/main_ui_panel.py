@@ -85,6 +85,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
 
         box = layout.box()
         box.label(text="Generators", icon='GHOST_ENABLED')

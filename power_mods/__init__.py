@@ -5,6 +5,7 @@ from . import weighted_normal_bevel
 from . import vertex_bevel
 from . import mirror
 from . import profile_extrude
+from . import circular_array
 
 
 def reload():
@@ -14,6 +15,7 @@ def reload():
     importlib.reload(vertex_bevel)
     importlib.reload(mirror)
     importlib.reload(profile_extrude)
+    importlib.reload(circular_array)
 
 
 def register():
@@ -23,6 +25,7 @@ def register():
     vertex_bevel.register()
     mirror.register()
     profile_extrude.register()
+    circular_array.register()
 
 
 def unregister():
@@ -32,5 +35,6 @@ def unregister():
     vertex_bevel.unregister()
     mirror.unregister()
     profile_extrude.unregister()
+    circular_array.unregister()
 
     

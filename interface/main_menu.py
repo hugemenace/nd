@@ -24,6 +24,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.screw", icon='MOD_SCREW')
         layout.operator("nd.mirror", icon='MOD_MIRROR')
         layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+        layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
         layout.separator()
         layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
         layout.operator("nd.screw_head", icon='CANCEL')

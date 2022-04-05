@@ -161,7 +161,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "{}".format('Full (360°)' if self.angle == 360 else "Angle: {}°".format(self.angle)),
+        "Angle: {}".format('Circle (360°)' if self.angle == 360 else "Arc ({}°)".format(self.angle)),
         "Ctrl (±15)  |  Shift (±1)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl)

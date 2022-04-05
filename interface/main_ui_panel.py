@@ -30,9 +30,13 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         column = box.column()
         
         row = column.row(align=True)
-        row.scale_y = 1.5
-        row.operator("wm.url_open", text="Website", icon='HOME').url = "https://docs.nd.hugemenace.co"
-        row.operator("wm.url_open", text="YouTube", icon='FILE_MOVIE').url = "https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg"
+        row.scale_y = 1.2
+        row.operator("wm.url_open", text="Website").url = "https://docs.nd.hugemenace.co"
+        row.operator("wm.url_open", text="YouTube").url = "https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg"
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("wm.url_open", text="Discord").url = "https://discord.gg/FbhkhvKAn3"
 
         box = layout.box()
         box.label(text="Sketching", icon='GREASEPENCIL')

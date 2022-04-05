@@ -17,6 +17,7 @@ class ND_OT_circular_array(bpy.types.Operator):
         capture_modifier_keys(self, event)
 
         angle_factor = 1 if self.key_shift else 15
+        count_factor = 1 if self.key_shift else 2
 
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
@@ -36,21 +37,21 @@ class ND_OT_circular_array(bpy.types.Operator):
 
         elif self.key_step_up:
             if self.key_alt:
-                self.count = self.count + 1
+                self.axis = (self.axis + 1) % 3
             elif self.key_ctrl:
                 self.angle = min(360, self.angle + angle_factor)
             else:
-                self.axis = (self.axis + 1) % 3
+                self.count = 2 if self.count == 1 else self.count + count_factor
 
             self.dirty = True
             
         elif self.key_step_down:
             if self.key_alt:
-                self.count = max(2, self.count - 1)
-            elif self.key_ctrl:
-                self.angle = max(0, self.angle - angle_factor)
-            else:
                 self.axis = (self.axis - 1) % 3
+            elif self.key_ctrl:
+                self.angle = max(-360, self.angle - angle_factor)
+            else:
+                self.count = max(2, self.count - count_factor)
 
             self.dirty = True
         
@@ -110,7 +111,7 @@ class ND_OT_circular_array(bpy.types.Operator):
     
 
     def operate(self, context):
-        count = self.count if self.angle == 360 else self.count - 1
+        count = self.count if abs(self.angle) == 360 else self.count - 1
         final_rotation = radians(self.angle / count)
         rotation_axis = ['X', 'Y', 'Z'][self.axis]
 
@@ -130,6 +131,8 @@ class ND_OT_circular_array(bpy.types.Operator):
 
     def finish(self, context):
         self.select_reference_obj(context)
+        self.reference_obj.parent = self.rotator_obj
+        self.reference_obj.matrix_parent_inverse = self.rotator_obj.matrix_world.inverted()
 
         unregister_draw_handler()
 
@@ -147,21 +150,21 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Axis: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "X, Y, Z",
+        "Count: {}".format(self.count),
+        "(±2) | Shift (±1)",
         active=self.key_no_modifiers,
-        alt_mode=False)
+        alt_mode=self.key_shift_no_modifiers)
 
     draw_property(
         self, 
-        "Count: {}".format(self.count),
-        "Alt (±1)",
+        "Axis: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Alt (X, Y, Z)",
         active=self.key_alt,
         alt_mode=False)
 
     draw_property(
         self, 
-        "Angle: {}".format('Circle (360°)' if self.angle == 360 else "Arc ({}°)".format(self.angle)),
+        "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({}°)".format(self.angle)),
         "Ctrl (±15)  |  Shift (±1)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl)

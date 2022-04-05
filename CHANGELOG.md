@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/hugemenace/nd/compare/v1.16.0...v1.17.0) (2022-04-05)
+
+
+### Features
+
+* add a message/button to the shortcut menu & a link to the changelog in the UI panel when an update is available ([bd754cb](https://github.com/hugemenace/nd/commit/bd754cbd11729b9534dbf89e6dfff150eebb64a6))
+* add bevel operator ([126af0d](https://github.com/hugemenace/nd/commit/126af0d7311576c3dfff6bc8429fdcf03bae078b))
+* add circular_array operator ([8d6d20e](https://github.com/hugemenace/nd/commit/8d6d20eb21d6a73370a0770342bedbc1539d5177))
+* adjust circular array option order, add even/odd count step, and allow negative arc angles ([b9dedf0](https://github.com/hugemenace/nd/commit/b9dedf0ea1f699da8c8a3755be402d268b2b9558))
+* ensure mirror modifier bisects selected axis & add flip option for negative axis mirroring ([10ddb3d](https://github.com/hugemenace/nd/commit/10ddb3d5c8cf1b777f18835e4e978e35444e8863))
+* organise operators by relevance in the shortcut menu ([b450ba9](https://github.com/hugemenace/nd/commit/b450ba9b75a615cc074db5fd1be44aa2eda93d5b))
+* update documentation section on main UI panel & add Discord link ([b5c2d0f](https://github.com/hugemenace/nd/commit/b5c2d0fcd701d0ab90e12c859a0b1ed868cf854b))
+
+
+### Bug Fixes
+
+* ensure operate is only executed on interactive option mutation ([8fa29fc](https://github.com/hugemenace/nd/commit/8fa29fc01e93daae2afd88a5aa7d38a63a966e2e))
+
 ## [1.16.0](https://github.com/hugemenace/nd/compare/v1.15.0...v1.16.0) (2022-04-03)
 
 

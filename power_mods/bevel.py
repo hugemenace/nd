@@ -80,15 +80,12 @@ class ND_OT_bevel(bpy.types.Operator):
         self.base_width_factor = 0.001
         self.segments = 1
 
-        if len(context.selected_objects) == 1:
-            mods = context.active_object.modifiers
-            mod_names = list(map(lambda x: x.name, mods))
-            previous_op = all(m in mod_names for m in mod_summon_list)
+        mods = context.active_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
 
-            if previous_op:
-                self.summon_old_operator(context, mods)
-            else:
-                self.prepare_new_operator(context)
+        if previous_op:
+            self.summon_old_operator(context, mods)
         else:
             self.prepare_new_operator(context)
 

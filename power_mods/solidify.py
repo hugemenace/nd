@@ -92,15 +92,12 @@ class ND_OT_solidify(bpy.types.Operator):
         self.base_thickness_factor = 0.01
         self.base_offset_factor = 0.001
 
-        if len(context.selected_objects) == 1:
-            mods = context.active_object.modifiers
-            mod_names = list(map(lambda x: x.name, mods))
-            previous_op = all(m in mod_names for m in mod_summon_list)
+        mods = context.active_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
 
-            if previous_op:
-                self.summon_old_operator(context, mods)
-            else:
-                self.prepare_new_operator(context)
+        if previous_op:
+            self.summon_old_operator(context, mods)
         else:
             self.prepare_new_operator(context)
 

@@ -223,7 +223,7 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "Screw Axis: {} ~ Offset Axis: {}".format(['X', 'Y', 'Z'][self.screw_axis], ['X', 'Y', 'Z'][self.offset_axis]),
+        "Screw Axis: {}  /  Offset Axis: {}".format(['X', 'Y', 'Z'][self.screw_axis], ['X', 'Y', 'Z'][self.offset_axis]),
         "Alt (Screw X, Y, Z)  |  Shift + Alt (Offset X, Y, Z)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt)

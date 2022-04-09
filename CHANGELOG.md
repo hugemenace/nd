@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/hugemenace/nd/compare/v1.17.0...v1.18.0) (2022-04-09)
+
+
+### Features
+
+* add square_array operator and create arrays sub-menu ([14ea44e](https://github.com/hugemenace/nd/commit/14ea44e7cdaa471fcecc7d453ac0eed89bce9d59))
+* allow active overlay values to be updated with arrow and WASD keys ([dbb30c9](https://github.com/hugemenace/nd/commit/dbb30c94e0ec9dba795881b4ab6a54dc02605baa))
+
+
+### Bug Fixes
+
+* ensure ND keymap is included in 3D View, Mesh, and Object Mode by default ([95498b1](https://github.com/hugemenace/nd/commit/95498b18c602617196221c97fb57aa80c05f601b))
+
 ## [1.17.0](https://github.com/hugemenace/nd/compare/v1.16.0...v1.17.0) (2022-04-05)
 
 

@@ -87,10 +87,6 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.screw", icon='MOD_SCREW')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.mirror", icon='MOD_MIRROR')
 
         row = column.row(align=True)
         row.scale_y = 1.2
@@ -103,6 +99,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.square_array", icon='LIGHTPROBE_GRID')
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.mirror", icon='MOD_MIRROR')
 
         box = layout.box()
         box.label(text="Generators", icon='GHOST_ENABLED')

@@ -6,6 +6,7 @@ from . import vertex_bevel
 from . import mirror
 from . import profile_extrude
 from . import circular_array
+from . import square_array
 from . import bevel
 
 
@@ -17,6 +18,7 @@ def reload():
     importlib.reload(mirror)
     importlib.reload(profile_extrude)
     importlib.reload(circular_array)
+    importlib.reload(square_array)
     importlib.reload(bevel)
 
 
@@ -28,6 +30,7 @@ def register():
     mirror.register()
     profile_extrude.register()
     circular_array.register()
+    square_array.register()
     bevel.register()
 
 
@@ -39,6 +42,7 @@ def unregister():
     mirror.unregister()
     profile_extrude.unregister()
     circular_array.unregister()
+    square_array.unregister()
     bevel.unregister()
 
     

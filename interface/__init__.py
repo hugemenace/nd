@@ -6,6 +6,7 @@ from . import utils_menu
 from . import boolean_menu
 from . import bevel_menu
 from . import extrude_menu
+from . import array_menu
 
 
 def reload():
@@ -16,6 +17,7 @@ def reload():
     importlib.reload(boolean_menu)
     importlib.reload(bevel_menu)
     importlib.reload(extrude_menu)
+    importlib.reload(array_menu)
 
 
 def register():
@@ -26,6 +28,7 @@ def register():
     boolean_menu.register()
     bevel_menu.register()
     extrude_menu.register()
+    array_menu.register()
 
 
 def unregister():
@@ -36,3 +39,4 @@ def unregister():
     boolean_menu.unregister()
     bevel_menu.unregister()
     extrude_menu.unregister()
+    array_menu.unregister()

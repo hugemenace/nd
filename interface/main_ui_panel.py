@@ -99,6 +99,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.square_array", icon='LIGHTPROBE_GRID')
 
         box = layout.box()
         box.label(text="Generators", icon='GHOST_ENABLED')

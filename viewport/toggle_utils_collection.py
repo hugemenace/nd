@@ -12,6 +12,9 @@ class ND_OT_toggle_utils_collection(bpy.types.Operator):
         collection = bpy.data.collections.get(get_preferences().utils_collection_name)
         if collection is not None:
             collection.hide_viewport = not collection.hide_viewport
+            for obj in collection.all_objects:
+                obj.hide_set(collection.hide_viewport)
+                obj.hide_viewport = collection.hide_viewport
 
         return {'FINISHED'}
 

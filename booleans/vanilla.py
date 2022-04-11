@@ -1,4 +1,5 @@
 import bpy
+from .. lib.collections import move_to_utils_collection
 
 
 class ND_OT_bool_vanilla(bpy.types.Operator):
@@ -37,6 +38,8 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
 
         reference_obj.parent = context.object
         reference_obj.matrix_parent_inverse = context.object.matrix_world.inverted()
+
+        move_to_utils_collection(reference_obj)
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

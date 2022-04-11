@@ -4,12 +4,14 @@ from math import radians
 from mathutils import Euler
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+from .. lib.collections import move_to_utils_collection
 
 
 class ND_OT_circular_array(bpy.types.Operator):
     bl_idname = "nd.circular_array"
     bl_label = "Circular Array"
-    bl_description = "Array an object around another in a circular fashion"
+    bl_description = """Array an object around another in a circular fashion
+SHIFT — Do not place rotator object in utils collection"""
     bl_options = {'UNDO'}
 
 
@@ -72,6 +74,8 @@ class ND_OT_circular_array(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        self.skip_utils = event.shift
+
         self.dirty = False
         self.axis = 2
         self.count = 2
@@ -130,6 +134,9 @@ class ND_OT_circular_array(bpy.types.Operator):
 
 
     def finish(self, context):
+        if not self.skip_utils:
+            move_to_utils_collection(self.rotator_obj)
+
         self.select_reference_obj(context)
         self.reference_obj.parent = self.rotator_obj
         self.reference_obj.matrix_parent_inverse = self.rotator_obj.matrix_world.inverted()

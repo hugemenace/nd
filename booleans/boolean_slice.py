@@ -1,4 +1,5 @@
 import bpy
+from .. lib.collections import move_to_utils_collection
 
 
 class ND_OT_bool_slice(bpy.types.Operator):
@@ -45,6 +46,8 @@ class ND_OT_bool_slice(bpy.types.Operator):
 
         reference_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
         intersecting_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
+
+        move_to_utils_collection(reference_obj)
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

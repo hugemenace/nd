@@ -9,17 +9,18 @@ class ND_OT_toggle_clear_view(bpy.types.Operator):
 
 
     def execute(self, context):
-        enabled = bpy.context.space_data.overlay.show_cursor
+        enabled = not bpy.context.space_data.overlay.show_cursor
 
-        bpy.context.space_data.overlay.show_floor = not enabled
-        bpy.context.space_data.overlay.show_object_origins = not enabled
-        bpy.context.space_data.overlay.show_cursor = not enabled
-        bpy.context.space_data.overlay.show_axis_x = not enabled
-        bpy.context.space_data.overlay.show_axis_y = not enabled
-        bpy.context.space_data.overlay.show_relationship_lines = not enabled
-        bpy.context.space_data.overlay.show_extras = not enabled
-        bpy.context.space_data.overlay.show_bones = not enabled
-        bpy.context.space_data.overlay.show_motion_paths = not enabled
+        bpy.context.space_data.overlay.show_floor = enabled
+        bpy.context.space_data.overlay.show_object_origins = enabled
+        bpy.context.space_data.overlay.show_cursor = enabled
+        bpy.context.space_data.overlay.show_axis_x = enabled
+        bpy.context.space_data.overlay.show_axis_y = enabled
+        bpy.context.space_data.overlay.show_ortho_grid = enabled
+        bpy.context.space_data.overlay.show_relationship_lines = enabled
+        bpy.context.space_data.overlay.show_extras = enabled
+        bpy.context.space_data.overlay.show_bones = enabled
+        bpy.context.space_data.overlay.show_motion_paths = enabled
 
         return {'FINISHED'}
 

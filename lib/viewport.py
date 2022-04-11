@@ -11,8 +11,3 @@ def set_3d_cursor(location, rotation):
         cursor.rotation_axis_angle = rotation.to_axis_angle()
     else:
         cursor.rotation_euler = rotation.to_euler(cursor.rotation_mode)
-
-
-
-
-

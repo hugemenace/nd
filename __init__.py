@@ -21,6 +21,7 @@ from . import sketching
 from . import power_mods
 from . import generators
 from . import utils
+from . import viewport
 
 
 registerables = (
@@ -30,6 +31,7 @@ registerables = (
     power_mods,
     generators,
     utils,
+    viewport,
 )
 
 

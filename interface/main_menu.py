@@ -33,6 +33,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.screw_head", icon='CANCEL')
         layout.separator()
         layout.menu("ND_MT_utils_menu", icon='PLUGIN')
+        layout.menu("ND_MT_viewport_menu", text="Viewport", icon='RESTRICT_VIEW_OFF')
 
 
 def draw_item(self, context):

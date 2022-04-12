@@ -4,6 +4,7 @@ from . import set_lod_suffix
 from . import set_origin
 from . import smooth
 from . import seams
+from . import hydrate
 
 
 def reload():
@@ -12,6 +13,7 @@ def reload():
     importlib.reload(set_origin)
     importlib.reload(smooth)
     importlib.reload(seams)
+    importlib.reload(hydrate)
 
 
 def register():
@@ -20,6 +22,7 @@ def register():
     set_origin.register()
     smooth.register()
     seams.register()
+    hydrate.register()
 
 
 def unregister():
@@ -28,3 +31,4 @@ def unregister():
     set_origin.unregister()
     smooth.unregister()
     seams.unregister()
+    hydrate.unregister()

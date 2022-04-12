@@ -18,6 +18,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout.separator()
         layout.operator("nd.smooth", icon='MOD_SMOOTH')
         layout.operator("nd.seams", icon='UV_DATA')
+        layout.operator("nd.hydrate", icon='SHADING_RENDERED')
         
 
 def draw_item(self, context):

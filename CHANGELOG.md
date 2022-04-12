@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.19.0](https://github.com/hugemenace/nd/compare/v1.18.0...v1.19.0) (2022-04-12)
+
+
+### Features
+
+* add hydrate operator ([a4aef0f](https://github.com/hugemenace/nd/commit/a4aef0f8337d78c5d761e1fca3690a22d44a9ea2))
+* add option to enable quick favourites on primary menu ([1e8805d](https://github.com/hugemenace/nd/commit/1e8805de77e6277a45063c283a6eb456486a6bd5))
+* add optional late-invocation mode to vertex bevel operator (for post-sketch usage) ([ff0ffa4](https://github.com/hugemenace/nd/commit/ff0ffa46016bbfe5d1db6047568b0f06389023c0))
+* add ortho_grid to toggle_clear_view operator ([5e4f8de](https://github.com/hugemenace/nd/commit/5e4f8defc01ff75fe60e9049586cd3f70919153c))
+* add viewport menu (with various initial toggles) ([1d09367](https://github.com/hugemenace/nd/commit/1d09367805d3d2f76cb27da6a0fd70ef8cb65661))
+* automatically place boolean reference and circular array rotator objects in a utils collection (name configurable in preferences) ([eece58b](https://github.com/hugemenace/nd/commit/eece58bddd1dee663cfb95b03b3f07802e47c065))
+
+
+### Bug Fixes
+
+* ensure all objects in utils collection are toggled along with the collection consistently ([1316fff](https://github.com/hugemenace/nd/commit/1316fff82b2760ee80ede886342fc1f65bf15669))
+* fix object visibility error in toggle_utils_collection operator ([52f3ada](https://github.com/hugemenace/nd/commit/52f3ada8b2facd3f341e4387ed2db2a7a6ee8818))
+
 ## [1.18.0](https://github.com/hugemenace/nd/compare/v1.17.0...v1.18.0) (2022-04-09)
 
 

@@ -43,6 +43,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    enable_quick_favourites: BoolProperty(
+        name="Enable Quick Favourites",
+        default=False,
+    )
+
     utils_collection_name: StringProperty(
         name="Utils Collection Name",
         default="Utils",
@@ -60,6 +65,7 @@ class NDPreferences(AddonPreferences):
         layout = self.layout
         layout.prop(self, "overlay_dpi")
         layout.prop(self, "utils_collection_name")
+        layout.prop(self, "enable_quick_favourites")
 
 
 def register():

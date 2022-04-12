@@ -35,6 +35,10 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_utils_menu", icon='PLUGIN')
         layout.menu("ND_MT_viewport_menu", text="Viewport", icon='RESTRICT_VIEW_OFF')
 
+        if lib.preferences.get_preferences().enable_quick_favourites:
+            layout.separator()
+            layout.menu("SCREEN_MT_user_menu", icon='SOLO_ON')
+
 
 def draw_item(self, context):
     layout = self.layout

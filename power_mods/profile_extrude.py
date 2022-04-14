@@ -214,14 +214,14 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Weighting: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
-        "Ctrl (Negative, Neutral, Positive)",
+        "Alt (Negative, Neutral, Positive)",
         active=self.key_alt,
         alt_mode=False)
 
     draw_property(
         self, 
         "Axis: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Alt (X, Y, Z)",
+        "Ctrl (X, Y, Z)",
         active=self.key_ctrl,
         alt_mode=False)
 

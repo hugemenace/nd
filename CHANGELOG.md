@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.20.1](https://github.com/hugemenace/nd/compare/v1.20.0...v1.20.1) (2022-04-17)
+
+
+### Bug Fixes
+
+* ensure all scene objects are deselected before executing core single_vertex operator functionality ([43b4e6d](https://github.com/hugemenace/nd/commit/43b4e6d4ced4fbbc2d116c399d0768c485e968fe))
+
 ## [1.20.0](https://github.com/hugemenace/nd/compare/v1.19.0...v1.20.0) (2022-04-17)
 
 

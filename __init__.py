@@ -12,8 +12,9 @@ bl_info = {
 
 
 import bpy
+import rna_keymap_ui
 from bpy.types import AddonPreferences
-from bpy.props import BoolProperty, IntProperty, StringProperty
+from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty
 from . import lib
 from . import booleans
 from . import interface
@@ -37,7 +38,7 @@ registerables = (
 
 class NDPreferences(AddonPreferences):
     bl_idname = __name__
-    
+
     update_available: BoolProperty(
         name="Update Available",
         default=False,
@@ -61,11 +62,67 @@ class NDPreferences(AddonPreferences):
         step=1,
     )
 
+    tabs: EnumProperty(
+        name="Tabs",
+        items=[
+            ("GENERAL", "General", ""),
+            ("UI", "UI", ""),
+            ("KEYMAP", "Keymap", ""),
+        ],
+        default="GENERAL",
+    )
+
+
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "overlay_dpi")
-        layout.prop(self, "utils_collection_name")
-        layout.prop(self, "enable_quick_favourites")
+
+        column = layout.column(align=True)
+        row = column.row()
+        row.prop(self, "tabs", expand=True)
+
+        box = layout.box()
+
+        if self.tabs == "GENERAL":
+            self.draw_general(box)
+        elif self.tabs == "UI":
+            self.draw_ui(box)
+        elif self.tabs == "KEYMAP":
+            self.draw_keymap(box)
+
+
+    def draw_general(self, box):
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "utils_collection_name")
+
+    
+    def draw_ui(self, box):
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "overlay_dpi")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "enable_quick_favourites")
+
+    
+    def draw_keymap(self, box):
+        name = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
+        wm = bpy.context.window_manager
+        kc = wm.keyconfigs.user
+        
+        for keymap in ['3D View', 'Mesh', 'Object Mode']:
+            km = kc.keymaps.get(keymap)
+
+            column = box.column(align=True)
+            row = column.row()
+            row.label(text=keymap)
+
+            for kmi in km.keymap_items:
+                if kmi.idname == "wm.call_menu" and kmi.name.startswith(name):
+                    column = box.column(align=True)
+                    row = column.row()
+                    rna_keymap_ui.draw_kmi(["ADDON", "USER", "DEFAULT"], kc, km, kmi, row, 0)
 
 
 def register():

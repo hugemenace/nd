@@ -44,15 +44,24 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
+        row.operator("nd.single_vertex", icon='DOT')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
+
+        row = column.row(align=True)
+        row.scale_y = 1.2
         row.operator("nd.geo_lift", icon='FACESEL')
         
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.view_align", icon='ORIENTATION_VIEW')
 
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.blank_sketch", icon='GREASEPENCIL')
+        if lib.preferences.get_preferences().enable_deprecated_features:
+            row = column.row(align=True)
+            row.scale_y = 1.2
+            row.operator("nd.blank_sketch", icon='GREASEPENCIL')
 
         box = layout.box()
         box.label(text="Power Mods", icon='MODIFIER')

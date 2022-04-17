@@ -49,6 +49,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    enable_deprecated_features: BoolProperty(
+        name="Compatibility Mode",
+        default=False,
+    )
+
     utils_collection_name: StringProperty(
         name="Utils Collection Name",
         default="Utils",
@@ -106,6 +111,14 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "utils_collection_name")
+
+        box = box.box()
+        column = box.column(align=True)
+        row = column.row()
+        row.label(text="Enable deprecated features for short term backwards compatibility", icon="ERROR")
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "enable_deprecated_features")
 
     
     def draw_ui(self, box):

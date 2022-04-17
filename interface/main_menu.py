@@ -19,9 +19,14 @@ class ND_MT_main_menu(bpy.types.Menu):
             layout.separator()
 
         layout.operator_context = 'INVOKE_DEFAULT'
+        layout.operator("nd.single_vertex", icon='DOT')
+        layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
         layout.operator("nd.view_align", icon='ORIENTATION_VIEW')
         layout.operator("nd.geo_lift", icon='FACESEL')
-        layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
+
+        if lib.preferences.get_preferences().enable_deprecated_features:
+            layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
+
         layout.separator()
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
         layout.menu("ND_MT_bevel_menu", icon='MOD_BEVEL')

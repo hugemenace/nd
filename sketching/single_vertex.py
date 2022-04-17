@@ -10,8 +10,11 @@ class ND_OT_single_vertex(bpy.types.Operator):
 
 
     def execute(self, context):
+        bpy.ops.object.select_all(action='DESELECT')
+
         add_single_vertex_object(self, context, "Sketch")
         align_object_to_3d_cursor(self, context)
+
         self.start_sketch_editing(context)
 
         return {'FINISHED'}

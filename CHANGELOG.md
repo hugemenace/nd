@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/hugemenace/nd/compare/v1.19.0...v1.20.0) (2022-04-17)
+
+
+### Features
+
+* allow customization of overlay pin and pause keybinds ([aae7e91](https://github.com/hugemenace/nd/commit/aae7e91c667cc8ea7b05586b5cebe1c89bfa1706))
+* organise addon preferences panel and expose Blender keymap settings ([35c26bb](https://github.com/hugemenace/nd/commit/35c26bba1e77b5cd401af8d45dddde6b65cf0eec))
+* split blank_sketch into single_vertex and make_manifold operators ([08f6efe](https://github.com/hugemenace/nd/commit/08f6efefeee9de51e24c1945b12d91d8664ac625))
+
+
+### Bug Fixes
+
+* fix incorrectly labled profile_extrude overlay alt/ctrl key options ([8134622](https://github.com/hugemenace/nd/commit/81346226fc9607525a7029aa5aa48feb9cd13efc))
+
 ## [1.19.0](https://github.com/hugemenace/nd/compare/v1.18.0...v1.19.0) (2022-04-12)
 
 

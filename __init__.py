@@ -72,6 +72,18 @@ class NDPreferences(AddonPreferences):
         default="GENERAL",
     )
 
+    overlay_pause_key: EnumProperty(
+        name="Pause Key",
+        items=lib.overlay_keys.overlay_keys_enum,
+        default="BACK_SLASH",
+    )
+
+    overlay_pin_key: EnumProperty(
+        name="Pin Key",
+        items=lib.overlay_keys.overlay_keys_enum,
+        default="P",
+    )
+
 
     def draw(self, context):
         layout = self.layout
@@ -107,6 +119,18 @@ class NDPreferences(AddonPreferences):
 
     
     def draw_keymap(self, box):
+        column = box.column(align=True)
+        row = column.row()
+        row.label(text="Overlay Keybinds")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "overlay_pin_key")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "overlay_pause_key")
+
         name = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
         wm = bpy.context.window_manager
         kc = wm.keyconfigs.user

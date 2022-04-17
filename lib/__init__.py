@@ -8,6 +8,7 @@ from . import assets
 from . import updates
 from . import preferences
 from . import collections
+from . import overlay_keys
 
 
 def reload():
@@ -20,5 +21,6 @@ def reload():
     importlib.reload(updates)
     importlib.reload(preferences)
     importlib.reload(collections)
+    importlib.reload(overlay_keys)
 
     overlay.unregister_draw_handler()

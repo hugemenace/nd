@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.21.0](https://github.com/hugemenace/nd/compare/v1.20.1...v1.21.0) (2022-04-18)
+
+
+### Features
+
+* add mouse values mode, and integrate all applicable operators ([a873f74](https://github.com/hugemenace/nd/commit/a873f7455d2a6310d4a29b3231336cdb25203e5c))
+* add profile option to vanilla bevel operator ([ca24b38](https://github.com/hugemenace/nd/commit/ca24b382d708a4618377f5a7a40498a2bb111ec5))
+
+
+### Bug Fixes
+
+* ensure a weld modifier is placed after a vanilla bevel modifier ([5cecea6](https://github.com/hugemenace/nd/commit/5cecea6ece0a8cc49b73128218143cdbe0333273))
+* ensure the previous profile value is retained when summoning & reverting a vanilla bevel operator ([733f6ad](https://github.com/hugemenace/nd/commit/733f6ad0f65fb4ae1bb77d0a15502fb4de6b39a3))
+* fix profile option behaviour on vertex_bevel operator ([9f22e77](https://github.com/hugemenace/nd/commit/9f22e7747b716c3ebcfd94f1e3f7efbc1aa0d8b9))
+* swap width and segments options on vertex_bevel operator to align with vanilla bevel operator ([c9c7e6b](https://github.com/hugemenace/nd/commit/c9c7e6bdb6324b7ec97cc966ee04f5f6831306ce))
+* update recon_poly option ordering to better align with other operators (width > segments > etc.) ([4c107e9](https://github.com/hugemenace/nd/commit/4c107e99b07600f414e2e9b862cac1a9093fc38a))
+
 ### [1.20.1](https://github.com/hugemenace/nd/compare/v1.20.0...v1.20.1) (2022-04-17)
 
 

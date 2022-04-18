@@ -23,7 +23,7 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         capture_modifier_keys(self, event)
 
         width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
-        profile_factor = (self.base_profile_factor / 10.0) if self.key_shift else self.base_profile_factor
+        profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
 
         if self.key_toggle_operator_passthrough:
@@ -45,14 +45,10 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         elif self.key_increase_factor:
             if self.key_no_modifiers:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
-            elif self.key_ctrl:
-                self.base_profile_factor = min(1, self.base_profile_factor * 10.0)
 
         elif self.key_decrease_factor:
             if self.key_no_modifiers:
                 self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
-            elif self.key_ctrl:
-                self.base_profile_factor = max(0.001, self.base_profile_factor / 10.0)
         
         elif self.key_step_up:
             if self.key_alt:
@@ -86,7 +82,7 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
             if self.key_no_modifiers:
                 self.width = max(0, self.width + self.mouse_value)
             elif self.key_ctrl:
-                self.profile = max(0, self.profile + self.mouse_value)
+                self.profile = max(0, min(1, self.profile + self.mouse_value))
 
             self.dirty = True
 
@@ -103,7 +99,6 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
 
         self.dirty = False
         self.base_width_factor = 0.01
-        self.base_profile_factor = 0.1
 
         self.segments = 1
         self.width = 0
@@ -208,7 +203,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Profile: {0:.2f}".format(self.profile),
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_profile_factor, self.base_profile_factor / 10),
+        "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True)

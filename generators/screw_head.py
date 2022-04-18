@@ -7,6 +7,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys
 from .. lib.assets import get_asset_path
 from .. lib.objects import align_object_to_3d_cursor
+from .. lib.preferences import get_preferences
 
 
 mod_displace = "Offset — ND SH"
@@ -83,6 +84,14 @@ class ND_OT_screw_head(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if get_preferences().enable_mouse_values:
+            if self.key_alt:
+                self.offset += self.mouse_value
+            elif self.key_ctrl:
+                self.scale += self.mouse_value
+
+            self.dirty = True
+
         if self.dirty:
             self.operate(context)
 
@@ -113,7 +122,7 @@ class ND_OT_screw_head(bpy.types.Operator):
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -208,14 +217,16 @@ def draw_text_callback(self):
         "Offset: {0:.1f}".format(self.offset * 1000), 
         "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_alt,
-        alt_mode=self.key_shift_alt)
+        alt_mode=self.key_shift_alt,
+        mouse_value=True)
 
     draw_property(
         self,
         "Scale: {0:.2f}%".format(self.scale * 100),
         "Ctrl (±{0:.2f}%)  |  Shift + Ctrl (±{1:.2f}%)".format(self.base_scale_factor * 100, (self.base_scale_factor / 10) * 100),
         active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl)
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True)
 
 
 def menu_func(self, context):

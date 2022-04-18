@@ -1,6 +1,6 @@
 from . preferences import get_preferences
 
-def capture_modifier_keys(cls, event=None):
+def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.key_no_modifiers = False if event == None else not event.ctrl and not event.alt
     cls.key_ctrl = False if event == None else event.ctrl and not event.alt
     cls.key_shift_ctrl = False if event == None else event.shift and cls.key_ctrl
@@ -36,3 +36,14 @@ def capture_modifier_keys(cls, event=None):
 
     cls.key_movement_passthrough = False if event == None else event.type == 'MIDDLEMOUSE' or (
         event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or event.type.startswith('NDOF')
+
+    cls.mouse_delta = 0 if event == None else (event.mouse_x - cls.prev_mouse_x) * get_preferences().mouse_value_scalar
+    cls.mouse_value = cls.mouse_delta * (0.1 if cls.key_shift else 1)
+    cls.prev_mouse_x = mouse_x if event == None else event.mouse_x
+
+    if event == None or cls.mouse_warped:
+        cls.mouse_delta = 0
+        cls.mouse_value = 0
+        cls.mouse_warped = False
+
+    cls.mouse_value_mag = cls.mouse_value * 100

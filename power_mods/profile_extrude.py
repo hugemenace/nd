@@ -2,6 +2,7 @@ import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+from .. lib.preferences import get_preferences
 
 
 mod_screw = "Extrusion — ND PE"
@@ -71,6 +72,12 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if get_preferences().enable_mouse_values:
+            if self.key_no_modifiers:
+                self.extrusion_length = max(0, self.extrusion_length + self.mouse_value)
+            
+            self.dirty = True
+
         if self.dirty:
             self.operate(context)
 
@@ -97,7 +104,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -209,7 +216,8 @@ def draw_text_callback(self):
         "Extrusion: {0:.1f}".format(self.extrusion_length * 1000),
         "(±{0:.1f})  |  Shift + (±{1:.1f})".format(self.base_extrude_factor * 1000, (self.base_extrude_factor / 10) * 1000),
         active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers)
+        alt_mode=self.key_shift_no_modifiers,
+        mouse_value=True)
 
     draw_property(
         self, 

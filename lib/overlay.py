@@ -60,6 +60,7 @@ def init_overlay(cls, event):
 
     cls.pin_overlay = False
     cls.operator_passthrough = False
+    cls.mouse_warped = False
 
 
 def update_overlay(cls, context, event):
@@ -67,7 +68,30 @@ def update_overlay(cls, context, event):
         cls.overlay_x = event.mouse_x - cls.region_offset_x + cls.overlay_offset_x
         cls.overlay_y = event.mouse_y - cls.region_offset_y + cls.overlay_offset_y
 
+    if not cls.operator_passthrough and get_preferences().enable_mouse_values:
+        wrap_cursor(cls, context, event)
+
     redraw_regions()
+
+
+def wrap_cursor(cls, context, event):
+    if event.mouse_region_x <= 0:
+        mouse_x = context.region.width + cls.region_offset_x - 10
+        context.window.cursor_warp(mouse_x, event.mouse_y)
+        cls.mouse_warped = True
+
+    if event.mouse_region_x >= context.region.width - 1:
+        mouse_x = cls.region_offset_x + 10
+        context.window.cursor_warp(mouse_x, event.mouse_y)
+        cls.mouse_warped = True
+
+    if event.mouse_region_y <= 0:
+        mouse_y = context.region.height + cls.region_offset_y - 10
+        context.window.cursor_warp(event.mouse_x, mouse_y)
+
+    if event.mouse_region_y >= context.region.height - 1:
+        mouse_y = cls.region_offset_y + 100
+        context.window.cursor_warp(event.mouse_x, mouse_y)
 
 
 def draw_header(cls):
@@ -101,7 +125,7 @@ def draw_header(cls):
     cls.line_step = 0
 
 
-def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False):
+def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False, mouse_value=False):
     blf.size(0, 28, cls.dpi)
     
     if cls.operator_passthrough:
@@ -117,6 +141,11 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
         blf.draw(0, "◑")
     else:
         blf.draw(0, "●")
+
+    if get_preferences().enable_mouse_values and mouse_value:
+        blf.size(0, 22, cls.dpi)
+        blf.position(0, cls.overlay_x - (15 * cls.dpi_scalar), cls.overlay_y - ((34 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
+        blf.draw(0, "»")
 
     blf.size(0, 16, cls.dpi)
 

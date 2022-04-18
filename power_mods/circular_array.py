@@ -5,6 +5,7 @@ from mathutils import Euler
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.collections import move_to_utils_collection
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_circular_array(bpy.types.Operator):
@@ -65,6 +66,12 @@ SHIFT — Do not place rotator object in utils collection"""
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
         
+        if get_preferences().enable_mouse_values:
+            if self.key_ctrl:
+                self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
+
+            self.dirty = True
+
         if self.dirty:
             self.operate(context)
 
@@ -89,7 +96,7 @@ SHIFT — Do not place rotator object in utils collection"""
         self.add_array_modifier()
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -171,10 +178,11 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({}°)".format(self.angle)),
+        "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({0:.1f}°)".format(self.angle)),
         "Ctrl (±15)  |  Shift (±1)",
         active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl)
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True)
 
 
 def menu_func(self, context):

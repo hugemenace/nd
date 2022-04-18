@@ -4,6 +4,7 @@ from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys
+from .. lib.preferences import get_preferences
 
 
 mod_displace = "Radius — ND RCP"
@@ -84,6 +85,15 @@ class ND_OT_recon_poly(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
         
+        if get_preferences().enable_mouse_values:
+            if self.key_alt:
+                self.inner_radius = max(0, self.inner_radius + self.mouse_value)
+                self.width = max(self.inner_radius * -0.5, self.width)
+            elif self.key_ctrl:
+                self.width = max(self.inner_radius * -0.5, self.width + self.mouse_value)
+
+            self.dirty = True
+
         if self.dirty:
             self.operate(context)
 
@@ -111,7 +121,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -270,14 +280,16 @@ def draw_text_callback(self):
         "Inner Radius: {0:.1f}".format(self.inner_radius * 1000), 
         "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
         active=self.key_alt, 
-        alt_mode=self.key_shift_alt)
+        alt_mode=self.key_shift_alt,
+        mouse_value=True)
 
     draw_property(
         self, 
         "{0}: {1:.1f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 2000),
         "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_ctrl, 
-        alt_mode=self.key_shift_ctrl)
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True)
 
 
 def menu_func(self, context):

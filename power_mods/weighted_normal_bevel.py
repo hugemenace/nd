@@ -3,6 +3,7 @@ import bmesh
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+from .. lib.preferences import get_preferences
 
 
 mod_bevel = "Bevel — ND WNB"
@@ -62,6 +63,11 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if get_preferences().enable_mouse_values:
+            self.width = max(0.0001, self.width + self.mouse_value)
+
+            self.dirty = True
+
         if self.dirty:
             self.operate(context)
 
@@ -85,7 +91,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -170,7 +176,8 @@ def draw_text_callback(self):
         "Width: {0:.1f}".format(self.width * 1000), 
         "(±{0:.1f})  |  Shift (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=True,
-        alt_mode=self.key_shift_no_modifiers)
+        alt_mode=self.key_shift_no_modifiers,
+        mouse_value=True)
 
 
 def menu_func(self, context):

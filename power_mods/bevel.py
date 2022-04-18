@@ -2,6 +2,7 @@ import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+from .. lib.preferences import get_preferences
 
 
 mod_bevel = "Bevel — ND B"
@@ -46,7 +47,7 @@ class ND_OT_bevel(bpy.types.Operator):
         elif self.key_step_up:
             if self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
-            else:
+            elif self.key_no_modifiers:
                 self.width += width_factor
 
             self.dirty = True
@@ -54,7 +55,7 @@ class ND_OT_bevel(bpy.types.Operator):
         elif self.key_step_down:
             if self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
-            else:
+            elif self.key_no_modifiers:
                 self.width = max(0.0001, self.width - width_factor)
 
             self.dirty = True
@@ -66,6 +67,12 @@ class ND_OT_bevel(bpy.types.Operator):
 
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
+
+        if get_preferences().enable_mouse_values:
+            if self.key_no_modifiers:
+                self.width = max(0.0001, self.width + self.mouse_value)
+
+            self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -91,7 +98,7 @@ class ND_OT_bevel(bpy.types.Operator):
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -161,7 +168,8 @@ def draw_text_callback(self):
         "Width: {0:.1f}".format(self.width * 1000), 
         "(±{0:.1f})  |  Shift (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers)
+        alt_mode=self.key_shift_no_modifiers,
+        mouse_value=True)
 
     draw_property(
         self,

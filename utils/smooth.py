@@ -3,6 +3,7 @@ import bmesh
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_smooth(bpy.types.Operator):
@@ -51,6 +52,11 @@ class ND_OT_smooth(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if get_preferences().enable_mouse_values:
+            self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
+
+            self.dirty = True
+
         if self.dirty:
             self.operate(context)
             
@@ -68,7 +74,7 @@ class ND_OT_smooth(bpy.types.Operator):
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -111,7 +117,8 @@ def draw_text_callback(self):
         "Angle: {0:.0f}°".format(self.angle), 
         "(±{0:.0f})  |  Shift + (±1)".format(self.base_angle_factor),
         active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers)
+        alt_mode=self.key_shift_no_modifiers,
+        mouse_value=True)
 
 
 def menu_func(self, context):

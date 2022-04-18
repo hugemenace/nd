@@ -14,7 +14,7 @@ bl_info = {
 import bpy
 import rna_keymap_ui
 from bpy.types import AddonPreferences
-from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty
+from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty
 from . import lib
 from . import booleans
 from . import interface
@@ -52,6 +52,20 @@ class NDPreferences(AddonPreferences):
     enable_deprecated_features: BoolProperty(
         name="Compatibility Mode",
         default=False,
+    )
+
+    enable_mouse_values: BoolProperty(
+        name="Enable Mouse Values",
+        default=False,
+    )
+
+    mouse_value_scalar: FloatProperty(
+        name="Mouse Value Scalar",
+        default=0.0025,
+        min=0.0001,
+        max=10,
+        precision=4,
+        step=0.01,
     )
 
     utils_collection_name: StringProperty(
@@ -125,6 +139,14 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "overlay_dpi")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "enable_mouse_values")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "mouse_value_scalar")
 
         column = box.column(align=True)
         row = column.row()

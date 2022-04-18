@@ -45,35 +45,35 @@ class ND_OT_recon_poly(bpy.types.Operator):
             return {'CANCELLED'}
 
         elif self.key_increase_factor:
-            if self.key_alt:
-                self.base_inner_radius_factor = min(1, self.base_inner_radius_factor * 10.0)
-            elif self.key_ctrl:
+            if self.key_no_modifiers:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
+            elif self.key_ctrl:
+                self.base_inner_radius_factor = min(1, self.base_inner_radius_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_alt:
-                self.base_inner_radius_factor = max(0.001, self.base_inner_radius_factor / 10.0)
-            elif self.key_ctrl:
+            if self.key_no_modifiers:
                 self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
+            elif self.key_ctrl:
+                self.base_inner_radius_factor = max(0.001, self.base_inner_radius_factor / 10.0)
         
         elif self.key_step_up:
             if self.key_alt:
-                self.inner_radius += inner_radius_factor
-            elif self.key_ctrl:
-                self.width += width_factor
-            elif self.key_no_modifiers:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
+            elif self.key_ctrl:
+                self.inner_radius += inner_radius_factor
+            elif self.key_no_modifiers:
+                self.width += width_factor
 
             self.dirty = True
 
         elif self.key_step_down:
             if self.key_alt:
+                self.segments = max(3, self.segments - segment_factor)
+            elif self.key_ctrl:
                 self.inner_radius = max(0, self.inner_radius - inner_radius_factor)
                 self.width = max(self.inner_radius * -0.5, self.width)
-            elif self.key_ctrl:
-                self.width = max(self.inner_radius * -0.5, self.width - width_factor)
             elif self.key_no_modifiers:
-                self.segments = max(3, self.segments - segment_factor)
+                self.width = max(self.inner_radius * -0.5, self.width - width_factor)
 
             self.dirty = True
 
@@ -86,11 +86,11 @@ class ND_OT_recon_poly(bpy.types.Operator):
             return {'PASS_THROUGH'}
         
         if get_preferences().enable_mouse_values:
-            if self.key_alt:
+            if self.key_no_modifiers:
+                self.width = max(self.inner_radius * -0.5, self.width + self.mouse_value)
+            elif self.key_ctrl:
                 self.inner_radius = max(0, self.inner_radius + self.mouse_value)
                 self.width = max(self.inner_radius * -0.5, self.width)
-            elif self.key_ctrl:
-                self.width = max(self.inner_radius * -0.5, self.width + self.mouse_value)
 
             self.dirty = True
 
@@ -269,25 +269,25 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
-        "Segments: {}".format(self.segments), 
-        "(±2)  |  Shift (±1)",
+        self,
+        "{0}: {1:.1f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 2000),
+        "(±{0:.1f})  |  Shift (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_no_modifiers, 
-        alt_mode=False)
-
-    draw_property(
-        self, 
-        "Inner Radius: {0:.1f}".format(self.inner_radius * 1000), 
-        "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
-        active=self.key_alt, 
-        alt_mode=self.key_shift_alt,
+        alt_mode=self.key_shift_no_modifiers,
         mouse_value=True)
 
     draw_property(
-        self, 
-        "{0}: {1:.1f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 2000),
-        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
-        active=self.key_ctrl, 
+        self,
+        "Segments: {}".format(self.segments), 
+        "Alt (±2)  |  Shift + Alt (±1)",
+        active=self.key_alt, 
+        alt_mode=self.key_shift_alt)
+
+    draw_property(
+        self,
+        "Inner Radius: {0:.1f}".format(self.inner_radius * 1000), 
+        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
+        active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True)
 

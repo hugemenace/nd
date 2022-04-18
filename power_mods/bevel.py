@@ -19,7 +19,8 @@ class ND_OT_bevel(bpy.types.Operator):
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        width_factor = (self.base_width_factor / 10.0) if event.shift else self.base_width_factor
+        width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
+        profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
 
         if self.key_toggle_operator_passthrough:
@@ -39,24 +40,30 @@ class ND_OT_bevel(bpy.types.Operator):
             return {'CANCELLED'}
 
         elif self.key_increase_factor:
-            self.base_width_factor = min(1, self.base_width_factor * 10.0)
+            if self.key_no_modifiers:
+                self.base_width_factor = min(1, self.base_width_factor * 10.0)
 
         elif self.key_decrease_factor:
-            self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
-
+            if self.key_no_modifiers:
+                self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
+        
         elif self.key_step_up:
             if self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
+            elif self.key_ctrl:
+                self.profile = min(1, self.profile + profile_factor)
             elif self.key_no_modifiers:
                 self.width += width_factor
-
-            self.dirty = True
             
+            self.dirty = True
+        
         elif self.key_step_down:
             if self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
+            elif self.key_ctrl:
+                self.profile = max(0, self.profile - profile_factor)
             elif self.key_no_modifiers:
-                self.width = max(0.0001, self.width - width_factor)
+                self.width = max(0, self.width - width_factor)
 
             self.dirty = True
         
@@ -70,7 +77,9 @@ class ND_OT_bevel(bpy.types.Operator):
 
         if get_preferences().enable_mouse_values:
             if self.key_no_modifiers:
-                self.width = max(0.0001, self.width + self.mouse_value)
+                self.width = max(0, self.width + self.mouse_value)
+            elif self.key_ctrl:
+                self.profile = max(0, min(1, self.profile + self.mouse_value))
 
             self.dirty = True
 
@@ -84,8 +93,11 @@ class ND_OT_bevel(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.dirty = False
-        self.base_width_factor = 0.001
+        self.base_width_factor = 0.01
+
         self.segments = 1
+        self.width = 0
+        self.profile = 0.5
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -141,6 +153,7 @@ class ND_OT_bevel(bpy.types.Operator):
     def operate(self, context):
         self.bevel.width = self.width
         self.bevel.segments = self.segments
+        self.bevel.profile = self.profile
 
         self.dirty = False
 
@@ -177,6 +190,14 @@ def draw_text_callback(self):
         "Alt (±2)  |  Shift (±1)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt)
+
+    draw_property(
+        self, 
+        "Profile: {0:.2f}".format(self.profile),
+        "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
+        active=self.key_ctrl,
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True)
 
 
 def menu_func(self, context):

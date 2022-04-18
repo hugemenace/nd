@@ -141,6 +141,7 @@ class ND_OT_bevel(bpy.types.Operator):
 
         self.width_prev = self.width = self.bevel.width
         self.segments_prev = self.segments = self.bevel.segments
+        self.profile_prev = self.profile = self.bevel.profile
 
 
     def add_bevel_modifier(self, context):
@@ -169,6 +170,7 @@ class ND_OT_bevel(bpy.types.Operator):
         if self.summoned:
             self.bevel.width = self.width_prev
             self.bevel.segments = self.segments_prev
+            self.bevel.profile = self.profile_prev
 
         unregister_draw_handler()
 

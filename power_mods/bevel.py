@@ -6,7 +6,8 @@ from .. lib.preferences import get_preferences
 
 
 mod_bevel = "Bevel — ND B"
-mod_summon_list = [mod_bevel]
+mod_weld = "Weld — ND B"
+mod_summon_list = [mod_bevel, mod_weld]
 
 
 class ND_OT_bevel(bpy.types.Operator):
@@ -149,7 +150,19 @@ class ND_OT_bevel(bpy.types.Operator):
         bevel.offset_type = 'WIDTH'
 
         self.bevel = bevel
+
     
+    def add_weld_modifier(self, context):
+        mods = context.active_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
+
+        if not previous_op:
+            weld = context.object.modifiers.new(mod_weld, type='WELD')
+            weld.merge_threshold = 0.00001
+
+            self.weld = weld
+
 
     def operate(self, context):
         self.bevel.width = self.width
@@ -160,6 +173,7 @@ class ND_OT_bevel(bpy.types.Operator):
 
 
     def finish(self, context):
+        self.add_weld_modifier(context)
         unregister_draw_handler()
 
 

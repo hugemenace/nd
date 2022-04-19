@@ -103,11 +103,16 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
+        row.operator("nd.array_cubed", icon='PARTICLES')
         
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.square_array", icon='LIGHTPROBE_GRID')
+        row.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
+        
+        if lib.preferences.get_preferences().enable_deprecated_features:
+            row = column.row(align=True)
+            row.scale_y = 1.2
+            row.operator("nd.square_array", icon='LIGHTPROBE_GRID')
 
         row = column.row(align=True)
         row.scale_y = 1.2

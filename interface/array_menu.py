@@ -1,5 +1,6 @@
 import bpy
 from .. import bl_info
+from .. import lib
 
 
 class ND_MT_array_menu(bpy.types.Menu):
@@ -10,8 +11,11 @@ class ND_MT_array_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
+        layout.operator("nd.array_cubed", icon='PARTICLES')
         layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
-        layout.operator("nd.square_array", icon='LIGHTPROBE_GRID')
+
+        if lib.preferences.get_preferences().enable_deprecated_features:
+            layout.operator("nd.square_array", icon='LIGHTPROBE_GRID')
         
 
 def draw_item(self, context):

@@ -1,7 +1,5 @@
 import bpy
 import bmesh
-from math import radians
-from mathutils import Euler
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
@@ -187,16 +185,15 @@ class ND_OT_square_array(bpy.types.Operator):
         self.second_offset_prev = self.second_offset = second_offset
 
 
-
     def add_first_array_modifier(self, context):
-        array = context.object.modifiers.new('Square Array A — ND', 'ARRAY')
+        array = context.object.modifiers.new(mod_first_array, 'ARRAY')
         array.use_relative_offset = True
 
         self.first_array = array
     
     
     def add_second_array_modifier(self, context):
-        array = context.object.modifiers.new('Square Array B — ND', 'ARRAY')
+        array = context.object.modifiers.new(mod_second_array, 'ARRAY')
         array.use_relative_offset = True
 
         self.second_array = array

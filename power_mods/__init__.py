@@ -7,6 +7,7 @@ from . import mirror
 from . import profile_extrude
 from . import circular_array
 from . import square_array
+from . import array_cubed
 from . import bevel
 
 
@@ -19,6 +20,7 @@ def reload():
     importlib.reload(profile_extrude)
     importlib.reload(circular_array)
     importlib.reload(square_array)
+    importlib.reload(array_cubed)
     importlib.reload(bevel)
 
 
@@ -31,6 +33,7 @@ def register():
     profile_extrude.register()
     circular_array.register()
     square_array.register()
+    array_cubed.register()
     bevel.register()
 
 
@@ -43,6 +46,7 @@ def unregister():
     profile_extrude.unregister()
     circular_array.unregister()
     square_array.unregister()
+    array_cubed.unregister()
     bevel.unregister()
 
     

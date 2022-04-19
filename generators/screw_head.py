@@ -111,12 +111,19 @@ class ND_OT_screw_head(bpy.types.Operator):
 
         self.target_object = context.active_object if len(context.selected_objects) > 0 else None
 
+        custom_objects = []
+        custom_file = get_preferences().custom_screw_heads_path
+        if custom_file.endswith(".blend"):
+            with bpy.data.libraries.load(custom_file) as (custom_data_from, custom_data_to):
+                custom_data_to.objects = custom_data_from.objects
+                custom_objects = custom_data_to.objects
+
         filepath = get_asset_path('screw_heads')
         with bpy.data.libraries.load(filepath) as (data_from, data_to):
             data_to.objects = data_from.objects
         
         self.obj = None
-        self.objects = data_to.objects
+        self.objects = data_to.objects + custom_objects
 
         self.update_head_type(context)
 

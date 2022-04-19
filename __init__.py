@@ -108,6 +108,10 @@ class NDPreferences(AddonPreferences):
         default="P",
     )
 
+    custom_screw_heads_path: StringProperty(
+        name="Custom Screw Heads",
+        subtype='FILE_PATH',
+    )
 
     def draw(self, context):
         layout = self.layout
@@ -135,11 +139,19 @@ class NDPreferences(AddonPreferences):
         row = column.row()
         row.prop(self, "use_fast_booleans")
 
-        box = box.box()
-        column = box.column(align=True)
+        box2 = box.box()
+        column = box2.column(align=True)
+        row = column.row()
+        row.label(text="Set a path for a custom screw heads .blend file")
+        column = box2.column(align=True)
+        row = column.row()
+        row.prop(self, "custom_screw_heads_path")
+
+        box3 = box.box()
+        column = box3.column(align=True)
         row = column.row()
         row.label(text="Enable deprecated features for short term backwards compatibility", icon="ERROR")
-        column = box.column(align=True)
+        column = box3.column(align=True)
         row = column.row()
         row.prop(self, "enable_deprecated_features")
 

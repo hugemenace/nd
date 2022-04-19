@@ -96,6 +96,8 @@ class ND_OT_array_cubed(bpy.types.Operator):
         self.current_axis = 0
         self.axes = [None, None, None]
 
+        context.active_object.show_axis = True
+
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
@@ -166,10 +168,14 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
 
     def finish(self, context):
+        context.active_object.show_axis = False
+
         unregister_draw_handler()
 
 
     def revert(self, context):
+        context.active_object.show_axis = False
+
         if not self.summoned:
             for mod in mod_summon_list:
                 bpy.ops.object.modifier_remove(modifier=mod)

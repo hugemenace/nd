@@ -59,6 +59,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    use_fast_booleans: BoolProperty(
+        name="Use Fast Booleans",
+        default=True,
+    )
+
     mouse_value_scalar: FloatProperty(
         name="Mouse Value Scalar",
         default=0.0025,
@@ -125,6 +130,10 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "utils_collection_name")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "use_fast_booleans")
 
         box = box.box()
         column = box.column(align=True)

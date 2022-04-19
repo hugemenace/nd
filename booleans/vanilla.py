@@ -1,5 +1,6 @@
 import bpy
 from .. lib.collections import move_to_utils_collection
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_bool_vanilla(bpy.types.Operator):
@@ -23,13 +24,15 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
 
 
     def execute(self, context):
+        solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
+
         a, b = context.selected_objects
         reference_obj = a if a.name != context.object.name else b
         
         boolean = context.object.modifiers.new(" — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN')
         boolean.operation = self.mode
         boolean.object = reference_obj
-        boolean.solver = 'EXACT'
+        boolean.solver = solver
 
         reference_obj.display_type = 'WIRE'
         reference_obj.hide_render = True

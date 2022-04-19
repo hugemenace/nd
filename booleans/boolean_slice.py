@@ -1,5 +1,6 @@
 import bpy
 from .. lib.collections import move_to_utils_collection
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_bool_slice(bpy.types.Operator):
@@ -16,6 +17,8 @@ class ND_OT_bool_slice(bpy.types.Operator):
 
 
     def execute(self, context):
+        solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
+
         a, b = context.selected_objects
         reference_obj = a if a.name != context.object.name else b
         
@@ -29,12 +32,12 @@ class ND_OT_bool_slice(bpy.types.Operator):
         boolean_diff = difference_obj.modifiers.new("Difference — ND Bool", 'BOOLEAN')
         boolean_diff.operation = 'DIFFERENCE'
         boolean_diff.object = reference_obj
-        boolean_diff.solver = 'EXACT'
+        boolean_diff.solver = solver
 
         boolean_isect = intersecting_obj.modifiers.new("Intersection — ND Bool", 'BOOLEAN')
         boolean_isect.operation = 'INTERSECT'
         boolean_isect.object = reference_obj
-        boolean_isect.solver = 'EXACT'
+        boolean_isect.solver = solver
 
         reference_obj.display_type = 'WIRE'
         reference_obj.hide_render = True

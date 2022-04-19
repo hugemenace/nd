@@ -23,6 +23,7 @@ class ND_OT_set_origin(bpy.types.Operator):
         (x_orig, y_orig, z_orig) = context.object.location
 
         reference_obj.location = context.object.location
+        reference_obj.rotation_euler = context.object.rotation_euler
 
         self.add_displace_modifier(reference_obj, 'X', x_dest - x_orig)
         self.add_displace_modifier(reference_obj, 'Y', y_dest - y_orig)

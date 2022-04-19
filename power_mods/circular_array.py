@@ -92,6 +92,25 @@ SHIFT — Do not place rotator object in utils collection"""
         self.reference_obj = a if a.name != context.object.name else b
         self.rotator_obj = context.active_object
 
+        self.reference_obj_prev_location = self.reference_obj.location.copy()
+        self.reference_obj_prev_rotation = self.reference_obj.rotation_euler.copy()
+        
+        self.new_empty = False
+        if self.rotator_obj.type != 'EMPTY':
+            empty_rotator_obj = bpy.data.objects.new("empty", None)
+            bpy.context.scene.collection.objects.link(empty_rotator_obj)
+            empty_rotator_obj.empty_display_size = 1
+            empty_rotator_obj.empty_display_type = 'PLAIN_AXES'
+            empty_rotator_obj.parent = self.rotator_obj
+            empty_rotator_obj.location = (0, 0, 0)
+            empty_rotator_obj.rotation_euler = (0, 0, 0)
+            empty_rotator_obj.scale = (1, 1, 1)
+
+            self.rotator_obj = empty_rotator_obj
+            self.new_empty = True
+
+        bpy.ops.nd.set_origin()
+
         self.rotation_snapshot = self.rotator_obj.rotation_euler.copy()
         self.add_array_modifier()
         self.operate(context)
@@ -155,6 +174,19 @@ SHIFT — Do not place rotator object in utils collection"""
         self.rotator_obj.rotation_euler = self.rotation_snapshot
         self.select_reference_obj(context)
         bpy.ops.object.modifier_remove(modifier=self.array.name)
+        
+        self.select_reference_obj(context)
+        modifier_names = [mod.name for mod in self.reference_obj.modifiers]
+        for name in modifier_names:
+            if "Axis Displace" in name:
+                bpy.ops.object.modifier_remove(modifier=name)
+
+        self.reference_obj.location = self.reference_obj_prev_location
+        self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
+
+        if self.new_empty:
+            bpy.context.scene.collection.objects.unlink(self.rotator_obj)
+            bpy.data.objects.remove(self.rotator_obj)
         
         unregister_draw_handler()
 

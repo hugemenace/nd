@@ -11,8 +11,11 @@ class ND_OT_set_origin(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 2
+        if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
+            a, b = context.selected_objects
+            reference_obj = a if a.name != context.object.name else b
+
+            return reference_obj.type == 'MESH'
 
 
     def execute(self, context):

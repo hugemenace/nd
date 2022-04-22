@@ -10,7 +10,8 @@ class ND_OT_name_sync(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return len(context.selected_objects) >= 1
+        if context.mode == 'OBJECT':
+            return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
 
     def execute(self, context):

@@ -124,7 +124,7 @@ class ND_OT_bevel(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1
+            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
 
 
     def prepare_new_operator(self, context):

@@ -95,7 +95,14 @@ class ND_OT_mirror(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) > 0 and len(context.selected_objects) <= 2
+            if len(context.selected_objects) == 1 and context.object.type == 'MESH':
+                return True
+
+            if len(context.selected_objects) == 2:
+                a, b = context.selected_objects
+                reference_obj = a if a.name != context.object.name else b
+
+                return reference_obj.type == 'MESH'
 
 
     def add_mirror_modifier(self):

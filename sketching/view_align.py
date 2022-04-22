@@ -85,7 +85,7 @@ class ND_OT_view_align(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1
+            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
 
 
     def set_selection_mode(self, context):

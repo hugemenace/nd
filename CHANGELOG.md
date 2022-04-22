@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.23.0](https://github.com/hugemenace/nd/compare/v1.22.0...v1.23.0) (2022-04-22)
+
+
+### Features
+
+* allow array_cubed count to roll faux negative ([9138c66](https://github.com/hugemenace/nd/commit/9138c665ec00fb62a24b9664e1f5d2008fb0b47c))
+* distinguish between built-in and custom screw head types in the operator overlay, and add additional .blend file cleanup on revert ([a37a5bf](https://github.com/hugemenace/nd/commit/a37a5bfc0986dcab7f1cb5b70c88dd26044703d8))
+
 ## [1.22.0](https://github.com/hugemenace/nd/compare/v1.21.0...v1.22.0) (2022-04-22)
 
 

@@ -4,6 +4,7 @@ from math import radians, degrees
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
+from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 
 
 mod_displace = "Offset — ND SCR"
@@ -56,7 +57,7 @@ class ND_OT_screw(bpy.types.Operator):
                 if self.key_shift:
                     self.offset_axis = (self.offset_axis + 1) % 3
                 else:
-                    self.screw_axis = (self.screw_axis + 1) % 3
+                    self.axis = (self.axis + 1) % 3
             elif self.key_ctrl:
                 self.angle = min(360, self.angle + angle_factor)
             else:
@@ -71,7 +72,7 @@ class ND_OT_screw(bpy.types.Operator):
                 if self.key_shift:
                     self.offset_axis = (self.offset_axis + 1) % 3
                 else:
-                    self.screw_axis = (self.screw_axis + 1) % 3
+                    self.axis = (self.axis + 1) % 3
             elif self.key_ctrl:
                 self.angle = max(0, self.angle - angle_factor)
             else:
@@ -126,6 +127,9 @@ class ND_OT_screw(bpy.types.Operator):
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
+        init_axis(self, context.active_object, self.axis)
+        register_axis_handler(self)
+
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
@@ -140,7 +144,7 @@ class ND_OT_screw(bpy.types.Operator):
     def prepare_new_operator(self, context):
         self.summoned = False
 
-        self.screw_axis = 2 # X (0), Y (1), Z (2)
+        self.axis = 2 # X (0), Y (1), Z (2)
         self.offset_axis = 1 # X (0), Y (1), Z (2)
         self.segments = 3
         self.angle = 360
@@ -159,7 +163,7 @@ class ND_OT_screw(bpy.types.Operator):
 
         self.offset_prev = self.offset = self.displace.strength
         self.offset_axis_prev = self.offset_axis = {'X': 0, 'Y': 1, 'Z': 2}[self.displace.direction]
-        self.screw_axis_prev = self.screw_axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
+        self.axis_prev = self.axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
         self.segments_prev = self.segments = self.screw.steps
         self.segments_prev = self.segments = self.screw.render_steps
         self.angle_prev = self.angle = degrees(self.screw.angle)
@@ -192,7 +196,7 @@ class ND_OT_screw(bpy.types.Operator):
     def operate(self, context):
         self.displace.strength = self.offset
         self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis]
-        self.screw.axis = ['X', 'Y', 'Z'][self.screw_axis]
+        self.screw.axis = ['X', 'Y', 'Z'][self.axis]
         self.screw.steps = self.segments
         self.screw.render_steps = self.segments
         self.screw.angle = radians(self.angle)
@@ -202,6 +206,7 @@ class ND_OT_screw(bpy.types.Operator):
 
     def finish(self, context):
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
     def revert(self, context):
@@ -212,12 +217,13 @@ class ND_OT_screw(bpy.types.Operator):
         if self.summoned:
             self.displace.strength = self.offset_prev
             self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis_prev]
-            self.screw.axis = ['X', 'Y', 'Z'][self.screw_axis_prev]
+            self.screw.axis = ['X', 'Y', 'Z'][self.axis_prev]
             self.screw.steps = self.segments_prev
             self.screw.render_steps = self.segments_prev
             self.screw.angle = radians(self.angle_prev)
 
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
 def draw_text_callback(self):
@@ -232,7 +238,7 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "Screw Axis: {}  /  Offset Axis: {}".format(['X', 'Y', 'Z'][self.screw_axis], ['X', 'Y', 'Z'][self.offset_axis]),
+        "Screw Axis: {}  /  Offset Axis: {}".format(['X', 'Y', 'Z'][self.axis], ['X', 'Y', 'Z'][self.offset_axis]),
         "Alt (Screw X, Y, Z)  |  Shift + Alt (Offset X, Y, Z)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt)

@@ -3,6 +3,7 @@ import bmesh
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
+from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 
 
 class ND_OT_mirror(bpy.types.Operator):
@@ -83,6 +84,9 @@ class ND_OT_mirror(bpy.types.Operator):
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
+        init_axis(self, self.reference_obj if self.mirror_obj is None else self.mirror_obj, self.axis)
+        register_axis_handler(self)
+
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
@@ -125,13 +129,15 @@ class ND_OT_mirror(bpy.types.Operator):
         self.select_reference_obj(context)
 
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
     def revert(self, context):
         self.select_reference_obj(context)
         bpy.ops.object.modifier_remove(modifier=self.mirror.name)
-        
+
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
 def draw_text_callback(self):

@@ -3,6 +3,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
+from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 
 
 mod_screw = "Extrusion — ND PE"
@@ -109,6 +110,9 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
+        init_axis(self, context.active_object, self.axis)
+        register_axis_handler(self)
+
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
@@ -190,6 +194,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
     def finish(self, context):
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
     def revert(self, context):
@@ -206,6 +211,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
             self.offset.strength = self.calculate_offset_strength()
         
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
 def draw_text_callback(self):

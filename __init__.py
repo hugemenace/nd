@@ -64,6 +64,44 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    enable_axis_helper: BoolProperty(
+        name="Enable Axis Visualization",
+        default=True,
+    )
+
+    axis_base_thickness: FloatProperty(
+        name="Axis Base Thickness",
+        default=2,
+        min=0,
+        max=100,
+        step=1,
+    )
+
+    axis_active_thickness: FloatProperty(
+        name="Axis Active Thickness",
+        default=4,
+        min=0,
+        max=100,
+        step=1,
+    )
+
+    axis_inactive_opacity: FloatProperty(
+        name="Axis Inactive Opacity",
+        default=0.2,
+        min=0,
+        max=1,
+        step=0.1,
+    )
+
+    mouse_value_scalar: FloatProperty(
+        name="Mouse Value Scalar",
+        default=0.0025,
+        min=0.0001,
+        max=10,
+        precision=4,
+        step=0.01,
+    )
+
     mouse_value_scalar: FloatProperty(
         name="Mouse Value Scalar",
         default=0.0025,
@@ -172,6 +210,16 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "enable_quick_favourites")
+        
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "enable_axis_helper")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "axis_base_thickness")
+        row.prop(self, "axis_active_thickness")
+        row.prop(self, "axis_inactive_opacity")
 
     
     def draw_keymap(self, box):

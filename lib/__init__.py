@@ -3,6 +3,7 @@ from . import events
 from . import math
 from . import objects
 from . import overlay
+from . import axis
 from . import viewport
 from . import assets
 from . import updates
@@ -16,6 +17,7 @@ def reload():
     importlib.reload(math)
     importlib.reload(objects)
     importlib.reload(overlay)
+    importlib.reload(axis)
     importlib.reload(viewport)
     importlib.reload(assets)
     importlib.reload(updates)
@@ -24,3 +26,4 @@ def reload():
     importlib.reload(overlay_keys)
 
     overlay.unregister_draw_handler()
+    axis.unregister_axis_handler()

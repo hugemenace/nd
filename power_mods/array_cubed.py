@@ -3,6 +3,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
+from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 
 
 mod_array_x = "Array³ X — ND"
@@ -49,21 +50,21 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
         elif self.key_step_up:
             if self.key_no_modifiers:
-                self.current_axis = (self.current_axis + 1) % 3
+                self.axis = (self.axis + 1) % 3
             elif self.key_alt:
-                self.axes[self.current_axis][1] += 1
+                self.axes[self.axis][1] += 1
             elif self.key_ctrl:
-                self.axes[self.current_axis][2] += offset_factor
+                self.axes[self.axis][2] += offset_factor
 
             self.dirty = True
             
         elif self.key_step_down:
             if self.key_no_modifiers:
-                self.current_axis = (self.current_axis - 1) % 3
+                self.axis = (self.axis - 1) % 3
             elif self.key_alt:
-                self.axes[self.current_axis][1] = max(1, self.axes[self.current_axis][1] - 1)
+                self.axes[self.axis][1] = max(1, self.axes[self.axis][1] - 1)
             elif self.key_ctrl:
-                self.axes[self.current_axis][2] -= offset_factor
+                self.axes[self.axis][2] -= offset_factor
 
             self.dirty = True
         
@@ -77,7 +78,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
         if get_preferences().enable_mouse_values:
             if self.key_ctrl:
-                self.axes[self.current_axis][2] += self.mouse_value
+                self.axes[self.axis][2] += self.mouse_value
 
             self.dirty = True
         
@@ -93,10 +94,8 @@ class ND_OT_array_cubed(bpy.types.Operator):
         self.dirty = False
         self.base_offset_factor = 0.01
 
-        self.current_axis = 0
+        self.axis = 0
         self.axes = [None, None, None]
-
-        context.active_object.show_axis = True
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -113,6 +112,9 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
+
+        init_axis(self, context.active_object, self.axis)
+        register_axis_handler(self)
 
         context.window_manager.modal_handler_add(self)
 
@@ -168,14 +170,11 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
 
     def finish(self, context):
-        context.active_object.show_axis = False
-
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
     def revert(self, context):
-        context.active_object.show_axis = False
-
         if not self.summoned:
             for mod in mod_summon_list:
                 bpy.ops.object.modifier_remove(modifier=mod)
@@ -187,6 +186,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
                 array.relative_offset_displace = [offset if i == axis else 0 for i in range(3)]
         
         unregister_draw_handler()
+        unregister_axis_handler()
 
 
 def draw_text_callback(self):
@@ -194,21 +194,21 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Axis: {0}".format(['X', 'Y', 'Z'][self.current_axis]),
+        "Axis: {0}".format(['X', 'Y', 'Z'][self.axis]),
         "(X, Y, Z)",
         active=self.key_no_modifiers,
         alt_mode=False)
 
     draw_property(
         self, 
-        "Count: {0}".format(self.axes[self.current_axis][1]),
+        "Count: {0}".format(self.axes[self.axis][1]),
         "Alt (±1)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt)
 
     draw_property(
         self,
-        "Offset: {0:.3f}".format(self.axes[self.current_axis][2]),
+        "Offset: {0:.3f}".format(self.axes[self.axis][2]),
         "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,

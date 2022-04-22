@@ -124,6 +124,7 @@ class ND_OT_screw_head(bpy.types.Operator):
         
         self.obj = None
         self.objects = data_to.objects + custom_objects
+        self.objects = [(obj, re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", obj.name), True if obj in custom_objects else False) for obj in self.objects]
 
         self.update_head_type(context)
 
@@ -149,7 +150,7 @@ class ND_OT_screw_head(bpy.types.Operator):
             bpy.ops.object.modifier_remove(modifier=self.displace.name)
             bpy.context.collection.objects.unlink(self.obj)
 
-        self.obj = self.objects[self.head_type_index]
+        self.obj = self.objects[self.head_type_index][0]
         bpy.context.collection.objects.link(self.obj)
 
         if self.target_object:
@@ -183,7 +184,7 @@ class ND_OT_screw_head(bpy.types.Operator):
 
 
     def finish(self, context):
-        objects_to_remove = [obj for obj in self.objects if obj.name != self.obj.name]
+        objects_to_remove = [obj[0] for obj in self.objects if obj[0].name != self.obj.name]
         for obj in objects_to_remove:
             bpy.data.meshes.remove(obj.data, do_unlink=True)
 
@@ -203,8 +204,9 @@ class ND_OT_screw_head(bpy.types.Operator):
 
     def revert(self, context):
         bpy.ops.object.select_all(action='DESELECT')
-        self.finish(context)
-        bpy.data.objects.remove(self.obj, do_unlink=True)
+
+        for obj in self.objects:
+            bpy.data.meshes.remove(obj[0].data, do_unlink=True)
 
         unregister_draw_handler()
 
@@ -214,8 +216,8 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "Type: {0}".format(re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", self.obj.name)),
-        "Select the head type...",
+        "Type: {0}".format(self.objects[self.head_type_index][1]),
+        "Browsing {} types...".format("custom" if self.objects[self.head_type_index][2] else "built-in"),
         active=self.key_no_modifiers,
         alt_mode=False)
 

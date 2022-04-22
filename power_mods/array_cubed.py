@@ -52,7 +52,13 @@ class ND_OT_array_cubed(bpy.types.Operator):
             if self.key_no_modifiers:
                 self.axis = (self.axis + 1) % 3
             elif self.key_alt:
-                self.axes[self.axis][1] += 1
+                new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
+
+                if new_count == 1:
+                    self.axes[self.axis][1] = 1
+                    self.axes[self.axis][2] = self.axes[self.axis][2] * -1
+                else:
+                    self.axes[self.axis][1] = new_count
             elif self.key_ctrl:
                 self.axes[self.axis][2] += offset_factor
 
@@ -62,7 +68,13 @@ class ND_OT_array_cubed(bpy.types.Operator):
             if self.key_no_modifiers:
                 self.axis = (self.axis - 1) % 3
             elif self.key_alt:
-                self.axes[self.axis][1] = max(1, self.axes[self.axis][1] - 1)
+                new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
+
+                if new_count == 0:
+                    self.axes[self.axis][1] = 2
+                    self.axes[self.axis][2] = self.axes[self.axis][2] * -1
+                else:
+                    self.axes[self.axis][1] = new_count
             elif self.key_ctrl:
                 self.axes[self.axis][2] -= offset_factor
 

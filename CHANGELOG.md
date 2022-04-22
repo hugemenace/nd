@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.22.0](https://github.com/hugemenace/nd/compare/v1.21.0...v1.22.0) (2022-04-22)
+
+
+### Features
+
+* add array_cubed operator and deprecate square_array ([d90dec6](https://github.com/hugemenace/nd/commit/d90dec6471c75977f5b279d3ff0b0f5e17bd0809))
+* add custom screw heads (.blend file) option to addon preferences ([539d982](https://github.com/hugemenace/nd/commit/539d982e34b8de4d47a196d57b4fc6feb162672b))
+* add enhanced axis visualization to array_cubed, mirror, profile_extrude, and screw modifiers ([9d2cd74](https://github.com/hugemenace/nd/commit/9d2cd74b3d844857dafe294576cd215b30812852))
+* add toggle for "fast" booleans in addon preferences and set default to true (previously "exact") ([43afa87](https://github.com/hugemenace/nd/commit/43afa87c5662f3a1ff7ca88d087c43834e9858df))
+* allow circular_array operator to be run on objects, empties, and at arbitrary rotations ([45cb48b](https://github.com/hugemenace/nd/commit/45cb48b196cbd35a09ef02f8280a79eebb1581ac))
+* show axes on selected object when using the array_cubed operator ([77a2a85](https://github.com/hugemenace/nd/commit/77a2a8569f0404ee6f2f7324b0214ff3afb7099d))
+
+
+### Bug Fixes
+
+* match target object rotation in set_origin operator ([09da9e8](https://github.com/hugemenace/nd/commit/09da9e8750d49dbf462fac47f1e19e4207219c96))
+
 ## [1.21.0](https://github.com/hugemenace/nd/compare/v1.20.1...v1.21.0) (2022-04-18)
 
 

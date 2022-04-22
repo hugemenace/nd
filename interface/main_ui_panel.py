@@ -117,6 +117,10 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row = column.row(align=True)
         row.scale_y = 1.2
         row.operator("nd.mirror", icon='MOD_MIRROR')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.lattice", icon='MOD_LATTICE')
 
         box = layout.box()
         box.label(text="Generators", icon='GHOST_ENABLED')

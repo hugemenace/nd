@@ -33,6 +33,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_extrude_menu", icon='MOD_SOLIDIFY')
         layout.menu("ND_MT_array_menu", icon='MOD_ARRAY')
         layout.operator("nd.mirror", icon='MOD_MIRROR')
+        layout.operator("nd.lattice", icon='MOD_LATTICE')
         layout.separator()
         layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
         layout.operator("nd.screw_head", icon='CANCEL')

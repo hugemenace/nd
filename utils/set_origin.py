@@ -1,11 +1,13 @@
 import bpy
 from mathutils import Vector
+from .. lib.objects import set_origin
 
 
 class ND_OT_set_origin(bpy.types.Operator):
     bl_idname = "nd.set_origin"
     bl_label = "Set Origin"
-    bl_description = "Set the origin of the active object to that of another"
+    bl_description = """Set the origin of the active object to that of another
+ALT — Use faux origin translation (for origin-reliant geometry)"""
     bl_options = {'UNDO'}
 
 
@@ -33,6 +35,19 @@ class ND_OT_set_origin(bpy.types.Operator):
         self.add_displace_modifier(reference_obj, 'Z', z_dest - z_orig)
 
         return {'FINISHED'}
+
+    
+    def invoke(self, context, event):
+        if event.alt:
+            return self.execute(context)
+        else:
+            a, b = context.selected_objects
+            reference_obj = a if a.name != context.object.name else b
+
+            mx = context.object.matrix_world
+            set_origin(reference_obj, mx)
+
+            return {'FINISHED'}
 
     
     def add_displace_modifier(self, reference_obj, axis, strength):

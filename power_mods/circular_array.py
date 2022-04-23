@@ -6,13 +6,16 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys
 from .. lib.collections import move_to_utils_collection
 from .. lib.preferences import get_preferences
+from .. lib.objects import set_origin
 
 
 class ND_OT_circular_array(bpy.types.Operator):
     bl_idname = "nd.circular_array"
     bl_label = "Circular Array"
     bl_description = """Array an object around another in a circular fashion
-SHIFT — Do not place rotator object in utils collection"""
+ALT — Use faux origin translation (for origin-reliant geometry)
+SHIFT — Do not place rotator object in utils collection
+"""
     bl_options = {'UNDO'}
 
 
@@ -82,6 +85,7 @@ SHIFT — Do not place rotator object in utils collection"""
 
     def invoke(self, context, event):
         self.skip_utils = event.shift
+        self.faux_origin = event.alt
 
         self.dirty = False
         self.axis = 2
@@ -109,7 +113,11 @@ SHIFT — Do not place rotator object in utils collection"""
             self.rotator_obj = empty_rotator_obj
             self.new_empty = True
 
-        bpy.ops.nd.set_origin()
+        if self.faux_origin:
+            bpy.ops.nd.set_origin()
+        else:
+            mx = self.rotator_obj.matrix_world
+            set_origin(self.reference_obj, mx)
 
         self.rotation_snapshot = self.rotator_obj.rotation_euler.copy()
         self.add_array_modifier()

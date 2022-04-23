@@ -28,3 +28,22 @@ def add_single_vertex_object(cls, context, name):
 def align_object_to_3d_cursor(cls, context):
     cls.obj.location = context.scene.cursor.location
     cls.obj.rotation_euler = context.scene.cursor.rotation_euler
+
+
+def set_origin(obj, mx):
+    update_child_matrices(obj, mx)
+
+    new_matrix = mx.inverted_safe() @ obj.matrix_world
+
+    obj.matrix_world = mx
+    obj.data.transform(new_matrix)
+    obj.data.update()
+
+
+def update_child_matrices(obj, mx):
+    orig_matrix = obj.matrix_world.copy()
+    new_matrix = mx.inverted_safe() @ orig_matrix
+
+    for c in obj.children:
+        parent_matrix = c.matrix_parent_inverse
+        c.matrix_parent_inverse = new_matrix @ parent_matrix

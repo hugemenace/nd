@@ -53,6 +53,8 @@ class ND_OT_bevel(bpy.types.Operator):
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
             elif self.key_ctrl:
                 self.profile = min(1, self.profile + profile_factor)
+            elif self.key_ctrl_alt:
+                self.harden_normals = not self.harden_normals
             elif self.key_no_modifiers:
                 self.width += width_factor
             
@@ -63,6 +65,8 @@ class ND_OT_bevel(bpy.types.Operator):
                 self.segments = max(1, self.segments - segment_factor)
             elif self.key_ctrl:
                 self.profile = max(0, self.profile - profile_factor)
+            elif self.key_ctrl_alt:
+                self.harden_normals = not self.harden_normals
             elif self.key_no_modifiers:
                 self.width = max(0, self.width - width_factor)
 
@@ -99,6 +103,7 @@ class ND_OT_bevel(bpy.types.Operator):
         self.segments = 1
         self.width = 0
         self.profile = 0.5
+        self.harden_normals = False
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -143,6 +148,7 @@ class ND_OT_bevel(bpy.types.Operator):
         self.width_prev = self.width = self.bevel.width
         self.segments_prev = self.segments = self.bevel.segments
         self.profile_prev = self.profile = self.bevel.profile
+        self.harden_normals_prev = self.harden_normals = self.bevel.harden_normals
 
 
     def add_bevel_modifier(self, context):
@@ -168,6 +174,7 @@ class ND_OT_bevel(bpy.types.Operator):
         self.bevel.width = self.width
         self.bevel.segments = self.segments
         self.bevel.profile = self.profile
+        self.bevel.harden_normals = self.harden_normals
 
         self.dirty = False
 
@@ -214,6 +221,13 @@ def draw_text_callback(self):
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True)
+
+    draw_property(
+        self, 
+        "Harden Normals: {0}".format("Yes" if self.harden_normals else "No"),
+        "Ctrl + Alt (Yes, No)",
+        active=self.key_ctrl_alt,
+        alt_mode=False)
 
 
 def menu_func(self, context):

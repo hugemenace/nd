@@ -135,8 +135,6 @@ class ND_OT_bevel(bpy.types.Operator):
     def prepare_new_operator(self, context):
         self.summoned = False
 
-        self.width = 0.001
-
         self.add_bevel_modifier(context)
 
 

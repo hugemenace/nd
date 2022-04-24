@@ -10,7 +10,9 @@ class ND_MT_bevel_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.vertex_bevel", icon='MOD_BEVEL')
+        layout.operator("nd.vertex_bevel", icon='VERTEXSEL')
+        layout.operator("nd.edge_bevel", icon='EDGESEL')
+        layout.separator()
         layout.operator("nd.bevel", icon='MOD_BEVEL')
         layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
         

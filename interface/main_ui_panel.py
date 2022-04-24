@@ -79,7 +79,11 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         row = column.row(align=True)
         row.scale_y = 1.2
-        row.operator("nd.vertex_bevel", icon='MOD_BEVEL')
+        row.operator("nd.vertex_bevel", icon='VERTEXSEL')
+        
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.edge_bevel", icon='EDGESEL')
 
         row = column.row(align=True)
         row.scale_y = 1.2

@@ -19,22 +19,22 @@ _All proceeds from the Blender Marketplace go to the Blender Development Fund_
 
 ---
 
-<div style="display: flex">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000714-c9ee686c-0f53-4965-b355-813048396e99.gif">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000716-31e33b31-97f6-40bd-ac5f-c46e34e0b366.gif">
-</div>
-<div style="display: flex">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000718-2fff8a2e-2691-488b-a59b-1c82c6073bec.gif">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000719-a2ce5d75-8bd5-47cb-a4aa-12f3a05eda00.gif">
-</div>
-<div style="display: flex">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000720-565354b9-4084-49d1-95d9-9cf7a505bbbf.gif">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000721-7eeefe78-84b0-49d9-a6b8-2403b7115adc.gif">
-</div>
-<div style="display: flex">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000722-f9070c93-0b05-4783-b5c6-6e5d7377c476.gif">
-    <img style="width: 50%" src="https://user-images.githubusercontent.com/77056966/165000724-20b41ae8-298b-4cc7-94a4-d151a647a2da.gif">
-</div>
+<p float="left">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000714-c9ee686c-0f53-4965-b355-813048396e99.gif">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000716-31e33b31-97f6-40bd-ac5f-c46e34e0b366.gif">
+</p>
+<p float="left">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000718-2fff8a2e-2691-488b-a59b-1c82c6073bec.gif">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000719-a2ce5d75-8bd5-47cb-a4aa-12f3a05eda00.gif">
+</p>
+<p float="left">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000720-565354b9-4084-49d1-95d9-9cf7a505bbbf.gif">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000721-7eeefe78-84b0-49d9-a6b8-2403b7115adc.gif">
+</p>
+<p float="left">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000722-f9070c93-0b05-4783-b5c6-6e5d7377c476.gif">
+    <img style="width: 49%" src="https://user-images.githubusercontent.com/77056966/165000724-20b41ae8-298b-4cc7-94a4-d151a647a2da.gif">
+</p>
 
 # Documentation
 

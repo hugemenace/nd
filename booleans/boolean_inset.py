@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection
 
@@ -34,6 +34,10 @@ class ND_OT_bool_inset(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'M'}):
+            self.outset = not self.outset
+            self.dirty = True
 
         elif self.key_increase_factor:
             if self.key_no_modifiers:
@@ -203,7 +207,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Mode: {0}".format('Outset' if self.outset else 'Inset'),
+        "Mode [M]: {0}".format('Outset' if self.outset else 'Inset'),
         "(Inset, Outset)",
         active=self.key_alt,
         alt_mode=False)

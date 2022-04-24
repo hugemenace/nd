@@ -9,7 +9,7 @@ from .. lib.collections import move_to_utils_collection
 
 class ND_OT_bool_inset(bpy.types.Operator):
     bl_idname = "nd.bool_inset"
-    bl_label = "Inset"
+    bl_label = "Inset/Outset"
     bl_description = "Perform a boolean operation on the selected objects"
     bl_options = {'UNDO'}
 
@@ -46,12 +46,16 @@ class ND_OT_bool_inset(bpy.types.Operator):
         elif self.key_step_up:
             if self.key_no_modifiers:
                 self.thickness += thickness_factor
+            elif self.key_alt:
+                self.outset = not self.outset
 
             self.dirty = True
             
         elif self.key_step_down:
             if self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - thickness_factor)
+            elif self.key_alt:
+                self.outset = not self.outset
 
             self.dirty = True
         
@@ -82,21 +86,22 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.base_thickness_factor = 0.01
 
         self.thickness = 0.02
+        self.outset = False
 
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.object.name else b
         
-        self.difference_obj = context.object
+        self.target_obj = context.object
 
         self.intersecting_obj = context.object.copy()
         self.intersecting_obj.data = context.object.data.copy()
         self.intersecting_obj.animation_data_clear()
         context.collection.objects.link(self.intersecting_obj)
 
-        self.boolean_diff = self.difference_obj.modifiers.new("Difference — ND Bool", 'BOOLEAN')
-        self.boolean_diff.operation = 'DIFFERENCE'
+        self.boolean_diff = self.target_obj.modifiers.new("Inset/Outset — ND Bool", 'BOOLEAN')
+        self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
         self.boolean_diff.object = self.intersecting_obj
         self.boolean_diff.solver = solver
 
@@ -124,11 +129,13 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.intersecting_obj.name = " — ".join(['Bool', self.intersecting_obj.name])
         self.intersecting_obj.data.name = self.intersecting_obj.name
 
-        self.reference_obj.parent = self.difference_obj
-        self.intersecting_obj.parent = self.difference_obj
+        self.reference_obj.parent = self.target_obj
+        self.intersecting_obj.parent = self.target_obj
 
-        self.reference_obj.matrix_parent_inverse = self.difference_obj.matrix_world.inverted()
-        self.intersecting_obj.matrix_parent_inverse = self.difference_obj.matrix_world.inverted()
+        self.reference_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
+        self.intersecting_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
+
+        bpy.ops.object.select_all(action='DESELECT')
 
         self.operate(context)   
 
@@ -150,6 +157,7 @@ class ND_OT_bool_inset(bpy.types.Operator):
     
     def operate(self, context):
         self.solidify.thickness = self.thickness
+        self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
 
         self.dirty = False
 
@@ -177,6 +185,7 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.reference_obj.name = self.reference_obj_name_prev
         self.reference_obj.data.name = self.reference_obj_name_prev
         self.reference_obj.parent = None
+        self.reference_obj.hide_set(False)
         
         unregister_draw_handler()
 
@@ -191,6 +200,13 @@ def draw_text_callback(self):
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True)
+
+    draw_property(
+        self, 
+        "Mode: {0}".format('Outset' if self.outset else 'Inset'),
+        "(Inset, Outset)",
+        active=self.key_alt,
+        alt_mode=False)
 
 
 def menu_func(self, context):

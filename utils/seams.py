@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from math import radians, degrees
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 
 
@@ -33,6 +33,10 @@ class ND_OT_seams(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'V'}):
+            self.commit_auto_smooth = not self.commit_auto_smooth
+            self.dirty = True
 
         elif self.key_step_up:
             if self.key_alt:
@@ -151,7 +155,7 @@ def draw_text_callback(self):
     
     draw_property(
         self, 
-        "Sync Auto Smooth: {0}".format("Yes" if self.commit_auto_smooth else "No"),
+        "Sync Auto Smooth [V]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
         "Alt (Yes / No)",
         active=self.key_alt,
         alt_mode=False)

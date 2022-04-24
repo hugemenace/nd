@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 
 
@@ -48,6 +48,10 @@ class ND_OT_bevel(bpy.types.Operator):
             if self.key_no_modifiers:
                 self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
         
+        elif pressed(event, {'H'}):
+            self.harden_normals = not self.harden_normals
+            self.dirty = True
+
         elif self.key_step_up:
             if self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
@@ -222,7 +226,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Harden Normals: {0}".format("Yes" if self.harden_normals else "No"),
+        "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
         "Ctrl + Alt (Yes, No)",
         active=self.key_ctrl_alt,
         alt_mode=False)

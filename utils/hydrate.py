@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 
 
 class ND_OT_hydrate(bpy.types.Operator):
@@ -29,6 +29,10 @@ class ND_OT_hydrate(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'C'}):
+            self.clear_parent = not self.clear_parent
+            self.dirty = True
 
         elif self.key_step_up:
             if self.key_alt:
@@ -135,7 +139,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Clear parent: {0}".format("Yes" if self.clear_parent else "No"),
+        "Clear parent [C]: {0}".format("Yes" if self.clear_parent else "No"),
         "Alt (Yes, No)",
         active=self.key_alt,
         alt_mode=False)

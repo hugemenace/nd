@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from math import radians, degrees
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 
@@ -41,6 +41,14 @@ class ND_OT_screw(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'R'}):
+            self.axis = (self.axis + 1) % 3
+            self.dirty = True
+
+        elif pressed(event, {'O'}):
+            self.offset_axis = (self.offset_axis + 1) % 3
+            self.dirty = True
 
         elif self.key_increase_factor:
             if self.key_ctrl_alt:
@@ -238,7 +246,7 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "Screw Axis: {}  /  Offset Axis: {}".format(['X', 'Y', 'Z'][self.axis], ['X', 'Y', 'Z'][self.offset_axis]),
+        "Screw Axis [R]: {}  /  Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.axis], ['X', 'Y', 'Z'][self.offset_axis]),
         "Alt (Screw X, Y, Z)  |  Shift + Alt (Offset X, Y, Z)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt)

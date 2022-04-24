@@ -1,7 +1,7 @@
 import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 
 
@@ -39,6 +39,10 @@ class ND_OT_edge_bevel(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'H'}):
+            self.harden_normals = not self.harden_normals
+            self.dirty = True
 
         elif self.key_increase_factor:
             if self.key_no_modifiers:
@@ -267,7 +271,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Width: {0:.0f}  /  Harden Normals: {1}".format(self.width * 1000, "Yes" if self.harden_normals else "No"),
+        "Width: {0:.0f}  /  Harden Normals [H]: {1}".format(self.width * 1000, "Yes" if self.harden_normals else "No"),
         "Ctrl + Alt (±100)  |  Shift + Ctrl + Alt (Yes, No)",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,

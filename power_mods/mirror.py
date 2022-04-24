@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 
 
@@ -31,6 +31,14 @@ class ND_OT_mirror(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'R'}):
+            self.axis = (self.axis + 1) % 3
+            self.dirty = True
+
+        elif pressed(event, {'F'}):
+            self.flip = not self.flip
+            self.dirty = True
 
         elif self.key_step_up:
             if self.key_alt:
@@ -152,14 +160,14 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Axis: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Axis [R]: {}".format(['X', 'Y', 'Z'][self.axis]),
         "X, Y, Z",
         active=self.key_no_modifiers,
         alt_mode=False)
 
     draw_property(
         self, 
-        "Flipped: {}".format('Yes' if self.flip else 'No'),
+        "Flipped [F]: {}".format('Yes' if self.flip else 'No'),
         "Alt (Yes, No)",
         active=self.key_alt,
         alt_mode=False)

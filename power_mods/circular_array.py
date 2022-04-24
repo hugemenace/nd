@@ -3,7 +3,7 @@ import bmesh
 from math import radians
 from mathutils import Euler
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import move_to_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
@@ -40,6 +40,10 @@ SHIFT — Do not place rotator object in utils collection
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'R'}):
+            self.axis = (self.axis + 1) % 3
+            self.dirty = True
 
         elif self.key_step_up:
             if self.key_alt:
@@ -216,7 +220,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Axis: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Axis [R]: {}".format(['X', 'Y', 'Z'][self.axis]),
         "Alt (X, Y, Z)",
         active=self.key_alt,
         alt_mode=False)

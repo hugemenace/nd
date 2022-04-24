@@ -2,7 +2,7 @@ import bpy
 import bmesh
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 
 
@@ -40,6 +40,10 @@ class ND_OT_solidify(bpy.types.Operator):
 
             return {'CANCELLED'}
 
+        elif pressed(event, {'T'}):
+            self.weighting = self.weighting + 1 if self.weighting < 1 else -1
+            self.dirty = True
+
         elif self.key_increase_factor:
             if self.key_ctrl:
                 self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
@@ -54,7 +58,7 @@ class ND_OT_solidify(bpy.types.Operator):
 
         elif self.key_step_up:
             if self.key_alt:
-                self.weighting = min(1, self.weighting + 1)
+                self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             elif self.key_ctrl:
                 self.offset += offset_factor
             elif self.key_no_modifiers:
@@ -64,7 +68,7 @@ class ND_OT_solidify(bpy.types.Operator):
             
         elif self.key_step_down:
             if self.key_alt:
-                self.weighting = max(-1, self.weighting - 1)
+                self.weighting = self.weighting - 1 if self.weighting > -1 else 1
             elif self.key_ctrl:
                 self.offset -= offset_factor
             elif self.key_no_modifiers:
@@ -208,7 +212,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Weighting: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
+        "Weighting [T]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
         "Alt (Negative, Neutral, Positive)",
         active=self.key_alt,
         alt_mode=False)

@@ -19,9 +19,7 @@ def menu_func(self, context):
 
 def register():
     bpy.utils.register_class(ND_OT_toggle_face_orientation)
-    bpy.types.VIEW3D_MT_object.append(menu_func)
 
 
 def unregister():
     bpy.utils.unregister_class(ND_OT_toggle_face_orientation)
-    bpy.types.VIEW3D_MT_object.remove(menu_func)

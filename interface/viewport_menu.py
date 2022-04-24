@@ -26,7 +26,6 @@ def draw_item(self, context):
 
 def register():
     bpy.utils.register_class(ND_MT_viewport_menu)
-    bpy.types.INFO_HT_header.append(draw_item)
 
     for mapping in [('3D View', 'VIEW_3D'), ('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
@@ -42,4 +41,3 @@ def unregister():
     keys.clear()
 
     bpy.utils.unregister_class(ND_MT_viewport_menu)
-    bpy.types.INFO_HT_header.remove(draw_item)

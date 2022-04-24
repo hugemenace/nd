@@ -28,9 +28,7 @@ def draw_item(self, context):
 
 def register():
     bpy.utils.register_class(ND_MT_utils_menu)
-    bpy.types.INFO_HT_header.append(draw_item)
    
 
 def unregister():
     bpy.utils.unregister_class(ND_MT_utils_menu)
-    bpy.types.INFO_HT_header.remove(draw_item)

@@ -51,6 +51,6 @@ Awesome! The best place to post your question, idea, or feedback is in our [Disc
 ## What should I know before I get started?
 
 1. Start by familiarising yourself with the project (build something cool with it in Blender), and the [documentation](https://docs.nd.hugemenace.co/).
-1. Have a look at the current [open issues](https://github.com/hugemenace/nd/issues) and if you see something you like to work on, leave a comment on the issue and/or open a pull request.
-1. If you don't see an open issue pertaining your bug fix or enhancement, you can [open a new issue](https://github.com/hugemenace/nd/issues/new) on GitHub.
-1. The best way to ensure your enhancements make their way into the codebase is to chat about them is in [Discord](https://discord.gg/FbhkhvKAn3) and guage the general appetite of the community / maintainers. There is also a special **#contributors** channel where you can discuss your idea further before you begin coding.
+1. Have a look at the current [open issues](https://github.com/hugemenace/nd/issues) and if you see something you'd like to work on, leave a comment on the issue and/or open a pull request.
+1. If you don't see an open issue related to your bug fix or enhancement, you can [open a new issue](https://github.com/hugemenace/nd/issues/new) on GitHub.
+1. The best way to ensure your enhancements make their way into the codebase is to chat about them in [Discord](https://discord.gg/FbhkhvKAn3) and gauge the general appetite of the community / maintainers. There is also a special **#contributors** channel where you can discuss your idea further before you begin coding.

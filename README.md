@@ -10,6 +10,8 @@
 
 This approach is useful for many types of modelling needs, particularly hard-surface forms, while being able to quickly adjust parameters without the need for manual poly-modelling. ND modelling makes extensive use of modifiers to enable this flexible workflow.
 
+<a href="https://www.patreon.com/bePatron?u=48315864"><img src="https://hugemenace.co/images/patreon.jpg"></a>
+
 # Packaged Downloads
 
 ## [Gumroad](https://hugemenace.gumroad.com/l/nd-blender-addon) (Free / Pay what you want.)

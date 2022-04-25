@@ -14,22 +14,24 @@ from . import toggle_utils_collection
 from . import toggle_clear_view
 
 
+registerables = (
+    toggle_wireframes,
+    toggle_face_orientation,
+    toggle_utils_collection,
+    toggle_clear_view
+)
+
+
 def reload():
-    importlib.reload(toggle_wireframes)
-    importlib.reload(toggle_face_orientation)
-    importlib.reload(toggle_utils_collection)
-    importlib.reload(toggle_clear_view)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
 
 def register():
-    toggle_wireframes.register()
-    toggle_face_orientation.register()
-    toggle_utils_collection.register()
-    toggle_clear_view.register()
+    for registerable in registerables:
+        registerable.register()
 
 
 def unregister():
-    toggle_wireframes.unregister()
-    toggle_face_orientation.unregister()
-    toggle_utils_collection.unregister()
-    toggle_clear_view.unregister()
+    for registerable in registerables:
+        registerable.unregister()

@@ -13,19 +13,23 @@ from . import boolean_slice
 from . import boolean_inset
 
 
+registerables = (
+    vanilla,
+    boolean_slice,
+    boolean_inset
+)
+
+
 def reload():
-    importlib.reload(vanilla)
-    importlib.reload(boolean_slice)
-    importlib.reload(boolean_inset)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
 
 def register():
-    vanilla.register()
-    boolean_slice.register()
-    boolean_inset.register()
+    for registerable in registerables:
+        registerable.register()
 
 
 def unregister():
-    vanilla.unregister()
-    boolean_slice.unregister()
-    boolean_inset.unregister()
+    for registerable in registerables:
+        registerable.unregister()

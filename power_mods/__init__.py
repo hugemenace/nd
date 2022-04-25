@@ -22,48 +22,33 @@ from . import edge_bevel
 from . import bevel
 
 
+registerables = (
+    screw,
+    solidify,
+    weighted_normal_bevel,
+    vertex_bevel,
+    mirror,
+    lattice,
+    profile_extrude,
+    circular_array,
+    square_array,
+    array_cubed,
+    edge_bevel,
+    bevel
+)
+
+
 def reload():
-    importlib.reload(screw)
-    importlib.reload(solidify)
-    importlib.reload(weighted_normal_bevel)
-    importlib.reload(vertex_bevel)
-    importlib.reload(mirror)
-    importlib.reload(lattice)
-    importlib.reload(profile_extrude)
-    importlib.reload(circular_array)
-    importlib.reload(square_array)
-    importlib.reload(array_cubed)
-    importlib.reload(edge_bevel)
-    importlib.reload(bevel)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
 
 def register():
-    screw.register()
-    solidify.register()
-    weighted_normal_bevel.register()
-    vertex_bevel.register()
-    mirror.register()
-    lattice.register()
-    profile_extrude.register()
-    circular_array.register()
-    square_array.register()
-    array_cubed.register()
-    edge_bevel.register()
-    bevel.register()
+    for registerable in registerables:
+        registerable.register()
 
 
 def unregister():
-    screw.unregister()
-    solidify.unregister()
-    weighted_normal_bevel.unregister()
-    vertex_bevel.unregister()
-    mirror.unregister()
-    lattice.unregister()
-    profile_extrude.unregister()
-    circular_array.unregister()
-    square_array.unregister()
-    array_cubed.unregister()
-    edge_bevel.unregister()
-    bevel.unregister()
-
+    for registerable in registerables:
+        registerable.unregister()
     

@@ -12,16 +12,22 @@ from . import recon_poly
 from . import screw_head
 
 
+registerables = (
+    recon_poly,
+    screw_head
+)
+
+
 def reload():
-    importlib.reload(recon_poly)
-    importlib.reload(screw_head)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
 
 def register():
-    recon_poly.register()
-    screw_head.register()
+    for registerable in registerables:
+        registerable.register()
 
 
 def unregister():
-    recon_poly.unregister()
-    screw_head.unregister()
+    for registerable in registerables:
+        registerable.unregister()

@@ -20,40 +20,30 @@ from . import array_menu
 from . import viewport_menu
 
 
+registerables = (
+    main_ui_panel,
+    utils_ui_panel,
+    viewport_ui_panel,
+    main_menu,
+    utils_menu,
+    boolean_menu,
+    bevel_menu,
+    extrude_menu,
+    array_menu,
+    viewport_menu
+)
+
+
 def reload():
-    importlib.reload(main_ui_panel)
-    importlib.reload(utils_ui_panel)
-    importlib.reload(viewport_ui_panel)
-    importlib.reload(main_menu)
-    importlib.reload(utils_menu)
-    importlib.reload(boolean_menu)
-    importlib.reload(bevel_menu)
-    importlib.reload(extrude_menu)
-    importlib.reload(array_menu)
-    importlib.reload(viewport_menu)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
 
 def register():
-    main_ui_panel.register()
-    utils_ui_panel.register()
-    viewport_ui_panel.register()
-    main_menu.register()
-    utils_menu.register()
-    boolean_menu.register()
-    bevel_menu.register()
-    extrude_menu.register()
-    array_menu.register()
-    viewport_menu.register()
+    for registerable in registerables:
+        registerable.register()
 
 
 def unregister():
-    main_ui_panel.unregister()
-    utils_ui_panel.unregister()
-    viewport_ui_panel.unregister()
-    main_menu.unregister()
-    utils_menu.unregister()
-    boolean_menu.unregister()
-    bevel_menu.unregister()
-    extrude_menu.unregister()
-    array_menu.unregister()
-    viewport_menu.unregister()
+    for registerable in registerables:
+        registerable.unregister()

@@ -16,28 +16,26 @@ from . import seams
 from . import hydrate
 
 
+registerables = (
+    name_sync,
+    set_lod_suffix,
+    set_origin,
+    smooth,
+    seams,
+    hydrate
+)
+
+
 def reload():
-    importlib.reload(name_sync)
-    importlib.reload(set_lod_suffix)
-    importlib.reload(set_origin)
-    importlib.reload(smooth)
-    importlib.reload(seams)
-    importlib.reload(hydrate)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
 
 def register():
-    name_sync.register()
-    set_lod_suffix.register()
-    set_origin.register()
-    smooth.register()
-    seams.register()
-    hydrate.register()
+    for registerable in registerables:
+        registerable.register()
 
 
 def unregister():
-    name_sync.unregister()
-    set_lod_suffix.unregister()
-    set_origin.unregister()
-    smooth.unregister()
-    seams.unregister()
-    hydrate.unregister()
+    for registerable in registerables:
+        registerable.unregister()

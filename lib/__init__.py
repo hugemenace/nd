@@ -21,18 +21,24 @@ from . import collections
 from . import overlay_keys
 
 
+registerables = (
+    events,
+    math,
+    objects,
+    overlay,
+    axis,
+    viewport,
+    assets,
+    updates,
+    preferences,
+    collections,
+    overlay_keys
+)
+
+
 def reload():
-    importlib.reload(events)
-    importlib.reload(math)
-    importlib.reload(objects)
-    importlib.reload(overlay)
-    importlib.reload(axis)
-    importlib.reload(viewport)
-    importlib.reload(assets)
-    importlib.reload(updates)
-    importlib.reload(preferences)
-    importlib.reload(collections)
-    importlib.reload(overlay_keys)
+    for registerable in registerables:
+        importlib.reload(registerable)
 
     overlay.unregister_draw_handler()
     axis.unregister_axis_handler()

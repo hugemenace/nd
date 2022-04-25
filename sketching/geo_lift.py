@@ -17,7 +17,8 @@ from .. lib.events import capture_modifier_keys
 class ND_OT_geo_lift(bpy.types.Operator):
     bl_idname = "nd.geo_lift"
     bl_label = "Geo Lift"
-    bl_description = "Lift geometry out of a non-destructive object"
+    bl_description = """Lift geometry out of a non-destructive object
+SHIFT — Ignore bevels when calculating selectable geometry"""
     bl_options = {'UNDO'}
 
 
@@ -79,6 +80,8 @@ class ND_OT_geo_lift(bpy.types.Operator):
     def invoke(self, context, event):
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
         self.register_mode()
+        
+        self.ignore_bevels = event.shift
 
         self.prepare_face_selection_mode(context)
 
@@ -110,6 +113,11 @@ class ND_OT_geo_lift(bpy.types.Operator):
 
     def prepare_face_selection_mode(self, context):
         bpy.ops.object.duplicate()
+
+        if self.ignore_bevels:
+            mods = [mod.name for mod in context.object.modifiers if mod.type == 'BEVEL' and mod.affect == 'EDGES']
+            for mod in mods:
+                bpy.ops.object.modifier_remove(modifier=mod)
 
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.object.evaluated_get(depsgraph)

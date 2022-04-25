@@ -1,3 +1,12 @@
+# “Commons Clause” License Condition v1.0
+# 
+# See LICENSE for license details. If you did not receive a copy of the license,
+# it may be obtained at https://github.com/hugemenace/nd/blob/main/LICENSE.
+# 
+# Software: ND Blender Addon
+# License: MIT
+# Licensor: T.S. & I.J. (HugeMenace)
+
 import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property

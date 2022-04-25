@@ -38,6 +38,11 @@ def toggle_pin_overlay(cls, event):
 
     cls.pin_overlay = not cls.pin_overlay
 
+    if get_preferences().lock_overlay_pinning:
+        get_preferences().overlay_pinned = cls.pin_overlay
+        get_preferences().overlay_pin_x = cls.overlay_x
+        get_preferences().overlay_pin_y = cls.overlay_y
+
 
 def toggle_operator_passthrough(cls):
     cls.operator_passthrough = not cls.operator_passthrough
@@ -61,6 +66,11 @@ def init_overlay(cls, event):
     cls.pin_overlay = False
     cls.operator_passthrough = False
     cls.mouse_warped = False
+
+    if get_preferences().lock_overlay_pinning:
+        cls.pin_overlay = get_preferences().overlay_pinned
+        cls.overlay_x = get_preferences().overlay_pin_x
+        cls.overlay_y = get_preferences().overlay_pin_y
 
 
 def update_overlay(cls, context, event):

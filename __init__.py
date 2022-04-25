@@ -69,6 +69,26 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    lock_overlay_pinning: BoolProperty(
+        name="Lock Overlay Pinning",
+        default=False,
+    )
+
+    overlay_pinned: BoolProperty(
+        name="Overlay Pinned",
+        default=False,
+    )
+
+    overlay_pin_x: IntProperty(
+        name="Overlay Pin X Coordinate",
+        default=0,
+    )
+
+    overlay_pin_y: IntProperty(
+        name="Overlay Pin Y Coordinate",
+        default=0,
+    )
+
     axis_base_thickness: FloatProperty(
         name="Axis Base Thickness",
         default=2,
@@ -210,6 +230,10 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "enable_quick_favourites")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "lock_overlay_pinning")
         
         column = box.column(align=True)
         row = column.row()

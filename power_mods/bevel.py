@@ -165,6 +165,7 @@ class ND_OT_bevel(bpy.types.Operator):
     def add_bevel_modifier(self, context):
         bevel = context.object.modifiers.new(mod_bevel, 'BEVEL')
         bevel.offset_type = 'WIDTH'
+        bevel.miter_outer = 'MITER_ARC'
 
         self.bevel = bevel
 

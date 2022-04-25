@@ -91,7 +91,7 @@ class ND_OT_screw(bpy.types.Operator):
                 else:
                     self.axis = (self.axis + 1) % 3
             elif self.key_ctrl:
-                self.angle = max(0, self.angle - angle_factor)
+                self.angle = max(-360, self.angle - angle_factor)
             else:
                 self.segments = max(3, self.segments - segment_factor)
                 
@@ -109,7 +109,7 @@ class ND_OT_screw(bpy.types.Operator):
             if self.key_ctrl_alt:
                 self.offset += self.mouse_value
             elif self.key_ctrl:
-                self.angle = max(0, min(360, self.angle + self.mouse_value_mag))
+                self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
 
             self.dirty = True
 

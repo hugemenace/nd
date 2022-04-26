@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.24.0](https://github.com/hugemenace/nd/compare/v1.23.0...v1.24.0) (2022-04-26)
+
+
+### Features
+
+* add alt mode to geo_lift operator to ignore all bevels when calculating selectable geometry ([2aff5bc](https://github.com/hugemenace/nd/commit/2aff5bcda7a3f65b375f3de1863eb953f50c9d88))
+* add bool_inset operator ([3f29af5](https://github.com/hugemenace/nd/commit/3f29af5a23f95bb7a73bef4ed8753d756aae297f))
+* add edge_bevel operator ([9d876f4](https://github.com/hugemenace/nd/commit/9d876f487ca3936e472e739cd7b6b7276cfd2bac))
+* add harden normals option to vanilla bevel operator ([7827900](https://github.com/hugemenace/nd/commit/7827900651e3b08ec940176919a692e64d21f874))
+* add lattice operator ([fd6eae0](https://github.com/hugemenace/nd/commit/fd6eae0171070a16161c1ea1f19735e98998ca2b))
+* add mode option shortcut key for bool_inset operator ([5fc4d30](https://github.com/hugemenace/nd/commit/5fc4d3008caa1710f49385a869e36d0ce8d6ede9))
+* add option to lock overlay pin state and position across all operators ([0ce0dd7](https://github.com/hugemenace/nd/commit/0ce0dd71024647acf4165757d8bdcff7042d79ee))
+* add outset mode to bool_inset operator ([cc8edd7](https://github.com/hugemenace/nd/commit/cc8edd7fd842569f427aa91c434a8adc7e18b651))
+* add toggle option shortcut keys to applicable operators ([c10b066](https://github.com/hugemenace/nd/commit/c10b066220dbd8789f27a368527cffa1c441d63a))
+* add traditional (now default) and faux origin translation to set_origin utility ([5122bae](https://github.com/hugemenace/nd/commit/5122bae4640e48c6dd5f3b514353dd78600e5657))
+* allow for -360 degree rotation on screw operator ([306a3e2](https://github.com/hugemenace/nd/commit/306a3e2be6d8a98b78cb8361cf8c16bf64f88947))
+* set face strength mode and face influence on wn_bevel modifiers ([eb7cd25](https://github.com/hugemenace/nd/commit/eb7cd2594198e19b77212d5b75f3924032e51a72))
+
+
+### Bug Fixes
+
+* add additional checks to all operator poll methods to avoid selection (and order) based errors ([cfdde4c](https://github.com/hugemenace/nd/commit/cfdde4c3ce3deaad5c2d2a7577b13ac1b9d20cc6))
+* ensure circular_array operator allows for traditional (now default) and faux origin translation ([a21a46c](https://github.com/hugemenace/nd/commit/a21a46c6be4e73bdbe47707f7d77d236ebe52f55))
+* remove all ND menus from info header bar ([db17157](https://github.com/hugemenace/nd/commit/db17157635611f6d0ef030fa8a1ca63442842838))
+* set miter_outer to arc in bevel operator ([fc4420b](https://github.com/hugemenace/nd/commit/fc4420b72b1a2dd0d2e52e303578153a6fe2b4bd))
+
 ## [1.23.0](https://github.com/hugemenace/nd/compare/v1.22.0...v1.23.0) (2022-04-22)
 
 

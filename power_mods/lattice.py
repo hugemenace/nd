@@ -13,6 +13,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection
+from .. lib.math import generate_bounding_box, v3_average
 
 
 mod_lattice = "Lattice — ND L"
@@ -152,13 +153,15 @@ class ND_OT_lattice(bpy.types.Operator):
         bm.to_mesh(context.object.data)
         bm.free()
 
-        bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME', center='BOUNDS')
-
         eval_obj = context.active_object
+
+        coords = [vert for vert in eval_obj.data.vertices]
+        box = generate_bounding_box(coords)
+        center = v3_average(box)
 
         bpy.ops.object.add(type='LATTICE', enter_editmode=False, align='WORLD', location=(0, 0, 0), rotation=(0, 0, 0), scale=(1, 1, 1))
 
-        context.active_object.location = eval_obj.location
+        context.active_object.location = eval_obj.matrix_world @ center
         context.active_object.rotation_euler = eval_obj.rotation_euler
         context.active_object.dimensions = eval_obj.dimensions * 1.001
         context.active_object.name = "ND — Lattice"

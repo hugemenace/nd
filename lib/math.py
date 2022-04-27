@@ -28,6 +28,10 @@ def v3_average(vectors):
     return v3_sum(vectors) / len(vectors)
 
 
+def v3_elem(label, vector):
+    return vector[{'X': 0, 'Y': 1, 'Z': 2}[label]]
+
+
 def get_edge_normal(edge):
     return v3_sum_normalized([face.normal for face in edge.link_faces])
 
@@ -92,3 +96,24 @@ def create_transposed_rotation_matrix(tangent, binormal, normal):
     rotation[2].xyz = normal
 
     return rotation.transposed()
+
+
+def get_min_max(value):
+    return (min(value), max(value))
+
+
+def generate_bounding_box(coords):
+    min_x, max_x = get_min_max([v3_elem('X', c.co) for c in coords])
+    min_y, max_y = get_min_max([v3_elem('Y', c.co) for c in coords])
+    min_z, max_z = get_min_max([v3_elem('Z', c.co) for c in coords])
+
+    return [
+        Vector((min_x, min_y, min_z)),
+        Vector((min_x, min_y, max_z)),
+        Vector((min_x, max_y, max_z)),
+        Vector((min_x, max_y, min_z)),
+        Vector((max_x, min_y, min_z)),
+        Vector((max_x, min_y, max_z)),
+        Vector((max_x, max_y, max_z)),
+        Vector((max_x, max_y, min_z))
+    ]

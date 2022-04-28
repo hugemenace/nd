@@ -134,6 +134,8 @@ SHIFT — Do not place rotator object in utils collection
             set_origin(self.reference_obj, mx)
 
         self.rotation_snapshot = self.rotator_obj.rotation_euler.copy()
+        self.reference_obj.rotation_euler = context.active_object.rotation_euler.copy()
+
         self.add_array_modifier()
         self.operate(context)
 
@@ -203,7 +205,9 @@ SHIFT — Do not place rotator object in utils collection
         bpy.ops.object.modifier_remove(modifier=self.array.name)
         
         self.select_reference_obj(context)
-        
+
+        self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
+
         if self.faux_origin:
             modifier_names = [mod.name for mod in self.reference_obj.modifiers]
             for name in modifier_names:
@@ -214,7 +218,6 @@ SHIFT — Do not place rotator object in utils collection
             set_origin(self.reference_obj, self.reference_obj_prev_matrix_world)
 
         self.reference_obj.location = self.reference_obj_prev_location
-        self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
 
         if self.new_empty:
             bpy.context.scene.collection.objects.unlink(self.rotator_obj)

@@ -111,6 +111,7 @@ SHIFT — Do not place rotator object in utils collection
 
         self.reference_obj_prev_location = self.reference_obj.location.copy()
         self.reference_obj_prev_rotation = self.reference_obj.rotation_euler.copy()
+        self.reference_obj_prev_matrix_world = self.reference_obj.matrix_world.copy()
         
         self.new_empty = False
         if self.rotator_obj.type != 'EMPTY':
@@ -202,10 +203,15 @@ SHIFT — Do not place rotator object in utils collection
         bpy.ops.object.modifier_remove(modifier=self.array.name)
         
         self.select_reference_obj(context)
-        modifier_names = [mod.name for mod in self.reference_obj.modifiers]
-        for name in modifier_names:
-            if "Axis Displace" in name:
-                bpy.ops.object.modifier_remove(modifier=name)
+        
+        if self.faux_origin:
+            modifier_names = [mod.name for mod in self.reference_obj.modifiers]
+            for name in modifier_names:
+                if "Axis Displace" in name:
+                    bpy.ops.object.modifier_remove(modifier=name)
+
+        if not self.faux_origin:
+            set_origin(self.reference_obj, self.reference_obj_prev_matrix_world)
 
         self.reference_obj.location = self.reference_obj_prev_location
         self.reference_obj.rotation_euler = self.reference_obj_prev_rotation

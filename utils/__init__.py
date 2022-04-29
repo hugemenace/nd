@@ -14,6 +14,7 @@ from . import set_origin
 from . import smooth
 from . import seams
 from . import hydrate
+from . import clear_vgs
 
 
 registerables = (
@@ -22,7 +23,8 @@ registerables = (
     set_origin,
     smooth,
     seams,
-    hydrate
+    hydrate,
+    clear_vgs
 )
 
 

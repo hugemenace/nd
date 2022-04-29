@@ -59,6 +59,10 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
         row.scale_y = 1.2
         row.operator("nd.hydrate", icon='SHADING_RENDERED')
 
+        row = column.row(align=True)
+        row.scale_y = 1.2
+        row.operator("nd.clear_vgs", icon='GROUP_VERTEX')
+
         
 def register():
     bpy.utils.register_class(ND_PT_utils_ui_panel)

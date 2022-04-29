@@ -47,7 +47,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
         layout.operator("nd.screw_head", icon='CANCEL')
         layout.separator()
-        layout.menu("ND_MT_utils_menu", icon='PLUGIN')
+        layout.menu("ND_MT_utils_menu", text="Utils", icon='PLUGIN')
         layout.menu("ND_MT_viewport_menu", text="Viewport", icon='RESTRICT_VIEW_OFF')
 
         if lib.preferences.get_preferences().enable_quick_favourites:

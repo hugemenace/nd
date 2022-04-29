@@ -11,8 +11,11 @@ import bpy
 from .. import bl_info
 
 
+keys = []
+
+
 class ND_MT_utils_menu(bpy.types.Menu):
-    bl_label = "Utils"
+    bl_label = "ND v%s — Utils" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_utils_menu"
 
 
@@ -38,7 +41,18 @@ def draw_item(self, context):
 
 def register():
     bpy.utils.register_class(ND_MT_utils_menu)
+
+    for mapping in [('3D View', 'VIEW_3D'), ('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
+        keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
+        entry = keymap.keymap_items.new("wm.call_menu", 'T', 'PRESS', alt = True)
+        entry.properties.name = "ND_MT_utils_menu"
+        keys.append((keymap, entry))
    
 
 def unregister():
+    for keymap, entry in keys:
+        keymap.keymap_items.remove(entry)
+
+    keys.clear()
+
     bpy.utils.unregister_class(ND_MT_utils_menu)

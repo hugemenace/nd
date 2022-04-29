@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.25.0](https://github.com/hugemenace/nd/compare/v1.24.0...v1.25.0) (2022-04-29)
+
+
+### Features
+
+* add clear vertex groups utility ([ef5e5d5](https://github.com/hugemenace/nd/commit/ef5e5d50362f44091d1b44a0418e333d19a907f4))
+* add isolated vertices in selection to active group in vertex bevel recall ([b62c55c](https://github.com/hugemenace/nd/commit/b62c55c5ba372840efe0e9074209ab881dadef07))
+* add recall functionality to vertex bevel operator ([7b5cd83](https://github.com/hugemenace/nd/commit/7b5cd83d1a03273dc79b1438fd4a89debc49fb18))
+* add shortcut for isolated utils menu ([dcfdf35](https://github.com/hugemenace/nd/commit/dcfdf354892268f407258cc83918f274caa67f65))
+
+
+### Bug Fixes
+
+* fix circular array revert behaviour ([0d61d74](https://github.com/hugemenace/nd/commit/0d61d74db3187f1af8924884da380cbcaf41924c))
+* match target object rotation in circular_array operator ([7ea17b0](https://github.com/hugemenace/nd/commit/7ea17b04faa216a79b9c2f32a522eae314938738))
+* remove set rotation from faux set_origin ([e371881](https://github.com/hugemenace/nd/commit/e37188103b0317b6190cc0a961a0b0cc0c725526))
+* replace center of volume with bounding box calculation in lattice operator ([22add82](https://github.com/hugemenace/nd/commit/22add821f7383c6542f15dcbdd28bd70268260f9))
+
 ## [1.24.0](https://github.com/hugemenace/nd/compare/v1.23.0...v1.24.0) (2022-04-26)
 
 

@@ -113,8 +113,36 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         self.width = 0
         self.profile = 0.5
 
-        self.add_vertex_group(context)
-        self.add_bevel_modifier(context)
+        previous_op = False
+
+        bm = bmesh.from_edit_mesh(context.object.data)
+        selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
+
+        self.vgroup_match = None
+        for group in context.object.vertex_groups:
+            vgroup_vert_indices = [vert.index for vert in context.object.data.vertices if group.index in [i.group for i in vert.groups]]
+            if len(set(vgroup_vert_indices) & set(selected_vert_indices)) > 0:
+                if self.vgroup_match:
+                    self.report({'ERROR_INVALID_INPUT'}, "Multiple vertex groups selected, unable to continue operation.")
+                    return {'CANCELLED'}
+                self.vgroup_match = (group, vgroup_vert_indices)
+        
+        if self.vgroup_match:
+            group, vgroup_vert_indices = self.vgroup_match
+            bpy.ops.mesh.select_all(action='DESELECT')
+            bpy.ops.object.vertex_group_set_active(group=group.name)
+            bpy.ops.object.vertex_group_select()
+
+            for mod in context.object.modifiers:
+                if mod.type == "BEVEL" and mod.vertex_group == group.name:
+                    previous_op = True
+                    self.bevel = mod
+                    break
+
+        if previous_op:
+            self.summon_old_operator(context)
+        else:
+            self.prepare_new_operator(context)
 
         self.operate(context)
 
@@ -133,6 +161,21 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         if context.mode == 'EDIT_MESH':
             mesh = bmesh.from_edit_mesh(context.object.data)
             return len([vert for vert in mesh.verts if vert.select]) >= 1
+
+
+    def summon_old_operator(self, context):
+        self.summoned = True
+
+        self.width_prev = self.width = self.bevel.width
+        self.segments_prev = self.segments = self.bevel.segments
+        self.profile_prev = self.profile = self.bevel.profile
+
+
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
+        self.add_vertex_group(context)
+        self.add_bevel_modifier(context)
 
 
     def add_vertex_group(self, context):
@@ -182,12 +225,26 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
 
     def finish(self, context):
         self.add_weld_modifier(context)
+
+        # TODO: Find a better solution. This is a workaround for the fact that
+        # the vertex group <> modifier combo's are not being detected by the recall 
+        # algorithm directly after they've been created while in edit mode.
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.mode_set(mode='EDIT')
+
         unregister_draw_handler()
     
 
     def revert(self, context):
-        bpy.ops.object.modifier_remove(modifier=self.bevel.name)
-        context.object.vertex_groups.remove(self.vgroup)
+        if self.summoned:
+            self.bevel.width = self.width_prev
+            self.bevel.segments = self.segments_prev
+            self.bevel.profile = self.profile_prev
+
+        if not self.summoned:
+            bpy.ops.object.modifier_remove(modifier=self.bevel.name)
+            context.object.vertex_groups.remove(self.vgroup)
+
         unregister_draw_handler()
 
 

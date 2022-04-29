@@ -129,12 +129,20 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         
         if self.vgroup_match:
             group, vgroup_vert_indices = self.vgroup_match
+
+            self.group = group
+            self.vgroup_difference = [i for i in selected_vert_indices if i not in vgroup_vert_indices]
+
+            bpy.ops.object.mode_set(mode='OBJECT')
+            self.group.add(self.vgroup_difference, 1.0, 'ADD')
+            bpy.ops.object.mode_set(mode='EDIT')
+
             bpy.ops.mesh.select_all(action='DESELECT')
-            bpy.ops.object.vertex_group_set_active(group=group.name)
+            bpy.ops.object.vertex_group_set_active(group=self.group.name)
             bpy.ops.object.vertex_group_select()
 
             for mod in context.object.modifiers:
-                if mod.type == "BEVEL" and mod.vertex_group == group.name:
+                if mod.type == "BEVEL" and mod.vertex_group == self.group.name:
                     previous_op = True
                     self.bevel = mod
                     break
@@ -240,6 +248,11 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
             self.bevel.width = self.width_prev
             self.bevel.segments = self.segments_prev
             self.bevel.profile = self.profile_prev
+
+            if self.vgroup_match:
+                bpy.ops.object.mode_set(mode='OBJECT')
+                self.group.remove(self.vgroup_difference)
+                bpy.ops.object.mode_set(mode='EDIT')
 
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)

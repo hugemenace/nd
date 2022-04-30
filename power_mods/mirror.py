@@ -85,15 +85,14 @@ class ND_OT_mirror(bpy.types.Operator):
         self.dirty = False
         self.axis = 0
         self.flip = False
-        self.reference_obj = context.active_object
+        self.reference_objs = [context.active_object]
         self.mirror_obj = None
 
-        if len(context.selected_objects) == 2:
-            a, b = context.selected_objects
-            self.reference_obj = a if a.name != context.object.name else b
+        if len(context.selected_objects) >= 2:
+            self.reference_objs = [obj for obj in context.selected_objects if obj != context.active_object]
             self.mirror_obj = context.active_object
 
-        self.add_mirror_modifier()
+        self.add_mirror_modifiers()
         self.operate(context)
 
         capture_modifier_keys(self)
@@ -101,7 +100,7 @@ class ND_OT_mirror(bpy.types.Operator):
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
-        init_axis(self, self.reference_obj if self.mirror_obj is None else self.mirror_obj, self.axis)
+        init_axis(self, self.reference_objs[0] if self.mirror_obj is None else self.mirror_obj, self.axis)
         register_axis_handler(self)
 
         context.window_manager.modal_handler_add(self)
@@ -115,50 +114,54 @@ class ND_OT_mirror(bpy.types.Operator):
             if len(context.selected_objects) == 1 and context.object.type == 'MESH':
                 return True
 
-            if len(context.selected_objects) == 2:
-                a, b = context.selected_objects
-                reference_obj = a if a.name != context.object.name else b
-
-                return reference_obj.type == 'MESH'
+            if len(context.selected_objects) >= 2:
+                return all(obj.type == 'MESH' for obj in context.selected_objects if obj.name != context.object.name)
 
 
-    def add_mirror_modifier(self):
-        mirror = self.reference_obj.modifiers.new('Mirror — ND', 'MIRROR')
-        mirror.use_clip = True
-        mirror.merge_threshold = 0.0001
+    def add_mirror_modifiers(self):
+        self.mirrors = []
 
-        if self.mirror_obj != None:
-            mirror.mirror_object = self.mirror_obj
+        for obj in self.reference_objs:
+            mirror = obj.modifiers.new('Mirror — ND', 'MIRROR')
+            mirror.use_clip = True
+            mirror.merge_threshold = 0.0001
 
-        self.mirror = mirror
+            if self.mirror_obj != None:
+                mirror.mirror_object = self.mirror_obj
+
+            self.mirrors.append(mirror)
     
 
     def operate(self, context):
-        for i in range(3):
-            active = self.axis == i
-            self.mirror.use_axis[i] = active
-            self.mirror.use_bisect_axis[i] = active
-            self.mirror.use_bisect_flip_axis[i] = self.flip and active
+        for mirror in self.mirrors:
+            for i in range(3):
+                active = self.axis == i
+                mirror.use_axis[i] = active
+                mirror.use_bisect_axis[i] = active
+                mirror.use_bisect_flip_axis[i] = self.flip and active
 
         self.dirty = False
 
 
-    def select_reference_obj(self, context):
+    def select_reference_objs(self, context):
         bpy.ops.object.select_all(action='DESELECT')
-        self.reference_obj.select_set(True)
-        bpy.context.view_layer.objects.active = self.reference_obj
+        for obj in self.reference_objs:
+            obj.select_set(True)
+        bpy.context.view_layer.objects.active = self.reference_objs[0]
 
 
     def finish(self, context):
-        self.select_reference_obj(context)
+        self.select_reference_objs(context)
 
         unregister_draw_handler()
         unregister_axis_handler()
 
 
     def revert(self, context):
-        self.select_reference_obj(context)
-        bpy.ops.object.modifier_remove(modifier=self.mirror.name)
+        self.select_reference_objs(context)
+
+        for obj in self.reference_objs:
+            obj.modifiers.remove(self.mirrors[self.reference_objs.index(obj)])
 
         unregister_draw_handler()
         unregister_axis_handler()

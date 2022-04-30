@@ -279,7 +279,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "{0}: {1:.1f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 2000),
+        "{0}: {1:.1f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 1000),
         "(±{0:.1f})  |  Shift (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_no_modifiers, 
         alt_mode=self.key_shift_no_modifiers,

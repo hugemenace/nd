@@ -31,6 +31,19 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
         elif self.key_toggle_pin_overlay:
             toggle_pin_overlay(self, event)
 
+        elif self.operator_passthrough:
+            update_overlay(self, context, event)
+            
+            return {'PASS_THROUGH'}
+
+        elif self.key_confirm:
+            return {'PASS_THROUGH'}
+
+        elif self.key_cancel:
+            self.clean_up(context)
+
+            return {'CANCELLED'}
+
         elif self.key_step_up:
             if self.key_alt:
                 self.selection_type = (self.selection_type + 1) % 3
@@ -53,19 +66,6 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
             self.selection_type = 2
             self.set_selection_mode(context)
 
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-            
-            return {'PASS_THROUGH'}
-
-        elif self.key_confirm:
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.clean_up(context)
-
-            return {'CANCELLED'}
-        
         elif self.key_confirm_alternative:
             return self.finish(context)
 

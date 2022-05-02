@@ -149,7 +149,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
 
         bpy.ops.object.select_all(action='DESELECT')
 
-        add_single_vertex_object(self, context, "Bolt")
+        add_single_vertex_object(self, context, "Recon Poly")
         align_object_to_3d_cursor(self, context)
 
         self.add_displace_modifier()

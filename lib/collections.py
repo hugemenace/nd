@@ -32,3 +32,29 @@ def move_to_utils_collection(obj):
 def remove_obj_from_all_collections(obj):
     for collection in obj.users_collection[:]:
         collection.objects.unlink(obj)
+
+
+def hide_utils_collection(hide):
+    collection = bpy.data.collections.get(get_preferences().utils_collection_name)
+    if collection is not None:
+        collection.hide_viewport = hide
+
+        obj_names = [obj.name for obj in collection.all_objects]
+        for obj_name in obj_names:
+            obj = bpy.data.objects[obj_name]
+            obj.hide_set(hide)
+            obj.hide_viewport = hide
+
+
+def isolate_in_utils_collection(target_objs):
+    collection = bpy.data.collections.get(get_preferences().utils_collection_name)
+    if collection is not None:
+        collection.hide_viewport = False
+
+        obj_names = [obj.name for obj in collection.all_objects]
+        target_obj_names = [obj.name for obj in target_objs]
+
+        for obj_name in obj_names:
+            obj = bpy.data.objects[obj_name]
+            obj.hide_set(obj.name not in target_obj_names)
+            obj.hide_viewport = obj.name not in target_obj_names

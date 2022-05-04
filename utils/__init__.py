@@ -15,6 +15,7 @@ from . import smooth
 from . import seams
 from . import hydrate
 from . import clear_vgs
+from . import cycle
 
 
 registerables = (
@@ -24,7 +25,8 @@ registerables = (
     smooth,
     seams,
     hydrate,
-    clear_vgs
+    clear_vgs,
+    cycle
 )
 
 

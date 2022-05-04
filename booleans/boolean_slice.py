@@ -8,7 +8,7 @@
 # Licensor: T.S. & I.J. (HugeMenace)
 
 import bpy
-from .. lib.collections import move_to_utils_collection
+from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 
 
@@ -60,6 +60,7 @@ class ND_OT_bool_slice(bpy.types.Operator):
         intersecting_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
 
         move_to_utils_collection(reference_obj)
+        isolate_in_utils_collection([reference_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

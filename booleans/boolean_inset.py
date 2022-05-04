@@ -13,7 +13,7 @@ from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.collections import move_to_utils_collection
+from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 
 
 class ND_OT_bool_inset(bpy.types.Operator):
@@ -180,6 +180,8 @@ class ND_OT_bool_inset(bpy.types.Operator):
 
         move_to_utils_collection(self.reference_obj)
         move_to_utils_collection(self.intersecting_obj)
+
+        isolate_in_utils_collection([self.reference_obj, self.intersecting_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)

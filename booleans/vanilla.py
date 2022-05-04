@@ -8,7 +8,7 @@
 # Licensor: T.S. & I.J. (HugeMenace)
 
 import bpy
-from .. lib.collections import move_to_utils_collection
+from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 
 
@@ -52,6 +52,7 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
         reference_obj.matrix_parent_inverse = context.object.matrix_world.inverted()
 
         move_to_utils_collection(reference_obj)
+        isolate_in_utils_collection([reference_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

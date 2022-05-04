@@ -101,7 +101,6 @@ class ND_OT_hydrate(bpy.types.Operator):
 
     
     def operate(self, context):
-        print(self.active_collection)
         self.dirty = False
 
 

@@ -12,6 +12,7 @@ from . import main_ui_panel
 from . import utils_ui_panel
 from . import viewport_ui_panel
 from . import main_menu
+from . import sketch_menu
 from . import utils_menu
 from . import boolean_menu
 from . import bevel_menu
@@ -25,6 +26,7 @@ registerables = (
     utils_ui_panel,
     viewport_ui_panel,
     main_menu,
+    sketch_menu,
     utils_menu,
     boolean_menu,
     bevel_menu,

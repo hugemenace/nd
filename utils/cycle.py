@@ -47,8 +47,11 @@ SHIFT — Cycle through the modifier stack"""
 
             self.dirty = True
 
+        elif pressed(event, {'F'}):
+            self.toggle_frozen_util(self.util_current_index)
+
         elif self.key_step_up:
-            if self.key_alt:
+            if self.key_ctrl:
                 self.mod_cycle = not self.mod_cycle
                 self.prepare_mode(context)
             elif self.mod_cycle:
@@ -57,10 +60,13 @@ SHIFT — Cycle through the modifier stack"""
                 if self.util_count > 0:
                     self.util_current_index = (self.util_current_index + 1) % self.util_count
 
+                    if self.key_alt:
+                        self.toggle_frozen_util(self.util_current_index)
+
             self.dirty = True
             
         elif self.key_step_down:
-            if self.key_alt:
+            if self.key_ctrl:
                 self.mod_cycle = not self.mod_cycle
                 self.prepare_mode(context)
             elif self.mod_cycle:
@@ -68,6 +74,9 @@ SHIFT — Cycle through the modifier stack"""
             elif not self.mod_cycle:
                 if self.util_count > 0:
                     self.util_current_index = (self.util_current_index - 1) % self.util_count
+
+                    if self.key_alt:
+                        self.toggle_frozen_util(self.util_current_index)
 
             self.dirty = True
         
@@ -91,11 +100,14 @@ SHIFT — Cycle through the modifier stack"""
         self.dirty = False
 
         self.mod_cycle = event.shift
+
+        self.target_obj = context.object
         
         self.mod_count = len(context.object.modifiers)
         self.mod_names = [mod.name for mod in context.object.modifiers]
         self.mod_snapshot = [(mod.show_viewport, mod.show_in_editmode) for mod in context.object.modifiers]
-
+        
+        self.frozen_utils = set(())
         self.util_objects = [mod for mod in context.object.modifiers if mod.type == 'BOOLEAN']
         self.util_names = [mod.name for mod in self.util_objects]
         self.util_count = len(self.util_objects)
@@ -125,12 +137,25 @@ SHIFT — Cycle through the modifier stack"""
         mod.show_in_editmode = visible
 
     
+    def toggle_frozen_util(self, index):
+        obj = self.util_objects[index].object
+
+        if obj in self.frozen_utils:
+            self.frozen_utils.remove(obj)
+        else:
+            self.frozen_utils.add(obj)
+    
+
     def operate(self, context):
         if self.mod_cycle:
             for counter, mod in enumerate(context.object.modifiers):
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
-            isolate_in_utils_collection([self.util_objects[self.util_current_index].object])
+            util_obj = self.util_objects[self.util_current_index].object
+            isolate_in_utils_collection(self.frozen_utils.union({util_obj}))
+            bpy.ops.object.select_all(action='DESELECT')
+            util_obj.select_set(True)
+            bpy.context.view_layer.objects.active = util_obj
 
         self.dirty = False
 
@@ -151,6 +176,10 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def prepare_mod_cycle(self, context):
+        bpy.ops.object.select_all(action='DESELECT')
+        self.target_obj.select_set(True)
+        context.view_layer.objects.active = self.target_obj
+
         self.mod_current_index = -1
 
         for mod in context.object.modifiers:
@@ -158,7 +187,10 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def prepare_util_cycle(self, context):
+        bpy.ops.object.select_all(action='DESELECT')
+
         self.util_current_index = 0
+        self.frozen_utils.clear()
 
         self.revert_mods(context)
 
@@ -168,7 +200,11 @@ SHIFT — Cycle through the modifier stack"""
             self.revert_mods(context)
         elif self.util_count > 0:
             bpy.ops.object.select_all(action='DESELECT')
-            self.util_objects[self.util_current_index].object.select_set(True)
+
+            all_objects = self.frozen_utils.union({self.util_objects[self.util_current_index].object})
+            for obj in all_objects:
+                obj.select_set(True)
+
             bpy.context.view_layer.objects.active = self.util_objects[self.util_current_index].object
 
         unregister_draw_handler()
@@ -204,14 +240,21 @@ def draw_text_callback(self):
                 "Current: {0}  /  Total: {1}".format(self.util_current_index + 1, self.util_count),
                 active=self.key_no_modifiers,
                 alt_mode=False)
+
+            draw_property(
+                self,
+                "Frozen [F]: {0}".format("Yes" if self.util_objects[self.util_current_index].object in self.frozen_utils else "No"),
+                "Alt (Yes, No)",
+                active=self.key_alt,
+                alt_mode=False)
         else:
             draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
 
     draw_property(
         self,
         "Mode [R]: {0}".format("Modifier" if self.mod_cycle else "Utility"),
-        "Alt (Modifier, Utility)",
-        active=self.key_alt,
+        "Ctrl (Modifier, Utility)",
+        active=self.key_ctrl,
         alt_mode=False)
 
 

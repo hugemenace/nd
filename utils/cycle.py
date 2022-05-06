@@ -58,10 +58,10 @@ SHIFT — Cycle through the modifier stack"""
                 self.mod_current_index = min(self.mod_current_index + 1, self.mod_count - 1)
             elif not self.mod_cycle:
                 if self.util_count > 0:
-                    self.util_current_index = (self.util_current_index + 1) % self.util_count
-
                     if self.key_alt:
                         self.toggle_frozen_util(self.util_current_index)
+                    else:
+                        self.util_current_index = (self.util_current_index + 1) % self.util_count
 
             self.dirty = True
             
@@ -73,10 +73,10 @@ SHIFT — Cycle through the modifier stack"""
                 self.mod_current_index = max(self.mod_current_index - 1, -1)
             elif not self.mod_cycle:
                 if self.util_count > 0:
-                    self.util_current_index = (self.util_current_index - 1) % self.util_count
-
                     if self.key_alt:
                         self.toggle_frozen_util(self.util_current_index)
+                    else:
+                        self.util_current_index = (self.util_current_index - 1) % self.util_count
 
             self.dirty = True
         

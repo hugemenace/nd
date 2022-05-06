@@ -54,5 +54,5 @@ Awesome! The best place to post your question, idea, or feedback is in our [Disc
 
 1. Start by familiarising yourself with the project (build something cool with it in Blender), and the [documentation](https://docs.nd.hugemenace.co/).
 1. Have a look at the current [task list](https://feedback.nd.hugemenace.co/).
-1. If you don't see anything related to your bug fix or enhancement, you can [create a new task](https://feedback.nd.hugemenace.co/).
+1. If you don't see anything related to your bug fix or enhancement, you can [create a new task](https://feedback.nd.hugemenace.co/feedback/add).
 1. The best way to ensure your enhancements make their way into the codebase is to chat about them in [Discord](https://discord.gg/FbhkhvKAn3) and gauge the general appetite of the community / maintainers based on their votes. There is also a special **#contributors** channel where you can discuss your idea further before you begin coding.

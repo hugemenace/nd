@@ -125,8 +125,8 @@ ALT — Mirror across selected object's geometry"""
             self.report({'ERROR'}, "Please select only one object")
 
         self.dirty = False
-        self.axis = 0
-        self.flip = False
+        self.axis = 2 if self.geometry_mode else 0
+        self.flip = self.geometry_mode
         self.reference_objs = [context.active_object]
         self.mirror_obj = None
 
@@ -298,6 +298,7 @@ ALT — Mirror across selected object's geometry"""
         register_axis_handler(self)
 
         self.geometry_ready = True
+        self.operate(context)
 
         return {'RUNNING_MODAL'}
 

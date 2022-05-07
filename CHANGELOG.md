@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.26.0](https://github.com/hugemenace/nd/compare/v1.25.0...v1.26.0) (2022-05-07)
+
+
+### Features
+
+* add enter & space key presses as additional operator finalisation events ([5e3eb6f](https://github.com/hugemenace/nd/commit/5e3eb6fc9e9bf7d9640c165b2127803821e79989))
+* add modifier & utility cycle operator ([73bf7a3](https://github.com/hugemenace/nd/commit/73bf7a330e6ba90d30b7c0425dd1054ab7f0024e))
+* add option to mirror across faces, edges, or vertices on selected object ([1ebc4ac](https://github.com/hugemenace/nd/commit/1ebc4acbc258415505e5a33fc0da86a87abc10ed))
+* add shift option to vanilla boolean operator to protect reference object (do not convert into utility) ([9efae25](https://github.com/hugemenace/nd/commit/9efae2533b562402238ba3698f9d1983e07eb71b))
+* add simple_deform operator ([d5acf67](https://github.com/hugemenace/nd/commit/d5acf6781349da0dfa2db33788d8278f8d037204))
+* add triangulate modifier ([2e990f8](https://github.com/hugemenace/nd/commit/2e990f82ab56ebe850414648ff6725cbd298c215))
+* allow for multiple utils to be selected with cycle operator ([8bb923b](https://github.com/hugemenace/nd/commit/8bb923bfc690edbb48a4302142ce0b0d9680084e))
+* allow mirror modifier to be applied to multiple objects simultaneously ([80467d1](https://github.com/hugemenace/nd/commit/80467d1b573b14c96f0a763edb6037b33e2fee51))
+* automatically set geometry mirror axis to Z and flipped ([426ed79](https://github.com/hugemenace/nd/commit/426ed79fefe25d296b25ccde165254215d5e57bd))
+* move sketch operators into their own sub-menu ([08bb8fd](https://github.com/hugemenace/nd/commit/08bb8fd04c19775d5623f522190423cb2083152a))
+* tidy up main menu by creating Replication and Deformation sub menus to house appropriate operators ([6cf9461](https://github.com/hugemenace/nd/commit/6cf9461a7623eb0b03f8b4a49f1380dd40a96afb))
+
+
+### Bug Fixes
+
+* ensure boolean operators isolate the reference object in the utils collection ([14dfdf4](https://github.com/hugemenace/nd/commit/14dfdf4887cac99aaa11c80e17e21ca80dfe0b5a))
+* ensure mirror empty object is removed if mirror operator is cancelled after geometry selection ([9c13ab6](https://github.com/hugemenace/nd/commit/9c13ab696b1843c1ea3b9d25754fcb1dd01fee01))
+* fix alt key value change behaviour on cycle operator ([9efadc8](https://github.com/hugemenace/nd/commit/9efadc8ac31c9b708a0c0204e296b002cfdfe89c))
+* fix geo_lift operator event handling order ([447c654](https://github.com/hugemenace/nd/commit/447c65453ad7e34e06f231cd9e3274ed49c775e8))
+* fix recon poly width option overlay display value ([8413096](https://github.com/hugemenace/nd/commit/841309665466bee5738d6aa5995431fba41dbc48))
+* fix reference/target object parenting in circular_array operator ([7df4058](https://github.com/hugemenace/nd/commit/7df4058928d6a5fd717715e14def436565e6e9de))
+* fix up mirror across geometry invalid selection cleanup logic ([97873a4](https://github.com/hugemenace/nd/commit/97873a4c59b3ab36b890feecdfff6876a076cb31))
+* update set_lod_suffix mode type in utils_menu ([73aa1e7](https://github.com/hugemenace/nd/commit/73aa1e7ee9a172e1613d3630759c4cf7070baeae))
+
 ## [1.25.0](https://github.com/hugemenace/nd/compare/v1.24.0...v1.25.0) (2022-04-29)
 
 

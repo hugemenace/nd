@@ -23,9 +23,6 @@ class ND_MT_replica_menu(bpy.types.Menu):
         layout.operator("nd.array_cubed", icon='PARTICLES')
         layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
         layout.operator("nd.mirror", icon='MOD_MIRROR')
-
-        if lib.preferences.get_preferences().enable_deprecated_features:
-            layout.operator("nd.square_array", icon='LIGHTPROBE_GRID')
         
 
 def draw_item(self, context):

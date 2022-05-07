@@ -14,7 +14,6 @@ sketching_ops = [
     ("nd.make_manifold", 'OUTLINER_DATA_SURFACE', None, None, False),
     ("nd.geo_lift", 'FACESEL', None, None, False),
     ("nd.view_align", 'ORIENTATION_VIEW', None, None, False),
-    ("nd.blank_sketch", 'GREASEPENCIL', None, None, True),
 ]
 
 power_mod_ops = [
@@ -32,7 +31,6 @@ power_mod_ops = [
     ("nd.profile_extrude", 'EMPTY_SINGLE_ARROW', None, None, False),
     ("nd.array_cubed", 'PARTICLES', None, None, False),
     ("nd.circular_array", 'DRIVER_ROTATIONAL_DIFFERENCE', None, None, False),
-    ("nd.square_array", 'LIGHTPROBE_GRID', None, None, True),
     ("nd.mirror", 'MOD_MIRROR', None, None, False),
     ("nd.lattice", 'MOD_LATTICE', None, None, False),
 ]

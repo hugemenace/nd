@@ -32,9 +32,6 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.operator("nd.cycle", icon='LONGDISPLAY')
         layout.menu("ND_MT_sketch_menu", text="Sketch", icon='GROUP_UVS')
 
-        if lib.preferences.get_preferences().enable_deprecated_features:
-            layout.operator("nd.blank_sketch", icon='GREASEPENCIL')
-
         layout.separator()
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
         layout.menu("ND_MT_bevel_menu", icon='MOD_BEVEL')

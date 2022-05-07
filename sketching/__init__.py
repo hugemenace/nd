@@ -8,7 +8,6 @@
 # Licensor: T.S. & I.J. (HugeMenace)
 
 import importlib
-from . import blank_sketch
 from . import view_align
 from . import geo_lift
 from . import single_vertex
@@ -16,7 +15,6 @@ from . import make_manifold
 
 
 registerables = (
-    blank_sketch,
     view_align,
     geo_lift,
     single_vertex,

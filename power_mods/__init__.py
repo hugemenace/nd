@@ -16,7 +16,6 @@ from . import mirror
 from . import lattice
 from . import profile_extrude
 from . import circular_array
-from . import square_array
 from . import array_cubed
 from . import edge_bevel
 from . import bevel
@@ -31,7 +30,6 @@ registerables = (
     lattice,
     profile_extrude,
     circular_array,
-    square_array,
     array_cubed,
     edge_bevel,
     bevel

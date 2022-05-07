@@ -193,8 +193,8 @@ SHIFT — Do not place rotator object in utils collection
             move_to_utils_collection(self.rotator_obj)
 
         self.select_reference_obj(context)
-        self.reference_obj.parent = self.rotator_obj
-        self.reference_obj.matrix_parent_inverse = self.rotator_obj.matrix_world.inverted()
+        self.rotator_obj.parent = self.reference_obj
+        self.rotator_obj.matrix_parent_inverse = self.reference_obj.matrix_world.inverted()
 
         unregister_draw_handler()
 

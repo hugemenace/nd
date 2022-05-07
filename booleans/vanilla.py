@@ -15,7 +15,8 @@ from .. lib.preferences import get_preferences
 class ND_OT_bool_vanilla(bpy.types.Operator):
     bl_idname = "nd.bool_vanilla"
     bl_label = "Boolean"
-    bl_description = "Perform a boolean operation on the selected objects"
+    bl_description = """Perform a boolean operation on the selected objects
+SHIFT — Protected reference object (do not convert into utility)"""
     bl_options = {'UNDO'}
 
     
@@ -43,22 +44,30 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
         boolean.object = reference_obj
         boolean.solver = solver
 
-        reference_obj.display_type = 'WIRE'
-        reference_obj.hide_render = True
-        reference_obj.name = " — ".join(['Bool', reference_obj.name])
-        reference_obj.data.name = reference_obj.name
+        if not self.protect_reference_obj:
+            reference_obj.display_type = 'WIRE'
+            reference_obj.hide_render = True
+            reference_obj.name = " — ".join(['Bool', reference_obj.name])
+            reference_obj.data.name = reference_obj.name
 
         reference_obj.parent = context.object
         reference_obj.matrix_parent_inverse = context.object.matrix_world.inverted()
 
-        move_to_utils_collection(reference_obj)
-        isolate_in_utils_collection([reference_obj])
+        if not self.protect_reference_obj:
+            move_to_utils_collection(reference_obj)
+            isolate_in_utils_collection([reference_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)
         bpy.context.view_layer.objects.active = reference_obj
 
         return {'FINISHED'}
+
+
+    def invoke(self, context, event):
+        self.protect_reference_obj = event.shift
+
+        return self.execute(context)
 
     
 def menu_func(self, context):

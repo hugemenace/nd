@@ -17,7 +17,8 @@ from . import utils_menu
 from . import boolean_menu
 from . import bevel_menu
 from . import extrude_menu
-from . import array_menu
+from . import replica_menu
+from . import deform_menu
 from . import viewport_menu
 from . import ops
 from . import common
@@ -33,7 +34,8 @@ registerables = (
     boolean_menu,
     bevel_menu,
     extrude_menu,
-    array_menu,
+    replica_menu,
+    deform_menu,
     viewport_menu
 )
 

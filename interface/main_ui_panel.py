@@ -38,16 +38,27 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             row.scale_y = 1.2
             web_link("https://docs.nd.hugemenace.co/#/getting-started/changelog", "View Changelog", "DOCUMENTS", row)
         
-        box = create_box("Documentation", 'INFO', layout)
+        box = create_box("Useful Links", 'INFO', layout)
         
         row = box.row(align=True)
-        row.scale_y = 1.2
-        web_link("https://docs.nd.hugemenace.co", "Website", None, row)
-        web_link("https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg", "YouTube", None, row)
+        row.scale_y = 1.3
+        web_link("https://docs.nd.hugemenace.co", "Documentation", 'HOME', row)
 
         row = box.row(align=True)
-        row.scale_y = 1.2
-        web_link("https://discord.gg/FbhkhvKAn3", "Discord", None, row)
+        row.scale_y = 1.3
+        web_link("https://hugemenace.co/youtube", "YouTube Channel", 'VIEW_CAMERA', row)
+
+        row = box.row(align=True)
+        row.scale_y = 1.3
+        web_link("https://hugemenace.co/nd/feedback", "Feature Requests / Bugs", 'FILE_SCRIPT', row)
+
+        row = box.row(align=True)
+        row.scale_y = 1.3
+        web_link("https://hugemenace.co/discord", "Discord Server", 'SYNTAX_ON', row)
+
+        row = box.row(align=True)
+        row.scale_y = 1.3
+        web_link("https://hugemenace.co/patreon", "Support ND on Patreon", 'SOLO_ON', row)
 
         box = create_box("Sketching", 'GREASEPENCIL', layout)
         render_ops(sketching_ops, box)

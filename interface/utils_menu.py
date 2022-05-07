@@ -23,8 +23,8 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
         layout.operator("nd.name_sync", icon='FILE_REFRESH')
-        layout.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').suffix = 'LOW'
-        layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').suffix = 'HIGH'
+        layout.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').mode = 'LOW'
+        layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').mode = 'HIGH'
         layout.separator()
         layout.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
         layout.separator()

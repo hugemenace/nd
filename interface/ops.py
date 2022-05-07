@@ -33,6 +33,7 @@ power_mod_ops = [
     ("nd.circular_array", 'DRIVER_ROTATIONAL_DIFFERENCE', None, None, False),
     ("nd.mirror", 'MOD_MIRROR', None, None, False),
     ("nd.lattice", 'MOD_LATTICE', None, None, False),
+    ("nd.simple_deform", 'MOD_SIMPLEDEFORM', None, None, False),
 ]
 
 generator_ops = [

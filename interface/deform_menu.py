@@ -21,6 +21,7 @@ class ND_MT_deform_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
         layout.operator("nd.lattice", icon='MOD_LATTICE')
+        layout.operator("nd.simple_deform", icon='MOD_SIMPLEDEFORM')
 
 
 def draw_item(self, context):

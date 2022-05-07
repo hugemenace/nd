@@ -257,8 +257,16 @@ ALT — Mirror across selected object's geometry"""
 
     def complete_geometry_mode(self, context):
         if self.has_invalid_selection(context):
-            self.clean_up(context)
-            if self.selection_type == 0:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            context.object.show_in_front = False
+            bpy.ops.object.delete()
+
+            self.select_reference_objs(context)
+
+            unregister_draw_handler()
+            unregister_axis_handler()
+
+            if self.geometry_selection_type == 0:
                 self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
             else:
                 self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single edge or face is selected.")

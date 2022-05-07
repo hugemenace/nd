@@ -357,6 +357,9 @@ ALT — Mirror across selected object's geometry"""
             for obj in self.reference_objs:
                 obj.modifiers.remove(self.mirrors[self.reference_objs.index(obj)])
 
+        if self.geometry_mode and self.geometry_ready:
+            bpy.data.objects.remove(self.mirror_obj, do_unlink=True)
+
         unregister_draw_handler()
         unregister_axis_handler()
 

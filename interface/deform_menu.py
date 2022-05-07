@@ -13,7 +13,7 @@ from .. import lib
 
 
 class ND_MT_deform_menu(bpy.types.Menu):
-    bl_label = "Deformation"
+    bl_label = "Deform"
     bl_idname = "ND_MT_deform_menu"
 
 

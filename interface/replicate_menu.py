@@ -12,9 +12,9 @@ from .. import bl_info
 from .. import lib
 
 
-class ND_MT_replica_menu(bpy.types.Menu):
-    bl_label = "Replication"
-    bl_idname = "ND_MT_replica_menu"
+class ND_MT_replicate_menu(bpy.types.Menu):
+    bl_label = "Replicate"
+    bl_idname = "ND_MT_replicate_menu"
 
 
     def draw(self, context):
@@ -27,12 +27,12 @@ class ND_MT_replica_menu(bpy.types.Menu):
 
 def draw_item(self, context):
     layout = self.layout
-    layout.menu(ND_MT_replica_menu.bl_idname)
+    layout.menu(ND_MT_replicate_menu.bl_idname)
 
 
 def register():
-    bpy.utils.register_class(ND_MT_replica_menu)
+    bpy.utils.register_class(ND_MT_replicate_menu)
    
 
 def unregister():
-    bpy.utils.unregister_class(ND_MT_replica_menu)
+    bpy.utils.unregister_class(ND_MT_replicate_menu)

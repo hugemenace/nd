@@ -36,7 +36,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
         layout.menu("ND_MT_bevel_menu", icon='MOD_BEVEL')
         layout.menu("ND_MT_extrude_menu", icon='MOD_SOLIDIFY')
-        layout.menu("ND_MT_replica_menu", icon='MOD_ARRAY')
+        layout.menu("ND_MT_replicate_menu", icon='MOD_ARRAY')
         layout.menu("ND_MT_deform_menu", icon='MOD_SIMPLEDEFORM')
         layout.separator()
         layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')

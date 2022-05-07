@@ -124,7 +124,7 @@ class ND_OT_view_align(bpy.types.Operator):
         context.object.data.name = 'ND — View Align'
 
     
-    def set_3d_cursor_to_face(self, mesh, world_matrix):
+    def get_face_transform(self, mesh, world_matrix):
         selected_faces = [f for f in mesh.faces if f.select]
         center = v3_average([f.calc_center_median_weighted() for f in selected_faces])
         location = world_matrix @ center
@@ -133,7 +133,7 @@ class ND_OT_view_align(bpy.types.Operator):
         return (location, rotation)
 
 
-    def set_3d_cursor_to_edge(self, mesh, world_matrix):
+    def get_edge_transform(self, mesh, world_matrix):
         selected_edges = [e for e in mesh.edges if e.select]
         center = v3_average([v3_center(*e.verts) for e in selected_edges])
         location = world_matrix @ center
@@ -142,7 +142,7 @@ class ND_OT_view_align(bpy.types.Operator):
         return (location, rotation)
 
     
-    def set_3d_cursor_to_vertex(self, mesh, world_matrix):
+    def get_vertex_transform(self, mesh, world_matrix):
         selected_vertices = [v for v in mesh.verts if v.select]
         center = v3_average([v.co for v in selected_vertices])
         location = world_matrix @ center
@@ -171,13 +171,13 @@ class ND_OT_view_align(bpy.types.Operator):
         self.set_custom_transform_orientation()
 
         if self.selection_type == 0:
-            (location, rotation) = self.set_3d_cursor_to_vertex(mesh, world_matrix)
+            (location, rotation) = self.get_vertex_transform(mesh, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
         elif self.selection_type == 1:
-            (location, rotation) = self.set_3d_cursor_to_edge(mesh, world_matrix)
+            (location, rotation) = self.get_edge_transform(mesh, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
         elif self.selection_type == 2:
-            (location, rotation) = self.set_3d_cursor_to_face(mesh, world_matrix)
+            (location, rotation) = self.get_face_transform(mesh, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
 
 

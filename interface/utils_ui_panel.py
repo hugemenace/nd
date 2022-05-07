@@ -9,6 +9,8 @@
 
 import bpy
 from .. import bl_info
+from . ops import object_names_ops, object_transform_ops, object_properties_ops
+from . common import create_box, render_ops
 
 
 class ND_PT_utils_ui_panel(bpy.types.Panel):
@@ -22,54 +24,14 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         
-        box = layout.box()
-        box.label(text="Object Names", icon='SCENE_DATA')
-        column = box.column()
+        box = create_box("Object Names", 'SCENE_DATA', layout)
+        render_ops(object_names_ops, box)
 
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.name_sync", icon='FILE_REFRESH')
+        box = create_box("Object Transform", 'ORIENTATION_GIMBAL', layout)
+        render_ops(object_transform_ops, box)
 
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').suffix = 'LOW'
-        row.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').suffix = 'HIGH'
-
-        box = layout.box()
-        box.label(text="Object Transform", icon='ORIENTATION_GIMBAL')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
-
-        box = layout.box()
-        box.label(text="Object Properties", icon='MESH_DATA')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.cycle", icon='LONGDISPLAY')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.smooth", icon='MOD_SMOOTH')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.seams", icon='UV_DATA')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.hydrate", icon='SHADING_RENDERED')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.clear_vgs", icon='GROUP_VERTEX')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.triangulate", icon='MOD_TRIANGULATE')
+        box = create_box("Object Properties", 'MESH_DATA', layout)
+        render_ops(object_properties_ops, box)
 
         
 def register():

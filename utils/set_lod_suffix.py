@@ -18,7 +18,7 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
     bl_options = {'UNDO'}
 
 
-    suffix: bpy.props.EnumProperty(items=[
+    mode: bpy.props.EnumProperty(items=[
         ('HIGH', 'High', 'Updates the selected object names with a _high suffix'),
         ('LOW', 'Low', 'Updates the selected object names with a _low suffix'),
     ], name="Suffix", default='HIGH')
@@ -41,7 +41,7 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
             if name_segments[-1].startswith("high") or name_segments[-1].startswith("low"):
                 name_segments = name_segments[:-1]
             
-            name_segments.append(self.suffix.lower())
+            name_segments.append(self.mode.lower())
             new_name = "_".join(name_segments)
 
             obj.name = new_name

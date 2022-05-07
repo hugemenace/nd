@@ -10,6 +10,8 @@
 import bpy
 from .. import bl_info
 from .. import lib
+from . ops import sketching_ops, power_mod_ops, generator_ops
+from . common import create_box, render_ops, web_link
 
 
 class ND_PT_main_ui_panel(bpy.types.Panel):
@@ -26,136 +28,35 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         if lib.preferences.get_preferences().update_available:
             box = layout.box()
             column = box.column()
+
             row = column.row(align=True)
             row.scale_y = 1.5
             row.alert = True
-            row.operator("wm.url_open", text="Update Available!", icon='PACKAGE').url = "https://hugemenace.gumroad.com/l/nd-blender-addon"
+            web_link("https://hugemenace.gumroad.com/l/nd-blender-addon", "Update Available!", "PACKAGE", row)
+
             row = column.row(align=True)
             row.scale_y = 1.2
-            row.operator("wm.url_open", text="View Changelog", icon='DOCUMENTS').url = "https://docs.nd.hugemenace.co/#/getting-started/changelog"
+            web_link("https://docs.nd.hugemenace.co/#/getting-started/changelog", "View Changelog", "DOCUMENTS", row)
         
-        box = layout.box()
-        box.label(text="Documentation", icon='INFO')
-        column = box.column()
+        box = create_box("Documentation", 'INFO', layout)
         
-        row = column.row(align=True)
+        row = box.row(align=True)
         row.scale_y = 1.2
-        row.operator("wm.url_open", text="Website").url = "https://docs.nd.hugemenace.co"
-        row.operator("wm.url_open", text="YouTube").url = "https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg"
+        web_link("https://docs.nd.hugemenace.co", "Website", None, row)
+        web_link("https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg", "YouTube", None, row)
 
-        row = column.row(align=True)
+        row = box.row(align=True)
         row.scale_y = 1.2
-        row.operator("wm.url_open", text="Discord").url = "https://discord.gg/FbhkhvKAn3"
+        web_link("https://discord.gg/FbhkhvKAn3", "Discord", None, row)
 
-        box = layout.box()
-        box.label(text="Sketching", icon='GREASEPENCIL')
-        column = box.column()
+        box = create_box("Sketching", 'GREASEPENCIL', layout)
+        render_ops(sketching_ops, box)
 
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.single_vertex", icon='DOT')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
+        box = create_box("Power Mod", 'MODIFIER', layout)
+        render_ops(power_mod_ops, box)
 
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.geo_lift", icon='FACESEL')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.view_align", icon='ORIENTATION_VIEW')
-
-        if lib.preferences.get_preferences().enable_deprecated_features:
-            row = column.row(align=True)
-            row.scale_y = 1.2
-            row.operator("nd.blank_sketch", icon='GREASEPENCIL')
-
-        box = layout.box()
-        box.label(text="Power Mods", icon='MODIFIER')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bool_vanilla", text="Union", icon='MOD_BOOLEAN').mode = 'UNION'
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bool_vanilla", text="Intersect", icon='MOD_BOOLEAN').mode = 'INTERSECT'
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bool_slice", icon='MOD_BOOLEAN')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bool_inset", icon='MOD_BOOLEAN')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.vertex_bevel", icon='VERTEXSEL')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.edge_bevel", icon='EDGESEL')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.bevel", icon='MOD_BEVEL')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.solidify", icon='MOD_SOLIDIFY')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.screw", icon='MOD_SCREW')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.array_cubed", icon='PARTICLES')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
-        
-        if lib.preferences.get_preferences().enable_deprecated_features:
-            row = column.row(align=True)
-            row.scale_y = 1.2
-            row.operator("nd.square_array", icon='LIGHTPROBE_GRID')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.mirror", icon='MOD_MIRROR')
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.lattice", icon='MOD_LATTICE')
-
-        box = layout.box()
-        box.label(text="Generators", icon='GHOST_ENABLED')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.recon_poly", icon='SURFACE_NCURVE')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.screw_head", icon='CANCEL')
+        box = create_box("Generators", 'GHOST_ENABLED', layout)
+        render_ops(generator_ops, box)
         
         
 def register():

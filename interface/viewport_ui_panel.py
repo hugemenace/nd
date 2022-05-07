@@ -9,6 +9,8 @@
 
 import bpy
 from .. import bl_info
+from . ops import toggle_ops
+from . common import create_box, render_ops
 
 
 class ND_PT_viewport_ui_panel(bpy.types.Panel):
@@ -22,25 +24,8 @@ class ND_PT_viewport_ui_panel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         
-        box = layout.box()
-        box.label(text="Toggles", icon='CON_ACTION')
-        column = box.column()
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.toggle_wireframes", icon='MOD_WIREFRAME')
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.toggle_face_orientation", icon="ORIENTATION_NORMAL")
-
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.toggle_utils_collection", icon="OUTLINER_COLLECTION")
-        
-        row = column.row(align=True)
-        row.scale_y = 1.2
-        row.operator("nd.toggle_clear_view", icon="OUTLINER_DATA_VOLUME")
+        box = create_box("Toggles", 'CON_ACTION', layout)
+        render_ops(toggle_ops, box)
 
         
 def register():

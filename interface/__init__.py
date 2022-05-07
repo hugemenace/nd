@@ -19,6 +19,8 @@ from . import bevel_menu
 from . import extrude_menu
 from . import array_menu
 from . import viewport_menu
+from . import ops
+from . import common
 
 
 registerables = (
@@ -37,6 +39,9 @@ registerables = (
 
 
 def reload():
+    importlib.reload(ops)
+    importlib.reload(common)
+
     for registerable in registerables:
         importlib.reload(registerable)
 

@@ -8,7 +8,7 @@
 # Licensor: T.S. & I.J. (HugeMenace)
 
 import bpy
-from .. lib.collections import get_utils_layer
+from .. lib.collections import hide_utils_collection, get_utils_layer
 
 
 class ND_OT_toggle_utils_collection(bpy.types.Operator):
@@ -21,17 +21,7 @@ class ND_OT_toggle_utils_collection(bpy.types.Operator):
         data = get_utils_layer()
         if data is not None:
             layer, collection = data
-
-            hide = not layer.hide_viewport
-
-            layer.hide_viewport = hide
-            collection.hide_viewport = hide
-
-            obj_names = [obj.name for obj in collection.all_objects]
-            for obj_name in obj_names:
-                obj = bpy.data.objects[obj_name]
-                obj.hide_set(hide)
-                obj.hide_viewport = hide
+            hide_utils_collection(not layer.hide_viewport)
 
         return {'FINISHED'}
 

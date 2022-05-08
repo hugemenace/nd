@@ -34,9 +34,21 @@ def remove_obj_from_all_collections(obj):
         collection.objects.unlink(obj)
 
 
+def get_utils_layer():
+    layers = bpy.context.view_layer.layer_collection
+    for layer in layers.children:
+        if layer.name == get_preferences().utils_collection_name:
+            return (layer, layer.collection)
+
+    return None
+
+
 def hide_utils_collection(hide):
-    collection = bpy.data.collections.get(get_preferences().utils_collection_name)
-    if collection is not None:
+    data = get_utils_layer()
+    if data is not None:
+        layer, collection = data
+
+        layer.hide_viewport = hide
         collection.hide_viewport = hide
 
         obj_names = [obj.name for obj in collection.all_objects]
@@ -47,8 +59,11 @@ def hide_utils_collection(hide):
 
 
 def isolate_in_utils_collection(target_objs):
-    collection = bpy.data.collections.get(get_preferences().utils_collection_name)
-    if collection is not None:
+    data = get_utils_layer()
+    if data is not None:
+        layer, collection = data
+        
+        layer.hide_viewport = False
         collection.hide_viewport = False
 
         obj_names = [obj.name for obj in collection.all_objects]

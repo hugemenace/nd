@@ -8,7 +8,7 @@
 # Licensor: T.S. & I.J. (HugeMenace)
 
 import bpy
-from .. lib.preferences import get_preferences
+from .. lib.collections import get_utils_layer
 
 
 class ND_OT_toggle_utils_collection(bpy.types.Operator):
@@ -18,15 +18,20 @@ class ND_OT_toggle_utils_collection(bpy.types.Operator):
 
 
     def execute(self, context):
-        collection = bpy.data.collections.get(get_preferences().utils_collection_name)
-        if collection is not None:
-            collection.hide_viewport = not collection.hide_viewport
+        data = get_utils_layer()
+        if data is not None:
+            layer, collection = data
+
+            hide = not layer.hide_viewport
+
+            layer.hide_viewport = hide
+            collection.hide_viewport = hide
 
             obj_names = [obj.name for obj in collection.all_objects]
             for obj_name in obj_names:
                 obj = bpy.data.objects[obj_name]
-                obj.hide_set(collection.hide_viewport)
-                obj.hide_viewport = collection.hide_viewport
+                obj.hide_set(hide)
+                obj.hide_viewport = hide
 
         return {'FINISHED'}
 

@@ -32,6 +32,10 @@ def v3_elem(label, vector):
     return vector[{'X': 0, 'Y': 1, 'Z': 2}[label]]
 
 
+def v3_distance(a, b):
+    return (a - b).length
+
+
 def get_edge_normal(edge):
     return v3_sum_normalized([face.normal for face in edge.link_faces])
 

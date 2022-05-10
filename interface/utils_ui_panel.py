@@ -9,7 +9,7 @@
 
 import bpy
 from .. import bl_info
-from . ops import object_names_ops, object_transform_ops, object_properties_ops
+from . ops import object_names_ops, object_transform_ops, object_properties_ops, misc_ops
 from . common import create_box, render_ops
 
 
@@ -32,6 +32,9 @@ class ND_PT_utils_ui_panel(bpy.types.Panel):
 
         box = create_box("Object Properties", 'MESH_DATA', layout)
         render_ops(object_properties_ops, box)
+
+        box = create_box("Miscellaneous", 'ASSET_MANAGER', layout)
+        render_ops(misc_ops, box)
 
         
 def register():

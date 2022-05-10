@@ -55,9 +55,13 @@ object_properties_ops = [
     ("nd.cycle", 'LONGDISPLAY', None, None, False),
     ("nd.smooth", 'MOD_SMOOTH', None, None, False),
     ("nd.seams", 'UV_DATA', None, None, False),
-    ("nd.hydrate", 'SHADING_RENDERED', None, None, False),
     ("nd.clear_vgs", 'GROUP_VERTEX', None, None, False),
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
+]
+
+misc_ops = [
+    ("nd.hydrate", 'SHADING_RENDERED', None, None, False),
+    ("nd.flare", 'LIGHT_AREA', "Flare (Lighting)", None, False),
 ]
 
 toggle_ops = [

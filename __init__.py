@@ -26,7 +26,6 @@ from bpy.types import AddonPreferences
 from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty
 from . import lib
 from . import booleans
-from . import flare
 from . import interface
 from . import sketching
 from . import power_mods
@@ -37,7 +36,6 @@ from . import viewport
 
 registerables = (
     booleans,
-    flare,
     interface,
     sketching,
     power_mods,

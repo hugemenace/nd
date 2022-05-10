@@ -30,9 +30,11 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout.separator()
         layout.operator("nd.smooth", icon='MOD_SMOOTH')
         layout.operator("nd.seams", icon='UV_DATA')
-        layout.operator("nd.hydrate", icon='SHADING_RENDERED')
         layout.operator("nd.clear_vgs", icon='GROUP_VERTEX')
         layout.operator("nd.triangulate", icon='MOD_TRIANGULATE')
+        layout.separator()
+        layout.operator("nd.hydrate", icon='SHADING_RENDERED')
+        layout.operator("nd.flare", text="Flare (Lighting)", icon='LIGHT_AREA')
         
 
 def draw_item(self, context):

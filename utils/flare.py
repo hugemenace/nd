@@ -15,8 +15,8 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 
 
-class ND_OT_flare_rig(bpy.types.Operator):
-    bl_idname = "nd.flare_rig"
+class ND_OT_flare(bpy.types.Operator):
+    bl_idname = "nd.flare"
     bl_label = "Flare"
     bl_description = "Adds a new lighting rig targeting selected objects position"
     bl_options = {'UNDO'}
@@ -26,6 +26,9 @@ class ND_OT_flare_rig(bpy.types.Operator):
         capture_modifier_keys(self, event)
 
         rotation_factor = 1 if self.key_shift else 15
+        height_factor = 0.1 if self.key_shift else 1
+        scale_factor = 0.01 if self.key_shift else 0.1
+        energy_factor = 1000 if self.key_shift else 10000
 
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
@@ -53,12 +56,26 @@ class ND_OT_flare_rig(bpy.types.Operator):
             self.randomise_energy(context)
 
         elif self.key_step_up:
-            self.rotation = (self.rotation + rotation_factor) % 360
+            if self.key_no_modifiers:
+                self.rotation = (self.rotation + rotation_factor) % 360
+            elif self.key_alt:
+                self.height_offset += height_factor
+            elif self.key_ctrl:
+                self.scale += scale_factor
+            elif self.key_ctrl_alt:
+                self.energy_offset += energy_factor
 
             self.dirty = True
             
         elif self.key_step_down:
-            self.rotation = (self.rotation - rotation_factor) % 360
+            if self.key_no_modifiers:
+                self.rotation = (self.rotation - rotation_factor) % 360
+            elif self.key_alt:
+                self.height_offset -= height_factor
+            elif self.key_ctrl:
+                self.scale = max(0, self.scale - scale_factor)
+            elif self.key_ctrl_alt:
+                self.energy_offset = max(0, self.energy_offset - energy_factor)
 
             self.dirty = True
 
@@ -160,7 +177,7 @@ class ND_OT_flare_rig(bpy.types.Operator):
 
     def remove_lights(self, context):
         for light, height, energy in self.lights:
-            bpy.data.objects.remove(light, do_unlink=True)
+            bpy.data.lights.remove(light.data, do_unlink=True)
 
         self.lights = []
 
@@ -189,12 +206,12 @@ class ND_OT_flare_rig(bpy.types.Operator):
 
 
     def add_light(self, context, energy=None, size=None, color=None, location=None):
-        light_data = bpy.data.lights.new(name="ND — Flare Light", type='AREA')
+        light_data = bpy.data.lights.new(name="ND — Flare Light.001", type='AREA')
         light_data.energy = uniform(1000, 25000) if energy is None else energy
         light_data.size = uniform(5, 30) if size is None else size
         light_data.color = (random(), random(), random()) if color is None else color
 
-        light_object = bpy.data.objects.new(name="ND — Flare Light", object_data=light_data)
+        light_object = bpy.data.objects.new(name="ND — Flare Light.001", object_data=light_data)
         light_object.parent = self.empty
 
         bpy.context.scene.collection.objects.link(light_object)
@@ -263,7 +280,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Height Offset: {0:.1f}".format(self.height_offset),
-        "Alt (±15)  |  Shift + Alt (±1)",
+        "Alt (±1)  |  Shift + Alt (±0.1)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True)
@@ -271,7 +288,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Scale: {0:.2f}".format(self.scale),
-        "Ctrl (±15)  |  Shift + Ctrl (±1)",
+        "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True)
@@ -279,7 +296,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Energy Offset: {0:.1e}".format(self.energy_offset),
-        "Ctrl + Alt (±15)  |  Shift + Ctrl + Alt (±1)",
+        "Ctrl + Alt (±10k)  |  Shift + Ctrl + Alt (±1k)",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
         mouse_value=True)
@@ -292,13 +309,13 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_flare_rig.bl_idname, text=ND_OT_flare_rig.bl_label)
+    self.layout.operator(ND_OT_flare.bl_idname, text=ND_OT_flare.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_flare_rig)
+    bpy.utils.register_class(ND_OT_flare)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_flare_rig)
+    bpy.utils.unregister_class(ND_OT_flare)
     unregister_draw_handler()

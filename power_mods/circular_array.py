@@ -246,7 +246,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({0:.1f}°)".format(self.angle)),
-        "Ctrl (±15)  |  Shift (±1)",
+        "Ctrl (±15)  |  Shift + Ctrl (±1)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True)

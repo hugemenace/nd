@@ -227,14 +227,14 @@ def draw_text_callback(self):
     draw_property(
         self,
         "V Points: {0}".format(self.lattice_points_v),
-        "(±1)",
+        "Alt (±1)",
         active=(self.uniform or self.key_alt),
         alt_mode=False)
 
     draw_property(
         self,
         "W Points: {0}".format(self.lattice_points_w),
-        "(±1)",
+        "Ctrl (±1)",
         active=(self.uniform or self.key_ctrl),
         alt_mode=False)
 

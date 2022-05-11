@@ -87,8 +87,6 @@ class ND_OT_snap_align(bpy.types.Operator):
         self.snap_point = None
         self.snap_point_rotation_cache = None
 
-        bpy.ops.object.hide_view_set(unselected=True)
-
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.object.name else b
         self.reference_obj_original_location = self.reference_obj.location.copy()
@@ -183,8 +181,16 @@ class ND_OT_snap_align(bpy.types.Operator):
         depsgraph = context.evaluated_depsgraph_get()
 
         hit, location, normal, face_index, object, matrix = context.scene.ray_cast(depsgraph, ray_origin, ray_direction)
+        hidden_objects = []
+        while hit and object.name != context.object.name:
+            hidden_objects.append(object)
+            object.hide_set(True)
+            hit, location, normal, face_index, object, matrix = context.scene.ray_cast(depsgraph, location + 0.001 * ray_direction, ray_direction)
 
-        if hit and object.name == context.object.name:
+        for obj in hidden_objects:
+            obj.hide_set(False)
+
+        if hit:
             self.hit_location = location
 
             self.primary_points = []
@@ -211,7 +217,6 @@ class ND_OT_snap_align(bpy.types.Operator):
 
 
     def clean_up(self, context):
-        bpy.ops.object.hide_view_clear()
         for mod in context.active_object.modifiers:
             if mod.type == 'BOOLEAN' and mod.object == self.reference_obj:
                 mod.show_viewport = self.affected_boolean_modifiers[mod.name]

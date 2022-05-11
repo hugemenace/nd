@@ -108,7 +108,7 @@ SHIFT — Cycle through the modifier stack"""
         self.mod_snapshot = [(mod.show_viewport, mod.show_in_editmode) for mod in context.object.modifiers]
         
         self.frozen_utils = set(())
-        self.util_objects = [mod for mod in context.object.modifiers if mod.type == 'BOOLEAN']
+        self.util_objects = [mod for mod in context.object.modifiers if mod.type == 'BOOLEAN' and mod.object]
         self.util_names = [mod.name for mod in self.util_objects]
         self.util_count = len(self.util_objects)
 

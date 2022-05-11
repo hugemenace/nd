@@ -75,7 +75,7 @@ class ND_OT_flare(bpy.types.Operator):
             elif self.key_ctrl:
                 self.scale = max(0, self.scale - scale_factor)
             elif self.key_ctrl_alt:
-                self.energy_offset = max(0, self.energy_offset - energy_factor)
+                self.energy_offset -= energy_factor
 
             self.dirty = True
 

@@ -44,16 +44,18 @@ class ND_OT_snap_align(bpy.types.Operator):
             return {'CANCELLED'}
 
         elif pressed(event, {'C'}):
-            if self.snap_point:
-                self.snap_point_rotation_cache = self.snap_point[1]
-                self.tertiary_points = [self.snap_point[0]]
-                self.guide_line = (self.reference_obj.location, self.snap_point[0])
+            if self.snap_point and len(self.capture_points) < 2:
+                self.capture_points.append(self.snap_point)
+
+                if len(self.capture_points) == 1:
+                    self.guide_line = (self.capture_points[0][0], self.reference_obj.location)
+                else:
+                    self.guide_line = (self.capture_points[0][0], self.capture_points[1][0])
 
                 self.dirty = True
 
         elif pressed(event, {'R'}):
-            self.snap_point_rotation_cache = None
-            self.tertiary_points = []
+            self.capture_points = []
             self.guide_line = ()
                 
             self.dirty = True
@@ -81,11 +83,11 @@ class ND_OT_snap_align(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.hit_location = None
+        self.capture_points = []
         self.primary_points = []
         self.secondary_points = []
         self.tertiary_points = []
         self.snap_point = None
-        self.snap_point_rotation_cache = None
 
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.object.name else b
@@ -155,13 +157,21 @@ class ND_OT_snap_align(bpy.types.Operator):
 
     
     def operate(self, context):
-        if self.snap_point:
+        self.tertiary_points = [cap[0] for cap in self.capture_points]
+
+        if len(self.capture_points) == 2:
+            self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
+            mid_point = v3_average([self.capture_points[0][0], self.capture_points[1][0]])
+            self.reference_obj.location = mid_point
+            self.tertiary_points.append(mid_point)
+
+        elif self.snap_point:
             vect, rotation_matrix = self.snap_point
             self.reference_obj.location = vect
-            if self.snap_point_rotation_cache is None:
+            if len(self.capture_points) == 0:
                 self.reference_obj.rotation_euler = rotation_matrix.to_euler()
             else:
-                self.reference_obj.rotation_euler = self.snap_point_rotation_cache.to_euler()
+                self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
                 
         elif self.hit_location:
             self.reference_obj.location = self.hit_location
@@ -170,6 +180,9 @@ class ND_OT_snap_align(bpy.types.Operator):
 
 
     def recalculate_points(self, context, mouse_coords):
+        if len(self.capture_points) == 2:
+            return
+
         self.reference_obj.hide_set(True)
 
         region = context.region
@@ -251,14 +264,14 @@ class ND_OT_snap_align(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(self, "Select snap point", "Hover over the selected object to select a snap point")
+    draw_hint(self, "Select snap point", "Hover over the selected object to view snap points")
 
     draw_property(
-        self, 
-        "Capture Rotation [C] / Reset [R]".format(),
-        "{}".format("Snap point rotation captured!" if self.snap_point_rotation_cache else "Free rotation enabled..."),
-        active=self.snap_point_rotation_cache is not None,
-        alt_mode=False)
+        self,
+        "Capture Points [C]  /  Reset [R]",
+        "{}".format("{}/2 Snap points captured!".format(len(self.capture_points)) if len(self.capture_points) > 0 else "No points captured..."),
+        active=len(self.capture_points) > 0,
+        alt_mode=len(self.capture_points) == 1)
 
 
 def menu_func(self, context):

@@ -98,6 +98,9 @@ class ND_OT_snap_align(bpy.types.Operator):
                 self.affected_boolean_modifiers[mod.name] = mod.show_viewport
                 mod.show_viewport = False
 
+        self.triangulate_modifier = context.active_object.modifiers.new('Snap Align Triangulate — ND', 'TRIANGULATE')
+        self.triangulate_modifier.min_vertices = 5
+
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.object.evaluated_get(depsgraph)
 
@@ -220,6 +223,8 @@ class ND_OT_snap_align(bpy.types.Operator):
         for mod in context.active_object.modifiers:
             if mod.type == 'BOOLEAN' and mod.object == self.reference_obj:
                 mod.show_viewport = self.affected_boolean_modifiers[mod.name]
+
+        context.active_object.modifiers.remove(self.triangulate_modifier)
 
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)

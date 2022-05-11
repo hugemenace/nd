@@ -94,6 +94,12 @@ class ND_OT_snap_align(bpy.types.Operator):
         self.reference_obj_original_location = self.reference_obj.location.copy()
         self.reference_obj_original_rotation = self.reference_obj.rotation_euler.copy()
 
+        self.affected_boolean_modifiers = {}
+        for mod in context.active_object.modifiers:
+            if mod.type == 'BOOLEAN' and mod.object == self.reference_obj:
+                self.affected_boolean_modifiers[mod.name] = mod.show_viewport
+                mod.show_viewport = False
+
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.object.evaluated_get(depsgraph)
 
@@ -204,15 +210,23 @@ class ND_OT_snap_align(bpy.types.Operator):
         self.operate(context)
 
 
-    def finish(self, context):
+    def clean_up(self, context):
         bpy.ops.object.hide_view_clear()
+        for mod in context.active_object.modifiers:
+            if mod.type == 'BOOLEAN' and mod.object == self.reference_obj:
+                mod.show_viewport = self.affected_boolean_modifiers[mod.name]
+
+
+
+    def finish(self, context):
+        self.clean_up(context)
 
         unregister_draw_handler()
         unregister_points_handler()
 
 
     def revert(self, context):
-        bpy.ops.object.hide_view_clear()
+        self.clean_up(context)
 
         self.reference_obj.location = self.reference_obj_original_location
         self.reference_obj.rotation_euler = self.reference_obj_original_rotation

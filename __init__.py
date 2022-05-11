@@ -63,6 +63,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    recon_poly_solidify: BoolProperty(
+        name="Automatically run Solidify after Recon Poly",
+        default=False,
+    )
+
     enable_mouse_values: BoolProperty(
         name="Enable Mouse Values",
         default=False,
@@ -205,6 +210,10 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "use_fast_booleans")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "recon_poly_solidify")
 
         box2 = box.box()
         column = box2.column(align=True)

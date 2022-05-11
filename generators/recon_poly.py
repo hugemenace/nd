@@ -257,6 +257,9 @@ class ND_OT_recon_poly(bpy.types.Operator):
 
         unregister_draw_handler()
 
+        if not self.summoned and get_preferences().recon_poly_solidify:
+            bpy.ops.nd.solidify('INVOKE_DEFAULT')
+
 
     def revert(self, context):
         if not self.summoned:

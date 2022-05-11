@@ -17,6 +17,7 @@ from . import hydrate
 from . import clear_vgs
 from . import cycle
 from . import flare
+from . import snap_align
 from . import triangulate
 
 
@@ -30,6 +31,7 @@ registerables = (
     clear_vgs,
     cycle,
     flare,
+    snap_align,
     triangulate
 )
 

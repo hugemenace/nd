@@ -13,6 +13,7 @@ from . import math
 from . import objects
 from . import overlay
 from . import axis
+from . import points
 from . import viewport
 from . import assets
 from . import updates
@@ -27,6 +28,7 @@ registerables = (
     objects,
     overlay,
     axis,
+    points,
     viewport,
     assets,
     updates,
@@ -42,3 +44,4 @@ def reload():
 
     overlay.unregister_draw_handler()
     axis.unregister_axis_handler()
+    points.unregister_points_handler()

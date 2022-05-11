@@ -47,12 +47,14 @@ class ND_OT_snap_align(bpy.types.Operator):
             if self.snap_point:
                 self.snap_point_rotation_cache = self.snap_point[1]
                 self.tertiary_points = [self.snap_point[0]]
+                self.guide_line = (self.reference_obj.location, self.snap_point[0])
 
                 self.dirty = True
 
         elif pressed(event, {'R'}):
             self.snap_point_rotation_cache = None
             self.tertiary_points = []
+            self.guide_line = ()
                 
             self.dirty = True
 
@@ -156,9 +158,6 @@ class ND_OT_snap_align(bpy.types.Operator):
                 
         elif self.hit_location:
             self.reference_obj.location = self.hit_location
-
-        if self.tertiary_points:
-            self.guide_line = (self.reference_obj.location, self.tertiary_points[0])
 
         self.dirty = False
 

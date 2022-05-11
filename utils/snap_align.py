@@ -216,6 +216,9 @@ class ND_OT_snap_align(bpy.types.Operator):
             if mod.type == 'BOOLEAN' and mod.object == self.reference_obj:
                 mod.show_viewport = self.affected_boolean_modifiers[mod.name]
 
+        bpy.ops.object.select_all(action='DESELECT')
+        self.reference_obj.select_set(True)
+        context.view_layer.objects.active = self.reference_obj
 
 
     def finish(self, context):

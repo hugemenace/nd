@@ -119,8 +119,8 @@ class ND_OT_snap_align(bpy.types.Operator):
             face_matrix = create_rotation_matrix_from_face(world_matrix, face)
             face_points.append((world_matrix @ v3_average([v.co for v in face.verts]), face_matrix))
 
-        shortest_edge_length = min(edge_lengths)
-        self.snap_distance_factor = shortest_edge_length / 2.0
+        average_edge_length = sum(edge_lengths) / len(edge_lengths)
+        self.snap_distance_factor = average_edge_length / 2.0
 
         self.points_cache = vert_points + edge_points + face_points
 

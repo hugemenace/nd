@@ -160,6 +160,9 @@ class ND_OT_snap_align(bpy.types.Operator):
         self.tertiary_points = [cap[0] for cap in self.capture_points]
 
         if len(self.capture_points) == 2:
+            self.primary_points = []
+            self.secondary_points = []
+
             self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
             mid_point = v3_average([self.capture_points[0][0], self.capture_points[1][0]])
             self.reference_obj.location = mid_point

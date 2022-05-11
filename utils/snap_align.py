@@ -17,10 +17,10 @@ from .. lib.points import init_points, register_points_handler, unregister_point
 from .. lib.math import v3_average, v3_distance, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face
 
 
-class ND_OT_points(bpy.types.Operator):
-    bl_idname = "nd.points"
-    bl_label = "Points"
-    bl_description = "Show all possible snap points on selected object"
+class ND_OT_snap_align(bpy.types.Operator):
+    bl_idname = "nd.snap_align"
+    bl_label = "Snap Align"
+    bl_description = "Align and snap one object to another"
     bl_options = {'UNDO'}
 
 
@@ -45,12 +45,14 @@ class ND_OT_points(bpy.types.Operator):
 
         elif pressed(event, {'C'}):
             if self.snap_point:
-                self.snap_point_rotation_cache = self.snap_point[1].copy()
+                self.snap_point_rotation_cache = self.snap_point[1]
+                self.tertiary_points = [self.snap_point[0]]
 
                 self.dirty = True
 
         elif pressed(event, {'R'}):
             self.snap_point_rotation_cache = None
+            self.tertiary_points = []
                 
             self.dirty = True
 
@@ -79,8 +81,11 @@ class ND_OT_points(bpy.types.Operator):
         self.hit_location = None
         self.primary_points = []
         self.secondary_points = []
+        self.tertiary_points = []
         self.snap_point = None
         self.snap_point_rotation_cache = None
+
+        bpy.ops.object.hide_view_set(unselected=True)
 
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.object.name else b
@@ -101,14 +106,19 @@ class ND_OT_points(bpy.types.Operator):
             vert_points.append((world_matrix @ vert.co, vert_matrix))
 
         edge_points = []
+        edge_lengths = []
         for edge in bm.edges:
             edge_matrix = create_rotation_matrix_from_edge(world_matrix, edge)
             edge_points.append((world_matrix @ v3_average([v.co for v in edge.verts]), edge_matrix))
+            edge_lengths.append(v3_distance(world_matrix @ edge.verts[0].co, world_matrix @ edge.verts[1].co))
 
         face_points = []
         for face in bm.faces:
             face_matrix = create_rotation_matrix_from_face(world_matrix, face)
             face_points.append((world_matrix @ v3_average([v.co for v in face.verts]), face_matrix))
+
+        shortest_edge_length = min(edge_lengths)
+        self.snap_distance_factor = shortest_edge_length / 2.0
 
         self.points_cache = vert_points + edge_points + face_points
 
@@ -132,7 +142,7 @@ class ND_OT_points(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 2 and all(obj.type == 'MESH' for obj in context.selected_objects)
+            return len(context.selected_objects) == 2 and context.active_object.type == 'MESH'
 
     
     def operate(self, context):
@@ -143,8 +153,12 @@ class ND_OT_points(bpy.types.Operator):
                 self.reference_obj.rotation_euler = rotation_matrix.to_euler()
             else:
                 self.reference_obj.rotation_euler = self.snap_point_rotation_cache.to_euler()
+                
         elif self.hit_location:
             self.reference_obj.location = self.hit_location
+
+        if self.tertiary_points:
+            self.guide_line = (self.reference_obj.location, self.tertiary_points[0])
 
         self.dirty = False
 
@@ -172,9 +186,9 @@ class ND_OT_points(bpy.types.Operator):
             self.secondary_points = []
             snap_points = []
             for (vect, rotation_matrix) in self.points_cache:
-                if v3_distance(vect, location) <= 0.2:
+                if v3_distance(vect, location) <= (0.2 * self.snap_distance_factor):
                     snap_points.append((vect, rotation_matrix))
-                elif v3_distance(vect, location) <= 0.5:
+                elif v3_distance(vect, location) <= (0.8 * self.snap_distance_factor):
                     self.secondary_points.append(vect)
             
             snap_points.sort(key=lambda p: v3_distance(p[0], location))
@@ -192,11 +206,15 @@ class ND_OT_points(bpy.types.Operator):
 
 
     def finish(self, context):
+        bpy.ops.object.hide_view_clear()
+
         unregister_draw_handler()
         unregister_points_handler()
 
 
     def revert(self, context):
+        bpy.ops.object.hide_view_clear()
+
         self.reference_obj.location = self.reference_obj_original_location
         self.reference_obj.rotation_euler = self.reference_obj_original_rotation
 
@@ -218,13 +236,13 @@ def draw_text_callback(self):
 
 
 def menu_func(self, context):
-    self.layout.operator(ND_OT_points.bl_idname, text=ND_OT_points.bl_label)
+    self.layout.operator(ND_OT_snap_align.bl_idname, text=ND_OT_snap_align.bl_label)
 
 
 def register():
-    bpy.utils.register_class(ND_OT_points)
+    bpy.utils.register_class(ND_OT_snap_align)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_points)
+    bpy.utils.unregister_class(ND_OT_snap_align)
     unregister_draw_handler()

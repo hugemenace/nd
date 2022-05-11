@@ -46,6 +46,8 @@ def redraw_regions():
 def init_points(cls):
     cls.primary_points = []
     cls.secondary_points = []
+    cls.tertiary_points = []
+    cls.guide_line = ()
 
 
 def draw_points(shader, points, size, color):
@@ -56,10 +58,22 @@ def draw_points(shader, points, size, color):
     batch.draw(shader)
 
 
+def draw_guideline(shader, line, size, color):
+    gpu.state.depth_test_set('NONE')
+    gpu.state.blend_set('ALPHA')
+    gpu.state.line_width_set(size)
+    batch = batch_for_shader(shader, 'LINES', {"pos": line})
+    shader.bind()
+    shader.uniform_float("color", color)
+    batch.draw(shader)
+
+
 def update_points(cls):
     shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
 
-    draw_points(shader, cls.primary_points, 12, (255/255, 255/255, 255/255, 1.0))
-    draw_points(shader, cls.secondary_points, 8, (255/255, 135/255, 55/255, 1.0))
+    draw_points(shader, cls.primary_points, 10, (82/255, 224/255, 82/255, 1.))
+    draw_points(shader, cls.secondary_points, 6, (255/255, 135/255, 55/255, 1.0))
+    draw_points(shader, cls.tertiary_points, 12, (82/255, 224/255, 82/255, 1.0))
+    draw_guideline(shader, cls.guide_line, 2, (82/255, 224/255, 82/255, 0.5))
 
     redraw_regions()

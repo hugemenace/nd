@@ -27,6 +27,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').mode = 'HIGH'
         layout.separator()
         layout.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
+        layout.operator("nd.snap_align", icon='SNAP_ON')
         layout.separator()
         layout.operator("nd.smooth", icon='MOD_SMOOTH')
         layout.operator("nd.seams", icon='UV_DATA')

@@ -49,6 +49,7 @@ object_names_ops = [
 
 object_transform_ops = [
     ("nd.set_origin", 'TRANSFORM_ORIGINS', None, None, False),
+    ("nd.snap_align", 'SNAP_ON', None, None, False),
 ]
 
 object_properties_ops = [

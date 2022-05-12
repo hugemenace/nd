@@ -10,13 +10,14 @@
 import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.collections import move_to_utils_collection
+from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
 
 
 mod_lattice = "Lattice — ND L"
+mod_summon_list = [mod_lattice]
 
 
 class ND_OT_lattice(bpy.types.Operator):
@@ -44,6 +45,9 @@ class ND_OT_lattice(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+
+        elif pressed(event, {'F'}):
+            self.uniform = not self.uniform
 
         elif self.key_increase_factor:
             if self.key_no_modifiers:
@@ -118,10 +122,22 @@ class ND_OT_lattice(bpy.types.Operator):
         self.lattice_points_w = 2
 
         self.reference_object = context.object
+
+        mods = context.active_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
+
+        if previous_op:
+            self.summon_old_operator(context, mods)
+        else:
+            self.prepare_new_operator(context)
+
+        if self.lattice_obj is None:
+            bpy.ops.object.modifier_remove(modifier=self.lattice.name)
+            self.prepare_new_operator(context)
         
-        self.add_lattice_object(context)
-        self.select_reference_object(context)
-        self.add_lattice_modifier(context)
+        if self.summoned:
+            isolate_in_utils_collection([self.lattice_obj])
 
         self.operate(context)
 
@@ -139,6 +155,26 @@ class ND_OT_lattice(bpy.types.Operator):
     def poll(cls, context):
         if context.mode == 'OBJECT':
             return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+
+
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
+        self.add_lattice_object(context)
+        self.select_reference_object(context)
+        self.add_lattice_modifier(context)
+
+    
+    def summon_old_operator(self, context, mods):
+        self.summoned = True
+
+        self.lattice = mods[mod_lattice]
+        self.lattice_obj = self.lattice.object
+
+        if self.lattice_obj:
+            self.lattice_points_u = self.lattice_points_u_prev = self.lattice_obj.data.points_u
+            self.lattice_points_v = self.lattice_points_v_prev = self.lattice_obj.data.points_v
+            self.lattice_points_w = self.lattice_points_w_prev = self.lattice_obj.data.points_w
 
 
     def add_lattice_object(self, context):
@@ -169,6 +205,7 @@ class ND_OT_lattice(bpy.types.Operator):
         context.active_object.data.use_outside = True
 
         self.lattice_obj = context.active_object
+        self.lattice_obj.parent = self.reference_object
 
         bpy.data.meshes.remove(eval_obj.data, do_unlink=True)
 
@@ -202,14 +239,23 @@ class ND_OT_lattice(bpy.types.Operator):
 
     def finish(self, context):
         move_to_utils_collection(self.lattice_obj)
+        isolate_in_utils_collection([self.lattice_obj])
         self.select_lattice_object(context)
 
         unregister_draw_handler()
 
 
     def revert(self, context):
-        bpy.ops.object.modifier_remove(modifier=self.lattice.name)
-        bpy.data.lattices.remove(self.lattice_obj.data, do_unlink=True)
+        if self.summoned:
+            self.lattice_obj.data.points_u = self.lattice_points_u_prev
+            self.lattice_obj.data.points_v = self.lattice_points_v_prev
+            self.lattice_obj.data.points_w = self.lattice_points_w_prev
+
+            hide_utils_collection(True)
+
+        if not self.summoned:
+            bpy.ops.object.modifier_remove(modifier=self.lattice.name)
+            bpy.data.lattices.remove(self.lattice_obj.data, do_unlink=True)
 
         unregister_draw_handler()
 
@@ -219,7 +265,7 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "U Points: {0}  /  Uniform: {1}".format(self.lattice_points_u, "Yes" if self.uniform else "No"),
+        "U Points: {0}  /  Uniform [F]: {1}".format(self.lattice_points_u, "Yes" if self.uniform else "No"),
         "(±1)  |  Shift (Yes, No)",
         active=(self.uniform or self.key_no_modifiers),
         alt_mode=self.key_shift_no_modifiers)

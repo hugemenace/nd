@@ -18,6 +18,10 @@ from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
 
 
+mod_array = 'Circular Array — ND CA'
+mod_summon_list = [mod_array]
+
+
 class ND_OT_circular_array(bpy.types.Operator):
     bl_idname = "nd.circular_array"
     bl_label = "Circular Array"
@@ -105,6 +109,43 @@ SHIFT — Do not place rotator object in utils collection
         self.count = 2
         self.angle = 360
 
+        mods = context.active_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
+
+        if previous_op:
+            self.summon_old_operator(context, mods)
+        else:
+            self.prepare_new_operator(context)
+
+        self.operate(context)
+
+        capture_modifier_keys(self, None, event.mouse_x)
+
+        init_overlay(self, event)
+        register_draw_handler(self, draw_text_callback)
+
+        context.window_manager.modal_handler_add(self)
+
+        return {'RUNNING_MODAL'}
+
+
+    @classmethod
+    def poll(cls, context):
+        if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
+            a, b = context.selected_objects
+            reference_obj = a if a.name != context.object.name else b
+
+            return reference_obj.type == 'MESH'
+        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.object.type == 'MESH':
+            return True
+        else:
+            return False
+
+
+    def prepare_new_operator(self, context):
+        self.summoned = False
+
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.object.name else b
         self.rotator_obj = context.active_object
@@ -134,34 +175,33 @@ SHIFT — Do not place rotator object in utils collection
             set_origin(self.reference_obj, mx)
 
         self.rotation_snapshot = self.rotator_obj.rotation_euler.copy()
+        bpy.data.objects[self.reference_obj.name]["NDCA_rotation_snapshot"] = self.rotation_snapshot.copy()
+
         self.reference_obj.rotation_euler = context.active_object.rotation_euler.copy()
 
         self.add_array_modifier()
-        self.operate(context)
 
-        capture_modifier_keys(self, None, event.mouse_x)
+    
+    def summon_old_operator(self, context, mods):
+        self.summoned = True
 
-        init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback)
+        self.array = mods[mod_array]
+        self.reference_obj = context.object
+        self.rotator_obj = self.array.offset_object
 
-        context.window_manager.modal_handler_add(self)
+        if self.rotator_obj is None:
+            bpy.ops.object.modifier_remove(modifier=self.array.name)
+            self.prepare_new_operator(context)
+            return
 
-        return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
-            a, b = context.selected_objects
-            reference_obj = a if a.name != context.object.name else b
-
-            return reference_obj.type == 'MESH'
-        else:
-            return False
+        self.angle = self.angle_prev = bpy.data.objects[self.reference_obj.name]["NDCA_angle"]
+        self.axis = self.axis_prev = bpy.data.objects[self.reference_obj.name]["NDCA_axis"]
+        self.rotation_snapshot = self.rotation_snapshot_prev = bpy.data.objects[self.reference_obj.name]["NDCA_rotation_snapshot"]
+        self.count = self.count_prev = self.array.count
 
 
     def add_array_modifier(self):
-        array = self.reference_obj.modifiers.new('Circular Array — ND', 'ARRAY')
+        array = self.reference_obj.modifiers.new(mod_array, 'ARRAY')
         array.use_relative_offset = False
         array.use_object_offset = True
         array.offset_object = self.rotator_obj
@@ -170,16 +210,23 @@ SHIFT — Do not place rotator object in utils collection
     
 
     def operate(self, context):
-        count = self.count if abs(self.angle) == 360 else self.count - 1
-        final_rotation = radians(self.angle / count)
-        rotation_axis = ['X', 'Y', 'Z'][self.axis]
-
-        self.rotator_obj.rotation_euler = self.rotation_snapshot
-        self.rotator_obj.rotation_euler.rotate_axis(rotation_axis, final_rotation)
-
-        self.array.count = self.count
+        self.set_operational_state(self.count, self.angle, self.axis, self.rotation_snapshot)
 
         self.dirty = False
+
+
+    def set_operational_state(self, count, angle, axis, rotation_snapshot):
+        corrected_count = count if abs(angle) == 360 else count - 1
+        final_rotation = radians(angle / corrected_count)
+        rotation_axis = ['X', 'Y', 'Z'][axis]
+
+        bpy.data.objects[self.reference_obj.name]["NDCA_angle"] = angle
+        bpy.data.objects[self.reference_obj.name]["NDCA_axis"] = axis
+
+        self.rotator_obj.rotation_euler = rotation_snapshot
+        self.rotator_obj.rotation_euler.rotate_axis(rotation_axis, final_rotation)
+
+        self.array.count = count
 
 
     def select_reference_obj(self, context):
@@ -189,39 +236,44 @@ SHIFT — Do not place rotator object in utils collection
 
 
     def finish(self, context):
-        if not self.skip_utils:
-            move_to_utils_collection(self.rotator_obj)
+        if not self.summoned:
+            if not self.skip_utils:
+                move_to_utils_collection(self.rotator_obj)
 
-        self.select_reference_obj(context)
-        self.rotator_obj.parent = self.reference_obj
-        self.rotator_obj.matrix_parent_inverse = self.reference_obj.matrix_world.inverted()
+            self.select_reference_obj(context)
+            self.rotator_obj.parent = self.reference_obj
+            self.rotator_obj.matrix_parent_inverse = self.reference_obj.matrix_world.inverted()
 
         unregister_draw_handler()
 
 
     def revert(self, context):
-        self.rotator_obj.rotation_euler = self.rotation_snapshot
-        self.select_reference_obj(context)
-        bpy.ops.object.modifier_remove(modifier=self.array.name)
-        
-        self.select_reference_obj(context)
+        if self.summoned:
+            self.set_operational_state(self.count_prev, self.angle_prev, self.axis_prev, self.rotation_snapshot_prev)
 
-        self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
+        if not self.summoned:
+            self.rotator_obj.rotation_euler = self.rotation_snapshot
+            self.select_reference_obj(context)
+            bpy.ops.object.modifier_remove(modifier=self.array.name)
+            
+            self.select_reference_obj(context)
 
-        if self.faux_origin:
-            modifier_names = [mod.name for mod in self.reference_obj.modifiers]
-            for name in modifier_names:
-                if "Axis Displace" in name:
-                    bpy.ops.object.modifier_remove(modifier=name)
+            self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
 
-        if not self.faux_origin:
-            set_origin(self.reference_obj, self.reference_obj_prev_matrix_world)
+            if self.faux_origin:
+                modifier_names = [mod.name for mod in self.reference_obj.modifiers]
+                for name in modifier_names:
+                    if "Axis Displace" in name:
+                        bpy.ops.object.modifier_remove(modifier=name)
 
-        self.reference_obj.location = self.reference_obj_prev_location
+            if not self.faux_origin:
+                set_origin(self.reference_obj, self.reference_obj_prev_matrix_world)
 
-        if self.new_empty:
-            bpy.context.scene.collection.objects.unlink(self.rotator_obj)
-            bpy.data.objects.remove(self.rotator_obj)
+            self.reference_obj.location = self.reference_obj_prev_location
+
+            if self.new_empty:
+                bpy.context.scene.collection.objects.unlink(self.rotator_obj)
+                bpy.data.objects.remove(self.rotator_obj)
         
         unregister_draw_handler()
 

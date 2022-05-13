@@ -289,6 +289,7 @@ ALT — Mirror across selected object's geometry"""
         empty.location = location
         empty.rotation_euler = rotation.to_euler()
         empty.parent = self.reference_objs[0]
+        empty.matrix_parent_inverse = self.reference_objs[0].matrix_world.inverted()
 
         move_to_utils_collection(empty)
         isolate_in_utils_collection([empty])

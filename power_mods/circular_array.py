@@ -14,7 +14,7 @@ from mathutils import Euler
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.collections import move_to_utils_collection
+from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
 
@@ -183,6 +183,7 @@ class ND_OT_circular_array(bpy.types.Operator):
             self.reference_obj.rotation_euler = context.object.rotation_euler.copy()
 
         self.rotator_obj = bpy.data.objects.new("empty", None)
+        self.rotator_obj.name = "ND — Circular Array Rotator"
         bpy.context.scene.collection.objects.link(self.rotator_obj)
         self.rotator_obj.empty_display_size = 1
         self.rotator_obj.empty_display_type = 'PLAIN_AXES'
@@ -287,6 +288,7 @@ class ND_OT_circular_array(bpy.types.Operator):
     def finish(self, context):
         if not self.summoned:
             move_to_utils_collection(self.rotator_obj)
+            hide_utils_collection(True)
 
         unregister_draw_handler()
         unregister_axis_handler()

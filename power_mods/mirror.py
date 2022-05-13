@@ -97,6 +97,9 @@ ALT — Mirror across selected object's geometry"""
             if self.geometry_mode and not self.geometry_ready:
                 return self.complete_geometry_mode(context)
 
+        elif self.key_left_click and self.geometry_mode and not self.geometry_ready:
+            return {'PASS_THROUGH'}
+
         elif self.key_confirm:
             if self.geometry_mode and not self.geometry_ready:
                 return {'PASS_THROUGH'}

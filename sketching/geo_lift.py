@@ -39,7 +39,7 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
         elif self.key_confirm_alternative:
             return self.finish(context)
 
-        elif self.key_confirm:
+        elif self.key_left_click:
             return {'PASS_THROUGH'}
 
         elif self.key_cancel:

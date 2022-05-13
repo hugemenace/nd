@@ -66,7 +66,7 @@ class ND_OT_view_align(bpy.types.Operator):
         elif self.key_confirm_alternative:
             return self.finish(context)
 
-        elif self.key_confirm:
+        elif self.key_left_click:
             return {'PASS_THROUGH'}
 
         elif self.key_movement_passthrough:

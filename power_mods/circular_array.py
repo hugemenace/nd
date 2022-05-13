@@ -310,8 +310,11 @@ class ND_OT_circular_array(bpy.types.Operator):
             self.reference_obj.modifiers.remove(self.displace)
             self.reference_obj.modifiers.remove(self.array)
             
-            self.reference_obj.location = self.reference_obj_prev_location
-            self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
+            bpy.data.objects.remove(self.rotator_obj, do_unlink=True)
+            
+            if not self.single_obj_mode:
+                self.reference_obj.location = self.reference_obj_prev_location
+                self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
 
         unregister_draw_handler()
         unregister_axis_handler()

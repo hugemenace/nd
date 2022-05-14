@@ -73,7 +73,7 @@ class ND_OT_simple_deform(bpy.types.Operator):
         elif self.key_step_down:
             if self.key_no_modifiers:
                 if self.is_angular[self.methods[self.current_method]]:
-                    self.angle = min(360, self.angle + angle_factor)
+                    self.angle = min(360, self.angle - angle_factor)
                 else:
                     self.factor -= factor_factor
             elif self.key_alt:

@@ -2,6 +2,39 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.27.0](https://github.com/hugemenace/nd/compare/v1.26.0...v1.27.0) (2022-05-14)
+
+
+### Features
+
+* add Flare (Lighting) operator ([83e9be0](https://github.com/hugemenace/nd/commit/83e9be05a1dc794b07951999c6afbc2386e726f2))
+* add option to automatically run solidify after a recon poly operation ([9a5dff3](https://github.com/hugemenace/nd/commit/9a5dff34ccaa7df329e4807bad51380568c2d497))
+* add option to capture 2 points in snap_align to align the selected object at the midpoint ([21b7a0a](https://github.com/hugemenace/nd/commit/21b7a0a1236daf5216b88d9488799a5d5da0a8d8))
+* add recall ability to circular_array operator ([1ff93e8](https://github.com/hugemenace/nd/commit/1ff93e8038287c22726383c7183cdf06735c0062))
+* add snap_align operator ([7548c66](https://github.com/hugemenace/nd/commit/7548c6645449c2598dd3bd61f7a6555cb6176661))
+* add temporary triangulation to active object during snap_align operations to increase face points ([640bc8c](https://github.com/hugemenace/nd/commit/640bc8cd52919b9d28925f4200394df8524b9f63))
+* allow circular_array operator to be used on a single selected object, and alter origin/translation logic ([d273720](https://github.com/hugemenace/nd/commit/d273720c485ed053fa143fb047cdfa1bbdad9dc5))
+* allow snapping to occur through objects occluding the target while using snap_align ([8301845](https://github.com/hugemenace/nd/commit/83018451e6af1b8e7acf25759175f62389df5bdc))
+* enhance lattice modifier behaviour and allow it to be recalled ([10dc6f9](https://github.com/hugemenace/nd/commit/10dc6f985316f76c17adf2242e27bc1fc3d7468c))
+* hide circular_array empties on completion and give them an appropriate name ([c04c466](https://github.com/hugemenace/nd/commit/c04c4664c021cdca75ba800ff6370ef637144b00))
+
+
+### Bug Fixes
+
+* ensure active boolean utils don't affect the geometry of the target object while using snap_align ([e796693](https://github.com/hugemenace/nd/commit/e7966936a9f9daeb6868e868bfa36d7de79b6b12))
+* ensure guideline in snap_align operator is cleared when capture rotation is reset ([374ad50](https://github.com/hugemenace/nd/commit/374ad50f39b104f685e2e7184133024a6f9a54a4))
+* ensure mirror selected object show_in_front mode is disabled on complete/cancel ([e2d0e07](https://github.com/hugemenace/nd/commit/e2d0e07dc9f81875f146aafe71f95da2b3137596))
+* ensure simple deform angle decrements as intended using the step_down key event ([9e7b91a](https://github.com/hugemenace/nd/commit/9e7b91a355c8d751219e2bddfee06cc0045ff237))
+* ensure snap_align operator supports meshes with vastly different edge lengths ([e9de396](https://github.com/hugemenace/nd/commit/e9de39678ee89aed01e26890dfdfcc7e029cdf85))
+* ensure that the reference object is solo-selected when completing a snap_align operation ([73ff168](https://github.com/hugemenace/nd/commit/73ff16857a4422427023f797cf3bcdfdff0252ff))
+* fix circular array revert behaviour for single object mode ([f14b5d2](https://github.com/hugemenace/nd/commit/f14b5d259a1ee6873a0af66d8880ca1edcf2ccb4))
+* fix error when using cycle operator on objects with objectless booleans in their modifier stack ([d1bc6cf](https://github.com/hugemenace/nd/commit/d1bc6cf77ff38a8529784e8885a8a07907ca6bef))
+* fix left-click handling for operators that need to pass through the event ([8a335b2](https://github.com/hugemenace/nd/commit/8a335b2e79f0da495f151085c5b21f832b315cd4))
+* fix mirror over geometry empty's matrix parent inverse ([9a16503](https://github.com/hugemenace/nd/commit/9a1650387f3bb4ff9df575fac338fcee88e95caf))
+* fix up circular_array and lattice overlay option control key labels ([22e7e54](https://github.com/hugemenace/nd/commit/22e7e54b9c10dbc324fa37b162c39908f1576b30))
+* only detect click events on release when using interactive operators ([ee19d30](https://github.com/hugemenace/nd/commit/ee19d3059a98129772e51ef27a514af4128f3272))
+* remove light energy offset limits ([1eb7964](https://github.com/hugemenace/nd/commit/1eb7964b9d3d051a116ded2740d7d14b5c81e3d4))
+
 ## [1.26.0](https://github.com/hugemenace/nd/compare/v1.25.0...v1.26.0) (2022-05-07)
 
 

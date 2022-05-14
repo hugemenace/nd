@@ -16,7 +16,7 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
     bl_idname = "nd.bool_vanilla"
     bl_label = "Boolean"
     bl_description = """Perform a boolean operation on the selected objects
-SHIFT — Protected reference object (do not convert into utility)"""
+SHIFT — Protect the reference object (do not convert into utility)"""
     bl_options = {'UNDO'}
 
     

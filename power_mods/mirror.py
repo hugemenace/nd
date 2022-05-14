@@ -346,6 +346,8 @@ ALT — Mirror across selected object's geometry"""
     def finish(self, context):
         self.select_reference_objs(context)
 
+        context.object.show_in_front = False
+
         unregister_draw_handler()
         unregister_axis_handler()
 
@@ -353,7 +355,6 @@ ALT — Mirror across selected object's geometry"""
     def revert(self, context):
         if self.geometry_mode and not self.geometry_ready:
             bpy.ops.object.mode_set(mode='OBJECT')
-            context.object.show_in_front = False
             bpy.ops.object.delete()
 
         self.select_reference_objs(context)
@@ -364,6 +365,8 @@ ALT — Mirror across selected object's geometry"""
 
         if self.geometry_mode and self.geometry_ready:
             bpy.data.objects.remove(self.mirror_obj, do_unlink=True)
+
+        context.object.show_in_front = False
 
         unregister_draw_handler()
         unregister_axis_handler()

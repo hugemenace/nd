@@ -50,7 +50,7 @@ class ND_OT_lattice(bpy.types.Operator):
         elif self.key_numeric_input:
             if self.key_no_modifiers:
                 self.lattice_points_u_input_stream = update_stream(self.lattice_points_u_input_stream, event.type)
-                self.lattice_points_u = get_stream_value(self.lattice_points_u_input_stream, minValue=2)
+                self.lattice_points_u = get_stream_value(self.lattice_points_u_input_stream, min_value=2)
 
                 if self.uniform:
                     self.lattice_points_v_input_stream = self.lattice_points_u_input_stream
@@ -62,11 +62,11 @@ class ND_OT_lattice(bpy.types.Operator):
                 self.dirty = True
             elif self.key_alt:
                 self.lattice_points_v_input_stream = update_stream(self.lattice_points_v_input_stream, event.type)
-                self.lattice_points_v = get_stream_value(self.lattice_points_v_input_stream, minValue=2)
+                self.lattice_points_v = get_stream_value(self.lattice_points_v_input_stream, min_value=2)
                 self.dirty = True
             elif self.key_ctrl:
                 self.lattice_points_w_input_stream = update_stream(self.lattice_points_w_input_stream, event.type)
-                self.lattice_points_w = get_stream_value(self.lattice_points_w_input_stream, minValue=2)
+                self.lattice_points_w = get_stream_value(self.lattice_points_w_input_stream, min_value=2)
                 self.dirty = True
 
         elif self.key_reset:

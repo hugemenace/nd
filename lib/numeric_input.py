@@ -64,12 +64,12 @@ def no_stream(input_stream):
     return value is None
 
 
-def get_stream_value(input_stream, factor=1, default=0, minValue=-inf, maxValue=inf):
+def get_stream_value(input_stream, factor=1, default=0, min_value=-inf, max_value=inf):
     ok, value, raw = input_stream
 
     computed_value = value * factor if ok and value is not None else default
 
-    return max(minValue, min(maxValue, computed_value))
+    return max(min_value, min(max_value, computed_value))
 
 
 def new_stream():

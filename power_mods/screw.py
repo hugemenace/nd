@@ -88,6 +88,10 @@ class ND_OT_screw(bpy.types.Operator):
             self.offset_axis = (self.offset_axis + 1) % 3
             self.dirty = True
 
+        elif pressed(event, {'F'}):
+            self.flip_normals = not self.flip_normals
+            self.dirty = True
+
         elif self.key_increase_factor:
             if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
@@ -191,6 +195,7 @@ class ND_OT_screw(bpy.types.Operator):
         self.segments = 3
         self.angle = 360
         self.offset = 0
+        self.flip_normals = True
 
         self.add_smooth_shading(context)
         self.add_displace_modifier(context)
@@ -209,6 +214,7 @@ class ND_OT_screw(bpy.types.Operator):
         self.segments_prev = self.segments = self.screw.steps
         self.segments_prev = self.segments = self.screw.render_steps
         self.angle_prev = self.angle = degrees(self.screw.angle)
+        self.flip_normals_prev = self.flip_normals = self.screw.use_normal_flip
 
 
     def add_smooth_shading(self, context):
@@ -242,6 +248,7 @@ class ND_OT_screw(bpy.types.Operator):
         self.screw.steps = self.segments
         self.screw.render_steps = self.segments
         self.screw.angle = radians(self.angle)
+        self.screw.use_normal_flip = self.flip_normals
 
         self.dirty = False
 
@@ -306,6 +313,11 @@ def draw_text_callback(self):
         self,
         "Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.offset_axis]),
         "Axis to offset origin along (X, Y, Z)")
+
+    draw_hint(
+        self,
+        "Flip Normals [F]: {}".format("Yes" if self.flip_normals else "No"),
+        "Flip the normals of the resulting mesh")
 
 
 def menu_func(self, context):

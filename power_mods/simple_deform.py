@@ -10,10 +10,11 @@
 import bpy
 import bmesh
 from math import radians, degrees
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_deform = "Deform — ND SD"
@@ -49,39 +50,53 @@ class ND_OT_simple_deform(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'E'}):
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                if self.is_angular[self.methods[self.current_method]]:
+                    self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
+                    self.angle = get_stream_value(self.angle_input_stream)
+                else:
+                    self.factor_input_stream = update_stream(self.factor_input_stream, event.type)
+                    self.factor = get_stream_value(self.factor_input_stream)
+
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                if self.is_angular[self.methods[self.current_method]]:
+                    self.angle_input_stream = new_stream()
+                    self.angle = 0
+                else:
+                    self.factor_input_stream = new_stream()
+                    self.factor = 0
+
+                self.dirty = True
+
+        elif pressed(event, {'M'}):
             self.current_method = (self.current_method + 1) % len(self.methods)
             self.dirty = True
 
-        elif pressed(event, {'R'}):
+        elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
         elif self.key_step_up:
             if self.key_no_modifiers:
-                if self.is_angular[self.methods[self.current_method]]:
+                if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle + angle_factor)
-                else:
+                elif no_stream(self.factor_input_stream):
                     self.factor += factor_factor
-            elif self.key_alt:
-                self.current_method = (self.current_method + 1) % len(self.methods)
-            elif self.key_ctrl:
-                self.axis = (self.axis + 1) % 3
-
-            self.dirty = True
+                
+                self.dirty = True
             
         elif self.key_step_down:
             if self.key_no_modifiers:
-                if self.is_angular[self.methods[self.current_method]]:
+                if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle - angle_factor)
-                else:
+                elif no_stream(self.factor_input_stream):
                     self.factor -= factor_factor
-            elif self.key_alt:
-                self.current_method = (self.current_method - 1) % len(self.methods)
-            elif self.key_ctrl:
-                self.axis = (self.axis - 1) % 3
-
-            self.dirty = True
+                
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -93,9 +108,9 @@ class ND_OT_simple_deform(bpy.types.Operator):
 
         if get_preferences().enable_mouse_values:
             if self.key_no_modifiers:
-                if self.is_angular[self.methods[self.current_method]]:
+                if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
-                else:
+                elif no_stream(self.factor_input_stream):
                     self.factor += self.mouse_value
             
                 self.dirty = True
@@ -113,6 +128,9 @@ class ND_OT_simple_deform(bpy.types.Operator):
         self.methods = ['TWIST', 'BEND', 'TAPER', 'STRETCH']
         self.current_method = 0
         self.is_angular = {'TWIST': True, 'BEND': True, 'TAPER': False, 'STRETCH': False}
+
+        self.angle_input_stream = new_stream()
+        self.factor_input_stream = new_stream()
 
         if len(context.selected_objects) == 1:
             mods = context.active_object.modifiers
@@ -219,10 +237,11 @@ def draw_text_callback(self):
         draw_property(
             self,
             "Angle: {0:.0f}°".format(self.angle),
-            "Ctrl (±10)  |  Shift + Ctrl (±1)",
+            "(±10)  |  Shift (±1)",
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
-            mouse_value=True)
+            mouse_value=True,
+            input_stream=self.angle_input_stream)
     else:
         draw_property(
             self,
@@ -230,21 +249,18 @@ def draw_text_callback(self):
             "(±0.1)  |  Shift (±0.01)",
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
-            mouse_value=True)
+            mouse_value=True,
+            input_stream=self.factor_input_stream)
 
-    draw_property(
-        self, 
-        "Method [E]: {}".format(self.methods[self.current_method].capitalize()),
-        "Alt ({})".format(", ".join([m.capitalize() for m in self.methods])),
-        active=self.key_alt,
-        alt_mode=False)
+    draw_hint(
+        self,
+        "Method [M]: {}".format(self.methods[self.current_method].capitalize()),
+        "Deformation method ({})".format(", ".join([m.capitalize() for m in self.methods])))
 
-    draw_property(
-        self, 
-        "Axis [R]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Ctrl (X, Y, Z)",
-        active=self.key_ctrl,
-        alt_mode=False)
+    draw_hint(
+        self,
+        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Deformation axis (X, Y, Z)")
 
 
 def menu_func(self, context):

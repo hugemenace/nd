@@ -9,10 +9,11 @@
 
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_array_x = "Array³ X — ND"
@@ -49,7 +50,27 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'R'}):
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.count_streams[self.axis] = update_stream(self.count_streams[self.axis], event.type)
+                self.axes[self.axis][1] = get_stream_value(self.count_streams[self.axis])
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_streams[self.axis] = update_stream(self.offset_streams[self.axis], event.type)
+                self.axes[self.axis][2] = get_stream_value(self.offset_streams[self.axis])
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.count_streams[self.axis] = new_stream()
+                self.axes[self.axis][1] = 0
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_streams[self.axis] = new_stream()
+                self.axes[self.axis][2] = 0
+                self.dirty = True
+
+        elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
@@ -63,8 +84,6 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
         elif self.key_step_up:
             if self.key_no_modifiers:
-                self.axis = (self.axis + 1) % 3
-            elif self.key_alt:
                 new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
 
                 if new_count == 1:
@@ -72,15 +91,14 @@ class ND_OT_array_cubed(bpy.types.Operator):
                     self.axes[self.axis][2] = self.axes[self.axis][2] * -1
                 else:
                     self.axes[self.axis][1] = new_count
+                
+                self.dirty = True
             elif self.key_ctrl:
                 self.axes[self.axis][2] += offset_factor
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
             if self.key_no_modifiers:
-                self.axis = (self.axis - 1) % 3
-            elif self.key_alt:
                 new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
 
                 if new_count == 0:
@@ -88,10 +106,11 @@ class ND_OT_array_cubed(bpy.types.Operator):
                     self.axes[self.axis][2] = self.axes[self.axis][2] * -1
                 else:
                     self.axes[self.axis][1] = new_count
+                
+                self.dirty = True
             elif self.key_ctrl:
                 self.axes[self.axis][2] -= offset_factor
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -121,6 +140,9 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
         self.axis = 0
         self.axes = [None, None, None]
+
+        self.count_streams = [new_stream(), new_stream(), new_stream()]
+        self.offset_streams = [new_stream(), new_stream(), new_stream()]
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -219,17 +241,11 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Axis [R]: {0}".format(['X', 'Y', 'Z'][self.axis]),
-        "(X, Y, Z)",
-        active=self.key_no_modifiers,
-        alt_mode=False)
-
-    draw_property(
-        self, 
-        "Count: {0}".format(self.axes[self.axis][1]),
+        "Count: {0:.0f}".format(self.axes[self.axis][1]),
         "Alt (±1)",
-        active=self.key_alt,
-        alt_mode=self.key_shift_alt)
+        active=self.key_no_modifiers,
+        alt_mode=False,
+        input_stream=self.count_streams[self.axis])
 
     draw_property(
         self,
@@ -237,7 +253,13 @@ def draw_text_callback(self):
         "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.offset_streams[self.axis])
+
+    draw_hint(
+        self,
+        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Axis replicate across (X, Y, Z)")
 
 
 def menu_func(self, context):

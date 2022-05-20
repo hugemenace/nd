@@ -10,10 +10,11 @@
 import bpy
 import bmesh
 from math import radians, degrees
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_displace = "Offset — ND SCR"
@@ -51,7 +52,35 @@ class ND_OT_screw(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'R'}):
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
+                self.segments = get_stream_value(self.segments_input_stream)
+                self.dirty = True
+            elif self.key_alt:
+                self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
+                self.angle = get_stream_value(self.angle_input_stream)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.segments_input_stream = new_stream()
+                self.segments = 3
+                self.dirty = True
+            elif self.key_alt:
+                self.angle_input_stream = new_stream()
+                self.angle = 360
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = new_stream()
+                self.offset = 0
+                self.dirty = True
+
+        elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
@@ -60,42 +89,34 @@ class ND_OT_screw(bpy.types.Operator):
             self.dirty = True
 
         elif self.key_increase_factor:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
 
         elif self.key_step_up:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += offset_factor
-            elif self.key_alt:
-                if self.key_shift:
-                    self.offset_axis = (self.offset_axis + 1) % 3
-                else:
-                    self.axis = (self.axis + 1) % 3
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = min(360, self.angle + angle_factor)
-            else:
+                self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset -= offset_factor
-            elif self.key_alt:
-                if self.key_shift:
-                    self.offset_axis = (self.offset_axis + 1) % 3
-                else:
-                    self.axis = (self.axis + 1) % 3
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, self.angle - angle_factor)
-            else:
+                self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = max(3, self.segments - segment_factor)
-                
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -106,12 +127,12 @@ class ND_OT_screw(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
-
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -124,6 +145,10 @@ class ND_OT_screw(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_offset_factor = 0.01
+
+        self.offset_input_stream = new_stream()
+        self.angle_input_stream = new_stream()
+        self.segments_input_stream = new_stream()
 
         if len(context.selected_objects) == 1:
             mods = context.active_object.modifiers
@@ -194,7 +219,7 @@ class ND_OT_screw(bpy.types.Operator):
 
     def add_displace_modifier(self, context):
         displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
-        displace.mid_level = 0.5
+        displace.mid_level = 0
         displace.space = 'LOCAL'
         
         self.displace = displace
@@ -251,30 +276,36 @@ def draw_text_callback(self):
         "Segments: {}".format(self.segments),
         "(±2)  |  Shift (±1)",
         active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers)
+        alt_mode=self.key_shift_no_modifiers,
+        input_stream=self.segments_input_stream)
     
     draw_property(
         self,
-        "Screw Axis [R]: {}  /  Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.axis], ['X', 'Y', 'Z'][self.offset_axis]),
-        "Alt (Screw X, Y, Z)  |  Shift + Alt (Offset X, Y, Z)",
-        active=self.key_alt,
-        alt_mode=self.key_shift_alt)
-
-    draw_property(
-        self,
         "Angle: {0:.0f}°".format(self.angle),
-        "Ctrl (±10)  |  Shift + Ctrl (±1)",
-        active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        "Alt (±10)  |  Shift + Alt (±1)",
+        active=self.key_alt,
+        alt_mode=self.key_shift_alt,
+        mouse_value=True,
+        input_stream=self.angle_input_stream)
 
     draw_property(
         self,
         "Offset: {0:.3f}".format(self.offset),
-        "Ctrl + Alt (±{0:.1f})  |  Shift + Ctrl + Alt (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
-        active=self.key_ctrl_alt,
-        alt_mode=self.key_shift_ctrl_alt,
-        mouse_value=True)
+        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        active=self.key_ctrl,
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True,
+        input_stream=self.offset_input_stream)
+
+    draw_hint(
+        self,
+        "Screw Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Axis to revolve around (X, Y, Z)")
+
+    draw_hint(
+        self,
+        "Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.offset_axis]),
+        "Axis to offset origin along (X, Y, Z)")
 
 
 def menu_func(self, context):

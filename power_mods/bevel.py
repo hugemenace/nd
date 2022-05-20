@@ -90,6 +90,10 @@ class ND_OT_bevel(bpy.types.Operator):
             self.harden_normals = not self.harden_normals
             self.dirty = True
 
+        elif pressed(event, {'W'}):
+            self.target_object.show_wire = not self.target_object.show_wire
+            self.target_object.show_in_front = not self.target_object.show_in_front
+
         elif self.key_step_up:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
@@ -148,6 +152,8 @@ class ND_OT_bevel(bpy.types.Operator):
         self.segments_input_stream = new_stream()
         self.width_input_stream = new_stream()
         self.profile_input_stream = new_stream()
+
+        self.target_object = context.active_object
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -223,11 +229,16 @@ class ND_OT_bevel(bpy.types.Operator):
 
 
     def finish(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
         self.add_weld_modifier(context)
         unregister_draw_handler()
 
 
     def revert(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
+
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
 
@@ -272,6 +283,11 @@ def draw_text_callback(self):
         self,
         "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
         "Match normals of new faces to adjacent faces")
+
+    draw_hint(
+        self,
+        "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        "Display the objects's wireframe over solid shading")
 
 
 def menu_func(self, context):

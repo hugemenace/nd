@@ -10,8 +10,8 @@
 import bpy
 import bmesh
 from math import radians
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
@@ -61,6 +61,10 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
                 self.width = 0
                 self.dirty = True
 
+        elif pressed(event, {'W'}):
+            self.target_object.show_wire = not self.target_object.show_wire
+            self.target_object.show_in_front = not self.target_object.show_in_front
+
         elif self.key_increase_factor:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
@@ -105,6 +109,8 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         self.base_width_factor = 0.001
 
         self.width_input_stream = new_stream()
+
+        self.target_object = context.active_object
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -182,10 +188,15 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
 
     def finish(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
         unregister_draw_handler()
 
 
     def revert(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
+
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
             bpy.ops.object.modifier_remove(modifier=self.wn.name)
@@ -207,6 +218,11 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.width_input_stream)
+
+    draw_hint(
+        self,
+        "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        "Display the objects's wireframe over solid shading")
 
 
 def menu_func(self, context):

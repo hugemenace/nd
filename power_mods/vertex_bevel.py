@@ -9,8 +9,8 @@
 
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
@@ -80,6 +80,10 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
                 self.profile = 0.5
                 self.dirty = True
 
+        elif pressed(event, {'W'}):
+            self.target_object.show_wire = not self.target_object.show_wire
+            self.target_object.show_in_front = not self.target_object.show_in_front
+
         elif self.key_increase_factor:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
@@ -147,6 +151,8 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         self.segments_input_stream = new_stream()
         self.width_input_stream = new_stream()
         self.profile_input_stream = new_stream()
+
+        self.target_object = context.active_object
 
         previous_op = False
 
@@ -267,6 +273,8 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
 
 
     def finish(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
         self.add_weld_modifier(context)
 
         # TODO: Find a better solution. This is a workaround for the fact that
@@ -279,6 +287,9 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
     
 
     def revert(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
+
         if self.summoned:
             self.bevel.width = self.width_prev
             self.bevel.segments = self.segments_prev
@@ -324,6 +335,11 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,
         input_stream=self.profile_input_stream)
+
+    draw_hint(
+        self,
+        "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        "Display the objects's wireframe over solid shading")
 
 
 def menu_func(self, context):

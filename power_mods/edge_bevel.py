@@ -90,6 +90,10 @@ class ND_OT_edge_bevel(bpy.types.Operator):
             self.harden_normals = not self.harden_normals
             self.dirty = True
 
+        elif pressed(event, {'W'}):
+            self.target_object.show_wire = not self.target_object.show_wire
+            self.target_object.show_in_front = not self.target_object.show_in_front
+
         elif self.key_increase_factor:
             if no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.base_weight_factor = min(1, self.base_weight_factor * 10.0)
@@ -166,6 +170,8 @@ class ND_OT_edge_bevel(bpy.types.Operator):
         self.weight_input_stream = new_stream()
         self.width_input_stream = new_stream()
         self.profile_input_stream = new_stream()
+
+        self.target_object = context.active_object
 
         if not context.object.data.use_customdata_edge_bevel:
             context.object.data.use_customdata_edge_bevel = True
@@ -269,11 +275,16 @@ class ND_OT_edge_bevel(bpy.types.Operator):
 
 
     def finish(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
         self.add_weld_modifier(context)
         unregister_draw_handler()
 
 
     def revert(self, context):
+        self.target_object.show_wire = False
+        self.target_object.show_in_front = False
+
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
 
@@ -337,6 +348,11 @@ def draw_text_callback(self):
         self,
         "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
         "Match normals of new faces to adjacent faces")
+
+    draw_hint(
+        self,
+        "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        "Display the objects's wireframe over solid shading")
 
 
 def menu_func(self, context):

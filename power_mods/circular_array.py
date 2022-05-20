@@ -11,12 +11,13 @@ import bpy
 import bmesh
 from math import radians
 from mathutils import Euler
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_displace = 'Displace — ND CA'
@@ -53,42 +54,68 @@ class ND_OT_circular_array(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+        
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.count_input_stream = update_stream(self.count_input_stream, event.type)
+                self.count = get_stream_value(self.count_input_stream, minValue=2)
+                self.dirty = True
+            elif self.key_alt:
+                self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
+                self.angle = get_stream_value(self.angle_input_stream)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.dirty = True
 
-        elif pressed(event, {'R'}):
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.count_input_stream = new_stream()
+                self.count = 2
+                self.dirty = True
+            elif self.key_alt:
+                self.angle_input_stream = new_stream()
+                self.angle = 360
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = new_stream()
+                self.offset = 360
+                self.dirty = True
+
+        elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
         elif self.key_increase_factor:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_ctrl_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
 
         elif self.key_step_up:
-            if self.key_alt:
-                self.axis = (self.axis + 1) % 3
-            elif self.key_ctrl:
+            if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = min(360, self.angle + angle_factor)
-            elif self.key_ctrl_alt:
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += offset_factor
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = 2 if self.count == 1 else self.count + count_factor
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_alt:
-                self.axis = (self.axis - 1) % 3
-            elif self.key_ctrl:
+            if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, self.angle - angle_factor)
-            elif self.key_ctrl_alt:
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset -= offset_factor
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = max(2, self.count - count_factor)
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -99,12 +126,12 @@ class ND_OT_circular_array(bpy.types.Operator):
             return {'PASS_THROUGH'}
         
         if get_preferences().enable_mouse_values:
-            if self.key_ctrl:
+            if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
-            elif self.key_ctrl_alt:
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
-
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -124,6 +151,10 @@ class ND_OT_circular_array(bpy.types.Operator):
         self.angle = 360
         self.offset = 0
         self.single_obj_mode = len(context.selected_objects) == 1
+
+        self.count_input_stream = new_stream()
+        self.angle_input_stream = new_stream()
+        self.offset_input_stream = new_stream()
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -328,30 +359,31 @@ def draw_text_callback(self):
         "Count: {}".format(self.count),
         "(±2) | Shift (±1)",
         active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers)
-
-    draw_property(
-        self, 
-        "Axis [R]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Alt (X, Y, Z)",
-        active=self.key_alt,
-        alt_mode=False)
+        alt_mode=self.key_shift_no_modifiers,
+        input_stream=self.count_input_stream)
 
     draw_property(
         self, 
         "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({0:.1f}°)".format(self.angle)),
-        "Ctrl (±15)  |  Shift + Ctrl (±1)",
-        active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        "Alt (±15)  |  Shift + Alt (±1)",
+        active=self.key_alt,
+        alt_mode=self.key_shift_alt,
+        mouse_value=True,
+        input_stream=self.angle_input_stream)
 
     draw_property(
         self, 
         "Offset: {0:.1f}".format(self.offset * 1000), 
-        "Ctrl + Alt (±{0:.1f})  |  Shift + Ctrl + Alt (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
-        active=self.key_ctrl_alt,
-        alt_mode=self.key_shift_ctrl_alt,
-        mouse_value=True)
+        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        active=self.key_ctrl,
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True,
+        input_stream=self.offset_input_stream)
+
+    draw_hint(
+        self,
+        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Axis to revolve around (X, Y, Z)")
 
 
 def menu_func(self, context):

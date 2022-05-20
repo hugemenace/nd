@@ -10,9 +10,10 @@
 import bpy
 import bmesh
 from math import radians, degrees
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 class ND_OT_seams(bpy.types.Operator):
@@ -43,25 +44,31 @@ class ND_OT_seams(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'V'}):
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
+                self.angle = get_stream_value(self.angle_input_stream)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.angle_input_stream = new_stream()
+                self.angle = degrees(context.object.data.auto_smooth_angle)
+                self.dirty = True
+
+        elif pressed(event, {'A'}):
             self.commit_auto_smooth = not self.commit_auto_smooth
             self.dirty = True
 
         elif self.key_step_up:
-            if self.key_alt:
-                self.commit_auto_smooth = not self.commit_auto_smooth
-            else:
+            if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = min(180, self.angle + angle_factor)
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_alt:
-                self.commit_auto_smooth = not self.commit_auto_smooth
-            else:
+            if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, self.angle - angle_factor)
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -72,9 +79,9 @@ class ND_OT_seams(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
-
-            self.dirty = True
+            if no_stream(self.angle_input_stream) and self.key_no_modifiers:
+                self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -89,6 +96,8 @@ class ND_OT_seams(bpy.types.Operator):
         self.base_angle_factor = 15
         self.angle = degrees(context.object.data.auto_smooth_angle)
         self.commit_auto_smooth = False
+
+        self.angle_input_stream = new_stream()
 
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={'EDGE'})
         bpy.ops.mesh.select_all(action='DESELECT')
@@ -155,20 +164,19 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
-        "Angle: {0:.0f}°".format(self.angle), 
+        self,
+        "Angle: {0:.0f}°".format(self.angle),
         "(±{0:.0f})  |  Shift + (±1)".format(self.base_angle_factor),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
-    
-    draw_property(
-        self, 
-        "Sync Auto Smooth [V]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
-        "Alt (Yes / No)",
-        active=self.key_alt,
-        alt_mode=False)
+        mouse_value=True,
+        input_stream=self.angle_input_stream)
 
+    draw_hint(
+        self,
+        "Sync Auto Smooth [A]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
+        "Synchronize auto-smooth with seams angle on complete")
+    
 
 def menu_func(self, context):
     self.layout.operator(ND_OT_seams.bl_idname, text=ND_OT_seams.bl_label)

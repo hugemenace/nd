@@ -9,10 +9,11 @@
 
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_screw = "Extrusion — ND PE"
@@ -48,11 +49,23 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'R'}):
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.extrusion_length_input_stream = update_stream(self.extrusion_length_input_stream, event.type)
+                self.extrusion_length = get_stream_value(self.extrusion_length_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.extrusion_length_input_stream = new_stream()
+                self.extrusion_length = 0
+                self.dirty = True
+
+        elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
-        elif pressed(event, {'T'}):
+        elif pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             self.dirty = True
 
@@ -63,24 +76,14 @@ class ND_OT_profile_extrude(bpy.types.Operator):
             self.base_extrude_factor = max(0.001, self.base_extrude_factor / 10.0)
 
         elif self.key_step_up:
-            if self.key_alt:
-                self.weighting = self.weighting + 1 if self.weighting < 1 else -1
-            elif self.key_ctrl:
-                self.axis = (self.axis + 1) % 3
-            elif self.key_no_modifiers:
+            if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length += extrude_factor
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_alt:
-                self.weighting = self.weighting - 1 if self.weighting > -1 else 1
-            elif self.key_ctrl:
-                self.axis = (self.axis - 1) % 3
-            elif self.key_no_modifiers:
+            if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length - extrude_factor)
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -91,10 +94,9 @@ class ND_OT_profile_extrude(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers:
+            if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length + self.mouse_value)
-            
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -107,6 +109,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_extrude_factor = 0.01
+
+        self.extrusion_length_input_stream = new_stream()
 
         if len(context.selected_objects) == 1:
             mods = context.active_object.modifiers
@@ -183,7 +187,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
     def add_offset_modifier(self, context):
         offset = context.object.modifiers.new(mod_offset, 'DISPLACE')
         offset.space = 'LOCAL'
-        offset.mid_level = 0.5
+        offset.mid_level = 0
 
         self.offset = offset
 
@@ -240,21 +244,18 @@ def draw_text_callback(self):
         "(±{0:.1f})  |  Shift + (±{1:.1f})".format(self.base_extrude_factor * 1000, (self.base_extrude_factor / 10) * 1000),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.extrusion_length_input_stream)
 
-    draw_property(
-        self, 
-        "Weighting [T]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
-        "Alt (Negative, Neutral, Positive)",
-        active=self.key_alt,
-        alt_mode=False)
+    draw_hint(
+        self,
+        "Weighting [W]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
+        "Negative, Neutral, Positive")
 
-    draw_property(
-        self, 
-        "Axis [R]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Ctrl (X, Y, Z)",
-        active=self.key_ctrl,
-        alt_mode=False)
+    draw_hint(
+        self,
+        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Axis to extrude along (X, Y, Z)")
 
 
 def menu_func(self, context):

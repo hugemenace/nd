@@ -9,11 +9,12 @@
 
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_lattice = "Lattice — ND L"
@@ -46,56 +47,98 @@ class ND_OT_lattice(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'F'}):
-            self.uniform = not self.uniform
-
-        elif self.key_increase_factor:
+        elif self.key_numeric_input:
             if self.key_no_modifiers:
-                self.base_width_factor = min(1, self.base_width_factor * 10.0)
+                self.lattice_points_u_input_stream = update_stream(self.lattice_points_u_input_stream, event.type)
+                self.lattice_points_u = get_stream_value(self.lattice_points_u_input_stream, minValue=2)
 
-        elif self.key_decrease_factor:
-            if self.key_no_modifiers:
-                self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
-        
-        elif self.key_step_up:
-            if self.key_shift_no_modifiers:
-                self.uniform = not self.uniform
                 if self.uniform:
+                    self.lattice_points_v_input_stream = self.lattice_points_u_input_stream
+                    self.lattice_points_w_input_stream = self.lattice_points_u_input_stream
+
                     self.lattice_points_v = self.lattice_points_u
                     self.lattice_points_w = self.lattice_points_u
-            elif self.uniform:
+
+                self.dirty = True
+            elif self.key_alt:
+                self.lattice_points_v_input_stream = update_stream(self.lattice_points_v_input_stream, event.type)
+                self.lattice_points_v = get_stream_value(self.lattice_points_v_input_stream, minValue=2)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.lattice_points_w_input_stream = update_stream(self.lattice_points_w_input_stream, event.type)
+                self.lattice_points_w = get_stream_value(self.lattice_points_w_input_stream, minValue=2)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.lattice_points_u_input_stream = new_stream()
+                self.lattice_points_u = 2
+
+                if self.uniform:
+                    self.lattice_points_v_input_stream = new_stream()
+                    self.lattice_points_w_input_stream = new_stream()
+                    self.lattice_points_v = 2
+                    self.lattice_points_w = 2
+
+                self.dirty = True
+            elif self.key_alt:
+                self.lattice_points_v_input_stream = new_stream()
+                self.lattice_points_v = 2
+                self.dirty = True
+            elif self.key_ctrl:
+                self.lattice_points_w_input_stream = new_stream()
+                self.lattice_points_w = 2
+                self.dirty = True
+
+        elif pressed(event, {'U'}):
+            self.uniform = not self.uniform
+
+            if self.uniform:
+                self.lattice_points_v_input_stream = self.lattice_points_u_input_stream
+                self.lattice_points_w_input_stream = self.lattice_points_u_input_stream
+
+                self.lattice_points_v = self.lattice_points_u
+                self.lattice_points_w = self.lattice_points_u
+            else:
+                self.lattice_points_v_input_stream = new_stream()
+                self.lattice_points_w_input_stream = new_stream()
+
+            self.dirty = True
+
+        elif self.key_step_up:
+            if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u += 1
                 self.lattice_points_v = self.lattice_points_u
                 self.lattice_points_w = self.lattice_points_u
-            else:
-                if self.key_no_modifiers:
+                self.dirty = True
+            elif not self.uniform:
+                if no_stream(self.lattice_points_u_input_stream) and self.key_no_modifiers:
                     self.lattice_points_u += 1
-                elif self.key_alt:
+                    self.dirty = True
+                elif no_stream(self.lattice_points_v_input_stream) and self.key_alt:
                     self.lattice_points_v += 1
-                elif self.key_ctrl:
+                    self.dirty = True
+                elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w += 1
+                    self.dirty = True
 
-            self.dirty = True
         
         elif self.key_step_down:
-            if self.key_shift_no_modifiers:
-                self.uniform = not self.uniform
-                if self.uniform:
-                    self.lattice_points_v = self.lattice_points_u
-                    self.lattice_points_w = self.lattice_points_u
-            elif self.uniform:
+            if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u = max(2, self.lattice_points_u - 1)
                 self.lattice_points_v = self.lattice_points_u
                 self.lattice_points_w = self.lattice_points_u
-            else:
-                if self.key_no_modifiers:
+                self.dirty = True
+            elif not self.uniform:
+                if no_stream(self.lattice_points_u_input_stream) and self.key_no_modifiers:
                     self.lattice_points_u = max(2, self.lattice_points_u - 1)
-                elif self.key_alt:
+                    self.dirty = True
+                elif no_stream(self.lattice_points_v_input_stream) and self.key_alt:
                     self.lattice_points_v = max(2, self.lattice_points_v - 1)
-                elif self.key_ctrl:
+                    self.dirty = True
+                elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w = max(2, self.lattice_points_w - 1)
-            
-            self.dirty = True
+                    self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -120,6 +163,10 @@ class ND_OT_lattice(bpy.types.Operator):
         self.lattice_points_u = 2
         self.lattice_points_v = 2
         self.lattice_points_w = 2
+
+        self.lattice_points_u_input_stream = new_stream()
+        self.lattice_points_v_input_stream = new_stream()
+        self.lattice_points_w_input_stream = new_stream()
 
         self.reference_object = context.object
 
@@ -265,24 +312,32 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "U Points: {0}  /  Uniform [F]: {1}".format(self.lattice_points_u, "Yes" if self.uniform else "No"),
-        "(±1)  |  Shift (Yes, No)",
+        "U Points: {}".format(self.lattice_points_u),
+        "(±1)",
         active=(self.uniform or self.key_no_modifiers),
-        alt_mode=self.key_shift_no_modifiers)
+        alt_mode=False,
+        input_stream=self.lattice_points_u_input_stream)
 
     draw_property(
         self,
-        "V Points: {0}".format(self.lattice_points_v),
+        "V Points: {}".format(self.lattice_points_v),
         "Alt (±1)",
         active=(self.uniform or self.key_alt),
-        alt_mode=False)
+        alt_mode=False,
+        input_stream=self.lattice_points_v_input_stream)
 
     draw_property(
         self,
-        "W Points: {0}".format(self.lattice_points_w),
+        "W Points: {}".format(self.lattice_points_w),
         "Ctrl (±1)",
         active=(self.uniform or self.key_ctrl),
-        alt_mode=False)
+        alt_mode=False,
+        input_stream=self.lattice_points_w_input_stream)
+
+    draw_hint(
+        self,
+        "Uniform [U]: {}".format("Yes" if self.uniform else "No"),
+        "Adjust all points uniformly")
 
 
 def menu_func(self, context):

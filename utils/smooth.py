@@ -13,6 +13,7 @@ from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 class ND_OT_smooth(bpy.types.Operator):
@@ -43,15 +44,27 @@ class ND_OT_smooth(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif self.key_step_up:
-            self.angle = min(180, self.angle + angle_factor)
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
+                self.angle = get_stream_value(self.angle_input_stream)
+                self.dirty = True
 
-            self.dirty = True
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.angle_input_stream = new_stream()
+                self.angle = 30
+                self.dirty = True
+
+        elif self.key_step_up:
+            if no_stream(self.angle_input_stream) and self.key_no_modifiers:
+                self.angle = min(180, self.angle + angle_factor)
+                self.dirty = True
             
         elif self.key_step_down:
-            self.angle = max(0, self.angle - angle_factor)
-
-            self.dirty = True
+            if no_stream(self.angle_input_stream) and self.key_no_modifiers:
+                self.angle = max(0, self.angle - angle_factor)
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -62,9 +75,9 @@ class ND_OT_smooth(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
-
-            self.dirty = True
+            if no_stream(self.angle_input_stream) and self.key_no_modifiers:
+                self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -78,6 +91,8 @@ class ND_OT_smooth(bpy.types.Operator):
         self.dirty = False
         self.base_angle_factor = 15
         self.angle = 30
+
+        self.angle_input_stream = new_stream()
 
         self.add_smooth_shading(context)
 
@@ -122,12 +137,13 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
-        "Angle: {0:.0f}°".format(self.angle), 
+        self,
+        "Angle: {0:.0f}°".format(self.angle),
         "(±{0:.0f})  |  Shift + (±1)".format(self.base_angle_factor),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.angle_input_stream)
 
 
 def menu_func(self, context):

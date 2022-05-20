@@ -13,6 +13,7 @@ from random import random, uniform, randrange
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 class ND_OT_flare(bpy.types.Operator):
@@ -46,6 +47,42 @@ class ND_OT_flare(bpy.types.Operator):
 
             return {'CANCELLED'}
 
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.rotation_input_stream = update_stream(self.rotation_input_stream, event.type)
+                self.rotation = get_stream_value(self.rotation_input_stream)
+                self.dirty = True
+            elif self.key_alt:
+                self.height_offset_input_stream = update_stream(self.height_offset_input_stream, event.type)
+                self.height_offset = get_stream_value(self.height_offset_input_stream)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.scale_input_stream = update_stream(self.scale_input_stream, event.type)
+                self.scale = get_stream_value(self.scale_input_stream)
+                self.dirty = True
+            elif self.key_ctrl_alt:
+                self.energy_offset_input_stream = update_stream(self.energy_offset_input_stream, event.type)
+                self.energy_offset = get_stream_value(self.energy_offset_input_stream)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.rotation_input_stream = new_stream()
+                self.rotation = 0
+                self.dirty = True
+            elif self.key_alt:
+                self.height_offset_input_stream = new_stream()
+                self.height_offset = 0
+                self.dirty = True
+            elif self.key_ctrl:
+                self.scale_input_stream = new_stream()
+                self.scale = 1
+                self.dirty = True
+            elif self.key_ctrl_alt:
+                self.enery_offset_input_stream = new_stream()
+                self.enery_offset = 0
+                self.dirty = True
+
         elif pressed(event, {'R'}):
             self.generate_rig(context)
 
@@ -56,25 +93,25 @@ class ND_OT_flare(bpy.types.Operator):
             self.randomise_energy(context)
 
         elif self.key_step_up:
-            if self.key_no_modifiers:
+            if no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation + rotation_factor) % 360
-            elif self.key_alt:
+            elif no_stream(self.height_offset_input_stream) and self.key_alt:
                 self.height_offset += height_factor
-            elif self.key_ctrl:
+            elif no_stream(self.scale_input_stream) and self.key_ctrl:
                 self.scale += scale_factor
-            elif self.key_ctrl_alt:
+            elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset += energy_factor
 
             self.dirty = True
             
         elif self.key_step_down:
-            if self.key_no_modifiers:
+            if no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation - rotation_factor) % 360
-            elif self.key_alt:
+            elif no_stream(self.height_offset_input_stream) and self.key_alt:
                 self.height_offset -= height_factor
-            elif self.key_ctrl:
+            elif no_stream(self.scale_input_stream) and self.key_ctrl:
                 self.scale = max(0, self.scale - scale_factor)
-            elif self.key_ctrl_alt:
+            elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset -= energy_factor
 
             self.dirty = True
@@ -88,13 +125,13 @@ class ND_OT_flare(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_alt:
+            if no_stream(self.height_offset_input_stream) and self.key_alt:
                 self.height_offset += self.mouse_value
-            elif self.key_ctrl:
+            elif no_stream(self.scale_input_stream) and self.key_ctrl:
                 self.scale = max(0, self.scale + self.mouse_value)
-            elif self.key_ctrl_alt:
+            elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset += self.mouse_value * 2500
-            elif self.key_no_modifiers:
+            elif no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation + self.mouse_value_mag) % 360
             
             self.dirty = True
@@ -108,6 +145,11 @@ class ND_OT_flare(bpy.types.Operator):
 
 
     def reset_values(self, context):
+        self.rotation_input_stream = new_stream()
+        self.height_offset_input_stream = new_stream()
+        self.energy_offset_input_stream = new_stream()
+        self.scale_input_stream = new_stream()
+
         self.rotation = 0
         self.height_offset = 0
         self.scale = 1
@@ -125,6 +167,11 @@ class ND_OT_flare(bpy.types.Operator):
         self.last_height_offset = 0
         self.last_scale = 1
         self.last_energy_offset = 0
+
+        self.rotation_input_stream = new_stream()
+        self.height_offset_input_stream = new_stream()
+        self.energy_offset_input_stream = new_stream()
+        self.scale_input_stream = new_stream()
 
         if context.object.type == 'EMPTY':
             self.summoned = True
@@ -201,6 +248,9 @@ class ND_OT_flare(bpy.types.Operator):
 
     
     def randomise_energy(self, context):
+        self.energy_offset_input_stream = new_stream()
+        self.energy_offset = 0
+        
         for light, height, energy in self.lights:
             light.data.energy = uniform(1000, 25000)
 
@@ -275,7 +325,8 @@ def draw_text_callback(self):
         "(±15)  |  Shift (±1)",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.rotation_input_stream)
 
     draw_property(
         self, 
@@ -283,7 +334,8 @@ def draw_text_callback(self):
         "Alt (±1)  |  Shift + Alt (±0.1)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.height_offset_input_stream)
 
     draw_property(
         self, 
@@ -291,7 +343,8 @@ def draw_text_callback(self):
         "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.scale_input_stream)
 
     draw_property(
         self, 
@@ -299,12 +352,11 @@ def draw_text_callback(self):
         "Ctrl + Alt (±10k)  |  Shift + Ctrl + Alt (±1k)",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.energy_offset_input_stream)
 
     draw_hint(self, "New Rig [R]", "Generate a new randomised rig and reset light options")
-
     draw_hint(self, "New Colors [C]", "Generate new randomised colors for the lights")
-
     draw_hint(self, "New Energy [E]", "Generate new randomised energy for the lights")
 
 

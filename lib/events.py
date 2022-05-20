@@ -30,19 +30,22 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.key_one = pressed(event, {'ONE'})
     cls.key_two = pressed(event, {'TWO'})
     cls.key_three = pressed(event, {'THREE'})
+
+    cls.key_numeric_input = pressed(event, {'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO', 'PERIOD', 'MINUS', 'NUMPAD_0', 'NUMPAD_1', 'NUMPAD_2', 'NUMPAD_3', 'NUMPAD_4', 'NUMPAD_5', 'NUMPAD_6', 'NUMPAD_7', 'NUMPAD_8', 'NUMPAD_9', 'NUMPAD_PERIOD', 'NUMPAD_MINUS', 'BACK_SPACE'})
+    cls.key_reset = pressed(event, {get_preferences().overlay_reset_key})
     
     cls.key_toggle_pin_overlay = pressed(event, {get_preferences().overlay_pin_key})
     cls.key_toggle_operator_passthrough = pressed(event, {get_preferences().overlay_pause_key})
     
-    cls.key_increase_factor = pressed(event, {'PLUS', 'EQUAL', 'NUMPAD_PLUS'})
-    cls.key_decrease_factor = pressed(event, {'MINUS', 'NUMPAD_MINUS'})
+    cls.key_increase_factor = pressed(event, {get_preferences().overlay_increase_factor})
+    cls.key_decrease_factor = pressed(event, {get_preferences().overlay_decrease_factor})
 
-    cls.key_step_up = detected(event, {'WHEELUPMOUSE'}) or pressed(event, {'UP_ARROW'}) or pressed(event, {'RIGHT_ARROW'}) or pressed(event, {'D'}) or pressed(event, {'W'})
-    cls.key_step_down = detected(event, {'WHEELDOWNMOUSE'}) or pressed(event, {'DOWN_ARROW'}) or pressed(event, {'LEFT_ARROW'}) or pressed(event, {'A'}) or pressed(event, {'S'})
+    cls.key_step_up = detected(event, {'WHEELUPMOUSE'}) or pressed(event, {'UP_ARROW'}) or pressed(event, {'RIGHT_ARROW'})
+    cls.key_step_down = detected(event, {'WHEELDOWNMOUSE'}) or pressed(event, {'DOWN_ARROW'}) or pressed(event, {'LEFT_ARROW'})
     
-    cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET'})
+    cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
     cls.key_left_click = detected(event, {'LEFTMOUSE'})
-    cls.key_confirm_alternative = pressed(event, {'SPACE', 'RET'})
+    cls.key_confirm_alternative = pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
     cls.key_cancel = clicked(event, {'RIGHTMOUSE'}) or pressed(event, {'ESC'})
 
     cls.key_movement_passthrough = detected(event, {'MIDDLEMOUSE'}) or (has(event) and event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or (has(event) and event.type.startswith('NDOF'))

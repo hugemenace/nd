@@ -10,10 +10,11 @@
 import bpy
 import bmesh
 from math import radians
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 class ND_OT_bool_inset(bpy.types.Operator):
@@ -43,34 +44,40 @@ class ND_OT_bool_inset(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+        
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.thickness_input_stream = update_stream(self.thickness_input_stream, event.type)
+                self.thickness = get_stream_value(self.thickness_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.thickness_input_stream = new_stream()
+                self.thickness = 0
+                self.dirty = True
 
         elif pressed(event, {'M'}):
             self.outset = not self.outset
             self.dirty = True
 
         elif self.key_increase_factor:
-            if self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
 
         elif self.key_step_up:
-            if self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness += thickness_factor
-            elif self.key_alt:
-                self.outset = not self.outset
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - thickness_factor)
-            elif self.key_alt:
-                self.outset = not self.outset
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -81,10 +88,9 @@ class ND_OT_bool_inset(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness + self.mouse_value)
-
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -100,6 +106,8 @@ class ND_OT_bool_inset(bpy.types.Operator):
 
         self.thickness = 0.02
         self.outset = False
+
+        self.thickness_input_stream = new_stream()
 
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
@@ -214,14 +222,13 @@ def draw_text_callback(self):
         "(±{0:.1f})  |  Shift + (±{1:.1f})".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.thickness_input_stream)
 
-    draw_property(
-        self, 
+    draw_hint(
+        self,
         "Mode [M]: {0}".format('Outset' if self.outset else 'Inset'),
-        "(Inset, Outset)",
-        active=self.key_alt,
-        alt_mode=False)
+        "Create an Inset or Outset")
 
 
 def menu_func(self, context):

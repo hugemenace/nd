@@ -12,6 +12,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_bevel = "Bevel — ND EB"
@@ -49,45 +50,81 @@ class ND_OT_edge_bevel(bpy.types.Operator):
 
             return {'CANCELLED'}
 
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.weight_input_stream = update_stream(self.weight_input_stream, event.type)
+                self.weight = get_stream_value(self.weight_input_stream)
+                self.dirty = True
+            elif self.key_alt:
+                self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
+                self.segments = get_stream_value(self.segments_input_stream)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.profile_input_stream = update_stream(self.profile_input_stream, event.type)
+                self.profile = get_stream_value(self.profile_input_stream)
+                self.dirty = True
+            elif self.key_ctrl_alt:
+                self.width_input_stream = update_stream(self.width_input_stream, event.type)
+                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.weight_input_stream = new_stream()
+                self.weight = 0
+                self.dirty = True
+            elif self.key_alt:
+                self.segments_input_stream = new_stream()
+                self.segments = 1
+                self.dirty = True
+            elif self.key_ctrl:
+                self.profile_input_stream = new_stream()
+                self.profile = 0.5
+                self.dirty = True
+            elif self.key_ctrl_alt:
+                self.width_input_stream = new_stream()
+                self.width = 0.5
+                self.dirty = True
+
         elif pressed(event, {'H'}):
             self.harden_normals = not self.harden_normals
             self.dirty = True
 
         elif self.key_increase_factor:
-            if self.key_no_modifiers:
+            if no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.base_weight_factor = min(1, self.base_weight_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_no_modifiers:
+            if no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.base_weight_factor = max(0.001, self.base_weight_factor / 10.0)
         
         elif self.key_step_up:
-            if self.key_alt:
+            if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, self.profile + profile_factor)
-            elif self.key_shift_ctrl_alt:
-                self.harden_normals = not self.harden_normals
-            elif self.key_ctrl_alt:
+                self.dirty = True
+            elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
                 self.width = max(0, self.width + 0.1)
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight + weight_factor))
-            
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_step_down:
-            if self.key_alt:
+            if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, self.profile - profile_factor)
-            elif self.key_shift_ctrl_alt:
-                self.harden_normals = not self.harden_normals
-            elif self.key_ctrl_alt:
+                self.dirty = True
+            elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
                 self.width = max(0, self.width - 0.1)
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight - weight_factor))
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -98,14 +135,15 @@ class ND_OT_edge_bevel(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_ctrl_alt:
+            if no_stream(self.width_input_stream) and self.key_ctrl_alt:
                 self.width = max(0, self.width + self.mouse_value)
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, min(1, self.profile + self.mouse_value))
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight + self.mouse_value))
-
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -123,6 +161,11 @@ class ND_OT_edge_bevel(bpy.types.Operator):
         self.width = 0.5
         self.profile = 0.5
         self.harden_normals = False
+
+        self.segments_input_stream = new_stream()
+        self.weight_input_stream = new_stream()
+        self.width_input_stream = new_stream()
+        self.profile_input_stream = new_stream()
 
         if not context.object.data.use_customdata_edge_bevel:
             context.object.data.use_customdata_edge_bevel = True
@@ -261,14 +304,16 @@ def draw_text_callback(self):
         "(±0.1)  |  Shift (±0.01)",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.weight_input_stream)
 
     draw_property(
         self,
         "Segments: {}".format(self.segments), 
         "Alt (±2)  |  Shift (±1)",
         active=self.key_alt,
-        alt_mode=self.key_shift_alt)
+        alt_mode=self.key_shift_alt,
+        input_stream=self.segments_input_stream)
 
     draw_property(
         self, 
@@ -276,15 +321,22 @@ def draw_text_callback(self):
         "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.profile_input_stream)
 
     draw_property(
         self,
-        "Width: {0:.0f}  /  Harden Normals [H]: {1}".format(self.width * 1000, "Yes" if self.harden_normals else "No"),
-        "Ctrl + Alt (±100)  |  Shift + Ctrl + Alt (Yes, No)",
+        "Width: {0:.0f}".format(self.width * 1000),
+        "Ctrl + Alt (±100) | Shift + Ctrl + Alt (±10)",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
-        mouse_value=(not self.key_shift_ctrl_alt))
+        mouse_value=True,
+        input_stream=self.width_input_stream)
+
+    draw_hint(
+        self,
+        "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
+        "Match normals of new faces to adjacent faces")
 
 
 def menu_func(self, context):

@@ -12,7 +12,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.viewport import set_3d_cursor
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 
 
 class ND_OT_view_align(bpy.types.Operator):
@@ -41,15 +41,9 @@ class ND_OT_view_align(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif self.key_step_up:
-            if self.key_alt:
-                self.selection_type = (self.selection_type + 1) % 3
-                self.set_selection_mode(context)
-            
-        elif self.key_step_down:
-            if self.key_alt:
-                self.selection_type = (self.selection_type - 1) % 3
-                self.set_selection_mode(context)
+        elif pressed(event, {'S'}):
+            self.selection_type = (self.selection_type + 1) % 3
+            self.set_selection_mode(context)
 
         elif self.key_one:
             self.selection_type = 0
@@ -228,14 +222,12 @@ class ND_OT_view_align(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(self, "Select geometry...", "Press space to confirm")
+    draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
 
-    draw_property(
+    draw_hint(
         self,
-        "Selection Type: {0}".format(['Vertex', 'Edge', 'Face'][self.selection_type]),
-        "Alt / 1, 2, 3 (Vertex, Edge, Face)",
-        active=self.key_alt,
-        alt_mode=False)
+        "Selection Type [S,1,2,3]: {0}".format(['Vertex', 'Edge', 'Face'][self.selection_type]),
+        "Type of geometry to select (Vertex, Edge, Face)")
 
 
 def menu_func(self, context):

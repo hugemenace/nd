@@ -17,6 +17,7 @@ from .. lib.events import capture_modifier_keys
 from .. lib.assets import get_asset_path
 from .. lib.objects import align_object_to_3d_cursor
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_displace = "Offset — ND SH"
@@ -51,39 +52,61 @@ class ND_OT_screw_head(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif self.key_increase_factor:
+        elif self.key_numeric_input:
             if self.key_alt:
-                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
+                self.scale_input_stream = update_stream(self.scale_input_stream, event.type)
+                self.scale = get_stream_value(self.scale_input_stream, 0.01)
+                self.dirty = True
             elif self.key_ctrl:
+                self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_alt:
+                self.scale_input_stream = new_stream()
+                self.scale = 1
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = new_stream()
+                self.offset = 0
+                self.dirty = True
+
+        elif self.key_increase_factor:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
+            elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.base_scale_factor = min(1, self.base_scale_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
-            elif self.key_ctrl:
+            elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.base_scale_factor = max(0.001, self.base_scale_factor / 10.0)
 
         elif self.key_step_up:
             if self.key_no_modifiers:
                 self.head_type_index = (self.head_type_index + 1) % len(self.objects)
                 self.update_head_type(context)
-            elif self.key_alt:
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += offset_factor
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale += scale_factor
-            
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
             if self.key_no_modifiers:
                 self.head_type_index = (self.head_type_index - 1) % len(self.objects)
                 self.update_head_type(context)
-            elif self.key_alt:
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset -= offset_factor
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale -= scale_factor
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -94,9 +117,9 @@ class ND_OT_screw_head(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_alt:
+            if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
-            elif self.key_ctrl:
+            elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale += self.mouse_value
 
             self.dirty = True
@@ -117,6 +140,9 @@ class ND_OT_screw_head(bpy.types.Operator):
         self.head_type_index = 0
         self.offset = 0
         self.scale = 1
+
+        self.offset_input_stream = new_stream()
+        self.scale_input_stream = new_stream()
 
         self.target_object = context.active_object if len(context.selected_objects) > 0 else None
 
@@ -181,6 +207,7 @@ class ND_OT_screw_head(bpy.types.Operator):
         displace = self.obj.modifiers.new(mod_displace, 'DISPLACE')
         displace.direction = 'Z'
         displace.space = 'LOCAL'
+        displace.mid_level = 0
 
         self.displace = displace
 
@@ -232,19 +259,21 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Offset: {0:.1f}".format(self.offset * 1000), 
-        "Alt (±{0:.1f})  |  Shift + Alt (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        "Scale: {0:.2f}%".format(self.scale * 100),
+        "Alt (±{0:.2f}%)  |  Shift + Alt (±{1:.2f}%)".format(self.base_scale_factor * 100, (self.base_scale_factor / 10) * 100),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.scale_input_stream)
 
     draw_property(
         self,
-        "Scale: {0:.2f}%".format(self.scale * 100),
-        "Ctrl (±{0:.2f}%)  |  Shift + Ctrl (±{1:.2f}%)".format(self.base_scale_factor * 100, (self.base_scale_factor / 10) * 100),
+        "Offset: {0:.1f}".format(self.offset * 1000), 
+        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.offset_input_stream)
 
 
 def menu_func(self, context):

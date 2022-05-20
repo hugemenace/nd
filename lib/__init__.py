@@ -19,6 +19,7 @@ from . import assets
 from . import updates
 from . import preferences
 from . import collections
+from . import bools
 from . import numeric_input
 from . import overlay_keys
 
@@ -35,6 +36,7 @@ registerables = (
     updates,
     preferences,
     collections,
+    bools,
     numeric_input,
     overlay_keys
 )

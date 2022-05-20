@@ -10,6 +10,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
+from .. lib.bools import move_bool_under_bevels
 
 
 class ND_OT_bool_slice(bpy.types.Operator):
@@ -43,10 +44,14 @@ class ND_OT_bool_slice(bpy.types.Operator):
         boolean_diff.object = reference_obj
         boolean_diff.solver = solver
 
+        move_bool_under_bevels(difference_obj, boolean_diff.name)
+
         boolean_isect = intersecting_obj.modifiers.new("Intersection — ND Bool", 'BOOLEAN')
         boolean_isect.operation = 'INTERSECT'
         boolean_isect.object = reference_obj
         boolean_isect.solver = solver
+        
+        move_bool_under_bevels(intersecting_obj, boolean_isect.name)
 
         reference_obj.display_type = 'WIRE'
         reference_obj.hide_render = True

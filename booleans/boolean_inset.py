@@ -15,6 +15,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.bools import move_bool_under_bevels, remove_problematic_bevels
 
 
 class ND_OT_bool_inset(bpy.types.Operator):
@@ -126,6 +127,8 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.boolean_diff.object = self.intersecting_obj
         self.boolean_diff.solver = solver
 
+        move_bool_under_bevels(self.target_obj, self.boolean_diff.name)
+
         self.solidify = self.intersecting_obj.modifiers.new("Thickness — ND Bool", 'SOLIDIFY')
         self.solidify.use_even_offset = True
         self.solidify.offset = 0
@@ -134,6 +137,8 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.boolean_isect.operation = 'INTERSECT'
         self.boolean_isect.object = self.reference_obj
         self.boolean_isect.solver = solver
+
+        remove_problematic_bevels(self.intersecting_obj)
 
         self.reference_obj_display_type_prev = self.reference_obj.display_type
         self.reference_obj_hide_render_prev = self.reference_obj.hide_render

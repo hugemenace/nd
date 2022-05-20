@@ -41,7 +41,7 @@ SHIFT — Cycle through the modifier stack"""
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'R'}):
+        elif pressed(event, {'M'}):
             self.mod_cycle = not self.mod_cycle
             self.prepare_mode(context)
 
@@ -51,34 +51,20 @@ SHIFT — Cycle through the modifier stack"""
             self.toggle_frozen_util(self.util_current_index)
 
         elif self.key_step_up:
-            if self.key_ctrl:
-                self.mod_cycle = not self.mod_cycle
-                self.prepare_mode(context)
-            elif self.mod_cycle:
+            if self.mod_cycle:
                 self.mod_current_index = min(self.mod_current_index + 1, self.mod_count - 1)
-            elif not self.mod_cycle:
-                if self.util_count > 0:
-                    if self.key_alt:
-                        self.toggle_frozen_util(self.util_current_index)
-                    else:
-                        self.util_current_index = (self.util_current_index + 1) % self.util_count
-
-            self.dirty = True
+                self.dirty = True
+            elif not self.mod_cycle and self.util_count > 0:
+                self.util_current_index = (self.util_current_index + 1) % self.util_count
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_ctrl:
-                self.mod_cycle = not self.mod_cycle
-                self.prepare_mode(context)
-            elif self.mod_cycle:
+            if self.mod_cycle:
                 self.mod_current_index = max(self.mod_current_index - 1, -1)
-            elif not self.mod_cycle:
-                if self.util_count > 0:
-                    if self.key_alt:
-                        self.toggle_frozen_util(self.util_current_index)
-                    else:
-                        self.util_current_index = (self.util_current_index - 1) % self.util_count
-
-            self.dirty = True
+                self.dirty = True
+            elif not self.mod_cycle and self.util_count > 0:
+                self.util_current_index = (self.util_current_index - 1) % self.util_count
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -228,7 +214,7 @@ def draw_text_callback(self):
                 self,
                 "Modifier: {0}".format("None" if self.mod_current_index == -1 else self.mod_names[self.mod_current_index]),
                 "Active: {0}  /  Total: {1}".format(self.mod_current_index + 1, self.mod_count),
-                active=self.key_no_modifiers,
+                active=True,
                 alt_mode=False)
         else:
             draw_hint(self, "Whoops", "Looks like there are no modifiers to view.")
@@ -238,24 +224,20 @@ def draw_text_callback(self):
                 self,
                 "Utility: {0}".format(self.util_names[self.util_current_index]),
                 "Current: {0}  /  Total: {1}".format(self.util_current_index + 1, self.util_count),
-                active=self.key_no_modifiers,
+                active=True,
                 alt_mode=False)
 
-            draw_property(
+            draw_hint(
                 self,
                 "Frozen [F]: {0}".format("Yes" if self.util_objects[self.util_current_index].object in self.frozen_utils else "No"),
-                "Alt (Yes, No)",
-                active=self.key_alt,
-                alt_mode=False)
+                "Keep the current utility selected while cycling")
         else:
             draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
 
-    draw_property(
+    draw_hint(
         self,
-        "Mode [R]: {0}".format("Modifier" if self.mod_cycle else "Utility"),
-        "Ctrl (Modifier, Utility)",
-        active=self.key_ctrl,
-        alt_mode=False)
+        "Mode [M]: {0}".format("Modifier" if self.mod_cycle else "Utility"),
+        "Switch modes (Modifier, Utility)")
 
 
 def menu_func(self, context):

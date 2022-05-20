@@ -9,7 +9,7 @@
 
 import bpy
 import bmesh
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 
 
@@ -44,20 +44,14 @@ class ND_OT_hydrate(bpy.types.Operator):
             self.dirty = True
 
         elif self.key_step_up:
-            if self.key_alt:
-                self.clear_parent = not self.clear_parent
-            else:
+            if self.key_no_modifiers:
                 self.active_collection = (self.active_collection + 1) % (len(self.all_collections) + 1)
-
-            self.dirty = True
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_alt:
-                self.clear_parent = not self.clear_parent
-            else:
+            if self.key_no_modifiers:
                 self.active_collection = (self.active_collection - 1) % (len(self.all_collections) + 1)
-
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -142,15 +136,13 @@ def draw_text_callback(self):
         self, 
         "Collection: {0}".format("N/A — Scene" if self.active_collection >= len(self.all_collections) else self.all_collections[self.active_collection]),
         "Where to place the new object...",
-        active=self.key_no_modifiers,
+        active=True,
         alt_mode=False)
 
-    draw_property(
-        self, 
-        "Clear parent [C]: {0}".format("Yes" if self.clear_parent else "No"),
-        "Alt (Yes, No)",
-        active=self.key_alt,
-        alt_mode=False)
+    draw_hint(
+        self,
+        "Clear Parent [C]: {0}".format("Yes" if self.clear_parent else "No"),
+        "Unparent the new object from the original target object")
 
 
 def menu_func(self, context):

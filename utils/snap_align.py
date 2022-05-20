@@ -267,11 +267,11 @@ class ND_OT_snap_align(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(self, "Select snap point", "Hover over the selected object to view snap points")
+    draw_hint(self, "Select Snap Point", "Hover over the selected object to view snap points")
 
     draw_property(
         self,
-        "Capture Points [C]  /  Reset [R]",
+        "Capture Point [C]  /  Reset [R]",
         "{}".format("{}/2 Snap points captured!".format(len(self.capture_points)) if len(self.capture_points) > 0 else "No points captured..."),
         active=len(self.capture_points) > 0,
         alt_mode=len(self.capture_points) == 1)

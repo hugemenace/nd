@@ -44,7 +44,7 @@ ALT — Mirror across selected object's geometry"""
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'R'}):
+        elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
@@ -67,32 +67,10 @@ ALT — Mirror across selected object's geometry"""
                 self.geometry_selection_type = 2
                 self.set_selection_mode(context)
 
-        elif self.key_step_up:
-            if self.geometry_mode and not self.geometry_ready:
-                if self.key_alt:
-                    self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
-                    self.set_selection_mode(context)
-            elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
-                if self.key_alt:
-                    self.flip = not self.flip
-                else:
-                    self.axis = (self.axis + 1) % 3
+        elif pressed(event, {'S'}):
+            self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
+            self.set_selection_mode(context)
 
-            self.dirty = True
-            
-        elif self.key_step_down:
-            if self.geometry_mode and not self.geometry_ready:
-                if self.key_alt:
-                    self.geometry_selection_type = (self.geometry_selection_type - 1) % 3
-                    self.set_selection_mode(context)
-            elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
-                if self.key_alt:
-                    self.flip = not self.flip
-                else:
-                    self.axis = (self.axis - 1) % 3
-
-            self.dirty = True        
-        
         elif self.key_confirm_alternative:
             if self.geometry_mode and not self.geometry_ready:
                 return self.complete_geometry_mode(context)
@@ -376,28 +354,22 @@ def draw_text_callback(self):
     draw_header(self)
 
     if self.geometry_mode and not self.geometry_ready:
-        draw_hint(self, "Select geometry...", "Press space to confirm")
+        draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to mirrored across")
 
-        draw_property(
+        draw_hint(
             self,
-            "Selection Type: {0}".format(['Vertex', 'Edge', 'Face'][self.geometry_selection_type]),
-            "Alt / 1, 2, 3 (Vertex, Edge, Face)",
-            active=self.key_alt,
-            alt_mode=False)
+            "Selection Type [S,1,2,3]: {0}".format(['Vertex', 'Edge', 'Face'][self.geometry_selection_type]),
+            "Type of geometry to select (Vertex, Edge, Face)")
     elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
-        draw_property(
-            self, 
-            "Axis [R]: {}".format(['X', 'Y', 'Z'][self.axis]),
-            "X, Y, Z",
-            active=self.key_no_modifiers,
-            alt_mode=False)
+        draw_hint(
+            self,
+            "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+            "Axis to mirror across (X, Y, Z)")
 
-        draw_property(
-            self, 
+        draw_hint(
+            self,
             "Flipped [F]: {}".format('Yes' if self.flip else 'No'),
-            "Alt (Yes, No)",
-            active=self.key_alt,
-            alt_mode=False)
+            "Flip the mirror direction")
 
 
 def menu_func(self, context):

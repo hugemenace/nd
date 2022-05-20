@@ -1,3 +1,10 @@
+# ███╗   ██╗██████╗ 
+# ████╗  ██║██╔══██╗
+# ██╔██╗ ██║██║  ██║
+# ██║╚██╗██║██║  ██║
+# ██║ ╚████║██████╔╝
+# ╚═╝  ╚═══╝╚═════╝ 
+# 
 # “Commons Clause” License Condition v1.0
 # 
 # See LICENSE for license details. If you did not receive a copy of the license,
@@ -6,6 +13,10 @@
 # Software: ND Blender Addon
 # License: MIT
 # Licensor: T.S. & I.J. (HugeMenace)
+# 
+# ---
+# Contributors: Tristo (HM)
+# ---
 
 bl_info = {
     "name": "HugeMenace — ND",
@@ -335,6 +346,16 @@ def register():
     bpy.utils.register_class(NDPreferences)
 
     lib.preferences.get_preferences().update_available = lib.updates.update_available(bl_info['version'])
+
+    print("""
+███╗   ██╗██████╗ 
+████╗  ██║██╔══██╗
+██╔██╗ ██║██║  ██║
+██║╚██╗██║██║  ██║
+██║ ╚████║██████╔╝
+╚═╝  ╚═══╝╚═════╝
+HugeMenace — ND Addon v%s
+    """ % ('.'.join([str(v) for v in bl_info['version']])));
 
 
 def unregister():

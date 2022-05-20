@@ -1,3 +1,10 @@
+# ███╗   ██╗██████╗ 
+# ████╗  ██║██╔══██╗
+# ██╔██╗ ██║██║  ██║
+# ██║╚██╗██║██║  ██║
+# ██║ ╚████║██████╔╝
+# ╚═╝  ╚═══╝╚═════╝ 
+# 
 # “Commons Clause” License Condition v1.0
 # 
 # See LICENSE for license details. If you did not receive a copy of the license,
@@ -6,6 +13,10 @@
 # Software: ND Blender Addon
 # License: MIT
 # Licensor: T.S. & I.J. (HugeMenace)
+# 
+# ---
+# Contributors: Tristo (HM)
+# ---
 
 import bpy
 from mathutils import Vector

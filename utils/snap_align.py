@@ -100,9 +100,6 @@ class ND_OT_snap_align(bpy.types.Operator):
                 self.affected_boolean_modifiers[mod.name] = mod.show_viewport
                 mod.show_viewport = False
 
-        self.triangulate_modifier = context.active_object.modifiers.new('Snap Align Triangulate — ND', 'TRIANGULATE')
-        self.triangulate_modifier.min_vertices = 5
-
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.object.evaluated_get(depsgraph)
 
@@ -126,7 +123,7 @@ class ND_OT_snap_align(bpy.types.Operator):
         face_points = []
         for face in bm.faces:
             face_matrix = create_rotation_matrix_from_face(world_matrix, face)
-            face_points.append((world_matrix @ v3_average([v.co for v in face.verts]), face_matrix))
+            face_points.append((world_matrix @ face.calc_center_median(), face_matrix))
 
         average_edge_length = sum(edge_lengths) / len(edge_lengths)
         self.snap_distance_factor = average_edge_length / 2.0
@@ -239,8 +236,6 @@ class ND_OT_snap_align(bpy.types.Operator):
         for mod in context.active_object.modifiers:
             if mod.type == 'BOOLEAN' and mod.object == self.reference_obj:
                 mod.show_viewport = self.affected_boolean_modifiers[mod.name]
-
-        context.active_object.modifiers.remove(self.triangulate_modifier)
 
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)

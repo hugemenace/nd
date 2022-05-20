@@ -12,6 +12,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_bevel = "Bevel — ND VB"
@@ -51,33 +52,63 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
 
             return {'CANCELLED'}
 
-        elif self.key_increase_factor:
+        elif self.key_numeric_input:
             if self.key_no_modifiers:
+                self.width_input_stream = update_stream(self.width_input_stream, event.type)
+                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.dirty = True
+            elif self.key_alt:
+                self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
+                self.segments = get_stream_value(self.segments_input_stream)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.profile_input_stream = update_stream(self.profile_input_stream, event.type)
+                self.profile = get_stream_value(self.profile_input_stream)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.width_input_stream = new_stream()
+                self.width = 0
+                self.dirty = True
+            elif self.key_alt:
+                self.segments_input_stream = new_stream()
+                self.segments = 1
+                self.dirty = True
+            elif self.key_ctrl:
+                self.profile_input_stream = new_stream()
+                self.profile = 0.5
+                self.dirty = True
+
+        elif self.key_increase_factor:
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_no_modifiers:
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
         
         elif self.key_step_up:
-            if self.key_alt:
+            if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, self.profile + profile_factor)
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width += width_factor
-            
-            self.dirty = True
+                self.dirty = True
         
         elif self.key_step_down:
-            if self.key_alt:
+            if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, self.profile - profile_factor)
-            elif self.key_no_modifiers:
+                self.dirty = True
+            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width - width_factor)
-
-            self.dirty = True
+                self.dirty = True
 
         elif self.key_confirm:
             self.finish(context)
@@ -88,12 +119,12 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers:
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width + self.mouse_value)
-            elif self.key_ctrl:
+                self.dirty = True
+            elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, min(1, self.profile + self.mouse_value))
-
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -112,6 +143,10 @@ SHIFT — Place modifiers at the top of the stack (post-sketch)"""
         self.segments = 1
         self.width = 0
         self.profile = 0.5
+
+        self.segments_input_stream = new_stream()
+        self.width_input_stream = new_stream()
+        self.profile_input_stream = new_stream()
 
         previous_op = False
 
@@ -265,27 +300,30 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
+        self,
         "Width: {0:.1f}".format(self.width * 1000), 
         "(±{0:.1f})  |  Shift (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.width_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Segments: {}".format(self.segments), 
-        "Alt (±2)  |  Shift + Alt (±1)",
+        "Alt (±2)  |  Shift (±1)",
         active=self.key_alt,
-        alt_mode=self.key_shift_alt)
-    
+        alt_mode=self.key_shift_alt,
+        input_stream=self.segments_input_stream)
+
     draw_property(
         self, 
         "Profile: {0:.2f}".format(self.profile),
         "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.profile_input_stream)
 
 
 def menu_func(self, context):

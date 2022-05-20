@@ -13,6 +13,7 @@ from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_bevel = "Bevel — ND WNB"
@@ -47,22 +48,36 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
             self.revert(context)
 
             return {'CANCELLED'}
+        
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.width_input_stream = update_stream(self.width_input_stream, event.type)
+                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.width_input_stream = new_stream()
+                self.width = 0
+                self.dirty = True
 
         elif self.key_increase_factor:
-            self.base_width_factor = min(1, self.base_width_factor * 10.0)
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
+                self.base_width_factor = min(1, self.base_width_factor * 10.0)
 
         elif self.key_decrease_factor:
-            self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
+                self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
 
         elif self.key_step_up:
-            self.width += width_factor
-
-            self.dirty = True
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
+                self.width += width_factor
+                self.dirty = True
             
         elif self.key_step_down:
-            self.width = max(0.0001, self.width - width_factor)
-
-            self.dirty = True
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
+                self.width = max(0.0001, self.width - width_factor)
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -73,9 +88,9 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            self.width = max(0.0001, self.width + self.mouse_value)
-
-            self.dirty = True
+            if no_stream(self.width_input_stream) and self.key_no_modifiers:
+                self.width = max(0.0001, self.width + self.mouse_value)
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -88,6 +103,8 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_width_factor = 0.001
+
+        self.width_input_stream = new_stream()
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -186,9 +203,10 @@ def draw_text_callback(self):
         self,
         "Width: {0:.1f}".format(self.width * 1000), 
         "(±{0:.1f})  |  Shift (±{1:.1f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
-        active=True,
+        active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.width_input_stream)
 
 
 def menu_func(self, context):

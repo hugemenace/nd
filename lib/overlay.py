@@ -144,11 +144,15 @@ def draw_header(cls):
     cls.line_step = 0
 
 
-def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False, mouse_value=False):
+def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False, mouse_value=False, input_stream=None):
     blf.size(0, 28, cls.dpi)
+
+    is_ok, is_value, is_raw = input_stream or (False, None, None)
     
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
+    elif is_value is not None and active:
+        blf.color(0, 237/255, 185/255, 94/255, 1.0)
     elif active:
         blf.color(0, 55/255, 174/255, 255/255, 1.0)
     else:
@@ -184,7 +188,11 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
         blf.color(0, 255/255, 255/255, 255/255, 0.3)
 
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((40 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
-    blf.draw(0, metadata_content)
+
+    if is_value is not None:
+        blf.draw(0, "Manual Override — [{}] to reset.".format(get_preferences().overlay_reset_key))
+    else:
+        blf.draw(0, metadata_content)
 
     cls.line_step += 1
 

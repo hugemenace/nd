@@ -180,6 +180,24 @@ class NDPreferences(AddonPreferences):
         default="P",
     )
 
+    overlay_reset_key: EnumProperty(
+        name="Reset Option Key",
+        items=lib.overlay_keys.overlay_keys_enum,
+        default="X",
+    )
+
+    overlay_increase_factor: EnumProperty(
+        name="Increase Option Factor",
+        items=lib.overlay_keys.overlay_keys_enum,
+        default="RIGHT_BRACKET",
+    )
+
+    overlay_decrease_factor: EnumProperty(
+        name="Decrease Option Factor",
+        items=lib.overlay_keys.overlay_keys_enum,
+        default="LEFT_BRACKET",
+    )
+
     custom_screw_heads_path: StringProperty(
         name="Custom Screw Heads",
         subtype='FILE_PATH',
@@ -276,6 +294,18 @@ class NDPreferences(AddonPreferences):
         column = box.column(align=True)
         row = column.row()
         row.prop(self, "overlay_pause_key")
+        
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "overlay_reset_key")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "overlay_increase_factor")
+
+        column = box.column(align=True)
+        row = column.row()
+        row.prop(self, "overlay_decrease_factor")
 
         name = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
         wm = bpy.context.window_manager

@@ -10,9 +10,10 @@
 import bpy
 import bmesh
 from math import radians
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
 mod_displace = "Offset — ND SOL"
@@ -49,41 +50,57 @@ class ND_OT_solidify(bpy.types.Operator):
 
             return {'CANCELLED'}
 
-        elif pressed(event, {'T'}):
+        elif self.key_numeric_input:
+            if self.key_no_modifiers:
+                self.thickness_input_stream = update_stream(self.thickness_input_stream, event.type)
+                self.thickness = get_stream_value(self.thickness_input_stream, 0.001)
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.dirty = True
+
+        elif self.key_reset:
+            if self.key_no_modifiers:
+                self.thickness_input_stream = new_stream()
+                self.thickness = 0
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = new_stream()
+                self.offset = 0
+                self.dirty = True
+
+        elif pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             self.dirty = True
 
         elif self.key_increase_factor:
-            if self.key_ctrl:
-                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
-            elif self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.base_thickness_factor = min(1, self.base_thickness_factor * 10.0)
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
 
         elif self.key_decrease_factor:
-            if self.key_ctrl:
-                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
-            elif self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                self.base_thickness_factor = max(0.001, self.base_thickness_factor / 10.0)
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
 
         elif self.key_step_up:
-            if self.key_alt:
-                self.weighting = self.weighting + 1 if self.weighting < 1 else -1
-            elif self.key_ctrl:
-                self.offset += offset_factor
-            elif self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness += thickness_factor
-
-            self.dirty = True
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.offset += offset_factor
+                self.dirty = True
             
         elif self.key_step_down:
-            if self.key_alt:
-                self.weighting = self.weighting - 1 if self.weighting > -1 else 1
-            elif self.key_ctrl:
-                self.offset -= offset_factor
-            elif self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - thickness_factor)
-
-            self.dirty = True
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.offset -= offset_factor
+                self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -94,12 +111,12 @@ class ND_OT_solidify(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_ctrl:
-                self.offset += self.mouse_value
-            elif self.key_no_modifiers:
+            if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness + self.mouse_value)
-
-            self.dirty = True
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.offset += self.mouse_value
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -113,6 +130,9 @@ class ND_OT_solidify(bpy.types.Operator):
         self.dirty = False
         self.base_thickness_factor = 0.01
         self.base_offset_factor = 0.001
+
+        self.thickness_input_stream = new_stream()
+        self.offset_input_stream = new_stream()
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -144,7 +164,7 @@ class ND_OT_solidify(bpy.types.Operator):
     def prepare_new_operator(self, context):
         self.summoned = False
 
-        self.thickness = 0.02
+        self.thickness = 0
         self.weighting = 0
         self.offset = 0
 
@@ -172,6 +192,7 @@ class ND_OT_solidify(bpy.types.Operator):
 
     def add_displace_modifier(self, context):
         displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
+        displace.mid_level = 0
 
         self.displace = displace
 
@@ -217,14 +238,8 @@ def draw_text_callback(self):
         "(±{0:.1f})  |  Shift + (±{1:.1f})".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True)
-
-    draw_property(
-        self, 
-        "Weighting [T]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
-        "Alt (Negative, Neutral, Positive)",
-        active=self.key_alt,
-        alt_mode=False)
+        mouse_value=True,
+        input_stream=self.thickness_input_stream)
 
     draw_property(
         self, 
@@ -232,7 +247,13 @@ def draw_text_callback(self):
         "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
-        mouse_value=True)
+        mouse_value=True,
+        input_stream=self.offset_input_stream)
+
+    draw_hint(
+        self,
+        "Weighting [W]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
+        "Negative, Neutral, Positive")
 
 
 def menu_func(self, context):

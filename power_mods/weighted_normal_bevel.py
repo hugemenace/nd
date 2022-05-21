@@ -172,7 +172,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
         context.object.data.use_auto_smooth = True
-        context.object.data.auto_smooth_angle = radians(30)
+        context.object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_bevel_modifier(self, context):

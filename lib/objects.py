@@ -21,6 +21,7 @@
 import bpy 
 import bmesh
 from math import radians
+from . preferences import get_preferences
 
 
 def add_single_vertex_object(cls, context, name):
@@ -40,7 +41,7 @@ def add_single_vertex_object(cls, context, name):
     
     bpy.ops.object.shade_smooth()
     obj.data.use_auto_smooth = True
-    obj.data.auto_smooth_angle = radians(30)
+    obj.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
     
     cls.obj = obj
 

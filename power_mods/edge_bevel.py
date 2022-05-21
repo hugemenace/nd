@@ -20,6 +20,7 @@
 
 import bpy
 import bmesh
+from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -222,6 +223,7 @@ SHIFT — Place modifiers at the top of the stack"""
     def prepare_new_operator(self, context):
         self.summoned = False
 
+        self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
 
 
@@ -234,6 +236,14 @@ SHIFT — Place modifiers at the top of the stack"""
         self.segments_prev = self.segments = self.bevel.segments
         self.profile_prev = self.profile = self.bevel.profile
         self.harden_normals_prev = self.harden_normals = self.bevel.harden_normals
+
+
+    def add_smooth_shading(self, context):
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.shade_smooth()
+        context.object.data.use_auto_smooth = True
+        context.object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_bevel_modifier(self, context):

@@ -64,7 +64,7 @@ class ND_OT_smooth(bpy.types.Operator):
         elif self.key_reset:
             if self.key_no_modifiers:
                 self.angle_input_stream = new_stream()
-                self.angle = 30
+                self.angle = float(get_preferences().default_smoothing_angle)
                 self.dirty = True
 
         elif self.key_step_up:
@@ -101,7 +101,7 @@ class ND_OT_smooth(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_angle_factor = 15
-        self.angle = 30
+        self.angle = float(get_preferences().default_smoothing_angle)
 
         self.angle_input_stream = new_stream()
 

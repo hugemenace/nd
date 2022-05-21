@@ -179,6 +179,16 @@ class NDPreferences(AddonPreferences):
         default="GENERAL",
     )
 
+    default_smoothing_angle: EnumProperty(
+        name="Default Smooting Angle",
+        items=[
+            ("30", "30°", ""),
+            ("45", "45°", ""),
+            ("60", "60°", ""),
+        ],
+        default="30",
+    )
+
     overlay_pause_key: EnumProperty(
         name="Pause Key",
         items=lib.overlay_keys.overlay_keys_enum,
@@ -232,33 +242,29 @@ class NDPreferences(AddonPreferences):
 
 
     def draw_general(self, box):
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "utils_collection_name")
+        general_prefs = [
+            "utils_collection_name",
+            "use_fast_booleans",
+            "recon_poly_solidify"]
 
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "use_fast_booleans")
+        for pref in general_prefs:
+            column = box.column(align=True)
+            row = column.row()
+            row.prop(self, pref)
 
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "recon_poly_solidify")
+        general_boxed_prefs = [
+            ["The default angle to use for smoothing operations (eg. auto-smooth)", "default_smoothing_angle", True],
+            ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False],
+            ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False]]
 
-        box2 = box.box()
-        column = box2.column(align=True)
-        row = column.row()
-        row.label(text="Set a path for a custom screw heads .blend file")
-        column = box2.column(align=True)
-        row = column.row()
-        row.prop(self, "custom_screw_heads_path")
-
-        box3 = box.box()
-        column = box3.column(align=True)
-        row = column.row()
-        row.label(text="Enable deprecated features for short term backwards compatibility", icon="ERROR")
-        column = box3.column(align=True)
-        row = column.row()
-        row.prop(self, "enable_deprecated_features")
+        for label, prop, expanded in general_boxed_prefs:
+            pref_box = box.box()
+            column = pref_box.column(align=True)
+            row = column.row()
+            row.label(text=label)
+            column = pref_box.column(align=True)
+            row = column.row()
+            row.prop(self, prop, expand=expanded)
 
     
     def draw_ui(self, box):

@@ -36,7 +36,7 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
     bl_idname = "nd.vertex_bevel"
     bl_label = "Vertex Bevel"
     bl_description = """Adds a vertex group bevel and weld modifier
-SHIFT — Place modifiers at the top of the stack (post-sketch)"""
+SHIFT — Place modifiers at the bottom of the stack"""
     bl_options = {'UNDO'}
 
 

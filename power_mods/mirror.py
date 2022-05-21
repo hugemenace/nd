@@ -32,7 +32,8 @@ class ND_OT_mirror(bpy.types.Operator):
     bl_idname = "nd.mirror"
     bl_label = "Mirror"
     bl_description = """Mirror an object in isolation, or across another object
-ALT — Mirror across selected object's geometry"""
+ALT — Mirror across selected object's geometry
+SHIFT — Place modifiers at the top of the stack"""
     bl_options = {'UNDO'}
 
 
@@ -110,6 +111,7 @@ ALT — Mirror across selected object's geometry"""
 
     def invoke(self, context, event):
         self.geometry_mode = event.alt
+        self.early_apply = event.shift
         self.geometry_ready = False
         self.geometry_selection_type = 2 # ['VERT', 'EDGE', 'FACE']
 
@@ -308,6 +310,10 @@ ALT — Mirror across selected object's geometry"""
                 mirror.mirror_object = self.mirror_obj
 
             self.mirrors.append(mirror)
+
+            if self.early_apply:
+                while obj.modifiers[0].name != mirror.name:
+                    bpy.ops.object.modifier_move_up({'object': obj}, modifier=mirror.name)
     
 
     def operate(self, context):

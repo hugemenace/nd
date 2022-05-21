@@ -34,7 +34,8 @@ mod_summon_list = [mod_bevel, mod_weld]
 class ND_OT_edge_bevel(bpy.types.Operator):
     bl_idname = "nd.edge_bevel"
     bl_label = "Edge Bevel"
-    bl_description = "Adds a weighted edge bevel modifier to the selected object"
+    bl_description = """Adds a weighted edge bevel modifier to the selected object
+SHIFT — Place modifiers at the top of the stack"""
     bl_options = {'UNDO'}
 
 
@@ -170,6 +171,7 @@ class ND_OT_edge_bevel(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.dirty = False
+        self.early_apply = event.shift
 
         self.segments = 1
         self.weight = 0
@@ -241,7 +243,11 @@ class ND_OT_edge_bevel(bpy.types.Operator):
 
         self.bevel = bevel
 
-    
+        if self.early_apply:
+            while context.object.modifiers[0].name != self.bevel.name:
+                bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
+
+
     def add_weld_modifier(self, context):
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -252,6 +258,10 @@ class ND_OT_edge_bevel(bpy.types.Operator):
             weld.merge_threshold = 0.00001
 
             self.weld = weld
+
+            if self.early_apply:
+                while context.object.modifiers[1].name != self.weld.name:
+                    bpy.ops.object.modifier_move_up(modifier=self.weld.name)
 
 
     def take_edges_snapshot(self, context):

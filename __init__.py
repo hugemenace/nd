@@ -262,61 +262,38 @@ class NDPreferences(AddonPreferences):
 
     
     def draw_ui(self, box):
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "overlay_dpi")
+        ui_prefs = [
+            ["overlay_dpi"],
+            ["enable_mouse_values"],
+            ["mouse_value_scalar"],
+            ["enable_quick_favourites"],
+            ["lock_overlay_pinning"],
+            ["enable_axis_helper"],
+            ["axis_base_thickness", "axis_active_thickness", "axis_inactive_opacity"]]
 
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "enable_mouse_values")
+        for prefs in ui_prefs:
+            column = box.column(align=True)
+            row = column.row()
+            for pref in prefs:
+                row.prop(self, pref)
 
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "mouse_value_scalar")
 
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "enable_quick_favourites")
-
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "lock_overlay_pinning")
-        
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "enable_axis_helper")
-
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "axis_base_thickness")
-        row.prop(self, "axis_active_thickness")
-        row.prop(self, "axis_inactive_opacity")
-
-    
     def draw_keymap(self, box):
+        overlay_prefs = [
+            "overlay_pin_key",
+            "overlay_pause_key",
+            "overlay_reset_key",
+            "overlay_increase_factor",
+            "overlay_decrease_factor"]
+
         column = box.column(align=True)
         row = column.row()
         row.label(text="Overlay Keybinds")
 
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "overlay_pin_key")
-
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "overlay_pause_key")
-        
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "overlay_reset_key")
-
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "overlay_increase_factor")
-
-        column = box.column(align=True)
-        row = column.row()
-        row.prop(self, "overlay_decrease_factor")
+        for pref in overlay_prefs:
+            column = box.column(align=True)
+            row = column.row()
+            row.prop(self, pref)
 
         name = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
         wm = bpy.context.window_manager

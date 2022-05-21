@@ -25,6 +25,7 @@ from . import viewport_ui_panel
 from . import main_menu
 from . import sketch_menu
 from . import utils_menu
+from . import fast_menu
 from . import boolean_menu
 from . import bevel_menu
 from . import extrude_menu
@@ -42,6 +43,7 @@ registerables = (
     main_menu,
     sketch_menu,
     utils_menu,
+    fast_menu,
     boolean_menu,
     bevel_menu,
     extrude_menu,

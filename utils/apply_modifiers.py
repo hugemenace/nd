@@ -56,7 +56,11 @@ class ND_OT_apply_modifiers(bpy.types.Operator):
             if type == 'BEVEL' and mod.segments == 1 and mod.harden_normals:
                 continue
 
-            bpy.ops.object.modifier_apply({'object': obj}, modifier=name)
+            try:
+                bpy.ops.object.modifier_apply({'object': obj}, modifier=name)
+            except:
+                # If the modifier is disabled, just remove it.
+                bpy.ops.object.modifier_remove({'object': obj}, modifier=name)
 
 
 def menu_func(self, context):

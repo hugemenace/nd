@@ -180,9 +180,9 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
     def calculate_offset_strength(self):
         if self.weighting == -1:
-            return self.extrusion_length * -2
-        elif self.weighting == 0:
             return self.extrusion_length * -1
+        elif self.weighting == 0:
+            return self.extrusion_length * -0.5
         elif self.weighting == 1:
             return 0
 

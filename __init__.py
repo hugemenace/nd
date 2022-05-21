@@ -104,6 +104,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    enable_update_check: BoolProperty(
+        name="Enable Update Check",
+        default=True,
+    )
+
     overlay_pin_x: IntProperty(
         name="Overlay Pin X Coordinate",
         default=0,
@@ -255,6 +260,7 @@ class NDPreferences(AddonPreferences):
         general_boxed_prefs = [
             ["The default angle to use for smoothing operations (eg. auto-smooth)", "default_smoothing_angle", True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False],
+            ["Automatically check if addon is up to date when Blender starts", "enable_update_check", False],
             ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False]]
 
         for label, prop, expanded in general_boxed_prefs:
@@ -328,7 +334,10 @@ def register():
 
     bpy.utils.register_class(NDPreferences)
 
-    lib.preferences.get_preferences().update_available = lib.updates.update_available(bl_info['version'])
+    if lib.preferences.get_preferences().enable_update_check:
+        lib.preferences.get_preferences().update_available = lib.updates.update_available(bl_info['version'])
+    else:
+        lib.preferences.get_preferences().update_available = False
 
     print("""
 ███╗   ██╗██████╗ 

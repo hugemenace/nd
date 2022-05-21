@@ -44,6 +44,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout.operator("nd.seams", icon='UV_DATA')
         layout.operator("nd.clear_vgs", icon='GROUP_VERTEX')
         layout.operator("nd.triangulate", icon='MOD_TRIANGULATE')
+        layout.operator("nd.apply_modifiers", icon='ORPHAN_DATA')
         layout.separator()
         layout.operator("nd.hydrate", icon='SHADING_RENDERED')
         layout.operator("nd.flare", text="Flare (Lighting)", icon='LIGHT_AREA')

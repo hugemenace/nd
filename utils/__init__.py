@@ -26,6 +26,7 @@ from . import smooth
 from . import seams
 from . import hydrate
 from . import clear_vgs
+from . import apply_modifiers
 from . import cycle
 from . import flare
 from . import snap_align
@@ -40,6 +41,7 @@ registerables = (
     seams,
     hydrate,
     clear_vgs,
+    apply_modifiers,
     cycle,
     flare,
     snap_align,

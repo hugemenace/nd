@@ -46,8 +46,25 @@ class ND_MT_fast_menu(bpy.types.Menu):
         if len(objs) > 2:
             return self.draw_many_object_predictions(context)
 
-        layout.label(text="Sorry, ND could not make a prediction.", icon='LIBRARY_DATA_BROKEN')
+        return self.draw_no_predictions(context)
     
+
+    def draw_no_predictions(self, context):
+        layout = self.layout
+        layout.label(text="No predictions available", icon='ZOOM_SELECTED')
+
+
+    def draw_make_edge_face_ops(self, context):
+        layout = self.layout
+        layout.operator_context = 'INVOKE_DEFAULT'
+
+        layout.separator()
+
+        try:
+            layout.operator("mesh.f2", text="[F] Make Edge/Face", icon='MOD_SIMPLIFY')
+        except:
+            layout.operator("mesh.edge_face_add", text="[F] Make Edge/Face", icon='MOD_SIMPLIFY')
+
 
     def draw_no_object_predictions(self, context):
         layout = self.layout
@@ -100,6 +117,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             if self.profile:
                 layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
+
+            self.draw_make_edge_face_ops(context)
 
             return
 
@@ -165,7 +184,7 @@ def register():
 
     for mapping in [('3D View', 'VIEW_3D'), ('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
-        entry = keymap.keymap_items.new("wm.call_menu", 'F', 'PRESS', shift=True)
+        entry = keymap.keymap_items.new("wm.call_menu", 'F', 'PRESS')
         entry.properties.name = "ND_MT_fast_menu"
         keys.append((keymap, entry))
    

@@ -81,6 +81,13 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
+        obj_names = [obj.name for obj in context.selected_objects]
+        if all(["Bool —" in name for name in obj_names]):
+            layout.operator("nd.hydrate", icon='SHADING_RENDERED')
+            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
+
+            return
+
         layout.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
         layout.operator("nd.bool_slice", icon='MOD_BOOLEAN')
         layout.operator("nd.bool_inset", icon='MOD_BOOLEAN')
@@ -179,6 +186,13 @@ class ND_MT_fast_menu(bpy.types.Menu):
     def draw_many_object_predictions(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
+
+        obj_names = [obj.name for obj in context.selected_objects]
+        if all(["Bool —" in name for name in obj_names]):
+            layout.operator("nd.hydrate", icon='SHADING_RENDERED')
+            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
+
+            return
 
         layout.operator("nd.mirror", icon='MOD_MIRROR')
         layout.operator("nd.triangulate", icon='MOD_TRIANGULATE')

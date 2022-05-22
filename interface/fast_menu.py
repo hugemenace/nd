@@ -72,6 +72,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         layout.operator("nd.single_vertex", icon='DOT')
         layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
+        layout.separator()
+        layout.operator("mesh.primitive_plane_add", icon='MESH_PLANE')
+        layout.operator("mesh.primitive_cube_add", icon='MESH_CUBE')
 
 
     def draw_two_object_predictions(self, context):
@@ -164,6 +167,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.bevel", icon='MOD_BEVEL')
                 layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
                 layout.operator("nd.array_cubed", icon='PARTICLES')
+                layout.operator("nd.mirror", icon='MOD_MIRROR')
                 layout.operator("nd.screw_head", icon='CANCEL')
                 layout.operator("nd.flare", text="Flare (Lighting)", icon='LIGHT_AREA')
 

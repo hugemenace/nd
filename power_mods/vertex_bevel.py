@@ -37,7 +37,8 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
     bl_idname = "nd.vertex_bevel"
     bl_label = "Vertex Bevel"
     bl_description = """Adds a vertex group bevel and weld modifier
-SHIFT — Place modifiers at the bottom of the stack"""
+SHIFT — Place modifiers at the bottom of the stack
+ALT — Create a vertex group edge bevel"""
     bl_options = {'UNDO'}
 
 
@@ -152,6 +153,7 @@ SHIFT — Place modifiers at the bottom of the stack"""
 
     def invoke(self, context, event):
         self.late_apply = event.shift
+        self.edge_mode = event.alt
 
         self.dirty = False
         self.base_width_factor = 0.01
@@ -257,7 +259,10 @@ SHIFT — Place modifiers at the bottom of the stack"""
 
     def add_bevel_modifier(self, context):
         bevel = context.object.modifiers.new(mod_bevel, type='BEVEL')
-        bevel.affect = 'VERTICES'
+        if self.edge_mode:
+            bevel.affect = 'EDGES'
+        else:
+            bevel.affect = 'VERTICES'
         bevel.limit_method = 'VGROUP'
         bevel.offset_type = 'WIDTH'
         bevel.vertex_group = self.vgroup.name

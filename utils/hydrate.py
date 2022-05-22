@@ -83,6 +83,8 @@ class ND_OT_hydrate(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
 
+        self.active_object = context.object
+
         self.clear_parent = False
         self.all_collections = [c.name for c in bpy.data.collections]
         self.active_collection = len(self.all_collections)
@@ -102,7 +104,7 @@ class ND_OT_hydrate(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) > 0 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
     
     def operate(self, context):
@@ -110,28 +112,34 @@ class ND_OT_hydrate(bpy.types.Operator):
 
 
     def finish(self, context):
-        new_obj = context.object.copy()
-        new_obj.data = context.object.data.copy()
-        new_obj.animation_data_clear()
+        new_objects = []
+        for obj in context.selected_objects:
+            new_obj = obj.copy()
+            new_obj.data = obj.data.copy()
+            new_obj.animation_data_clear()
 
-        if new_obj.name.startswith("Bool — "):
-            new_obj.name = new_obj.name[6:]
-            new_obj.data.name = new_obj.name
-        
-        if self.active_collection >= len(self.all_collections):
-            bpy.context.collection.objects.link(new_obj)
-        else:
-            bpy.data.collections[self.active_collection].objects.link(new_obj)
+            if new_obj.name.startswith("Bool — "):
+                new_obj.name = new_obj.name[6:]
+                new_obj.data.name = new_obj.name
+            
+            if self.active_collection >= len(self.all_collections):
+                bpy.context.collection.objects.link(new_obj)
+            else:
+                bpy.data.collections[self.active_collection].objects.link(new_obj)
 
-        new_obj.display_type = 'SOLID'
-        new_obj.hide_render = False
-        
+            new_obj.display_type = 'SOLID'
+            new_obj.hide_render = False
+            
+            new_objects.append((new_obj, obj))
+
+            if self.clear_parent:
+                bpy.ops.object.parent_clear({'object': new_obj}, type='CLEAR_KEEP_TRANSFORM')
+
         bpy.ops.object.select_all(action='DESELECT')
-        new_obj.select_set(True)
-        bpy.context.view_layer.objects.active = new_obj
-
-        if self.clear_parent:
-            bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+        for new_obj, orig_obj in new_objects:
+            new_obj.select_set(True)
+            if orig_obj == self.active_object:
+                bpy.context.view_layer.objects.active = new_obj
 
         unregister_draw_handler()
 

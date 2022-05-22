@@ -196,7 +196,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         layout.operator("nd.mirror", icon='MOD_MIRROR')
         layout.operator("nd.triangulate", icon='MOD_TRIANGULATE')
-        layout.operator("nd.apply_modifiers", icon='ORPHAN_DATA')
         layout.operator("nd.name_sync", icon='FILE_REFRESH')
         layout.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').mode = 'LOW'
         layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').mode = 'HIGH'

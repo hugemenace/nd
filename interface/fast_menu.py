@@ -90,39 +90,47 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
-
-        bm = bmesh.new()
-        bm.from_mesh(object_eval.data)
-
-        self.verts = [vert for vert in bm.verts]
-        self.edges = [edge for edge in bm.edges]
-        self.faces = [face for face in bm.faces]
-        self.sketch = len(self.faces) == 1
-        self.profile = len(self.faces) == 0 and len(self.edges) > 0
-        self.form = len(self.faces) > 1
-
-        bm.free()
-
         if context.mode == 'EDIT_MESH':
             mesh = bmesh.from_edit_mesh(context.object.data)
 
-            if len([vert for vert in mesh.verts if vert.select]) >= 1:
+            verts_selected = len([vert for vert in mesh.verts if vert.select]) >= 1
+            edges_selected = len([edge for edge in mesh.edges if edge.select]) >= 1
+
+            has_verts = len(mesh.verts) >= 1
+            has_edges = len(mesh.edges) >= 1
+            has_faces = len(mesh.faces) >= 1
+
+            if verts_selected:
                 layout.operator("nd.vertex_bevel", icon='VERTEXSEL')
                 layout.operator("nd.clear_vgs", icon='GROUP_VERTEX')
             
-            if len([edge for edge in mesh.edges if edge.select]) >= 1:
+            if edges_selected:
                 layout.operator("nd.edge_bevel", icon='EDGESEL')
 
-            if self.profile:
+            if has_verts and not has_faces:
                 layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
 
-            self.draw_make_edge_face_ops(context)
+            if verts_selected:
+                self.draw_make_edge_face_ops(context)
 
             return
 
         if context.mode == 'OBJECT':
+            depsgraph = context.evaluated_depsgraph_get()
+            object_eval = context.object.evaluated_get(depsgraph)
+
+            bm = bmesh.new()
+            bm.from_mesh(object_eval.data)
+
+            self.verts = [vert for vert in bm.verts]
+            self.edges = [edge for edge in bm.edges]
+            self.faces = [face for face in bm.faces]
+            self.sketch = len(self.faces) == 1
+            self.profile = len(self.faces) == 0 and len(self.edges) > 0
+            self.form = len(self.faces) > 1
+
+            bm.free()
+
             mod_names = [mod.name for mod in context.object.modifiers]
 
             has_mod_pe = False

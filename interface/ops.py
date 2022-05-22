@@ -74,6 +74,7 @@ object_properties_ops = [
 
 misc_ops = [
     ("nd.hydrate", 'SHADING_RENDERED', None, None, False),
+    ("nd.swap_solver", 'CON_OBJECTSOLVER', None, None, False),
     ("nd.flare", 'LIGHT_AREA', "Flare (Lighting)", None, False),
 ]
 

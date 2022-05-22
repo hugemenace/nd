@@ -148,6 +148,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             if "Bool —" in context.object.name:
                 layout.operator("nd.hydrate", icon='SHADING_RENDERED')
+                layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
 
                 return
 

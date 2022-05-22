@@ -155,6 +155,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             if was_profile_extrude or self.sketch:
                 layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
+                layout.operator("nd.screw", icon='MOD_SCREW')
 
                 return
             

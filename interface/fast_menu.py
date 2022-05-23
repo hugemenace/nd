@@ -149,9 +149,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_mod_bool = False
 
             for name in mod_names:
-                has_mod_pe = bool("— ND PE" in name)
-                has_mod_sol = bool("— ND SOL" in name)
-                has_mod_bool = bool("— ND Bool" in name)
+                has_mod_pe = has_mod_pe or bool("— ND PE" in name)
+                has_mod_sol = has_mod_sol or bool("— ND SOL" in name)
+                has_mod_bool = has_mod_bool or bool("— ND Bool" in name)
 
             was_profile_extrude = has_mod_pe and not has_mod_sol
 

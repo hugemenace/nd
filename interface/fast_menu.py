@@ -91,6 +91,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
         layout.operator("nd.bool_slice", icon='MOD_BOOLEAN')
         layout.operator("nd.bool_inset", icon='MOD_BOOLEAN')
+        layout.separator()
         layout.operator("nd.mirror", icon='MOD_MIRROR')
         layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
         layout.operator("nd.snap_align", icon='SNAP_ON')

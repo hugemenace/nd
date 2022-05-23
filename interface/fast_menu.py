@@ -145,11 +145,12 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             has_mod_pe = False
             has_mod_sol = False 
+            has_mod_bool = False
+
             for name in mod_names:
-                if "— ND PE" in name:
-                    has_mod_pe = True
-                if "— ND SOL" in name:
-                    has_mod_sol = True
+                has_mod_pe = bool("— ND PE" in name)
+                has_mod_sol = bool("— ND SOL" in name)
+                has_mod_bool = bool("— ND Bool" in name)
 
             was_profile_extrude = has_mod_pe and not has_mod_sol
 
@@ -173,10 +174,17 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 return
 
             if self.form:
+                if has_mod_bool:
+                    layout.operator("nd.cycle", icon='LONGDISPLAY')
+                    layout.separator()
+
                 layout.operator("nd.bevel", icon='MOD_BEVEL')
                 layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
+                layout.separator()
                 layout.operator("nd.array_cubed", icon='PARTICLES')
+                layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
+                layout.separator()
                 layout.operator("nd.screw_head", icon='CANCEL')
                 layout.operator("nd.flare", text="Flare (Lighting)", icon='LIGHT_AREA')
 

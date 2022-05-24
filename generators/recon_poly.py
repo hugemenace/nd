@@ -20,10 +20,10 @@
 
 import bpy
 import bmesh
-from math import radians
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
+from math import radians, isclose
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
@@ -92,6 +92,10 @@ class ND_OT_recon_poly(bpy.types.Operator):
                 self.segments_input_stream = new_stream()
                 self.segments = 3
                 self.dirty = True
+
+        elif pressed(event, {'R'}):
+            self.natural_rotation = not self.natural_rotation
+            self.dirty = True
 
         elif self.key_increase_factor:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
@@ -192,6 +196,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.segments = 3
         self.inner_radius = 0
         self.width = 0.05
+        self.natural_rotation = True
 
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -217,6 +222,9 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.width_prev = self.width = self.screwX.screw_offset
 
         self.obj = context.active_object
+
+        self.natural_rotation = isclose(self.obj.rotation_euler.z, radians((360 / self.segments) / 2), rel_tol=1e-5)
+        self.prev_rotation = self.obj.rotation_euler.copy()
 
 
     @classmethod
@@ -286,6 +294,11 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.screwZ.render_steps = self.segments
         self.displace.strength = self.inner_radius
 
+        if self.natural_rotation:
+            self.obj.rotation_euler.z = radians((360 / self.segments) / 2)
+        else:
+            self.obj.rotation_euler.z = 0
+
         self.dirty = False
 
 
@@ -319,6 +332,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
             self.screwZ.steps = self.segments_prev
             self.screwZ.render_steps = self.segments_prev
             self.displace.strength = self.inner_radius_prev
+            self.obj.rotation_euler = self.prev_rotation
             
         unregister_draw_handler()
 
@@ -351,6 +365,12 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,
         input_stream=self.inner_radius_input_stream)
+
+    draw_hint(
+        self,
+        "Natural Rotation [R]: {}".format("Yes" if self.natural_rotation else "No"),
+        "Ensure the rightmost edge is perpendicular to the X axis"
+    )
 
 
 def menu_func(self, context):

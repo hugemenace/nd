@@ -111,18 +111,27 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_edges = len(mesh.edges) >= 1
             has_faces = len(mesh.faces) >= 1
 
+            made_prediction = False
+
             if verts_selected:
                 layout.operator("nd.vertex_bevel", icon='VERTEXSEL')
                 layout.operator("nd.clear_vgs", icon='GROUP_VERTEX')
+                made_prediction = True
             
             if edges_selected:
                 layout.operator("nd.edge_bevel", icon='EDGESEL')
+                made_prediction = True
 
             if has_verts and not has_faces:
                 layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
+                made_prediction = True
 
             if verts_selected:
                 self.draw_make_edge_face_ops(context)
+                made_prediction = True
+
+            if not made_prediction:
+                self.draw_no_predictions(context)
 
             return
 

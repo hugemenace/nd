@@ -50,10 +50,6 @@ class ND_OT_single_vertex(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='SELECT')
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_single_vertex.bl_idname, text=ND_OT_single_vertex.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_single_vertex)
 

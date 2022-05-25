@@ -189,10 +189,6 @@ def draw_text_callback(self):
         "Synchronize auto-smooth with seams angle on complete")
     
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_seams.bl_idname, text=ND_OT_seams.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_seams)
 

@@ -368,10 +368,6 @@ def draw_text_callback(self):
         "Display the objects's wireframe over solid shading")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_vertex_bevel.bl_idname, text=ND_OT_vertex_bevel.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_vertex_bevel)
 

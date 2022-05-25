@@ -283,10 +283,6 @@ def draw_text_callback(self):
         alt_mode=len(self.capture_points) == 1)
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_snap_align.bl_idname, text=ND_OT_snap_align.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_snap_align)
 

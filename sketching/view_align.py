@@ -241,10 +241,6 @@ def draw_text_callback(self):
         "Type of geometry to select (Vertex, Edge, Face)")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_view_align.bl_idname, text=ND_OT_view_align.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_view_align)
 

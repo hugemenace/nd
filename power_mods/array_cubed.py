@@ -273,10 +273,6 @@ def draw_text_callback(self):
         "Axis replicate across (X, Y, Z)")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_array_cubed.bl_idname, text=ND_OT_array_cubed.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_array_cubed)
 

@@ -77,10 +77,6 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
         displace.strength = strength
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_set_origin.bl_idname, text=ND_OT_set_origin.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_set_origin)
 

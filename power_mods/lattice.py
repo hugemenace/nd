@@ -351,10 +351,6 @@ def draw_text_callback(self):
         "Adjust all points uniformly")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_lattice.bl_idname, text=ND_OT_lattice.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_lattice)
 

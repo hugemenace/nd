@@ -373,10 +373,6 @@ def draw_text_callback(self):
     )
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_recon_poly.bl_idname, text=ND_OT_recon_poly.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_recon_poly)
 

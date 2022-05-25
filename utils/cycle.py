@@ -251,10 +251,6 @@ def draw_text_callback(self):
         "Switch modes (Modifier, Utility)")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_cycle.bl_idname, text=ND_OT_cycle.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_cycle)
 

@@ -202,10 +202,6 @@ def draw_text_callback(self):
         "Type of geometry to select (Vertex, Edge, Face)")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_geo_lift.bl_idname, text=ND_OT_geo_lift.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_geo_lift)
 

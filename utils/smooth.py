@@ -157,10 +157,6 @@ def draw_text_callback(self):
         input_stream=self.angle_input_stream)
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_smooth.bl_idname, text=ND_OT_smooth.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_smooth)
 

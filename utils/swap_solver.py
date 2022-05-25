@@ -141,10 +141,6 @@ def draw_text_callback(self):
         "Select the solver mode (Fast, Exact)")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_swap_solver.bl_idname, text=ND_OT_swap_solver.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_swap_solver)
 

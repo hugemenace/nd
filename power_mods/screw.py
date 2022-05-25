@@ -331,10 +331,6 @@ def draw_text_callback(self):
         "Flip the normals of the resulting mesh")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_screw.bl_idname, text=ND_OT_screw.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_screw)
 

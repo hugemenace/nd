@@ -46,10 +46,6 @@ ALT — Do not preserve custom normals"""
         return {'FINISHED'}
 
     
-def menu_func(self, context):
-    self.layout.operator(ND_OT_triangulate.bl_idname, text=ND_OT_triangulate.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_triangulate)
 

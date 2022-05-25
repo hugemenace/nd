@@ -164,10 +164,6 @@ def draw_text_callback(self):
         "Unparent the new object from the original target object")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_hydrate.bl_idname, text=ND_OT_hydrate.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_hydrate)
 

@@ -371,10 +371,6 @@ def draw_text_callback(self):
     draw_hint(self, "New Energy [E]", "Generate new randomised energy for the lights")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_flare.bl_idname, text=ND_OT_flare.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_flare)
 

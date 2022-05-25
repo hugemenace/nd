@@ -389,10 +389,6 @@ def draw_text_callback(self):
             "Flip the mirror direction")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_mirror.bl_idname, text=ND_OT_mirror.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_mirror)
 

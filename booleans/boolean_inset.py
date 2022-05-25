@@ -247,10 +247,6 @@ def draw_text_callback(self):
         "Create an Inset or Outset")
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_bool_inset.bl_idname, text=ND_OT_bool_inset.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_bool_inset)
 

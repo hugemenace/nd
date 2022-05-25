@@ -41,10 +41,6 @@ class ND_OT_name_sync(bpy.types.Operator):
         return {'FINISHED'}
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_name_sync.bl_idname, text=ND_OT_name_sync.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_name_sync)
 

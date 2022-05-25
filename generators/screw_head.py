@@ -287,10 +287,6 @@ def draw_text_callback(self):
         input_stream=self.offset_input_stream)
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_screw_head.bl_idname, text=ND_OT_screw_head.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_screw_head)
 

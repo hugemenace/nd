@@ -33,10 +33,6 @@ class ND_OT_toggle_wireframes(bpy.types.Operator):
         return {'FINISHED'}
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_toggle_wireframes.bl_idname, text=ND_OT_toggle_wireframes.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_toggle_wireframes)
 

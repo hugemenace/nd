@@ -63,10 +63,6 @@ class ND_OT_apply_modifiers(bpy.types.Operator):
                 bpy.ops.object.modifier_remove({'object': obj}, modifier=name)
 
 
-def menu_func(self, context):
-    self.layout.operator(ND_OT_apply_modifiers.bl_idname, text=ND_OT_apply_modifiers.bl_label)
-
-
 def register():
     bpy.utils.register_class(ND_OT_apply_modifiers)
 

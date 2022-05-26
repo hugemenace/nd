@@ -263,7 +263,7 @@ class NDPreferences(AddonPreferences):
             row.prop(self, pref)
 
         general_boxed_prefs = [
-            ["The default angle to use for smoothing operations (eg. auto-smooth)", "default_smoothing_angle", True],
+            ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False],
             ["Automatically check if addon is up to date when Blender starts", "enable_update_check", False],
             ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False]]

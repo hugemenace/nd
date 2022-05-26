@@ -20,7 +20,7 @@
 
 import bpy
 import bmesh
-from math import radians
+from math import radians, degrees
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -76,6 +76,9 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
 
+        elif pressed(event, {'A'}):
+            self.angle = (self.angle + 1) % len(self.angles)
+
         elif self.key_increase_factor:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.base_width_factor = min(1, self.base_width_factor * 10.0)
@@ -118,6 +121,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_width_factor = 0.001
+        self.angles = [30, 45, 60]
 
         self.width_input_stream = new_stream()
 
@@ -154,6 +158,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         self.summoned = False
 
         self.width = 0.001
+        self.angle = self.angles.index(int(get_preferences().default_smoothing_angle))
 
         self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
@@ -167,6 +172,10 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         self.wn = mods[mod_wn]
 
         self.width_prev = self.width = self.bevel.width
+        try:
+            self.angle_prev = self.angle = self.angles.index(int(degrees(self.bevel.angle_limit)))
+        except:
+            self.angle_prev = self.angle = self.angles.index(int(get_preferences().default_smoothing_angle))
 
 
     def add_smooth_shading(self, context):
@@ -194,6 +203,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
     def operate(self, context):
         self.bevel.width = self.width
+        self.bevel.angle_limit = radians(self.angles[self.angle])
 
         self.dirty = False
 
@@ -214,6 +224,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
         if self.summoned:
             self.bevel.width = self.width_prev
+            self.bevel.angle_limit = radians(self.angles[self.angle_prev])
 
         unregister_draw_handler()
 
@@ -234,6 +245,11 @@ def draw_text_callback(self):
         self,
         "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
         "Display the objects's wireframe over solid shading")
+
+    draw_hint(
+        self,
+        "Angle [A]: {0}°".format(self.angles[self.angle]),
+        "Edge angle limit ({})".format(", ".join(["{0}°".format(a) for a in self.angles])))
 
 
 def register():

@@ -39,11 +39,6 @@ class ND_MT_viewport_menu(bpy.types.Menu):
         layout.operator("nd.toggle_clear_view", icon="OUTLINER_DATA_VOLUME")
         
 
-def draw_item(self, context):
-    layout = self.layout
-    layout.menu(ND_MT_viewport_menu.bl_idname)
-
-
 def register():
     bpy.utils.register_class(ND_MT_viewport_menu)
 

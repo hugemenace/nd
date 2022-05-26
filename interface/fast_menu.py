@@ -216,11 +216,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').mode = 'HIGH'
 
 
-def draw_item(self, context):
-    layout = self.layout
-    layout.menu(ND_MT_fast_menu.bl_idname)
-
-
 def register():
     bpy.utils.register_class(ND_MT_fast_menu)
 

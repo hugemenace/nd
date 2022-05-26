@@ -35,11 +35,6 @@ class ND_MT_deform_menu(bpy.types.Menu):
         layout.operator("nd.simple_deform", icon='MOD_SIMPLEDEFORM')
 
 
-def draw_item(self, context):
-    layout = self.layout
-    layout.menu(ND_MT_deform_menu.bl_idname)
-
-
 def register():
     bpy.utils.register_class(ND_MT_deform_menu)
    

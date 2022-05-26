@@ -38,11 +38,6 @@ class ND_MT_boolean_menu(bpy.types.Menu):
         layout.operator("nd.bool_inset", icon='MOD_BOOLEAN')
         
 
-def draw_item(self, context):
-    layout = self.layout
-    layout.menu(ND_MT_boolean_menu.bl_idname)
-
-
 def register():
     bpy.utils.register_class(ND_MT_boolean_menu)
    

@@ -34,11 +34,6 @@ class ND_MT_simplify_menu(bpy.types.Menu):
         layout.operator("nd.weld", icon='AUTOMERGE_ON')
         
 
-def draw_item(self, context):
-    layout = self.layout
-    layout.menu(ND_MT_simplify_menu.bl_idname)
-
-
 def register():
     bpy.utils.register_class(ND_MT_simplify_menu)
    

@@ -27,7 +27,7 @@ from .. lib.events import capture_modifier_keys, pressed
 class ND_OT_swap_solver(bpy.types.Operator):
     bl_idname = "nd.swap_solver"
     bl_label = "Swap Solver"
-    bl_description = "Swap the solver mode of the boolean(s) using this utility"
+    bl_description = "Swap the solver mode of the boolean modifiers referencing the selected utility objects"
     bl_options = {'UNDO'}
 
 

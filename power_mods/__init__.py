@@ -26,6 +26,8 @@ from . import vertex_bevel
 from . import mirror
 from . import lattice
 from . import simple_deform
+from . import decimate
+from . import weld
 from . import profile_extrude
 from . import circular_array
 from . import array_cubed
@@ -41,6 +43,8 @@ registerables = (
     mirror,
     lattice,
     simple_deform,
+    decimate,
+    weld,
     profile_extrude,
     circular_array,
     array_cubed,

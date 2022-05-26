@@ -28,6 +28,7 @@ from . import utils_menu
 from . import fast_menu
 from . import boolean_menu
 from . import bevel_menu
+from . import simplify_menu
 from . import extrude_menu
 from . import replicate_menu
 from . import deform_menu
@@ -46,6 +47,7 @@ registerables = (
     fast_menu,
     boolean_menu,
     bevel_menu,
+    simplify_menu,
     extrude_menu,
     replicate_menu,
     deform_menu,

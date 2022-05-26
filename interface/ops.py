@@ -45,6 +45,8 @@ power_mod_ops = [
     ("nd.mirror", 'MOD_MIRROR', None, None, False),
     ("nd.lattice", 'MOD_LATTICE', None, None, False),
     ("nd.simple_deform", 'MOD_SIMPLEDEFORM', None, None, False),
+    ("nd.decimate", 'MOD_DECIM', None, None, False),
+    ("nd.weld", 'AUTOMERGE_ON', None, None, False),
 ]
 
 generator_ops = [

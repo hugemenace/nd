@@ -194,9 +194,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.array_cubed", icon='PARTICLES')
                 layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
-                layout.separator()
-                layout.operator("nd.screw_head", icon='CANCEL')
-                layout.operator("nd.flare", text="Flare (Lighting)", icon='LIGHT_AREA')
 
                 return
 

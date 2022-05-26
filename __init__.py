@@ -59,6 +59,11 @@ registerables = (
 class NDPreferences(AddonPreferences):
     bl_idname = __name__
 
+    local_user_prefs_version: StringProperty(
+        name="Local user preferences version",
+        default="0.0.0",
+    )
+
     update_available: BoolProperty(
         name="Update Available",
         default=False,
@@ -81,7 +86,7 @@ class NDPreferences(AddonPreferences):
 
     enable_mouse_values: BoolProperty(
         name="Enable Mouse Values",
-        default=False,
+        default=True,
     )
 
     use_fast_booleans: BoolProperty(
@@ -96,7 +101,7 @@ class NDPreferences(AddonPreferences):
 
     lock_overlay_pinning: BoolProperty(
         name="Lock Overlay Pinning",
-        default=False,
+        default=True,
     )
 
     overlay_pinned: BoolProperty(
@@ -334,10 +339,24 @@ def register():
 
     bpy.utils.register_class(NDPreferences)
 
-    if lib.preferences.get_preferences().enable_update_check:
-        lib.preferences.get_preferences().update_available = lib.updates.update_available(bl_info['version'])
+    version = '.'.join([str(v) for v in bl_info['version']])
+    prefs = lib.preferences.get_preferences()
+
+    if prefs.enable_update_check:
+        prefs.update_available = lib.updates.update_available(bl_info['version'])
     else:
-        lib.preferences.get_preferences().update_available = False
+        prefs.update_available = False
+
+    if prefs.local_user_prefs_version != version:
+        if version == "1.28.0":
+            prefs.overlay_pin_key = "P"
+            prefs.overlay_pause_key = "BACK_SLASH"
+            prefs.overlay_reset_key = "X"
+            prefs.overlay_increase_factor = "RIGHT_BRACKET"
+            prefs.overlay_decrease_factor = "LEFT_BRACKET"
+            prefs.lock_overlay_pinning = True
+            prefs.enable_mouse_values = True
+            prefs.local_user_prefs_version = version
 
     print("""
 ███╗   ██╗██████╗ 
@@ -347,7 +366,7 @@ def register():
 ██║ ╚████║██████╔╝
 ╚═╝  ╚═══╝╚═════╝
 HugeMenace — ND Addon v%s
-    """ % ('.'.join([str(v) for v in bl_info['version']])));
+    """ % (version));
 
 
 def unregister():

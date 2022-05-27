@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.28.1](https://github.com/hugemenace/nd/compare/v1.28.0...v1.28.1) (2022-05-27)
+
+
+### Bug Fixes
+
+* fix unexpected float error in Blender 3.1 and limit the possibility of dividing by zero errors on manual user input ([1cdac6c](https://github.com/hugemenace/nd/commit/1cdac6ce8718c947e6bcd93e545c6bbdf3494445))
+
 ## [1.28.0](https://github.com/hugemenace/nd/compare/v1.27.0...v1.28.0) (2022-05-27)
 
 

@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.28.0](https://github.com/hugemenace/nd/compare/v1.27.0...v1.28.0) (2022-05-27)
+
+
+### Features
+
+* add alt mode to vertex bevel to create a vertex group edge bevel ([77cfff4](https://github.com/hugemenace/nd/commit/77cfff4011993bebb0f0e38f5127a88a2b7b4677))
+* add an option to custom default smoothing angle and update & add it across all relevant operators ([ed02679](https://github.com/hugemenace/nd/commit/ed026796f34e034c3ac471173fb69b9d0bcbb2dc))
+* add apply_modifiers utility ([1ec0150](https://github.com/hugemenace/nd/commit/1ec01505c94df73051b8def906bd734a4e2492c3))
+* add cycle operator to fast menu for objects with boolean modifiers present ([a71896c](https://github.com/hugemenace/nd/commit/a71896c6cea247d1c26b91b91a2b8b5c91dd1c4a))
+* add decimate and weld operators under the new simplify menu ([1c7b454](https://github.com/hugemenace/nd/commit/1c7b454b3f47a2063f7a2745bea5d8b1094d443a))
+* add edge angle limit option to bevel and weight_normal_bevel operators ([c44e0b1](https://github.com/hugemenace/nd/commit/c44e0b15e8be0ba091b0586216089cf4d6733bba))
+* add enhanced wireframe mode toggle to all bevel operators ([03933cf](https://github.com/hugemenace/nd/commit/03933cf42b28d0e698385b14db7ee87e1315e879))
+* add fast prediction menu ([eb26d59](https://github.com/hugemenace/nd/commit/eb26d59c9721c2c02753a095f8a7809834ca86f1))
+* add flip normals option to screw operator ([768f1be](https://github.com/hugemenace/nd/commit/768f1beace3640311081a51fd88312d9ac35a1cd))
+* add natural rotation option to recon poly ([980fde9](https://github.com/hugemenace/nd/commit/980fde980985d423559f0812c552d1c4852edc61))
+* add option to place modifiers at the top/bottom of the stack across edge_bevel, vertex_bevel, and mirror ([fc08803](https://github.com/hugemenace/nd/commit/fc08803314309ca3805bff714a4dbe8ee186d3f9))
+* add swap_solver utility ([5481109](https://github.com/hugemenace/nd/commit/548110999b0dde2c55429597bde8e049ddaddb0d))
+* add the option to disable automatic update checks in preferences ([fbcb91d](https://github.com/hugemenace/nd/commit/fbcb91d1a2908b440a04fe490a13be359c2bccf3))
+* allow for manual values to be supplied to overlay & optimise operator overlay options ([bffaf72](https://github.com/hugemenace/nd/commit/bffaf72e965906bbd2db7096d054f607832301bb))
+* allow hydrate utility to be run on multiple selected objects ([12fc16e](https://github.com/hugemenace/nd/commit/12fc16e0e30ce85331c8a2ee73e92c4a0ede26ba))
+* automatically move booleans under WN bevels and single segment HN bevels ([1170f08](https://github.com/hugemenace/nd/commit/1170f08495138a023961fc7b2b25c6a57b09df49))
+* bind the fast menu to F and add a shortcut for Blender's underlying make edge/face operator ([b211a23](https://github.com/hugemenace/nd/commit/b211a2339fd23c25132ade2ccee6579c039c7ee3))
+* improve the mod ordering logic and apply it to the weld and decimate modifiers ([5307ed0](https://github.com/hugemenace/nd/commit/5307ed052af1f1126d1ea3c7669ab319f51b7b90))
+
+
+### Bug Fixes
+
+* add a check to apply_modifiers for disabled modifiers and remove them instead of applying ([ffc655a](https://github.com/hugemenace/nd/commit/ffc655a4801487e187d5dd75e755f462f9396edf))
+* add missing draw_hint import to edge_bevel operator ([7aec17d](https://github.com/hugemenace/nd/commit/7aec17d72acfd415b4dad3a8eed8defbed864ea7))
+* display no prediction message when in edit mode and no precondition matches ([7154241](https://github.com/hugemenace/nd/commit/715424133c08f6e4eb3e2f8c60812909c3c22644))
+* fix up has_mod_* logic in fast menu single object predictions ([3f27ee3](https://github.com/hugemenace/nd/commit/3f27ee31b19c4f36b012f23f7e86937d0be5d9be))
+* fix weighting calculation in profile_extrude operator ([4cd46fb](https://github.com/hugemenace/nd/commit/4cd46fbbf2641255354c8930aad348431c379ae1))
+* remove triangulate modifier & switch v3_average for .calc_center_median for face points in snap_align operator ([0842b3c](https://github.com/hugemenace/nd/commit/0842b3c5ac4fc7a2e413cb9d36917dd43b7117a6))
+
 ## [1.27.0](https://github.com/hugemenace/nd/compare/v1.26.0...v1.27.0) (2022-05-14)
 
 

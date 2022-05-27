@@ -20,6 +20,8 @@
 
 import bpy
 from math import radians
+from .. lib.modifiers import rectify_mod_order
+
 
 class ND_OT_decimate(bpy.types.Operator):
     bl_idname = "nd.decimate"
@@ -39,6 +41,7 @@ class ND_OT_decimate(bpy.types.Operator):
             modifier = obj.modifiers.new('Decimate — ND', 'DECIMATE')
             modifier.decimate_type = 'DISSOLVE'
             modifier.angle_limit = radians(1)
+            rectify_mod_order(obj, modifier.name)
 
         return {'FINISHED'}
 

@@ -21,7 +21,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.bools import move_bool_under_bevels
+from .. lib.modifiers import rectify_mod_order
 
 
 class ND_OT_bool_vanilla(bpy.types.Operator):
@@ -56,7 +56,7 @@ SHIFT — Protect the reference object (do not convert into utility)"""
         boolean.object = reference_obj
         boolean.solver = solver
 
-        move_bool_under_bevels(context.object, boolean.name)
+        rectify_mod_order(context.object, boolean.name)
 
         if not self.protect_reference_obj:
             reference_obj.display_type = 'WIRE'

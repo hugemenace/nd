@@ -21,20 +21,38 @@
 import bpy
 
 
-def move_bool_under_bevels(object, bool_name):
-    mods = [mod for mod in object.modifiers]
-    if len(mods) >= 3:
-        second_last = len(mods) - 2
-        third_last = len(mods) - 3
-        if "— ND WNB" in mods[second_last].name and "— ND WNB" in mods[third_last].name:
-            bpy.ops.object.modifier_move_up({'object': object}, modifier=bool_name)
-            bpy.ops.object.modifier_move_up({'object': object}, modifier=bool_name)
-        elif mods[second_last].type == 'BEVEL' and mods[second_last].segments == 1 and mods[second_last].harden_normals:
-            bpy.ops.object.modifier_move_up({'object': object}, modifier=bool_name)
-            bpy.ops.object.modifier_move_up({'object': object}, modifier=bool_name)
-        elif mods[third_last].type == 'BEVEL' and mods[third_last].segments == 1 and mods[third_last].harden_normals:
-            bpy.ops.object.modifier_move_up({'object': object}, modifier=bool_name)
-            bpy.ops.object.modifier_move_up({'object': object}, modifier=bool_name)
+def rectify_mod_order(object, mod_name):
+    mods = list(object.modifiers)
+
+    if len(mods) < 2:
+        return
+
+    matching_mod_index = None
+    for index, mod in enumerate(mods):
+        if "— ND WNB" in mod.name:
+            matching_mod_index = index
+            break
+
+        if "Weld — ND" in mod.name:
+            matching_mod_index = index
+            break
+        
+        if "Decimate — ND" in mod.name:
+            matching_mod_index = index
+            break
+        
+        if mod.type == 'BEVEL' and mod.segments > 1:
+            matching_mod_index = index
+            break
+        
+        if mod.type == 'BEVEL' and mod.segments == 1 and mod.harden_normals:
+            matching_mod_index = index
+            break
+
+    if matching_mod_index is None:
+        return
+
+    bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=matching_mod_index)
 
 
 def remove_problematic_bevels(object):

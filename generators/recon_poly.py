@@ -76,7 +76,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
                 self.dirty = True
             elif self.key_alt:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
-                self.segments = get_stream_value(self.segments_input_stream)
+                self.segments = int(get_stream_value(self.segments_input_stream, min_value=3))
                 self.dirty = True
 
         elif self.key_reset:

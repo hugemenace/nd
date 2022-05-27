@@ -72,7 +72,7 @@ ALT — Create a vertex group edge bevel"""
                 self.dirty = True
             elif self.key_alt:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
-                self.segments = get_stream_value(self.segments_input_stream)
+                self.segments = int(get_stream_value(self.segments_input_stream, min_value=1))
                 self.dirty = True
             elif self.key_ctrl:
                 self.profile_input_stream = update_stream(self.profile_input_stream, event.type)

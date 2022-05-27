@@ -66,7 +66,7 @@ class ND_OT_screw(bpy.types.Operator):
         elif self.key_numeric_input:
             if self.key_no_modifiers:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
-                self.segments = get_stream_value(self.segments_input_stream)
+                self.segments = int(get_stream_value(self.segments_input_stream, min_value=3))
                 self.dirty = True
             elif self.key_alt:
                 self.angle_input_stream = update_stream(self.angle_input_stream, event.type)

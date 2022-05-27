@@ -64,7 +64,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
         elif self.key_numeric_input:
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = update_stream(self.count_streams[self.axis], event.type)
-                self.axes[self.axis][1] = get_stream_value(self.count_streams[self.axis])
+                self.axes[self.axis][1] = int(get_stream_value(self.count_streams[self.axis]))
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_streams[self.axis] = update_stream(self.offset_streams[self.axis], event.type)

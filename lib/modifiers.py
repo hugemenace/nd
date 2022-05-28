@@ -45,14 +45,11 @@ def rectify_mod_order(object, mod_name):
             matching_mod_index = index
             break
         
-        if mod.type == 'BEVEL' and mod.segments > 1:
-            matching_mod_index = index
-            break
+        if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
+            if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
+                matching_mod_index = index
+                break
         
-        if mod.type == 'BEVEL' and mod.segments == 1 and mod.harden_normals:
-            matching_mod_index = index
-            break
-
     if matching_mod_index is None:
         return
 

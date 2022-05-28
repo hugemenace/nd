@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.28.4](https://github.com/hugemenace/nd/compare/v1.28.3...v1.28.4) (2022-05-28)
+
+
+### Bug Fixes
+
+* add additional checks to bevel types in automatic modifier reordering logic ([73ce5cf](https://github.com/hugemenace/nd/commit/73ce5cf8926a0e2685708e183e63b191542c6abc))
+
 ### [1.28.3](https://github.com/hugemenace/nd/compare/v1.28.2...v1.28.3) (2022-05-28)
 
 

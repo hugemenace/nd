@@ -192,21 +192,30 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
     def isolate_geometry(self, context):
         self.panel_bm = bmesh.from_edit_mesh(self.panel_obj.data)
 
+        self.delete_unselected_panel_geometry()
+        self.update_panel_edit_mesh(True)
+
+        self.panel_mesh_snapshot = self.panel_obj.data.copy()
+
+    
+    def delete_unselected_panel_geometry(self):
         verts = [v for v in self.panel_bm.verts if not v.select]
         bmesh.ops.delete(self.panel_bm, geom=verts, context='VERTS')
 
         faces = [f for f in self.panel_bm.faces if not f.select]
         bmesh.ops.delete(self.panel_bm, geom=faces, context='FACES')
-        
-        sca = self.target_obj.matrix_world.decompose()[2]
-        bmesh.ops.transform(self.panel_bm, matrix=Matrix.Diagonal(sca), space=Matrix(), verts=self.panel_bm.verts)
-        
-        bmesh.update_edit_mesh(self.panel_obj.data)
-        self.panel_obj.update_from_editmode()
-
-        self.panel_mesh_snapshot = self.panel_obj.data.copy()
 
     
+    def update_panel_edit_mesh(self, update_data=False):
+        bmesh.update_edit_mesh(self.panel_obj.data)
+        if update_data:
+            self.panel_obj.update_from_editmode()
+
+
+    def delete_panel_faces(self, faces):
+        bmesh.ops.delete(self.panel_bm, geom=faces, context='FACES')
+
+
     def operate(self, context):
         if self.stage == 1:
             bmesh.ops.delete(self.panel_bm, geom=self.panel_bm.verts, context='VERTS')
@@ -216,12 +225,12 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
                 faces = list(self.panel_bm.faces)
                 for face in faces:
                     result = self.inset_faces([face])
-                    bmesh.ops.delete(self.panel_bm, geom=result['faces'], context='FACES')
+                    self.delete_panel_faces(result['faces'])
             else:
                 result = self.inset_faces(self.panel_bm.faces)
-                bmesh.ops.delete(self.panel_bm, geom=result['faces'], context='FACES')
+                self.delete_panel_faces(result['faces'])
             
-            bmesh.update_edit_mesh(self.panel_obj.data)
+            self.update_panel_edit_mesh()
         
         self.dirty = False
 
@@ -233,7 +242,7 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
             use_boundary=True,
             use_even_offset=True,
             use_interpolate=True,
-            use_relative_offset=True,
+            use_relative_offset=False,
             use_edge_rail=True,
             thickness=self.inset,
             depth=0,
@@ -243,6 +252,8 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
     def finish(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         self.panel_obj.show_in_front = False
+
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
         
         unregister_draw_handler()
 

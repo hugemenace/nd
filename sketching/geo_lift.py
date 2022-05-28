@@ -87,6 +87,7 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
         self.register_mode()
         
         self.ignore_bevels = event.shift
+        self.target_obj = context.object
 
         self.prepare_face_selection_mode(context)
 
@@ -187,6 +188,9 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
 
         if remove_lifted_geometry:
             bpy.ops.object.delete()
+            bpy.ops.object.select_all(action='DESELECT')
+            self.target_obj.select_set(True)
+            bpy.context.view_layer.objects.active = self.target_obj
 
         unregister_draw_handler()
     

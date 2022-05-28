@@ -35,8 +35,11 @@ class ND_MT_sketch_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
         layout.operator("nd.single_vertex", icon='DOT')
         layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
+        layout.separator()
         layout.operator("nd.view_align", icon='ORIENTATION_VIEW')
+        layout.separator()
         layout.operator("nd.geo_lift", icon='FACESEL')
+        layout.operator("nd.panel", icon='MOD_EXPLODE')
         
 
 def register():

@@ -21,6 +21,7 @@
 import importlib
 from . import view_align
 from . import geo_lift
+from . import panel
 from . import single_vertex
 from . import make_manifold
 
@@ -28,6 +29,7 @@ from . import make_manifold
 registerables = (
     view_align,
     geo_lift,
+    panel,
     single_vertex,
     make_manifold
 )

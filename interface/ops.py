@@ -23,8 +23,9 @@
 sketching_ops = [
     ("nd.single_vertex", 'DOT', None, None, False),
     ("nd.make_manifold", 'OUTLINER_DATA_SURFACE', None, None, False),
-    ("nd.geo_lift", 'FACESEL', None, None, False),
     ("nd.view_align", 'ORIENTATION_VIEW', None, None, False),
+    ("nd.geo_lift", 'FACESEL', None, None, False),
+    ("nd.panel", 'MOD_EXPLODE', None, None, False),
 ]
 
 power_mod_ops = [

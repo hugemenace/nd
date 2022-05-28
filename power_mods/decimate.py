@@ -38,7 +38,7 @@ class ND_OT_decimate(bpy.types.Operator):
 
     def invoke(self, context, event):
         for obj in context.selected_objects:
-            modifier = obj.modifiers.new('Decimate — ND', 'DECIMATE')
+            modifier = obj.modifiers.new('Decimate — ND SD', 'DECIMATE')
             modifier.decimate_type = 'DISSOLVE'
             modifier.angle_limit = radians(1)
             rectify_mod_order(obj, modifier.name)

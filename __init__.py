@@ -348,7 +348,7 @@ def register():
         prefs.update_available = False
 
     if prefs.local_user_prefs_version != version:
-        if version == "1.28.0" or version == "1.28.2":
+        if version.startswith("1.28"):
             prefs.overlay_pin_key = "P"
             prefs.overlay_pause_key = "BACK_SLASH"
             prefs.overlay_reset_key = "X"

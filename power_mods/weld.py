@@ -37,7 +37,7 @@ class ND_OT_weld(bpy.types.Operator):
 
     def invoke(self, context, event):
         for obj in context.selected_objects:
-            modifier = obj.modifiers.new('Weld — ND', 'WELD')
+            modifier = obj.modifiers.new('Weld — ND SW', 'WELD')
             modifier.merge_threshold = 0.001
             rectify_mod_order(obj, modifier.name)
 

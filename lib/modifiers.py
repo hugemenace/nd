@@ -33,11 +33,15 @@ def rectify_mod_order(object, mod_name):
             matching_mod_index = index
             break
 
-        if "Weld — ND" in mod.name:
+        if "Weld — ND SW" in mod.name:
             matching_mod_index = index
             break
         
-        if "Decimate — ND" in mod.name:
+        if "Weld — ND B" in mod.name:
+            matching_mod_index = index
+            break
+        
+        if "Decimate — ND SD" in mod.name:
             matching_mod_index = index
             break
         

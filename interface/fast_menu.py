@@ -189,6 +189,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             if self.profile:
                 layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
                 layout.operator("nd.screw", icon='MOD_SCREW')
+                layout.operator("nd.mirror", icon='MOD_MIRROR')
 
                 return
 

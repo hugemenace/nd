@@ -155,26 +155,41 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             mod_names = [mod.name for mod in context.object.modifiers]
 
-            has_mod_pe = False
-            has_mod_sol = False 
-            has_mod_bool = False
+            has_mod_profile_extrude = False
+            has_mod_solidify = False 
+            has_mod_boolean = False
+            has_mod_screw = False
+            has_mod_array_cubed = False
+            has_mod_circular_array = False
 
             for name in mod_names:
-                has_mod_pe = has_mod_pe or bool("— ND PE" in name)
-                has_mod_sol = has_mod_sol or bool("— ND SOL" in name)
-                has_mod_bool = has_mod_bool or bool("— ND Bool" in name)
+                has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
+                has_mod_solidify = has_mod_solidify or bool("— ND SOL" in name)
+                has_mod_boolean = has_mod_boolean or bool("— ND Bool" in name)
+                has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
+                has_mod_array_cubed = has_mod_array_cubed or bool("Array³" in name)
+                has_mod_circular_array = has_mod_circular_array or bool("— ND CA" in name)
 
-            was_profile_extrude = has_mod_pe and not has_mod_sol
+            was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
 
-            if has_mod_bool:
+            if has_mod_boolean:
                 layout.operator("nd.cycle", icon='LONGDISPLAY')
                 layout.separator()
 
-            if has_mod_sol:
+            if has_mod_solidify:
                 layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
 
-            if has_mod_pe:
+            if has_mod_profile_extrude:
                 layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+            
+            if has_mod_screw:
+                layout.operator("nd.screw", icon='MOD_SCREW')
+            
+            if has_mod_array_cubed:
+                layout.operator("nd.array_cubed", icon='PARTICLES')
+
+            if has_mod_circular_array:
+                layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
 
             if "Bool —" in context.object.name:
                 layout.operator("nd.hydrate", icon='SHADING_RENDERED')
@@ -183,16 +198,16 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 return
 
             if was_profile_extrude or self.sketch:
-                layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
+                layout.operator("nd.solidify", icon='MOD_SOLIDIFY') if not has_mod_solidify else None
                 layout.separator()
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
-                layout.operator("nd.screw", icon='MOD_SCREW')
+                layout.operator("nd.screw", icon='MOD_SCREW') if not has_mod_screw else None
 
                 return
             
             if self.profile:
-                layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
-                layout.operator("nd.screw", icon='MOD_SCREW')
+                layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW') if not has_mod_profile_extrude else None
+                layout.operator("nd.screw", icon='MOD_SCREW') if not has_mod_screw else None
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
 
                 return
@@ -202,8 +217,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.bevel", icon='MOD_BEVEL')
                 layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
                 layout.separator()
-                layout.operator("nd.array_cubed", icon='PARTICLES')
-                layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
+                layout.operator("nd.array_cubed", icon='PARTICLES') if not has_mod_array_cubed else None
+                layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE') if not has_mod_circular_array else None
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
 
                 return

@@ -166,6 +166,10 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             was_profile_extrude = has_mod_pe and not has_mod_sol
 
+            if has_mod_bool:
+                layout.operator("nd.cycle", icon='LONGDISPLAY')
+                layout.separator()
+
             if has_mod_sol:
                 layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
 
@@ -194,10 +198,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 return
 
             if self.form:
-                if has_mod_bool:
-                    layout.operator("nd.cycle", icon='LONGDISPLAY')
-                    layout.separator()
-
+                layout.separator()
                 layout.operator("nd.bevel", icon='MOD_BEVEL')
                 layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
                 layout.separator()

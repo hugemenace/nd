@@ -95,6 +95,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
 
         elif pressed(event, {'R'}):
             self.natural_rotation = not self.natural_rotation
+            bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation
             self.dirty = True
 
         elif self.key_increase_factor:
@@ -207,6 +208,9 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.add_screw_x_modifier()
         self.add_screw_z_modifer()
 
+        self.rotation_snapshot = self.obj.rotation_euler.copy()
+        bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation
+
     
     def summon_old_operator(self, context, mods):
         self.summoned = True
@@ -223,8 +227,15 @@ class ND_OT_recon_poly(bpy.types.Operator):
 
         self.obj = context.active_object
 
-        self.natural_rotation = isclose(self.obj.rotation_euler.z, radians((360 / self.segments) / 2), rel_tol=1e-5)
-        self.prev_rotation = self.obj.rotation_euler.copy()
+        self.natural_rotation_prev = self.natural_rotation = bool(bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"])
+        self.rotation_snapshot = self.obj.rotation_euler.copy()
+        self.rotation_prev = self.obj.rotation_euler.copy()
+
+        if self.natural_rotation:
+            self.rotation_prev = self.obj.rotation_euler.copy()
+            self.obj.rotation_euler.rotate_axis('Z', radians((360 / self.segments) / 2) * -1)
+            self.rotation_snapshot = self.obj.rotation_euler.copy()
+            self.obj.rotation_euler = self.rotation_prev
 
 
     @classmethod
@@ -294,10 +305,10 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.screwZ.render_steps = self.segments
         self.displace.strength = self.inner_radius
 
+        self.obj.rotation_euler = self.rotation_snapshot
+
         if self.natural_rotation:
-            self.obj.rotation_euler.z = radians((360 / self.segments) / 2)
-        else:
-            self.obj.rotation_euler.z = 0
+            self.obj.rotation_euler.rotate_axis('Z', radians((360 / self.segments) / 2))
 
         self.dirty = False
 
@@ -332,7 +343,8 @@ class ND_OT_recon_poly(bpy.types.Operator):
             self.screwZ.steps = self.segments_prev
             self.screwZ.render_steps = self.segments_prev
             self.displace.strength = self.inner_radius_prev
-            self.obj.rotation_euler = self.prev_rotation
+            self.obj.rotation_euler = self.rotation_prev
+            bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation_prev
             
         unregister_draw_handler()
 
@@ -369,8 +381,7 @@ def draw_text_callback(self):
     draw_hint(
         self,
         "Natural Rotation [R]: {}".format("Yes" if self.natural_rotation else "No"),
-        "Ensure the rightmost edge is perpendicular to the X axis"
-    )
+        "Ensure the rightmost edge is perpendicular to the X axis")
 
 
 def register():

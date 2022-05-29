@@ -89,6 +89,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
             return
 
         layout.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
+        layout.operator("nd.bool_vanilla", text="Union", icon='MOD_BOOLEAN').mode = 'UNION'
+        layout.operator("nd.bool_vanilla", text="Intersect", icon='MOD_BOOLEAN').mode = 'INTERSECT'
         layout.operator("nd.bool_slice", icon='MOD_BOOLEAN')
         layout.operator("nd.bool_inset", icon='MOD_BOOLEAN')
         layout.separator()

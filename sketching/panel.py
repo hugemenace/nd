@@ -94,7 +94,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                     self.dirty = True
 
         elif self.stage == 0 and self.key_confirm_alternative:
-            if self.stage == 0:
+            if self.has_valid_selection(context):
                 self.isolate_geometry(context)
                 self.stage = 1
                 self.dirty = True
@@ -218,6 +218,13 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             thickness=self.inset,
             depth=0,
             use_outset=False)
+
+
+    def has_valid_selection(self, context):
+        mesh = bmesh.from_edit_mesh(context.object.data)
+        selected_faces = len([f for f in mesh.faces if f.select])
+        
+        return selected_faces > 0
 
 
     def finish(self, context):

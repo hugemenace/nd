@@ -26,13 +26,14 @@ from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.objects import create_duplicate_liftable_geometry
 
 
 class ND_OT_panel(bpy.types.Operator):
     bl_idname = "nd.panel"
     bl_label = "Panel"
     bl_description = """Combination operator which allows you to select faces, inset, and then solidify them
-SHIFT — Ignore bevels when calculating selectable geometry"""
+SHIFT — Do not clean duplicate mesh before extraction"""
     bl_options = {'UNDO'}
 
 
@@ -129,8 +130,6 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
 
 
     def invoke(self, context, event):
-        self.ignore_bevels = event.shift
-
         self.base_inset_factor = 0.01
 
         self.dirty = False
@@ -139,7 +138,9 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
         self.inset = 0
         self.stage = 0
         self.target_obj = context.object
-        self.prepare_face_selection_mode(context)
+
+        create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — Panel', not event.shift)
+        self.panel_obj = context.object
 
         self.inset_input_stream = new_stream()
 
@@ -159,36 +160,6 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
             return len(context.selected_objects) == 1 and context.object.type == 'MESH'
 
 
-    def prepare_face_selection_mode(self, context):
-        bpy.ops.object.duplicate()
-
-        if self.ignore_bevels:
-            mods = [mod.name for mod in context.object.modifiers if mod.type == 'BEVEL' and mod.affect == 'EDGES']
-            for mod in mods:
-                bpy.ops.object.modifier_remove(modifier=mod)
-
-        depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
-
-        context.object.modifiers.clear()
-        context.object.show_in_front = True
-
-        bm = bmesh.new()
-        bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.object.data)
-        bm.free()
-
-        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={'FACE'})
-        bpy.ops.mesh.select_all(action='DESELECT')
-
-        context.object.name = 'ND — Panel'
-        context.object.data.name = 'ND — Panel'
-
-        bpy.ops.mesh.customdata_custom_splitnormals_clear()
-
-        self.panel_obj = context.object
-
-    
     def isolate_geometry(self, context):
         self.panel_bm = bmesh.from_edit_mesh(self.panel_obj.data)
 

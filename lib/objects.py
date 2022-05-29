@@ -68,3 +68,50 @@ def update_child_matrices(obj, mx):
     for c in obj.children:
         parent_matrix = c.matrix_parent_inverse
         c.matrix_parent_inverse = new_matrix @ parent_matrix
+
+
+def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=True):
+    bpy.ops.object.duplicate()
+
+    if ignore_complex_geo:
+        mods = list(context.object.modifiers)
+        for mod in mods:
+            if mod.type == 'SUBSURF':
+                context.object.modifiers.remove(mod)
+            
+            if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
+                if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
+                    context.object.modifiers.remove(mod)
+            
+            if "— ND WNB" in mod.name:
+                context.object.modifiers.remove(mod)
+
+    depsgraph = context.evaluated_depsgraph_get()
+    object_eval = context.object.evaluated_get(depsgraph)
+
+    context.object.modifiers.clear()
+    context.object.show_in_front = True
+
+    vertex_groups = context.object.vertex_groups.values()
+    for vg in vertex_groups:
+        context.object.vertex_groups.remove(vg)
+
+    bm = bmesh.new()
+    bm.from_mesh(object_eval.data)
+
+    bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+
+    selected_edges = list(bm.edges)
+    for edge in selected_edges:
+        edge[bevel_weight_layer] = 0
+
+    bm.to_mesh(context.object.data)
+    bm.free()
+
+    bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode=mode)
+    bpy.ops.mesh.select_all(action='DESELECT')
+
+    context.object.name = name
+    context.object.data.name = name
+
+    bpy.ops.mesh.customdata_custom_splitnormals_clear()

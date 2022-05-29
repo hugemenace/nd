@@ -23,13 +23,14 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
+from .. lib.objects import create_duplicate_liftable_geometry
 
 
 class ND_OT_geo_lift(bpy.types.Operator):
     bl_idname = "nd.geo_lift"
     bl_label = "Geo Lift"
     bl_description = """Lift geometry out of a non-destructive object
-SHIFT — Ignore bevels when calculating selectable geometry"""
+SHIFT — Do not clean duplicate mesh before extraction"""
     bl_options = {'UNDO'}
 
 
@@ -86,10 +87,9 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
         self.register_mode()
         
-        self.ignore_bevels = event.shift
         self.target_obj = context.object
 
-        self.prepare_face_selection_mode(context)
+        create_duplicate_liftable_geometry(context, {self.mode}, 'ND — Geo Lift', not event.shift)
 
         capture_modifier_keys(self)
         
@@ -117,32 +117,6 @@ SHIFT — Ignore bevels when calculating selectable geometry"""
         self.register_mode()
 
 
-    def prepare_face_selection_mode(self, context):
-        bpy.ops.object.duplicate()
-
-        if self.ignore_bevels:
-            mods = [mod.name for mod in context.object.modifiers if mod.type == 'BEVEL' and mod.affect == 'EDGES']
-            for mod in mods:
-                bpy.ops.object.modifier_remove(modifier=mod)
-
-        depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
-
-        context.object.modifiers.clear()
-        context.object.show_in_front = True
-
-        bm = bmesh.new()
-        bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.object.data)
-        bm.free()
-
-        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={self.mode})
-        bpy.ops.mesh.select_all(action='DESELECT')
-
-        context.object.name = 'ND — Geo Lift'
-        context.object.data.name = 'ND — Geo Lift'
-
-    
     def isolate_geometry(self, context):
         bpy.ops.mesh.select_all(action='INVERT')
         bpy.ops.mesh.delete(type=self.mode)

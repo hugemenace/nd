@@ -175,7 +175,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
         self.axis_prev = self.axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
         self.extrusion_length_prev = self.extrusion_length = self.screw.screw_offset
-        self.weighting_prev = self.weighting = self.calculate_existing_weighting()
+        self.weighting = self.calculate_existing_weighting()
+        self.offset_strength_prev = self.offset.strength
 
 
     def calculate_offset_strength(self):
@@ -190,7 +191,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
     def calculate_existing_weighting(self):
         offset = abs(self.offset.strength)
         extrusion = self.screw.screw_offset
-        factor = offset / extrusion
+        factor = offset / (extrusion * 0.5)
 
         return max(-1, min(1, 1 - round(factor)))
 
@@ -240,7 +241,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
             self.screw.axis = axis
             self.screw.screw_offset = self.extrusion_length_prev
             self.offset.direction = axis
-            self.offset.strength = self.calculate_offset_strength()
+            self.offset.strength = self.offset_strength_prev
         
         unregister_draw_handler()
         unregister_axis_handler()

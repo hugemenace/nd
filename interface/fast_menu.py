@@ -164,6 +164,12 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             was_profile_extrude = has_mod_pe and not has_mod_sol
 
+            if has_mod_sol:
+                layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
+
+            if has_mod_pe:
+                layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+
             if "Bool —" in context.object.name:
                 layout.operator("nd.hydrate", icon='SHADING_RENDERED')
                 layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
@@ -172,6 +178,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             if was_profile_extrude or self.sketch:
                 layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
+                layout.separator()
                 layout.operator("nd.mirror", icon='MOD_MIRROR')
                 layout.operator("nd.screw", icon='MOD_SCREW')
 

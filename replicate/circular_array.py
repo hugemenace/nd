@@ -202,7 +202,7 @@ class ND_OT_circular_array(bpy.types.Operator):
             reference_obj = a if a.name != context.object.name else b
 
             return reference_obj.type == 'MESH'
-        elif context.mode == 'OBJECT' and context.object.type == 'MESH':
+        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.object.type == 'MESH':
             return True
         else:
             return False

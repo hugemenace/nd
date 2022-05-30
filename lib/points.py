@@ -23,6 +23,7 @@ import gpu
 import bgl
 from mathutils import Vector, Matrix
 from gpu_extras.batch import batch_for_shader
+from . preferences import get_preferences
 
 
 def register_points_handler(cls):
@@ -82,9 +83,9 @@ def draw_guideline(shader, line, size, color):
 def update_points(cls):
     shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
 
-    draw_points(shader, cls.primary_points, 10, (82/255, 224/255, 82/255, 1.))
-    draw_points(shader, cls.secondary_points, 6, (255/255, 135/255, 55/255, 1.0))
-    draw_points(shader, cls.tertiary_points, 12, (82/255, 224/255, 82/255, 1.0))
-    draw_guideline(shader, cls.guide_line, 2, (82/255, 224/255, 82/255, 0.5))
+    draw_points(shader, cls.primary_points, 10, get_preferences().points_primary_color)
+    draw_points(shader, cls.secondary_points, 6, get_preferences().points_secondary_color)
+    draw_points(shader, cls.tertiary_points, 12, get_preferences().points_tertiary_color)
+    draw_guideline(shader, cls.guide_line, 2, get_preferences().points_guide_line_color)
 
     redraw_regions()

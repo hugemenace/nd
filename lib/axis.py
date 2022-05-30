@@ -73,9 +73,9 @@ def update_axis(cls):
         return
 
     axes = [
-        (Vector((1, 0, 0)), (226/255, 54/255, 54/255)),
-        (Vector((0, 1, 0)), (130/255, 221/255, 85/255)),
-        (Vector((0, 0, 1)), (74/255, 144/255, 226/255)),
+        (Vector((1, 0, 0)), get_preferences().axis_x_color),
+        (Vector((0, 1, 0)), get_preferences().axis_y_color),
+        (Vector((0, 0, 1)), get_preferences().axis_z_color),
     ]
 
     for counter, conf in enumerate(axes):

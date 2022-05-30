@@ -128,11 +128,14 @@ def draw_header(cls):
     is_summoned = getattr(cls, "summoned", False)
 
     if cls.operator_passthrough:
-        blf.color(0, 238/255, 59/255, 43/255, 1.0)
+        r, g, b = get_preferences().overlay_header_paused_color
+        blf.color(0, r, g, b, 1.0)
     elif is_summoned and not cls.operator_passthrough:
-        blf.color(0, 82/255, 224/255, 82/255, 1.0)
+        r, g, b = get_preferences().overlay_header_recalled_color
+        blf.color(0, r, g, b, 1.0)
     else:
-        blf.color(0, 255/255, 135/255, 55/255, 1.0)
+        r, g, b = get_preferences().overlay_header_standard_color
+        blf.color(0, r, g, b, 1.0)
 
     if cls.operator_passthrough or is_summoned or cls.pin_overlay:
         blf.size(0, 11, cls.dpi)
@@ -163,9 +166,11 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     if cls.operator_passthrough:
         blf.color(0, 255/255, 255/255, 255/255, 0.2)
     elif is_value is not None and active:
-        blf.color(0, 237/255, 185/255, 94/255, 1.0)
+        r, g, b = get_preferences().overlay_option_manual_override_color
+        blf.color(0, r, g, b, 1.0)
     elif active:
-        blf.color(0, 55/255, 174/255, 255/255, 1.0)
+        r, g, b = get_preferences().overlay_option_active_color
+        blf.color(0, r, g, b, 1.0)
     else:
         blf.color(0, 255/255, 255/255, 255/255, 0.1)
     

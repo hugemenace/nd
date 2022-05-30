@@ -34,7 +34,7 @@ bl_info = {
 import bpy
 import rna_keymap_ui
 from bpy.types import AddonPreferences
-from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty
+from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty, FloatVectorProperty
 from . import lib
 from . import interface
 from . import booleans
@@ -187,12 +187,97 @@ class NDPreferences(AddonPreferences):
         step=1,
     )
 
+    overlay_header_standard_color: FloatVectorProperty(
+        name="Overlay Header Standard Color",
+        default=(255/255, 135/255, 55/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    overlay_header_recalled_color: FloatVectorProperty(
+        name="Overlay Header Recalled Color",
+        default=(82/255, 224/255, 82/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    overlay_header_paused_color: FloatVectorProperty(
+        name="Overlay Header Paused Color",
+        default=(238/255, 59/255, 43/2555),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    overlay_option_active_color: FloatVectorProperty(
+        name="Overlay Option Active Color",
+        default=(55/255, 174/255, 255/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    overlay_option_manual_override_color: FloatVectorProperty(
+        name="Overlay Option Manual Override Color",
+        default=(237/255, 185/255, 94/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    points_primary_color: FloatVectorProperty(
+        name="Points Primary Color",
+        default=(82/255, 224/255, 82/255, 1.0),
+        subtype='COLOR_GAMMA',
+        size=4,
+    )
+
+    points_secondary_color: FloatVectorProperty(
+        name="Points Secondary Color",
+        default=(255/255, 135/255, 55/255, 1.0),
+        subtype='COLOR_GAMMA',
+        size=4,
+    )
+
+    points_tertiary_color: FloatVectorProperty(
+        name="Points Tertiary Color",
+        default=(82/255, 224/255, 82/255, 1.0),
+        subtype='COLOR_GAMMA',
+        size=4,
+    )
+
+    points_guide_line_color: FloatVectorProperty(
+        name="Points Guide Line Color",
+        default=(82/255, 224/255, 82/255, 0.5),
+        subtype='COLOR_GAMMA',
+        size=4,
+    )
+
+    axis_x_color: FloatVectorProperty(
+        name="Axis X Color",
+        default=(226/255, 54/255, 54/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    axis_y_color: FloatVectorProperty(
+        name="Axis Y Color",
+        default=(130/255, 221/255, 85/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
+    axis_z_color: FloatVectorProperty(
+        name="Axis Z Color",
+        default=(74/255, 144/255, 226/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
     tabs: EnumProperty(
         name="Tabs",
         items=[
             ("GENERAL", "General", ""),
             ("UI", "UI", ""),
             ("KEYMAP", "Keymap", ""),
+            ("THEME", "Theme", ""),
         ],
         default="GENERAL",
     )
@@ -257,6 +342,8 @@ class NDPreferences(AddonPreferences):
             self.draw_ui(box)
         elif self.tabs == "KEYMAP":
             self.draw_keymap(box)
+        elif self.tabs == "THEME":
+            self.draw_theme(box)
 
 
     def draw_general(self, box):
@@ -337,6 +424,32 @@ class NDPreferences(AddonPreferences):
                     row = column.row()
                     rna_keymap_ui.draw_kmi(["ADDON", "USER", "DEFAULT"], kc, km, kmi, row, 0)
 
+
+    def draw_theme(self, box):
+        column = box.column(align=True)
+        row = column.row()
+        row.label(text="ND Theme Colors")
+
+        row.operator("nd.reset_theme")
+
+        colors = [
+            "overlay_header_standard_color",
+            "overlay_header_recalled_color",
+            "overlay_header_paused_color",
+            "overlay_option_active_color",
+            "overlay_option_manual_override_color",
+            "points_primary_color",
+            "points_secondary_color",
+            "points_tertiary_color",
+            "points_guide_line_color",
+            "axis_x_color",
+            "axis_y_color",
+            "axis_z_color"]
+
+        for pref in colors:
+            column = box.column(align=True)
+            row = column.row()
+            row.prop(self, pref)
 
 def register():
     lib.reload()

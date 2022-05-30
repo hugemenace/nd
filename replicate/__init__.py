@@ -18,25 +18,29 @@
 # Contributors: Tristo (HM)
 # ---
 
-import bpy
-from . import ops
-from . common import render_ops
+import importlib
+from . import array_cubed
+from . import circular_array
+from . import mirror
 
 
-class ND_MT_boolean_menu(bpy.types.Menu):
-    bl_label = "Booleans"
-    bl_idname = "ND_MT_boolean_menu"
+registerables = (
+    array_cubed,
+    circular_array,
+    mirror,
+)
 
 
-    def draw(self, context):
-        layout = self.layout
-        layout.operator_context = 'INVOKE_DEFAULT'
-        render_ops(ops.boolean_ops, layout, new_row=False, use_separator=True)
-        
+def reload():
+    for registerable in registerables:
+        importlib.reload(registerable)
+
 
 def register():
-    bpy.utils.register_class(ND_MT_boolean_menu)
-   
+    for registerable in registerables:
+        registerable.register()
+
 
 def unregister():
-    bpy.utils.unregister_class(ND_MT_boolean_menu)
+    for registerable in registerables:
+        registerable.unregister()

@@ -18,25 +18,40 @@
 # Contributors: Tristo (HM)
 # ---
 
-import bpy
-from . import ops
-from . common import render_ops
+import importlib
+from . import view_align
+from . import geo_lift
+from . import panel
+from . import single_vertex
+from . import recon_poly
+from . import screw_head
+from . import clear_vgs
+from . import make_manifold
 
 
-class ND_MT_boolean_menu(bpy.types.Menu):
-    bl_label = "Booleans"
-    bl_idname = "ND_MT_boolean_menu"
+registerables = (
+    view_align,
+    geo_lift,
+    panel,
+    single_vertex,
+    recon_poly,
+    screw_head,
+    clear_vgs,
+    make_manifold,
+)
 
 
-    def draw(self, context):
-        layout = self.layout
-        layout.operator_context = 'INVOKE_DEFAULT'
-        render_ops(ops.boolean_ops, layout, new_row=False, use_separator=True)
-        
+def reload():
+    for registerable in registerables:
+        importlib.reload(registerable)
+
 
 def register():
-    bpy.utils.register_class(ND_MT_boolean_menu)
-   
+    for registerable in registerables:
+        registerable.register()
+        
 
 def unregister():
-    bpy.utils.unregister_class(ND_MT_boolean_menu)
+    for registerable in registerables:
+        registerable.unregister()
+    

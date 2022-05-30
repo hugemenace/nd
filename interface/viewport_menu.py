@@ -19,6 +19,8 @@
 # ---
 
 import bpy
+from . import ops
+from . common import render_ops
 from .. import bl_info
 
 
@@ -33,10 +35,7 @@ class ND_MT_viewport_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.toggle_wireframes", icon='MOD_WIREFRAME')
-        layout.operator("nd.toggle_face_orientation", icon="ORIENTATION_NORMAL")
-        layout.operator("nd.toggle_utils_collection", icon="OUTLINER_COLLECTION")
-        layout.operator("nd.toggle_clear_view", icon="OUTLINER_DATA_VOLUME")
+        render_ops(ops.viewport_ops, layout, new_row=False, use_separator=True)
         
 
 def register():

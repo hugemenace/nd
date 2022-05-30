@@ -24,11 +24,7 @@ from . import set_lod_suffix
 from . import set_origin
 from . import smooth
 from . import seams
-from . import hydrate
-from . import clear_vgs
 from . import apply_modifiers
-from . import cycle
-from . import swap_solver
 from . import flare
 from . import snap_align
 from . import triangulate
@@ -40,14 +36,10 @@ registerables = (
     set_origin,
     smooth,
     seams,
-    hydrate,
-    clear_vgs,
     apply_modifiers,
-    cycle,
-    swap_solver,
     flare,
     snap_align,
-    triangulate
+    triangulate,
 )
 
 

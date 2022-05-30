@@ -29,7 +29,7 @@ registerables = (
     toggle_wireframes,
     toggle_face_orientation,
     toggle_utils_collection,
-    toggle_clear_view
+    toggle_clear_view,
 )
 
 

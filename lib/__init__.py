@@ -49,7 +49,7 @@ registerables = (
     collections,
     modifiers,
     numeric_input,
-    overlay_keys
+    overlay_keys,
 )
 
 

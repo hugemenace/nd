@@ -19,6 +19,8 @@
 # ---
 
 import bpy
+from . import ops
+from . common import render_ops
 from .. import bl_info
 
 
@@ -33,13 +35,8 @@ class ND_MT_sketch_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.single_vertex", icon='DOT')
-        layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
-        layout.separator()
-        layout.operator("nd.view_align", icon='ORIENTATION_VIEW')
-        layout.separator()
-        layout.operator("nd.geo_lift", icon='FACESEL')
-        layout.operator("nd.panel", icon='MOD_EXPLODE')
+
+        render_ops(ops.sketch_ops, layout, new_row=False, use_separator=True)
         
 
 def register():

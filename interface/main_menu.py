@@ -19,6 +19,8 @@
 # ---
 
 import bpy
+from . import ops
+from . common import render_ops
 from .. import bl_info
 from .. import lib
 
@@ -39,10 +41,10 @@ class ND_MT_main_menu(bpy.types.Menu):
             layout.separator()
 
         layout.operator_context = 'INVOKE_DEFAULT'
-        
-        layout.operator("nd.cycle", icon='LONGDISPLAY')
-        layout.menu("ND_MT_sketch_menu", text="Sketch", icon='GROUP_UVS')
 
+        render_ops(ops.standalone_ops, layout, new_row=False, use_separator=True)
+
+        layout.menu("ND_MT_sketch_menu", text="Sketch", icon='GROUP_UVS')
         layout.separator()
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
         layout.menu("ND_MT_bevel_menu", icon='MOD_BEVEL')
@@ -50,9 +52,6 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_replicate_menu", icon='MOD_ARRAY')
         layout.menu("ND_MT_deform_menu", icon='MOD_SIMPLEDEFORM')
         layout.menu("ND_MT_simplify_menu", icon='MOD_REMESH')
-        layout.separator()
-        layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
-        layout.operator("nd.screw_head", icon='CANCEL')
         layout.separator()
         layout.menu("ND_MT_utils_menu", text="Utils", icon='PLUGIN')
         layout.menu("ND_MT_viewport_menu", text="Viewport", icon='RESTRICT_VIEW_OFF')

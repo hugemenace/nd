@@ -19,37 +19,11 @@
 # ---
 
 import importlib
-from . import screw
-from . import solidify
-from . import weighted_normal_bevel
-from . import vertex_bevel
-from . import mirror
-from . import lattice
-from . import simple_deform
-from . import decimate
-from . import weld
-from . import profile_extrude
-from . import circular_array
-from . import array_cubed
-from . import edge_bevel
-from . import bevel
+from . import cycle
 
 
 registerables = (
-    screw,
-    solidify,
-    weighted_normal_bevel,
-    vertex_bevel,
-    mirror,
-    lattice,
-    simple_deform,
-    decimate,
-    weld,
-    profile_extrude,
-    circular_array,
-    array_cubed,
-    edge_bevel,
-    bevel
+    cycle,
 )
 
 

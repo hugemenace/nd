@@ -19,8 +19,8 @@
 # ---
 
 import bpy
-from .. import bl_info
-from .. import lib
+from . import ops
+from . common import render_ops
 
 
 class ND_MT_deform_menu(bpy.types.Menu):
@@ -31,8 +31,7 @@ class ND_MT_deform_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.lattice", icon='MOD_LATTICE')
-        layout.operator("nd.simple_deform", icon='MOD_SIMPLEDEFORM')
+        render_ops(ops.deform_ops, layout, new_row=False, use_separator=True)
 
 
 def register():

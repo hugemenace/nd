@@ -19,13 +19,13 @@
 # ---
 
 import importlib
-from . import recon_poly
-from . import screw_head
+from . import lattice
+from . import simple_deform
 
 
 registerables = (
-    recon_poly,
-    screw_head
+    lattice,
+    simple_deform,
 )
 
 

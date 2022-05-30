@@ -19,19 +19,15 @@
 # ---
 
 import importlib
-from . import view_align
-from . import geo_lift
-from . import panel
-from . import single_vertex
-from . import make_manifold
+from . import solidify
+from . import screw
+from . import profile_extrude
 
 
 registerables = (
-    view_align,
-    geo_lift,
-    panel,
-    single_vertex,
-    make_manifold
+    solidify,
+    screw,
+    profile_extrude,
 )
 
 
@@ -43,9 +39,8 @@ def reload():
 def register():
     for registerable in registerables:
         registerable.register()
-        
+
 
 def unregister():
     for registerable in registerables:
         registerable.unregister()
-    

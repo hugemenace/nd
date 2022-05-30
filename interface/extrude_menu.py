@@ -19,7 +19,8 @@
 # ---
 
 import bpy
-from .. import bl_info
+from . import ops
+from . common import render_ops
 
 
 class ND_MT_extrude_menu(bpy.types.Menu):
@@ -30,9 +31,7 @@ class ND_MT_extrude_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
-        layout.operator("nd.screw", icon='MOD_SCREW')
-        layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+        render_ops(ops.extrusion_ops, layout, new_row=False, use_separator=True)
         
 
 def register():

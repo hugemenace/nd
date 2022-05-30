@@ -19,8 +19,8 @@
 # ---
 
 import bpy
-from .. import bl_info
-from .. import lib
+from . import ops
+from . common import render_ops
 
 
 class ND_MT_replicate_menu(bpy.types.Menu):
@@ -31,9 +31,7 @@ class ND_MT_replicate_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.array_cubed", icon='PARTICLES')
-        layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
-        layout.operator("nd.mirror", icon='MOD_MIRROR')
+        render_ops(ops.replicate_ops, layout, new_row=False, use_separator=True)
         
 
 def register():

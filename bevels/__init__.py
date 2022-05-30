@@ -18,25 +18,32 @@
 # Contributors: Tristo (HM)
 # ---
 
-import bpy
-from . import ops
-from . common import render_ops
+import importlib
+from . import weighted_normal_bevel
+from . import vertex_bevel
+from . import edge_bevel
+from . import bevel
 
 
-class ND_MT_boolean_menu(bpy.types.Menu):
-    bl_label = "Booleans"
-    bl_idname = "ND_MT_boolean_menu"
+registerables = (
+    weighted_normal_bevel,
+    vertex_bevel,
+    edge_bevel,
+    bevel,
+)
 
 
-    def draw(self, context):
-        layout = self.layout
-        layout.operator_context = 'INVOKE_DEFAULT'
-        render_ops(ops.boolean_ops, layout, new_row=False, use_separator=True)
-        
+def reload():
+    for registerable in registerables:
+        importlib.reload(registerable)
+
 
 def register():
-    bpy.utils.register_class(ND_MT_boolean_menu)
-   
+    for registerable in registerables:
+        registerable.register()
+
 
 def unregister():
-    bpy.utils.unregister_class(ND_MT_boolean_menu)
+    for registerable in registerables:
+        registerable.unregister()
+    

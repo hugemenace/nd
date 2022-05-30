@@ -36,23 +36,31 @@ import rna_keymap_ui
 from bpy.types import AddonPreferences
 from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty
 from . import lib
-from . import booleans
 from . import interface
-from . import sketching
-from . import power_mods
-from . import generators
+from . import booleans
+from . import bevels
+from . import deform
+from . import extrusion
+from . import replicate
+from . import simplify
+from . import sketch
+from . import standalone
 from . import utils
 from . import viewport
 
 
 registerables = (
-    booleans,
     interface,
-    sketching,
-    power_mods,
-    generators,
+    booleans,
+    bevels,
+    deform,
+    extrusion,
+    replicate,
+    simplify,
+    sketch,
+    standalone,
     utils,
-    viewport,
+    viewport
 )
 
 

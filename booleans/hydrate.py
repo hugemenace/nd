@@ -27,7 +27,7 @@ from .. lib.events import capture_modifier_keys, pressed
 class ND_OT_hydrate(bpy.types.Operator):
     bl_idname = "nd.hydrate"
     bl_label = "Hydrate"
-    bl_description = "Convert a boolean (or other) reference object into solidified/shaded geometry"
+    bl_description = "Convert a boolean reference object into solidified geometry"
     bl_options = {'UNDO'}
 
 

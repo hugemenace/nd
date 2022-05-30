@@ -19,6 +19,8 @@
 # ---
 
 import bpy
+from . import ops
+from . common import render_ops
 from .. import bl_info
 
 
@@ -33,22 +35,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        layout.operator("nd.name_sync", icon='FILE_REFRESH')
-        layout.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').mode = 'LOW'
-        layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').mode = 'HIGH'
-        layout.separator()
-        layout.operator("nd.set_origin", icon='TRANSFORM_ORIGINS')
-        layout.operator("nd.snap_align", icon='SNAP_ON')
-        layout.separator()
-        layout.operator("nd.smooth", icon='MOD_SMOOTH')
-        layout.operator("nd.seams", icon='UV_DATA')
-        layout.operator("nd.clear_vgs", icon='GROUP_VERTEX')
-        layout.operator("nd.triangulate", icon='MOD_TRIANGULATE')
-        layout.operator("nd.apply_modifiers", icon='ORPHAN_DATA')
-        layout.separator()
-        layout.operator("nd.hydrate", icon='SHADING_RENDERED')
-        layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
-        layout.operator("nd.flare", text="Flare (Lighting)", icon='LIGHT_AREA')
+        render_ops(ops.util_ops, layout, new_row=False, use_separator=True)
         
 
 def register():

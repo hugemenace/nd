@@ -21,13 +21,17 @@
 import importlib
 from . import vanilla
 from . import boolean_slice
+from . import hydrate
+from . import swap_solver
 from . import boolean_inset
 
 
 registerables = (
     vanilla,
     boolean_slice,
-    boolean_inset
+    hydrate,
+    swap_solver,
+    boolean_inset,
 )
 
 

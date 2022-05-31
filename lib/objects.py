@@ -74,17 +74,20 @@ def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=T
     bpy.ops.object.duplicate()
 
     if ignore_complex_geo:
-        mods = list(context.object.modifiers)
-        for mod in mods:
+        mods = [(mod.name, mod) for mod in context.object.modifiers]
+        for name, mod in mods:
+            if not mod:
+                continue
+
             if mod.type == 'SUBSURF':
-                context.object.modifiers.remove(mod)
+                bpy.ops.object.modifier_remove(modifier=name)
             
             if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
                 if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
-                    context.object.modifiers.remove(mod)
+                    bpy.ops.object.modifier_remove(modifier=name)
             
             if "— ND WNB" in mod.name:
-                context.object.modifiers.remove(mod)
+                bpy.ops.object.modifier_remove(modifier=name)
 
     depsgraph = context.evaluated_depsgraph_get()
     object_eval = context.object.evaluated_get(depsgraph)

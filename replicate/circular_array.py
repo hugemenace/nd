@@ -229,6 +229,7 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
             self.reference_obj_prev_rotation = self.reference_obj.rotation_euler.copy()
             self.reference_obj.location = context.active_object.location.copy()
             self.reference_obj.rotation_euler = context.active_object.rotation_euler.copy()
+            self.reference_obj_matrix_world_backup = self.reference_obj.matrix_world.copy()
 
         self.rotator_obj = bpy.data.objects.new("empty", None)
         self.rotator_obj.name = "ND — Circular Array Rotator"
@@ -381,6 +382,9 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
             bpy.data.objects.remove(self.rotator_obj, do_unlink=True)
             
             if not self.single_obj_mode:
+                if not self.faux_origin:
+                    set_origin(self.reference_obj, self.reference_obj_matrix_world_backup)
+
                 self.reference_obj.location = self.reference_obj_prev_location
                 self.reference_obj.rotation_euler = self.reference_obj_prev_rotation
 

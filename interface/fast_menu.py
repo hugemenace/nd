@@ -161,6 +161,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_mod_screw = False
             has_mod_array_cubed = False
             has_mod_circular_array = False
+            has_mod_recon_poly = False
 
             for name in mod_names:
                 has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
@@ -169,6 +170,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
                 has_mod_array_cubed = has_mod_array_cubed or bool("Array³" in name)
                 has_mod_circular_array = has_mod_circular_array or bool("— ND CA" in name)
+                has_mod_recon_poly = has_mod_recon_poly or bool("— ND RCP" in name)
 
             was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
 
@@ -190,6 +192,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             if has_mod_circular_array:
                 layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
+
+            if has_mod_recon_poly:
+                layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
 
             if "Bool —" in context.object.name:
                 layout.operator("nd.hydrate", icon='SHADING_RENDERED')

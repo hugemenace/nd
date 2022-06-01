@@ -197,7 +197,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.segments = 3
         self.inner_radius = 0
         self.width = 0.05
-        self.natural_rotation = True
+        self.natural_rotation = False
 
         bpy.ops.object.select_all(action='DESELECT')
 

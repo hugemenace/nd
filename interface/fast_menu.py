@@ -104,7 +104,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
 
         if context.mode == 'EDIT_MESH':
-            mesh = bmesh.from_edit_mesh(context.object.data)
+            mesh = bmesh.from_edit_mesh(context.active_object.data)
 
             verts_selected = len([vert for vert in mesh.verts if vert.select]) >= 1
             edges_selected = len([edge for edge in mesh.edges if edge.select]) >= 1
@@ -139,7 +139,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if context.mode == 'OBJECT':
             depsgraph = context.evaluated_depsgraph_get()
-            object_eval = context.object.evaluated_get(depsgraph)
+            object_eval = context.active_object.evaluated_get(depsgraph)
 
             bm = bmesh.new()
             bm.from_mesh(object_eval.data)
@@ -153,7 +153,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             bm.free()
 
-            mod_names = [mod.name for mod in context.object.modifiers]
+            mod_names = [mod.name for mod in context.active_object.modifiers]
 
             has_mod_profile_extrude = False
             has_mod_solidify = False 
@@ -196,7 +196,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             if has_mod_recon_poly:
                 layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
 
-            if "Bool —" in context.object.name:
+            if "Bool —" in context.active_object.name:
                 layout.operator("nd.hydrate", icon='SHADING_RENDERED')
                 layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
 

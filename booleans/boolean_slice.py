@@ -41,12 +41,12 @@ class ND_OT_bool_slice(bpy.types.Operator):
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
         a, b = context.selected_objects
-        reference_obj = a if a.name != context.object.name else b
+        reference_obj = a if a.name != context.active_object.name else b
         
-        difference_obj = context.object
+        difference_obj = context.active_object
 
-        intersecting_obj = context.object.copy()
-        intersecting_obj.data = context.object.data.copy()
+        intersecting_obj = context.active_object.copy()
+        intersecting_obj.data = context.active_object.data.copy()
         intersecting_obj.animation_data_clear()
         context.collection.objects.link(intersecting_obj)
 

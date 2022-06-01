@@ -32,18 +32,18 @@ class ND_OT_clear_vgs(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'EDIT_MESH':
-            mesh = bmesh.from_edit_mesh(context.object.data)
+            mesh = bmesh.from_edit_mesh(context.active_object.data)
             return len([vert for vert in mesh.verts if vert.select]) >= 1
 
 
     def execute(self, context):
-        bm = bmesh.from_edit_mesh(context.object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
         bm.free()
 
         bpy.ops.object.mode_set(mode='OBJECT')
 
-        for vg in context.object.vertex_groups:
+        for vg in context.active_object.vertex_groups:
             vg.remove(selected_vert_indices)
 
         bpy.ops.object.mode_set(mode='EDIT')

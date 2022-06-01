@@ -170,12 +170,12 @@ ALT — Create a vertex group edge bevel"""
 
         previous_op = False
 
-        bm = bmesh.from_edit_mesh(context.object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
 
         self.vgroup_match = None
-        for group in context.object.vertex_groups:
-            vgroup_vert_indices = [vert.index for vert in context.object.data.vertices if group.index in [i.group for i in vert.groups]]
+        for group in context.active_object.vertex_groups:
+            vgroup_vert_indices = [vert.index for vert in context.active_object.data.vertices if group.index in [i.group for i in vert.groups]]
             if len(set(vgroup_vert_indices) & set(selected_vert_indices)) > 0:
                 if self.vgroup_match:
                     self.report({'ERROR_INVALID_INPUT'}, "Multiple vertex groups selected, unable to continue operation.")
@@ -196,7 +196,7 @@ ALT — Create a vertex group edge bevel"""
             bpy.ops.object.vertex_group_set_active(group=self.group.name)
             bpy.ops.object.vertex_group_select()
 
-            for mod in context.object.modifiers:
+            for mod in context.active_object.modifiers:
                 if mod.type == "BEVEL" and mod.vertex_group == self.group.name:
                     previous_op = True
                     self.bevel = mod
@@ -222,7 +222,7 @@ ALT — Create a vertex group edge bevel"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'EDIT_MESH':
-            mesh = bmesh.from_edit_mesh(context.object.data)
+            mesh = bmesh.from_edit_mesh(context.active_object.data)
             return len([vert for vert in mesh.verts if vert.select]) >= 1
 
 
@@ -245,20 +245,20 @@ ALT — Create a vertex group edge bevel"""
     def add_smooth_shading(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
-        context.object.data.use_auto_smooth = True
-        context.object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        context.active_object.data.use_auto_smooth = True
+        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
         bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_vertex_group(self, context):
-        vgroup = context.object.vertex_groups.new(name="ND — Bevel")
+        vgroup = context.active_object.vertex_groups.new(name="ND — Bevel")
         bpy.ops.object.vertex_group_assign()
 
         self.vgroup = vgroup
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.object.modifiers.new(mod_bevel, type='BEVEL')
+        bevel = context.active_object.modifiers.new(mod_bevel, type='BEVEL')
         if self.edge_mode:
             bevel.affect = 'EDGES'
         else:
@@ -270,7 +270,7 @@ ALT — Create a vertex group edge bevel"""
         self.bevel = bevel
 
         if not self.late_apply:
-            while context.object.modifiers[0].name != self.bevel.name:
+            while context.active_object.modifiers[0].name != self.bevel.name:
                 bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
     
 
@@ -280,13 +280,13 @@ ALT — Create a vertex group edge bevel"""
         previous_op = all(m in mod_names for m in mod_summon_list)
 
         if self.late_apply or not previous_op:
-            weld = context.object.modifiers.new(mod_weld_la if self.late_apply else mod_weld, type='WELD')
+            weld = context.active_object.modifiers.new(mod_weld_la if self.late_apply else mod_weld, type='WELD')
             weld.merge_threshold = 0.00001
 
             self.weld = weld
 
             if not self.late_apply:
-                while context.object.modifiers[1].name != self.weld.name:
+                while context.active_object.modifiers[1].name != self.weld.name:
                     bpy.ops.object.modifier_move_up(modifier=self.weld.name)
 
 
@@ -328,7 +328,7 @@ ALT — Create a vertex group edge bevel"""
 
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
-            context.object.vertex_groups.remove(self.vgroup)
+            context.active_object.vertex_groups.remove(self.vgroup)
 
         unregister_draw_handler()
 

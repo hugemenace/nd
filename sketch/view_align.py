@@ -99,7 +99,7 @@ class ND_OT_view_align(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def set_selection_mode(self, context):
@@ -111,22 +111,22 @@ class ND_OT_view_align(bpy.types.Operator):
         bpy.ops.object.duplicate()
 
         depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
+        object_eval = context.active_object.evaluated_get(depsgraph)
 
-        context.object.modifiers.clear()
-        context.object.show_in_front = True
+        context.active_object.modifiers.clear()
+        context.active_object.show_in_front = True
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.object.data)
+        bm.to_mesh(context.active_object.data)
         bm.free()
 
         mode = ['VERT', 'EDGE', 'FACE'][self.selection_type]
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
         bpy.ops.mesh.select_all(action='DESELECT')
 
-        context.object.name = 'ND — View Align'
-        context.object.data.name = 'ND — View Align'
+        context.active_object.name = 'ND — View Align'
+        context.active_object.data.name = 'ND — View Align'
 
     
     def get_face_transform(self, mesh, world_matrix):
@@ -161,8 +161,8 @@ class ND_OT_view_align(bpy.types.Operator):
 
 
     def prepare_view_align(self, context):
-        mesh = bmesh.from_edit_mesh(context.object.data)
-        world_matrix = context.object.matrix_world
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        world_matrix = context.active_object.matrix_world
 
         if self.selection_type == 0:
             selected_vertices = len([v for v in mesh.verts if v.select])
@@ -187,7 +187,7 @@ class ND_OT_view_align(bpy.types.Operator):
 
 
     def has_invalid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.object.data)
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
 
         selected_vertices = len([v for v in mesh.verts if v.select])
         selected_edges = len([e for e in mesh.edges if e.select])
@@ -223,7 +223,7 @@ class ND_OT_view_align(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
-        context.object.show_in_front = False
+        context.active_object.show_in_front = False
 
         bpy.ops.object.delete()
 

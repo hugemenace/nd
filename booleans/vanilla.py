@@ -49,14 +49,14 @@ SHIFT — Protect the reference object (do not convert into utility)"""
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
         a, b = context.selected_objects
-        reference_obj = a if a.name != context.object.name else b
+        reference_obj = a if a.name != context.active_object.name else b
         
-        boolean = context.object.modifiers.new(" — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN')
+        boolean = context.active_object.modifiers.new(" — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN')
         boolean.operation = self.mode
         boolean.object = reference_obj
         boolean.solver = solver
 
-        rectify_mod_order(context.object, boolean.name)
+        rectify_mod_order(context.active_object, boolean.name)
 
         if not self.protect_reference_obj:
             reference_obj.display_type = 'WIRE'
@@ -64,8 +64,8 @@ SHIFT — Protect the reference object (do not convert into utility)"""
             reference_obj.name = " — ".join(['Bool', reference_obj.name])
             reference_obj.data.name = reference_obj.name
 
-        reference_obj.parent = context.object
-        reference_obj.matrix_parent_inverse = context.object.matrix_world.inverted()
+        reference_obj.parent = context.active_object
+        reference_obj.matrix_parent_inverse = context.active_object.matrix_world.inverted()
 
         if not self.protect_reference_obj:
             move_to_utils_collection(reference_obj)

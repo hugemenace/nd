@@ -98,14 +98,14 @@ SHIFT — Cycle through the modifier stack"""
 
         self.mod_cycle = event.shift
 
-        self.target_obj = context.object
+        self.target_obj = context.active_object
         
-        self.mod_count = len(context.object.modifiers)
-        self.mod_names = [mod.name for mod in context.object.modifiers]
-        self.mod_snapshot = [(mod.show_viewport, mod.show_in_editmode) for mod in context.object.modifiers]
+        self.mod_count = len(context.active_object.modifiers)
+        self.mod_names = [mod.name for mod in context.active_object.modifiers]
+        self.mod_snapshot = [(mod.show_viewport, mod.show_in_editmode) for mod in context.active_object.modifiers]
         
         self.frozen_utils = set(())
-        self.util_objects = [mod for mod in context.object.modifiers if mod.type == 'BOOLEAN' and mod.object]
+        self.util_objects = [mod for mod in context.active_object.modifiers if mod.type == 'BOOLEAN' and mod.object]
         self.util_names = [mod.name for mod in self.util_objects]
         self.util_count = len(self.util_objects)
 
@@ -126,7 +126,7 @@ SHIFT — Cycle through the modifier stack"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def set_mod_visible(self, mod, visible):
@@ -145,7 +145,7 @@ SHIFT — Cycle through the modifier stack"""
 
     def operate(self, context):
         if self.mod_cycle:
-            for counter, mod in enumerate(context.object.modifiers):
+            for counter, mod in enumerate(context.active_object.modifiers):
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
             util_obj = self.util_objects[self.util_current_index].object
@@ -158,7 +158,7 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def revert_mods(self, context):
-        for counter, mod in enumerate(context.object.modifiers):
+        for counter, mod in enumerate(context.active_object.modifiers):
             mod.show_viewport = self.mod_snapshot[counter][0]
             mod.show_in_editmode = self.mod_snapshot[counter][1]
 
@@ -179,7 +179,7 @@ SHIFT — Cycle through the modifier stack"""
 
         self.mod_current_index = -1
 
-        for mod in context.object.modifiers:
+        for mod in context.active_object.modifiers:
             self.set_mod_visible(mod, False)
 
 

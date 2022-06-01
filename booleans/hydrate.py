@@ -83,7 +83,7 @@ class ND_OT_hydrate(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
 
-        self.active_object = context.object
+        self.active_object = context.active_object
 
         self.clear_parent = False
         self.all_collections = [c.name for c in bpy.data.collections]

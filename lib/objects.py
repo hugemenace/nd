@@ -74,7 +74,7 @@ def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=T
     bpy.ops.object.duplicate()
 
     if ignore_complex_geo:
-        mods = [(mod.name, mod) for mod in context.object.modifiers]
+        mods = [(mod.name, mod) for mod in context.active_object.modifiers]
         for name, mod in mods:
             if not mod:
                 continue
@@ -93,14 +93,14 @@ def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=T
                 continue
 
     depsgraph = context.evaluated_depsgraph_get()
-    object_eval = context.object.evaluated_get(depsgraph)
+    object_eval = context.active_object.evaluated_get(depsgraph)
 
-    context.object.modifiers.clear()
-    context.object.show_in_front = True
+    context.active_object.modifiers.clear()
+    context.active_object.show_in_front = True
 
-    vertex_groups = context.object.vertex_groups.values()
+    vertex_groups = context.active_object.vertex_groups.values()
     for vg in vertex_groups:
-        context.object.vertex_groups.remove(vg)
+        context.active_object.vertex_groups.remove(vg)
 
     bm = bmesh.new()
     bm.from_mesh(object_eval.data)
@@ -111,13 +111,13 @@ def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=T
     for edge in selected_edges:
         edge[bevel_weight_layer] = 0
 
-    bm.to_mesh(context.object.data)
+    bm.to_mesh(context.active_object.data)
     bm.free()
 
     bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode=mode)
     bpy.ops.mesh.select_all(action='DESELECT')
 
-    context.object.name = name
-    context.object.data.name = name
+    context.active_object.name = name
+    context.active_object.data.name = name
 
     bpy.ops.mesh.customdata_custom_splitnormals_clear()

@@ -101,7 +101,7 @@ class ND_OT_snap_align(bpy.types.Operator):
         self.snap_point = None
 
         a, b = context.selected_objects
-        self.reference_obj = a if a.name != context.object.name else b
+        self.reference_obj = a if a.name != context.active_object.name else b
         self.reference_obj_original_location = self.reference_obj.location.copy()
         self.reference_obj_original_rotation = self.reference_obj.rotation_euler.copy()
 
@@ -112,12 +112,12 @@ class ND_OT_snap_align(bpy.types.Operator):
                 mod.show_viewport = False
 
         depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
+        object_eval = context.active_object.evaluated_get(depsgraph)
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
         
-        world_matrix = context.object.matrix_world
+        world_matrix = context.active_object.matrix_world
 
         vert_points = []
         for vert in bm.verts:
@@ -209,7 +209,7 @@ class ND_OT_snap_align(bpy.types.Operator):
 
         hit, location, normal, face_index, object, matrix = context.scene.ray_cast(depsgraph, ray_origin, ray_direction)
         hidden_objects = []
-        while hit and object.name != context.object.name:
+        while hit and object.name != context.active_object.name:
             hidden_objects.append(object)
             object.hide_set(True)
             hit, location, normal, face_index, object, matrix = context.scene.ray_cast(depsgraph, location + 0.001 * ray_direction, ray_direction)

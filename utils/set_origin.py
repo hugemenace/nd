@@ -35,19 +35,19 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
     def poll(cls, context):
         if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
             a, b = context.selected_objects
-            reference_obj = a if a.name != context.object.name else b
+            reference_obj = a if a.name != context.active_object.name else b
 
             return reference_obj.type == 'MESH'
 
 
     def execute(self, context):
         a, b = context.selected_objects
-        reference_obj = a if a.name != context.object.name else b
+        reference_obj = a if a.name != context.active_object.name else b
         
         (x_dest, y_dest, z_dest) = reference_obj.location
-        (x_orig, y_orig, z_orig) = context.object.location
+        (x_orig, y_orig, z_orig) = context.active_object.location
 
-        reference_obj.location = context.object.location
+        reference_obj.location = context.active_object.location
 
         self.add_displace_modifier(reference_obj, 'X', x_dest - x_orig)
         self.add_displace_modifier(reference_obj, 'Y', y_dest - y_orig)
@@ -61,9 +61,9 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
             return self.execute(context)
         else:
             a, b = context.selected_objects
-            reference_obj = a if a.name != context.object.name else b
+            reference_obj = a if a.name != context.active_object.name else b
 
-            mx = context.object.matrix_world
+            mx = context.active_object.matrix_world
             set_origin(reference_obj, mx)
 
             return {'FINISHED'}

@@ -199,10 +199,10 @@ class ND_OT_circular_array(bpy.types.Operator):
     def poll(cls, context):
         if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
             a, b = context.selected_objects
-            reference_obj = a if a.name != context.object.name else b
+            reference_obj = a if a.name != context.active_object.name else b
 
             return reference_obj.type == 'MESH'
-        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.object.type == 'MESH':
+        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
             return True
         else:
             return False
@@ -213,16 +213,16 @@ class ND_OT_circular_array(bpy.types.Operator):
 
         if not self.single_obj_mode:
             a, b = context.selected_objects
-            self.reference_obj = a if a.name != context.object.name else b
-            self.target_obj = context.object
+            self.reference_obj = a if a.name != context.active_object.name else b
+            self.target_obj = context.active_object
         else:
-            self.reference_obj = context.object
+            self.reference_obj = context.active_object
 
         if not self.single_obj_mode:
             self.reference_obj_prev_location = self.reference_obj.location.copy()
             self.reference_obj_prev_rotation = self.reference_obj.rotation_euler.copy()
-            self.reference_obj.location = context.object.location.copy()
-            self.reference_obj.rotation_euler = context.object.rotation_euler.copy()
+            self.reference_obj.location = context.active_object.location.copy()
+            self.reference_obj.rotation_euler = context.active_object.rotation_euler.copy()
 
         self.rotator_obj = bpy.data.objects.new("empty", None)
         self.rotator_obj.name = "ND — Circular Array Rotator"
@@ -246,7 +246,7 @@ class ND_OT_circular_array(bpy.types.Operator):
 
         self.displace = mods[mod_displace]
         self.array = mods[mod_array]
-        self.reference_obj = context.object
+        self.reference_obj = context.active_object
         self.rotator_obj = self.array.offset_object
 
         if self.rotator_obj is None:

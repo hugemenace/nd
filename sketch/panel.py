@@ -137,10 +137,10 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         self.individual = False
         self.inset = 0
         self.stage = 0
-        self.target_obj = context.object
+        self.target_obj = context.active_object
 
         create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — Panel', not event.shift)
-        self.panel_obj = context.object
+        self.panel_obj = context.active_object
 
         self.inset_input_stream = new_stream()
 
@@ -157,7 +157,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def isolate_geometry(self, context):
@@ -221,7 +221,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def has_valid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.object.data)
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
         selected_faces = len([f for f in mesh.faces if f.select])
         
         return selected_faces > 0

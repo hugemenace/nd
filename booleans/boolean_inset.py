@@ -124,12 +124,12 @@ class ND_OT_bool_inset(bpy.types.Operator):
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
         a, b = context.selected_objects
-        self.reference_obj = a if a.name != context.object.name else b
+        self.reference_obj = a if a.name != context.active_object.name else b
         
-        self.target_obj = context.object
+        self.target_obj = context.active_object
 
-        self.intersecting_obj = context.object.copy()
-        self.intersecting_obj.data = context.object.data.copy()
+        self.intersecting_obj = context.active_object.copy()
+        self.intersecting_obj.data = context.active_object.data.copy()
         self.intersecting_obj.animation_data_clear()
         context.collection.objects.link(self.intersecting_obj)
 

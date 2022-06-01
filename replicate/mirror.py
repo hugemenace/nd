@@ -152,11 +152,11 @@ SHIFT — Place modifiers at the top of the stack"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            if len(context.selected_objects) == 1 and context.object.type == 'MESH':
+            if len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
                 return True
 
             if len(context.selected_objects) >= 2:
-                return all(obj.type == 'MESH' for obj in context.selected_objects if obj.name != context.object.name)
+                return all(obj.type == 'MESH' for obj in context.selected_objects if obj.name != context.active_object.name)
 
 
     def set_selection_mode(self, context):
@@ -168,22 +168,22 @@ SHIFT — Place modifiers at the top of the stack"""
         bpy.ops.object.duplicate()
 
         depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
+        object_eval = context.active_object.evaluated_get(depsgraph)
 
-        context.object.modifiers.clear()
-        context.object.show_in_front = True
+        context.active_object.modifiers.clear()
+        context.active_object.show_in_front = True
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.object.data)
+        bm.to_mesh(context.active_object.data)
         bm.free()
 
         mode = ['VERT', 'EDGE', 'FACE'][self.geometry_selection_type]
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
         bpy.ops.mesh.select_all(action='DESELECT')
 
-        context.object.name = 'ND — Mirror Geometry'
-        context.object.data.name = 'ND — Mirror Geometry'
+        context.active_object.name = 'ND — Mirror Geometry'
+        context.active_object.data.name = 'ND — Mirror Geometry'
 
     
     def get_face_transform(self, mesh, world_matrix):
@@ -214,8 +214,8 @@ SHIFT — Place modifiers at the top of the stack"""
 
 
     def get_geometry_transform(self, context):
-        mesh = bmesh.from_edit_mesh(context.object.data)
-        world_matrix = context.object.matrix_world
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        world_matrix = context.active_object.matrix_world
 
         if self.geometry_selection_type == 0:
             selected_vertices = len([v for v in mesh.verts if v.select])
@@ -233,7 +233,7 @@ SHIFT — Place modifiers at the top of the stack"""
 
 
     def has_invalid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.object.data)
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
 
         selected_vertices = len([v for v in mesh.verts if v.select])
         selected_edges = len([e for e in mesh.edges if e.select])
@@ -252,7 +252,7 @@ SHIFT — Place modifiers at the top of the stack"""
     def complete_geometry_mode(self, context):
         if self.has_invalid_selection(context):
             bpy.ops.object.mode_set(mode='OBJECT')
-            context.object.show_in_front = False
+            context.active_object.show_in_front = False
             bpy.ops.object.delete()
 
             self.select_reference_objs(context)
@@ -270,7 +270,7 @@ SHIFT — Place modifiers at the top of the stack"""
         (location, rotation) = self.get_geometry_transform(context)
 
         bpy.ops.object.mode_set(mode='OBJECT')
-        context.object.show_in_front = False
+        context.active_object.show_in_front = False
         bpy.ops.object.delete()
 
         empty = bpy.data.objects.new("empty", None)
@@ -341,7 +341,7 @@ SHIFT — Place modifiers at the top of the stack"""
     def finish(self, context):
         self.select_reference_objs(context)
 
-        context.object.show_in_front = False
+        context.active_object.show_in_front = False
 
         unregister_draw_handler()
         unregister_axis_handler()
@@ -361,7 +361,7 @@ SHIFT — Place modifiers at the top of the stack"""
         if self.geometry_mode and self.geometry_ready:
             bpy.data.objects.remove(self.mirror_obj, do_unlink=True)
 
-        context.object.show_in_front = False
+        context.active_object.show_in_front = False
 
         unregister_draw_handler()
         unregister_axis_handler()

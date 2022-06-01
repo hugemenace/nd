@@ -184,9 +184,9 @@ class ND_OT_flare(bpy.types.Operator):
         self.energy_offset_input_stream = new_stream()
         self.scale_input_stream = new_stream()
 
-        if context.object.type == 'EMPTY':
+        if context.active_object.type == 'EMPTY':
             self.summoned = True
-            self.empty = context.object
+            self.empty = context.active_object
             self.rotation_prev = self.rotation = degrees(self.empty.rotation_euler[2])
             self.scale_prev = self.scale = self.empty.scale[0]
 
@@ -217,7 +217,7 @@ class ND_OT_flare(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type in {'MESH', 'EMPTY'}
+            return len(context.selected_objects) == 1 and context.active_object.type in {'MESH', 'EMPTY'}
 
 
     def create_empty(self, context):
@@ -226,7 +226,7 @@ class ND_OT_flare(bpy.types.Operator):
         empty.name = "ND — Flare Rig"
         empty.empty_display_size = 1
         empty.empty_display_type = 'SPHERE'
-        empty.location = context.object.location.copy()
+        empty.location = context.active_object.location.copy()
         empty.rotation_euler = (0, 0, radians(self.rotation))
         empty.scale = (1, 1, 1)
 

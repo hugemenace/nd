@@ -153,7 +153,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
     
     def prepare_new_operator(self, context):
@@ -197,7 +197,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
 
     def add_offset_modifier(self, context):
-        offset = context.object.modifiers.new(mod_offset, 'DISPLACE')
+        offset = context.active_object.modifiers.new(mod_offset, 'DISPLACE')
         offset.space = 'LOCAL'
         offset.mid_level = 0
 
@@ -205,7 +205,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
 
     def add_screw_modifier(self, context):
-        screw = context.object.modifiers.new(mod_screw, 'SCREW')
+        screw = context.active_object.modifiers.new(mod_screw, 'SCREW')
         screw.steps = 0
         screw.render_steps = 0
         screw.angle = 0

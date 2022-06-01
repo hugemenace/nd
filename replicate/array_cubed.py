@@ -182,7 +182,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def prepare_new_operator(self, context):
@@ -212,7 +212,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
 
     def add_array_modifier(self, context, name, axis):
-        array = context.object.modifiers.new(name, 'ARRAY')
+        array = context.active_object.modifiers.new(name, 'ARRAY')
         array.use_relative_offset = True
 
         self.axes[axis] = [array, 1, 2]

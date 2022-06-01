@@ -187,8 +187,8 @@ SHIFT — Place modifiers at the top of the stack"""
 
         self.target_object = context.active_object
 
-        if not context.object.data.use_customdata_edge_bevel:
-            context.object.data.use_customdata_edge_bevel = True
+        if not context.active_object.data.use_customdata_edge_bevel:
+            context.active_object.data.use_customdata_edge_bevel = True
 
         self.take_edges_snapshot(context)
 
@@ -216,7 +216,7 @@ SHIFT — Place modifiers at the top of the stack"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'EDIT_MESH':
-            mesh = bmesh.from_edit_mesh(context.object.data)
+            mesh = bmesh.from_edit_mesh(context.active_object.data)
             return len([edge for edge in mesh.edges if edge.select]) >= 1
 
 
@@ -241,20 +241,20 @@ SHIFT — Place modifiers at the top of the stack"""
     def add_smooth_shading(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
-        context.object.data.use_auto_smooth = True
-        context.object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        context.active_object.data.use_auto_smooth = True
+        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
         bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.object.modifiers.new(mod_bevel, 'BEVEL')
+        bevel = context.active_object.modifiers.new(mod_bevel, 'BEVEL')
         bevel.offset_type = 'WIDTH'
         bevel.limit_method = 'WEIGHT'
 
         self.bevel = bevel
 
         if self.early_apply:
-            while context.object.modifiers[0].name != self.bevel.name:
+            while context.active_object.modifiers[0].name != self.bevel.name:
                 bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
 
 
@@ -264,20 +264,20 @@ SHIFT — Place modifiers at the top of the stack"""
         previous_op = all(m in mod_names for m in mod_summon_list)
 
         if not previous_op:
-            weld = context.object.modifiers.new(mod_weld, type='WELD')
+            weld = context.active_object.modifiers.new(mod_weld, type='WELD')
             weld.merge_threshold = 0.00001
 
             self.weld = weld
 
             if self.early_apply:
-                while context.object.modifiers[1].name != self.weld.name:
+                while context.active_object.modifiers[1].name != self.weld.name:
                     bpy.ops.object.modifier_move_up(modifier=self.weld.name)
 
 
     def take_edges_snapshot(self, context):
         self.edges_snapshot = {}
         
-        data = context.object.data
+        data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
         bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
     
@@ -292,7 +292,7 @@ SHIFT — Place modifiers at the top of the stack"""
         self.bevel.profile = self.profile
         self.bevel.harden_normals = self.harden_normals
 
-        data = context.object.data
+        data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
         bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
     
@@ -324,7 +324,7 @@ SHIFT — Place modifiers at the top of the stack"""
             self.bevel.segments = self.segments_prev
             self.bevel.profile = self.profile_prev
 
-        data = context.object.data
+        data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
         bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
     

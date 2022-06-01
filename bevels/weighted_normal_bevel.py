@@ -151,7 +151,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def prepare_new_operator(self, context):
@@ -180,12 +180,12 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
-        context.object.data.use_auto_smooth = True
-        context.object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        context.active_object.data.use_auto_smooth = True
+        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.object.modifiers.new(mod_bevel, 'BEVEL')
+        bevel = context.active_object.modifiers.new(mod_bevel, 'BEVEL')
         bevel.segments = 1
         bevel.offset_type = 'WIDTH'
         bevel.face_strength_mode = 'FSTR_AFFECTED'
@@ -194,7 +194,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     
 
     def add_weighted_normal_modifer(self, context):
-        wn = context.object.modifiers.new(mod_wn, 'WEIGHTED_NORMAL')
+        wn = context.active_object.modifiers.new(mod_wn, 'WEIGHTED_NORMAL')
         wn.weight = 100
         wn.use_face_influence = True
 

@@ -179,7 +179,7 @@ class ND_OT_lattice(bpy.types.Operator):
         self.lattice_points_v_input_stream = new_stream()
         self.lattice_points_w_input_stream = new_stream()
 
-        self.reference_object = context.object
+        self.reference_object = context.active_object
 
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
@@ -212,7 +212,7 @@ class ND_OT_lattice(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def prepare_new_operator(self, context):
@@ -239,12 +239,12 @@ class ND_OT_lattice(bpy.types.Operator):
         bpy.ops.object.duplicate()
 
         depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.object.evaluated_get(depsgraph)
-        context.object.modifiers.clear()
+        object_eval = context.active_object.evaluated_get(depsgraph)
+        context.active_object.modifiers.clear()
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.object.data)
+        bm.to_mesh(context.active_object.data)
         bm.free()
 
         eval_obj = context.active_object
@@ -281,7 +281,7 @@ class ND_OT_lattice(bpy.types.Operator):
 
 
     def add_lattice_modifier(self, context):
-        lattice = context.object.modifiers.new(mod_lattice, 'LATTICE')
+        lattice = context.active_object.modifiers.new(mod_lattice, 'LATTICE')
         lattice.object = self.lattice_obj
 
         self.lattice = lattice

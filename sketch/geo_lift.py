@@ -87,7 +87,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
         self.register_mode()
         
-        self.target_obj = context.object
+        self.target_obj = context.active_object
 
         create_duplicate_liftable_geometry(context, {self.mode}, 'ND — Geo Lift', not event.shift)
 
@@ -104,7 +104,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def register_mode(self):
@@ -125,7 +125,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def has_invalid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.object.data)
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
 
         selected_vertices = len([v for v in mesh.verts if v.select])
         selected_edges = len([e for e in mesh.edges if e.select])
@@ -158,7 +158,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
-        context.object.show_in_front = False
+        context.active_object.show_in_front = False
 
         if remove_lifted_geometry:
             bpy.ops.object.delete()

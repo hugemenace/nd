@@ -64,7 +64,7 @@ class ND_OT_seams(bpy.types.Operator):
         elif self.key_reset:
             if self.key_no_modifiers:
                 self.angle_input_stream = new_stream()
-                self.angle = degrees(context.object.data.auto_smooth_angle)
+                self.angle = degrees(context.active_object.data.auto_smooth_angle)
                 self.dirty = True
 
         elif pressed(event, {'A'}):
@@ -105,7 +105,7 @@ class ND_OT_seams(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_angle_factor = 15
-        self.angle = degrees(context.object.data.auto_smooth_angle)
+        self.angle = degrees(context.active_object.data.auto_smooth_angle)
         self.commit_auto_smooth = False
 
         self.angle_input_stream = new_stream()
@@ -128,7 +128,7 @@ class ND_OT_seams(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
     
     def operate(self, context):
@@ -158,8 +158,8 @@ class ND_OT_seams(bpy.types.Operator):
 
         if self.commit_auto_smooth:
             bpy.ops.object.shade_smooth()
-            context.object.data.use_auto_smooth = True
-            context.object.data.auto_smooth_angle = radians(self.angle)
+            context.active_object.data.use_auto_smooth = True
+            context.active_object.data.auto_smooth_angle = radians(self.angle)
 
         unregister_draw_handler()
 

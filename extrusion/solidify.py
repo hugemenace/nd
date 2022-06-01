@@ -169,7 +169,7 @@ class ND_OT_solidify(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
     
     def prepare_new_operator(self, context):
@@ -197,19 +197,19 @@ class ND_OT_solidify(bpy.types.Operator):
 
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
-        context.object.data.use_auto_smooth = True
-        context.object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        context.active_object.data.use_auto_smooth = True
+        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_displace_modifier(self, context):
-        displace = context.object.modifiers.new(mod_displace, 'DISPLACE')
+        displace = context.active_object.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0
 
         self.displace = displace
 
 
     def add_solidify_modifier(self, context):
-        solidify = context.object.modifiers.new(mod_solidify, 'SOLIDIFY')
+        solidify = context.active_object.modifiers.new(mod_solidify, 'SOLIDIFY')
         solidify.use_even_offset = True
 
         self.solidify = solidify

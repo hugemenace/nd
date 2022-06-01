@@ -39,7 +39,8 @@ mod_summon_list = [mod_displace, mod_array]
 class ND_OT_circular_array(bpy.types.Operator):
     bl_idname = "nd.circular_array"
     bl_label = "Circular Array"
-    bl_description = "Array an object around another in a circular fashion"
+    bl_description = """Array an object around another in a circular fashion
+ALT — Use faux origin translation (for origin-reliant geometry)"""
     bl_options = {'UNDO'}
 
 
@@ -91,11 +92,15 @@ class ND_OT_circular_array(bpy.types.Operator):
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_input_stream = new_stream()
-                self.offset = 360
+                self.offset = self.reference_obj.dimensions[self.axis] if self.single_obj_mode else 0
                 self.dirty = True
 
         elif pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
+            self.dirty = True
+
+        elif pressed(event, {'D'}):
+            self.displace_axis = (self.displace_axis + 1) % 3
             self.dirty = True
 
         elif self.key_increase_factor:
@@ -155,9 +160,11 @@ class ND_OT_circular_array(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
 
+        self.faux_origin = event.alt
         self.base_offset_factor = 0.001
 
         self.axis = 2
+        self.displace_axis = 0
         self.count = 2
         self.angle = 360
         self.offset = 0
@@ -183,10 +190,7 @@ class ND_OT_circular_array(bpy.types.Operator):
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
-        if self.single_obj_mode:
-            init_axis(self, self.reference_obj, self.axis)
-        else:
-            init_axis(self, self.target_obj, self.axis)
+        init_axis(self, self.reference_obj, self.axis)
 
         register_axis_handler(self)
 
@@ -218,6 +222,8 @@ class ND_OT_circular_array(bpy.types.Operator):
         else:
             self.reference_obj = context.active_object
 
+        bpy.data.objects[self.reference_obj.name]["NDCA_single_obj_mode"] = self.single_obj_mode
+
         if not self.single_obj_mode:
             self.reference_obj_prev_location = self.reference_obj.location.copy()
             self.reference_obj_prev_rotation = self.reference_obj.rotation_euler.copy()
@@ -229,12 +235,28 @@ class ND_OT_circular_array(bpy.types.Operator):
         bpy.context.scene.collection.objects.link(self.rotator_obj)
         self.rotator_obj.empty_display_size = 1
         self.rotator_obj.empty_display_type = 'PLAIN_AXES'
-        self.rotator_obj.parent = self.reference_obj
-        self.rotator_obj.location = (0, 0, 0)
-        self.rotator_obj.rotation_euler = (0, 0, 0)
+
+        if self.single_obj_mode or self.faux_origin:
+            self.rotator_obj.location = (0, 0, 0)
+        else:
+            self.rotator_obj.location = self.target_obj.location.copy()
+
+        self.rotator_obj.rotation_euler = self.reference_obj.rotation_euler.copy()
+        self.rotator_obj_rotation_snapshot = self.reference_obj.rotation_euler.copy()
+        bpy.data.objects[self.reference_obj.name]["NDCA_rotator_obj_rotation_snapshot"] = self.rotator_obj_rotation_snapshot
+
         self.rotator_obj.scale = (1, 1, 1)
+
+        self.rotator_obj.parent = self.reference_obj
+        if not self.faux_origin and not self.single_obj_mode: 
+            self.rotator_obj.matrix_parent_inverse = self.reference_obj.matrix_world.inverted()
         
-        self.add_displace_tranform_modifiers()
+        if self.faux_origin:
+            self.add_displace_tranform_modifiers()
+        elif not self.faux_origin and not self.single_obj_mode:
+            mx = self.target_obj.matrix_world
+            set_origin(self.reference_obj, mx)
+
         self.add_displace_modifier()
         self.add_array_modifier()
 
@@ -254,8 +276,11 @@ class ND_OT_circular_array(bpy.types.Operator):
 
         self.angle = self.angle_prev = bpy.data.objects[self.reference_obj.name]["NDCA_angle"]
         self.axis = self.axis_prev = bpy.data.objects[self.reference_obj.name]["NDCA_axis"]
+        self.single_obj_mode = bpy.data.objects[self.reference_obj.name]["NDCA_single_obj_mode"]
+        self.displace_axis = self.displace_axis_prev = ['X', 'Y', 'Z'].index(self.displace.direction)
         self.count = self.count_prev = self.array.count
         self.offset = self.offset_prev = self.displace.strength
+        self.rotator_obj_rotation_snapshot = bpy.data.objects[self.reference_obj.name]["NDCA_rotator_obj_rotation_snapshot"]
 
 
     def add_array_modifier(self):
@@ -285,7 +310,6 @@ class ND_OT_circular_array(bpy.types.Operator):
 
     def add_displace_modifier(self):
         displace = self.reference_obj.modifiers.new(mod_displace, 'DISPLACE')
-        displace.direction = 'X'
         displace.space = 'LOCAL'
         displace.mid_level = 0
         displace.show_in_editmode = True
@@ -303,7 +327,7 @@ class ND_OT_circular_array(bpy.types.Operator):
         rotation = radians(self.angle / altered_count)
         rotation_axis = ['X', 'Y', 'Z'][self.axis]
 
-        self.rotator_obj.rotation_euler = (0, 0, 0)
+        self.rotator_obj.rotation_euler = self.rotator_obj_rotation_snapshot
         self.rotator_obj.rotation_euler.rotate_axis(rotation_axis, rotation)
 
         self.array.count = self.count
@@ -314,6 +338,7 @@ class ND_OT_circular_array(bpy.types.Operator):
             self.displace.direction = 'Y'
 
         self.displace.strength = self.offset
+        self.displace.direction = ['X', 'Y', 'Z'][self.displace_axis]
 
         bpy.data.objects[self.reference_obj.name]["NDCA_angle"] = self.angle
         bpy.data.objects[self.reference_obj.name]["NDCA_axis"] = self.axis
@@ -346,8 +371,9 @@ class ND_OT_circular_array(bpy.types.Operator):
             self.operate(context)
 
         if not self.summoned:
-            for displace in self.displace_transforms:
-                self.reference_obj.modifiers.remove(displace)
+            if self.faux_origin:
+                for displace in self.displace_transforms:
+                    self.reference_obj.modifiers.remove(displace)
             
             self.reference_obj.modifiers.remove(self.displace)
             self.reference_obj.modifiers.remove(self.array)
@@ -393,8 +419,13 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
+        "Rotation Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
         "Axis to revolve around (X, Y, Z)")
+
+    draw_hint(
+        self,
+        "Displacement Axis [D]: {}".format(['X', 'Y', 'Z'][self.displace_axis]),
+        "Local axis to displace along (X, Y, Z)")
 
 
 def register():

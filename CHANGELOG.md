@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.29.0](https://github.com/hugemenace/nd/compare/v1.28.4...v1.29.0) (2022-06-02)
+
+
+### Features
+
+* add hard-apply mode to apply_modifiers utility, and exclude regular multi segment edge bevels from normal usage ([a5ee288](https://github.com/hugemenace/nd/commit/a5ee2886f588f9f820f9b808edbffae2e4e5ba53))
+* add mirror operator to the fast menu for profile predictions ([74f2545](https://github.com/hugemenace/nd/commit/74f25458a7c2216f4382253a5a9152f4ab1c4879))
+* add ND theme (color) options to preferences ([1d25644](https://github.com/hugemenace/nd/commit/1d2564421f805c181b8d2af9fbc7da5e29586223))
+* add panel operator ([a4e76aa](https://github.com/hugemenace/nd/commit/a4e76aab511733ae6837fedfd7e99e76ca97951e))
+* add recon poly detection to fast menu ([de87d9b](https://github.com/hugemenace/nd/commit/de87d9b50fd45a28a758ab3d1c27fdf6b345aebc))
+* add remaining boolean operations to the fast menu ([5db12e6](https://github.com/hugemenace/nd/commit/5db12e6a8473b08cbb705416f5aeac1a77db16c5))
+* add shift alt-mode to set_origin utility to undo faux origin translations ([43202bf](https://github.com/hugemenace/nd/commit/43202bfe57d5c7dd4900c0ff4b71839b4a0a33f3))
+* add solidify and profile extrude options to the fast menu when operators have been previously performed on the selected object ([84fa5a0](https://github.com/hugemenace/nd/commit/84fa5a0855dc64dee6f1ea3c20a427a395bd0609))
+* clean up duplicated mesh by default when using geo_lift or panel operators, with option to preserve geometry ([d27a8ab](https://github.com/hugemenace/nd/commit/d27a8aba71b7e43b043d4bf9b73faa7f2f3e7187))
+* detect additional existing mods in fast menu ([c0a5963](https://github.com/hugemenace/nd/commit/c0a5963f0ac8b263265f0aaf296e23e5f095ec56))
+* ensure starting geometry is reselected when reverting geo_lift operator ([321d2c9](https://github.com/hugemenace/nd/commit/321d2c91af8c49af39938373bf98aadca4e3325f))
+* harden up circular_array operator, add displacement axis option, and regular/faux origin alt mode ([48b5040](https://github.com/hugemenace/nd/commit/48b5040db100ce3fcc73859f48cb6fb050cc7254))
+
+
+### Bug Fixes
+
+* add an additional clause to the circular_array poll method ([11dc8ee](https://github.com/hugemenace/nd/commit/11dc8eeca5a00fd135274ab7063f35cd3511df06))
+* add missing continue statements in create_duplicate_liftable_geometry ([c6c9aad](https://github.com/hugemenace/nd/commit/c6c9aad3f89998310d49cd158ca75183e63632f7))
+* ensure the inset stage only begins if one or more faces have been selected when using the panel operator ([fd26650](https://github.com/hugemenace/nd/commit/fd26650439d101d7605e09e81b53b393ad2b5a6b))
+* ensure the reference object origin is restored when cancelling a new circular array operation ([00be593](https://github.com/hugemenace/nd/commit/00be593adf63ffde82ebef0ceeabd9b7dd0b759e))
+* fix mod reference error in create_duplicate_liftable_geometry function in object library ([979646d](https://github.com/hugemenace/nd/commit/979646dceb470d2e33975a7569a87c0934156408))
+* fix profile extrude recall and revert behaviour ([a9a870d](https://github.com/hugemenace/nd/commit/a9a870d599a7581b56251c6cf5fc83e2d62778b8))
+* fix recon poly local Z axis natural rotation and recall ability ([85e91a1](https://github.com/hugemenace/nd/commit/85e91a17e925d79db95b5f8427aad7dd20e8fefe))
+* tidy up and fix undesired relative offset behaviour in panel operator ([91bbb06](https://github.com/hugemenace/nd/commit/91bbb060d4235b8c3f7e3bd67411d6c7ea358080))
+
 ### [1.28.4](https://github.com/hugemenace/nd/compare/v1.28.3...v1.28.4) (2022-05-28)
 
 

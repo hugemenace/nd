@@ -298,7 +298,7 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
 
         if not self.single_obj_mode:
             for index, axis in enumerate(['X', 'Y', 'Z']):
-                displace = self.reference_obj.modifiers.new("Translate {} — ND CA".format(axis), 'DISPLACE')
+                displace = self.reference_obj.modifiers.new("Translate {} — ND FO".format(axis), 'DISPLACE')
                 displace.direction = axis
                 displace.space = 'LOCAL'
                 displace.mid_level = 0

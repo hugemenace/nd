@@ -27,7 +27,8 @@ class ND_OT_set_origin(bpy.types.Operator):
     bl_idname = "nd.set_origin"
     bl_label = "Set Origin"
     bl_description = """Set the origin of the active object to that of another
-ALT — Use faux origin translation (for origin-reliant geometry)"""
+ALT — Use faux origin translation (for origin-reliant geometry)
+SHIFT — Undo faux origin translation"""
     bl_options = {'UNDO'}
 
 
@@ -38,6 +39,8 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
             reference_obj = a if a.name != context.active_object.name else b
 
             return reference_obj.type == 'MESH'
+        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
+            return True
 
 
     def execute(self, context):
@@ -57,20 +60,42 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
 
     
     def invoke(self, context, event):
-        if event.alt:
-            return self.execute(context)
+        if len(context.selected_objects) == 1:
+            if event.shift:
+                self.revert_faux_origin(context)
         else:
-            a, b = context.selected_objects
-            reference_obj = a if a.name != context.active_object.name else b
+            if event.alt:
+                return self.execute(context)
+            else:
+                a, b = context.selected_objects
+                reference_obj = a if a.name != context.active_object.name else b
 
-            mx = context.active_object.matrix_world
-            set_origin(reference_obj, mx)
+                mx = context.active_object.matrix_world
+                set_origin(reference_obj, mx)
 
-            return {'FINISHED'}
+        return {'FINISHED'}
+
+
+    def revert_faux_origin(self, context):
+        location = context.active_object.location.copy()
+
+        mods = [mod for mod in context.active_object.modifiers if mod.type == 'DISPLACE' and mod.name.endswith('— ND FO')]
+        print(mods)
+        for mod in mods:
+            if mod.direction == 'X':
+                location.x = mod.strength
+            elif mod.direction == 'Y':
+                location.y = mod.strength
+            elif mod.direction == 'Z':
+                location.z = mod.strength
+
+            context.active_object.modifiers.remove(mod)
+        
+        context.active_object.location = location
 
     
     def add_displace_modifier(self, reference_obj, axis, strength):
-        displace = reference_obj.modifiers.new("{} Axis Displace — ND".format(axis), 'DISPLACE')
+        displace = reference_obj.modifiers.new("Translate {} — ND FO".format(axis), 'DISPLACE')
         displace.direction = axis 
         displace.space = 'GLOBAL'
         displace.mid_level = 0

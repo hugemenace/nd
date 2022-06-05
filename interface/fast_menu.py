@@ -21,6 +21,7 @@
 import bpy
 import bmesh
 from .. import bl_info
+from .. lib.objects import is_planar
 
 
 keys = []
@@ -147,7 +148,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             self.verts = [vert for vert in bm.verts]
             self.edges = [edge for edge in bm.edges]
             self.faces = [face for face in bm.faces]
-            self.sketch = len(self.faces) == 1
+            self.sketch = len(self.faces) >= 1 and is_planar(bm)
             self.profile = len(self.faces) == 0 and len(self.edges) > 0
             self.form = len(self.faces) > 1
 
@@ -196,7 +197,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             if has_mod_recon_poly:
                 layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
 
-            if "Bool —" in context.active_object.name:
+            if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
                 layout.operator("nd.hydrate", icon='SHADING_RENDERED')
                 layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
 

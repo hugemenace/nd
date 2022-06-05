@@ -21,6 +21,7 @@
 import bpy 
 import bmesh
 from math import radians
+from mathutils.geometry import distance_point_to_plane, normal
 from . preferences import get_preferences
 
 
@@ -121,3 +122,27 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
     context.active_object.data.name = object_name
 
     bpy.ops.mesh.customdata_custom_splitnormals_clear()
+
+
+def is_planar(bm, tolerance=0.001):
+    faces = list(bm.faces)
+
+    if len(faces) < 1:
+        return True
+    
+    head = faces[0]
+
+    if len(faces) == 1 and len(head.verts) == 3:
+        return True
+
+    co = head.verts[0].co
+    norm = normal([v.co for v in head.verts[:3]])
+
+    tail = faces[1:]
+    for f in tail:
+        verts = [v.co for v in f.verts]
+        for v in verts:
+            if not abs(distance_point_to_plane(v, co, norm)) < tolerance:
+                return False
+
+    return True

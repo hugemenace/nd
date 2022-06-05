@@ -46,17 +46,33 @@ class ND_OT_clean_utils(bpy.types.Operator):
         active_util_object_names = set()
         all_scene_objects = [obj for obj in bpy.data.objects if obj.type == 'MESH']
         all_util_objects = get_all_util_objects()
+        util_mods = ['BOOLEAN', 'ARRAY', 'MIRROR']
+
+        remove_mods = []
 
         for obj in all_scene_objects:
             mods = list(obj.modifiers)
             for mod in mods:
-                if mod.type != 'BOOLEAN':
+                if mod.type not in util_mods:
                     continue
-                if mod.object:
-                    active_util_object_names.add(mod.object.name)
-                    continue
-                obj.modifiers.remove(mod)
+                
+                if mod.type == 'BOOLEAN':
+                    if mod.object:
+                        active_util_object_names.add(mod.object.name)
+                    else:
+                        remove_mods.append((obj, mod))
+
+                if mod.type == 'ARRAY':
+                    if mod.offset_object:
+                        active_util_object_names.add(mod.offset_object.name)
+
+                if mod.type == 'MIRROR':
+                    if mod.mirror_object:
+                        active_util_object_names.add(mod.mirror_object.name)
         
+        for obj, mod in remove_mods:
+            obj.modifiers.remove(mod)
+
         for obj in all_util_objects:
             if obj.name not in active_util_object_names:
                 bpy.data.objects.remove(obj, do_unlink=True)

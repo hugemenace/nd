@@ -145,7 +145,7 @@ SHIFT — Cycle through the modifier stack"""
 
     def operate(self, context):
         if self.mod_cycle:
-            for counter, mod in enumerate(context.active_object.modifiers):
+            for counter, mod in enumerate(self.target_obj.modifiers):
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
             util_obj = self.util_objects[self.util_current_index].object
@@ -158,7 +158,7 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def revert_mods(self, context):
-        for counter, mod in enumerate(context.active_object.modifiers):
+        for counter, mod in enumerate(self.target_obj.modifiers):
             mod.show_viewport = self.mod_snapshot[counter][0]
             mod.show_in_editmode = self.mod_snapshot[counter][1]
 
@@ -179,7 +179,7 @@ SHIFT — Cycle through the modifier stack"""
 
         self.mod_current_index = -1
 
-        for mod in context.active_object.modifiers:
+        for mod in self.target_obj.modifiers:
             self.set_mod_visible(mod, False)
 
 

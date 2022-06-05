@@ -92,6 +92,7 @@ util_ops = [
     ("nd.seams", 'UV_DATA', None, None, False),
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
     ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
+    ("nd.clean_utils", 'MOD_FLUIDSIM', None, None, False),
     None, # Separator
     ("nd.flare", 'LIGHT_AREA', "Flare (Lighting)", None, False),
 ]

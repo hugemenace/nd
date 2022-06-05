@@ -28,6 +28,7 @@ from . import apply_modifiers
 from . import flare
 from . import snap_align
 from . import triangulate
+from . import clean_utils
 
 
 registerables = (
@@ -40,6 +41,7 @@ registerables = (
     flare,
     snap_align,
     triangulate,
+    clean_utils,
 )
 
 

@@ -54,6 +54,16 @@ def get_utils_layer():
     return None
 
 
+def get_all_util_objects():
+    data = get_utils_layer()
+    
+    if data is None:
+        return []
+    
+    layer, collection = data
+    return collection.all_objects
+
+
 def hide_utils_collection(hide):
     data = get_utils_layer()
     if data is not None:

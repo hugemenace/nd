@@ -70,7 +70,7 @@ def update_child_matrices(obj, mx):
         c.matrix_parent_inverse = new_matrix @ parent_matrix
 
 
-def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=True):
+def create_duplicate_liftable_geometry(context, mode, object_name, ignore_complex_geo=True):
     bpy.ops.object.duplicate()
 
     if ignore_complex_geo:
@@ -117,7 +117,7 @@ def create_duplicate_liftable_geometry(context, mode, name, ignore_complex_geo=T
     bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode=mode)
     bpy.ops.mesh.select_all(action='DESELECT')
 
-    context.active_object.name = name
-    context.active_object.data.name = name
+    context.active_object.name = object_name
+    context.active_object.data.name = object_name
 
     bpy.ops.mesh.customdata_custom_splitnormals_clear()

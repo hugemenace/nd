@@ -82,19 +82,22 @@ class ND_OT_swap_solver(bpy.types.Operator):
         self.solve_mode = None
 
         self.all_objects = [obj for obj in bpy.data.objects if obj.type == 'MESH']
+        self.reference_object_names = [obj.name for obj in context.selected_objects]
         self.boolean_mods = []
         self.fast_solver_count = 0
         self.exact_solver_count = 0
-        
+
         for obj in self.all_objects:
-            boolean_mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
-            if boolean_mods:
-                self.boolean_mods += boolean_mods
-                for mod in boolean_mods:
-                    if mod.solver == 'FAST':
-                        self.fast_solver_count += 1
-                    elif mod.solver == 'EXACT':
-                        self.exact_solver_count += 1
+            mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
+            for mod in mods:
+                if mod.object.name in self.reference_object_names:
+                    self.boolean_mods.append(mod)
+            
+        for mod in self.boolean_mods:
+            if mod.solver == 'FAST':
+                self.fast_solver_count += 1
+            elif mod.solver == 'EXACT':
+                self.exact_solver_count += 1
         
         if self.fast_solver_count == len(self.boolean_mods):
             self.solve_mode = 'FAST'

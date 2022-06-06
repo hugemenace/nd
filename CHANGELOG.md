@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.30.0](https://github.com/hugemenace/nd/compare/v1.29.0...v1.30.0) (2022-06-06)
+
+
+### Features
+
+* add additional screw head types (@Shaddow) ([b130d78](https://github.com/hugemenace/nd/commit/b130d78873608180d719fc9e4bad4146a00c27f3))
+* add better boolean and sketch detection in the fast prediction menu ([3c06550](https://github.com/hugemenace/nd/commit/3c065502b3e13cfd019337b0cb7c9bf10ea5879f))
+* add clean_utils operator ([3f4e47b](https://github.com/hugemenace/nd/commit/3f4e47bfd8f335afb21c05fa82cc8a788c907e9f))
+* perform additional geometry cleanup when extracting faces using the panel operator ([9e53d4b](https://github.com/hugemenace/nd/commit/9e53d4b2e644f1e4bc66a687161b5f05a0fb8274))
+
+
+### Bug Fixes
+
+* ensure boolean swap_solver updates only apply to objects referencing the selected utils ([6845d30](https://github.com/hugemenace/nd/commit/6845d300bf0b3cf22909848edf5b6e015b03c5c1))
+* ensure clean_utils also handles mirror and array empty objects in utils collection ([43c0c82](https://github.com/hugemenace/nd/commit/43c0c822f964be175a5b38461bf3a1da8267a6dc))
+* ensure that individual faces cannot be toggled until the inset stage in the panel operator ([e6cb10f](https://github.com/hugemenace/nd/commit/e6cb10f4914e7958a132c3263b0371d19a623423))
+* fix create_duplicate_liftable_geometry object_name parameter being overridden ([11d7b4b](https://github.com/hugemenace/nd/commit/11d7b4b76f43d33c4034b0803d431d1be5f809f8))
+* fix error when using swap solver on a utility referenced by an object with invalid boolean modifiers present ([20045ed](https://github.com/hugemenace/nd/commit/20045ed2ef6f7bcc70263e216935dde89355f741))
+* fix NoneType object error when cycling through a utility object ([4a5a402](https://github.com/hugemenace/nd/commit/4a5a402a35e9f468db9f9043d0b81fe805225199))
+
 ## [1.29.0](https://github.com/hugemenace/nd/compare/v1.28.4...v1.29.0) (2022-06-02)
 
 

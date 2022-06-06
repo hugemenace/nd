@@ -90,7 +90,7 @@ class ND_OT_swap_solver(bpy.types.Operator):
         for obj in all_scene_objects:
             mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
             for mod in mods:
-                if mod.object.name in selected_object_names:
+                if mod.object and mod.object.name in selected_object_names:
                     self.boolean_mods.append(mod)
             
         for mod in self.boolean_mods:

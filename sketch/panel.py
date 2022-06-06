@@ -79,8 +79,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                     self.dirty = True
 
         elif pressed(event, {'F'}):
-            self.individual = not self.individual
-            self.dirty = True
+            if self.stage == 1:
+                self.individual = not self.individual
+                self.dirty = True
 
         elif self.key_step_up:
             if self.stage == 1:
@@ -184,6 +185,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         loose_edges = [e for e in self.panel_bm.edges if not e.link_faces]
         bmesh.ops.delete(self.panel_bm, geom=loose_edges, context='EDGES')
+    
     
     def update_panel_edit_mesh(self, update_data=False):
         bmesh.update_edit_mesh(self.panel_obj.data)

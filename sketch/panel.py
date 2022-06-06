@@ -20,6 +20,7 @@
 
 import bpy
 import bmesh
+from math import radians
 from mathutils import Matrix
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
@@ -176,6 +177,13 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         faces = [f for f in self.panel_bm.faces if not f.select]
         bmesh.ops.delete(self.panel_bm, geom=faces, context='FACES')
 
+        bmesh.ops.dissolve_limit(self.panel_bm, angle_limit=radians(1), use_dissolve_boundaries=False, verts=self.panel_bm.verts)
+
+        loose_verts = [v for v in self.panel_bm.verts if not v.link_faces]
+        bmesh.ops.delete(self.panel_bm, geom=loose_verts, context='VERTS')
+
+        loose_edges = [e for e in self.panel_bm.edges if not e.link_faces]
+        bmesh.ops.delete(self.panel_bm, geom=loose_edges, context='EDGES')
     
     def update_panel_edit_mesh(self, update_data=False):
         bmesh.update_edit_mesh(self.panel_obj.data)

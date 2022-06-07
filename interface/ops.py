@@ -39,11 +39,11 @@ sketch_ops = [
 ]
 
 boolean_ops = [
-    ("nd.bool_vanilla", 'MOD_BOOLEAN', "Difference", 'DIFFERENCE', False),
-    ("nd.bool_vanilla", 'MOD_BOOLEAN', "Union", 'UNION', False),
-    ("nd.bool_vanilla", 'MOD_BOOLEAN', "Intersect", 'INTERSECT', False),
+    ("nd.bool_vanilla", 'SELECT_SUBTRACT', "Difference", 'DIFFERENCE', False),
+    ("nd.bool_vanilla", 'SELECT_EXTEND', "Union", 'UNION', False),
+    ("nd.bool_vanilla", 'SELECT_INTERSECT', "Intersect", 'INTERSECT', False),
     None, # Separator
-    ("nd.bool_slice", 'MOD_BOOLEAN', None, None, False),
+    ("nd.bool_slice", 'SELECT_DIFFERENCE', None, None, False),
     ("nd.bool_inset", 'MOD_BOOLEAN', None, None, False),
     None, # Separator
     ("nd.hydrate", 'SHADING_RENDERED', None, None, False),
@@ -55,7 +55,7 @@ bevel_ops = [
     ("nd.edge_bevel", 'EDGESEL', None, None, False),
     None, # Separator
     ("nd.bevel", 'MOD_BEVEL', None, None, False),
-    ("nd.weighted_normal_bevel", 'MOD_BEVEL', None, None, False),
+    ("nd.weighted_normal_bevel", 'NORMALS_VERTEX_FACE', None, None, False),
 ]
 
 extrusion_ops = [
@@ -103,3 +103,15 @@ viewport_ops = [
     ("nd.toggle_utils_collection", "OUTLINER_COLLECTION", None, None, False),
     ("nd.toggle_clear_view", "OUTLINER_DATA_VOLUME", None, None, False),
 ]
+
+
+def build_icon_lookup_table():
+    icon_lookup = {}
+    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + deform_ops + simplify_ops + util_ops + viewport_ops:
+        if op is None:
+            continue
+
+        key = f'{op[0]}+{op[3]}' if op[3] is not None else op[0]
+        icon_lookup[key] = op[1]
+
+    return icon_lookup

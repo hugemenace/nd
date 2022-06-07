@@ -22,9 +22,11 @@ import bpy
 import bmesh
 from .. import bl_info
 from .. lib.objects import is_planar
+from . ops import build_icon_lookup_table
 
 
 keys = []
+icons = build_icon_lookup_table()
 
 
 class ND_MT_fast_menu(bpy.types.Menu):
@@ -71,8 +73,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        layout.operator("nd.single_vertex", icon='DOT')
-        layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
+        layout.operator("nd.single_vertex", icon=icons['nd.single_vertex'])
+        layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
         layout.separator()
         layout.operator("mesh.primitive_plane_add", icon='MESH_PLANE')
         layout.operator("mesh.primitive_cube_add", icon='MESH_CUBE')
@@ -84,20 +86,20 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         obj_names = [obj.name for obj in context.selected_objects]
         if all(["Bool —" in name for name in obj_names]):
-            layout.operator("nd.hydrate", icon='SHADING_RENDERED')
-            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
+            layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
+            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
             return
 
-        layout.operator("nd.bool_vanilla", text="Difference", icon='MOD_BOOLEAN').mode = 'DIFFERENCE'
-        layout.operator("nd.bool_vanilla", text="Union", icon='MOD_BOOLEAN').mode = 'UNION'
-        layout.operator("nd.bool_vanilla", text="Intersect", icon='MOD_BOOLEAN').mode = 'INTERSECT'
-        layout.operator("nd.bool_slice", icon='MOD_BOOLEAN')
-        layout.operator("nd.bool_inset", icon='MOD_BOOLEAN')
+        layout.operator("nd.bool_vanilla", text="Difference", icon=icons['nd.bool_vanilla+DIFFERENCE']).mode = 'DIFFERENCE'
+        layout.operator("nd.bool_vanilla", text="Union", icon=icons['nd.bool_vanilla+UNION']).mode = 'UNION'
+        layout.operator("nd.bool_vanilla", text="Intersect", icon=icons['nd.bool_vanilla+INTERSECT']).mode = 'INTERSECT'
+        layout.operator("nd.bool_slice", icon=icons['nd.bool_slice'])
+        layout.operator("nd.bool_inset", icon=icons['nd.bool_inset'])
         layout.separator()
-        layout.operator("nd.mirror", icon='MOD_MIRROR')
-        layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
-        layout.operator("nd.snap_align", icon='SNAP_ON')
+        layout.operator("nd.mirror", icon=icons['nd.mirror'])
+        layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
+        layout.operator("nd.snap_align", icon=icons['nd.snap_align'])
 
 
     def draw_single_object_predictions(self, context):
@@ -117,16 +119,16 @@ class ND_MT_fast_menu(bpy.types.Menu):
             made_prediction = False
 
             if verts_selected:
-                layout.operator("nd.vertex_bevel", icon='VERTEXSEL')
-                layout.operator("nd.clear_vgs", icon='GROUP_VERTEX')
+                layout.operator("nd.vertex_bevel", icon=icons['nd.vertex_bevel'])
+                layout.operator("nd.clear_vgs", icon=icons['nd.clear_vgs'])
                 made_prediction = True
             
             if edges_selected:
-                layout.operator("nd.edge_bevel", icon='EDGESEL')
+                layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
                 made_prediction = True
 
             if has_verts and not has_faces:
-                layout.operator("nd.make_manifold", icon='OUTLINER_DATA_SURFACE')
+                layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
                 made_prediction = True
 
             if verts_selected:
@@ -176,56 +178,56 @@ class ND_MT_fast_menu(bpy.types.Menu):
             was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
 
             if has_mod_boolean:
-                layout.operator("nd.cycle", icon='LONGDISPLAY')
+                layout.operator("nd.cycle", icon=icons['nd.cycle'])
                 layout.separator()
 
             if has_mod_solidify:
-                layout.operator("nd.solidify", icon='MOD_SOLIDIFY')
+                layout.operator("nd.solidify", icon=icons['nd.solidify'])
 
             if has_mod_profile_extrude:
-                layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW')
+                layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
             
             if has_mod_screw:
-                layout.operator("nd.screw", icon='MOD_SCREW')
+                layout.operator("nd.screw", icon=icons['nd.screw'])
             
             if has_mod_array_cubed:
-                layout.operator("nd.array_cubed", icon='PARTICLES')
+                layout.operator("nd.array_cubed", icon=icons['nd.array_cubed'])
 
             if has_mod_circular_array:
-                layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE')
+                layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
 
             if has_mod_recon_poly:
-                layout.operator("nd.recon_poly", icon='SURFACE_NCURVE')
+                layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
 
             if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
-                layout.operator("nd.hydrate", icon='SHADING_RENDERED')
-                layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
+                layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
+                layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
                 return
 
             if was_profile_extrude or self.sketch:
-                layout.operator("nd.solidify", icon='MOD_SOLIDIFY') if not has_mod_solidify else None
+                layout.operator("nd.solidify", icon=icons['nd.solidify']) if not has_mod_solidify else None
                 layout.separator()
-                layout.operator("nd.mirror", icon='MOD_MIRROR')
-                layout.operator("nd.screw", icon='MOD_SCREW') if not has_mod_screw else None
+                layout.operator("nd.mirror", icon=icons['nd.mirror'])
+                layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
 
                 return
             
             if self.profile:
-                layout.operator("nd.profile_extrude", icon='EMPTY_SINGLE_ARROW') if not has_mod_profile_extrude else None
-                layout.operator("nd.screw", icon='MOD_SCREW') if not has_mod_screw else None
-                layout.operator("nd.mirror", icon='MOD_MIRROR')
+                layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
+                layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
+                layout.operator("nd.mirror", icon=icons['nd.mirror'])
 
                 return
 
             if self.form:
                 layout.separator()
-                layout.operator("nd.bevel", icon='MOD_BEVEL')
-                layout.operator("nd.weighted_normal_bevel", icon='MOD_BEVEL')
+                layout.operator("nd.bevel", icon=icons['nd.bevel'])
+                layout.operator("nd.weighted_normal_bevel", icon=icons['nd.weighted_normal_bevel'])
                 layout.separator()
-                layout.operator("nd.array_cubed", icon='PARTICLES') if not has_mod_array_cubed else None
-                layout.operator("nd.circular_array", icon='DRIVER_ROTATIONAL_DIFFERENCE') if not has_mod_circular_array else None
-                layout.operator("nd.mirror", icon='MOD_MIRROR')
+                layout.operator("nd.array_cubed", icon=icons['nd.array_cubed']) if not has_mod_array_cubed else None
+                layout.operator("nd.circular_array", icon=icons['nd.circular_array']) if not has_mod_circular_array else None
+                layout.operator("nd.mirror", icon=icons['nd.mirror'])
 
                 return
 
@@ -236,16 +238,17 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         obj_names = [obj.name for obj in context.selected_objects]
         if all(["Bool —" in name for name in obj_names]):
-            layout.operator("nd.hydrate", icon='SHADING_RENDERED')
-            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon='CON_OBJECTSOLVER')
+            layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
+            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
             return
 
-        layout.operator("nd.mirror", icon='MOD_MIRROR')
-        layout.operator("nd.triangulate", icon='MOD_TRIANGULATE')
-        layout.operator("nd.name_sync", icon='FILE_REFRESH')
-        layout.operator("nd.set_lod_suffix", text="Low LOD", icon='ALIASED').mode = 'LOW'
-        layout.operator("nd.set_lod_suffix", text="High LOD", icon='ANTIALIASED').mode = 'HIGH'
+        layout.operator("nd.mirror", icon=icons['nd.mirror'])
+        layout.operator("nd.triangulate", icon=icons['nd.triangulate'])
+        layout.separator()
+        layout.operator("nd.name_sync", icon=icons['nd.name_sync'])
+        layout.operator("nd.set_lod_suffix", text="Low LOD", icon=icons['nd.set_lod_suffix+LOW']).mode = 'LOW'
+        layout.operator("nd.set_lod_suffix", text="High LOD", icon=icons['nd.set_lod_suffix+HIGH']).mode = 'HIGH'
 
 
 def register():

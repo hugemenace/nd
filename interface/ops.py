@@ -43,7 +43,7 @@ boolean_ops = [
     ("nd.bool_vanilla", 'SELECT_EXTEND', "Union", 'UNION', False),
     ("nd.bool_vanilla", 'SELECT_INTERSECT', "Intersect", 'INTERSECT', False),
     None, # Separator
-    ("nd.bool_slice", 'SELECT_DIFFERENCE', None, None, False),
+    ("nd.bool_slice", 'FCURVE', None, None, False),
     ("nd.bool_inset", 'MOD_BOOLEAN', None, None, False),
     None, # Separator
     ("nd.hydrate", 'SHADING_RENDERED', None, None, False),

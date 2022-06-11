@@ -20,7 +20,7 @@
 
 import bpy
 import bmesh
-from math import radians, isclose
+from math import radians, isclose, cos
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
@@ -95,7 +95,10 @@ class ND_OT_recon_poly(bpy.types.Operator):
 
         elif pressed(event, {'R'}):
             self.natural_rotation = not self.natural_rotation
-            bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation
+            self.dirty = True
+
+        elif pressed(event, {'E'}):
+            self.inscribed = not self.inscribed
             self.dirty = True
 
         elif self.key_increase_factor:
@@ -198,6 +201,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.inner_radius = 0
         self.width = 0.05
         self.natural_rotation = False
+        self.inscribed = get_preferences().recon_poly_inscribed
 
         bpy.ops.object.select_all(action='DESELECT')
 
@@ -209,7 +213,6 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.add_screw_z_modifer()
 
         self.rotation_snapshot = self.obj.rotation_euler.copy()
-        bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation
 
     
     def summon_old_operator(self, context, mods):
@@ -220,14 +223,33 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.displace = mods[mod_displace]
         self.screwX = mods[mod_screw_1]
         self.screwZ = mods[mod_screw_2]
+        
+        self.obj = context.active_object
 
         self.segments_prev = self.segments = self.screwZ.steps
         self.inner_radius_prev = self.inner_radius = self.displace.strength
-        self.width_prev = self.width = self.screwX.screw_offset
+        
+        computed_width = self.screwX.screw_offset
+        try:
+            computed_width = float(bpy.data.objects[self.obj.name]["NDRCP_width"])
+        except:
+            pass
+        self.width_prev = self.width = computed_width
+        
+        computed_natural_rotation = False
+        try:
+            computed_natural_rotation = bool(bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"])
+        except:
+            pass
+        self.natural_rotation_prev = self.natural_rotation = computed_natural_rotation
 
-        self.obj = context.active_object
+        computed_inscribed = get_preferences().recon_poly_inscribed
+        try:
+            computed_inscribed = bool(bpy.data.objects[self.obj.name]["NDRCP_inscribed"])
+        except:
+            pass
+        self.inscribed_prev = self.inscribed = computed_inscribed
 
-        self.natural_rotation_prev = self.natural_rotation = bool(bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"])
         self.rotation_snapshot = self.obj.rotation_euler.copy()
         self.rotation_prev = self.obj.rotation_euler.copy()
 
@@ -300,7 +322,17 @@ class ND_OT_recon_poly(bpy.types.Operator):
 
 
     def operate(self, context):
-        self.screwX.screw_offset = self.width
+        bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation
+        bpy.data.objects[self.obj.name]["NDRCP_inscribed"] = self.inscribed
+        bpy.data.objects[self.obj.name]["NDRCP_width"] = self.width
+
+        theta = radians((360 / self.segments) / 2)
+        
+        if self.inscribed:
+            self.screwX.screw_offset = self.width
+        else:
+            self.screwX.screw_offset = self.width / cos(theta)
+
         self.screwZ.steps = self.segments
         self.screwZ.render_steps = self.segments
         self.displace.strength = self.inner_radius
@@ -308,7 +340,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         self.obj.rotation_euler = self.rotation_snapshot
 
         if self.natural_rotation:
-            self.obj.rotation_euler.rotate_axis('Z', radians((360 / self.segments) / 2))
+            self.obj.rotation_euler.rotate_axis('Z', theta)
 
         self.dirty = False
 
@@ -382,6 +414,11 @@ def draw_text_callback(self):
         self,
         "Natural Rotation [R]: {}".format("Yes" if self.natural_rotation else "No"),
         "Ensure the rightmost edge is perpendicular to the X axis")
+
+    draw_hint(
+        self,
+        "Extents [E]: {}".format("Inscribed" if self.inscribed else "Circumscribed"),
+        "The extents of the polygon (inscribed or circumscribed)")
 
 
 def register():

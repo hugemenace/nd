@@ -92,6 +92,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    recon_poly_inscribed: BoolProperty(
+        name="Automatically set Recon Poly extents to Inscribed (vs. Circumscribed)",
+        default=True,
+    )
+
     enable_mouse_values: BoolProperty(
         name="Enable Mouse Values",
         default=True,
@@ -350,7 +355,8 @@ class NDPreferences(AddonPreferences):
         general_prefs = [
             "utils_collection_name",
             "use_fast_booleans",
-            "recon_poly_solidify"]
+            "recon_poly_solidify",
+            "recon_poly_inscribed"]
 
         for pref in general_prefs:
             column = box.column(align=True)

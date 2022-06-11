@@ -130,10 +130,10 @@ class ND_OT_recon_poly(bpy.types.Operator):
                 self.dirty = True
             elif no_stream(self.inner_radius_input_stream) and self.key_ctrl:
                 self.inner_radius = max(0, self.inner_radius - inner_radius_factor)
-                self.width = max(self.inner_radius * -0.5, self.width)
+                self.width = max(self.computed_inner_radius() * -1, self.width)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(self.inner_radius * -0.5, self.width - width_factor)
+                self.width = max(self.computed_inner_radius() * -1, self.width - width_factor)
                 self.dirty = True
 
         elif self.key_confirm:
@@ -146,11 +146,11 @@ class ND_OT_recon_poly(bpy.types.Operator):
         
         if get_preferences().enable_mouse_values:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(self.inner_radius * -0.5, self.width + self.mouse_value)
+                self.width = max(self.computed_inner_radius() * -1, self.width + self.mouse_value)
                 self.dirty = True
             elif no_stream(self.inner_radius_input_stream) and self.key_ctrl:
                 self.inner_radius = max(0, self.inner_radius + self.mouse_value)
-                self.width = max(self.inner_radius * -0.5, self.width)
+                self.width = max(self.computed_inner_radius() * -1, self.width)
                 self.dirty = True
 
         if self.dirty:
@@ -226,8 +226,17 @@ class ND_OT_recon_poly(bpy.types.Operator):
         
         self.obj = context.active_object
 
+        self.computed_width_prev = self.screwX.screw_offset
+        self.computed_inner_radius_prev = self.displace.strength
+
         self.segments_prev = self.segments = self.screwZ.steps
-        self.inner_radius_prev = self.inner_radius = self.displace.strength
+
+        computed_inner_radius = self.displace.strength
+        try:
+            computed_inner_radius = float(bpy.data.objects[self.obj.name]["NDRCP_inner_radius"])
+        except:
+            pass
+        self.inner_radius_prev = self.inner_radius = computed_inner_radius
         
         computed_width = self.screwX.screw_offset
         try:
@@ -320,27 +329,39 @@ class ND_OT_recon_poly(bpy.types.Operator):
         except:
             self.had_decimate_mod = False
 
+    
+    def computed_width(self):
+        if self.inscribed or self.inner_radius > 0:
+            return self.width
+
+        theta = radians((360 / self.segments) / 2)
+        return self.width / cos(theta)
+
+
+    def computed_inner_radius(self):
+        if self.inscribed or self.inner_radius == 0:
+            return self.inner_radius
+
+        theta = radians((360 / self.segments) / 2)
+        return self.inner_radius / cos(theta)
+
 
     def operate(self, context):
         bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation
         bpy.data.objects[self.obj.name]["NDRCP_inscribed"] = self.inscribed
         bpy.data.objects[self.obj.name]["NDRCP_width"] = self.width
+        bpy.data.objects[self.obj.name]["NDRCP_inner_radius"] = self.inner_radius
 
-        theta = radians((360 / self.segments) / 2)
-        
-        if self.inscribed:
-            self.screwX.screw_offset = self.width
-        else:
-            self.screwX.screw_offset = self.width / cos(theta)
+        self.screwX.screw_offset = self.computed_width()
+        self.displace.strength = self.computed_inner_radius()
 
         self.screwZ.steps = self.segments
         self.screwZ.render_steps = self.segments
-        self.displace.strength = self.inner_radius
 
         self.obj.rotation_euler = self.rotation_snapshot
 
         if self.natural_rotation:
-            self.obj.rotation_euler.rotate_axis('Z', theta)
+            self.obj.rotation_euler.rotate_axis('Z', radians((360 / self.segments) / 2))
 
         self.dirty = False
 
@@ -371,12 +392,16 @@ class ND_OT_recon_poly(bpy.types.Operator):
             self.add_decimate_modifier()
 
         if self.summoned:
-            self.screwX.screw_offset = self.width_prev
+            self.screwX.screw_offset = self.computed_width_prev
+            self.displace.strength = self.computed_inner_radius_prev
             self.screwZ.steps = self.segments_prev
             self.screwZ.render_steps = self.segments_prev
-            self.displace.strength = self.inner_radius_prev
             self.obj.rotation_euler = self.rotation_prev
+
             bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"] = self.natural_rotation_prev
+            bpy.data.objects[self.obj.name]["NDRCP_inscribed"] = self.inscribed_prev
+            bpy.data.objects[self.obj.name]["NDRCP_width"] = self.width_prev
+            bpy.data.objects[self.obj.name]["NDRCP_inner_radius"] = self.inner_radius_prev
             
         unregister_draw_handler()
 

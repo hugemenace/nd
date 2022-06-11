@@ -162,12 +162,18 @@ SHIFT — Place modifiers at the top of the stack"""
 
 
     def prepare_evaluated_geometry(self, context):
+        active_object = context.active_object
+
+        bpy.ops.object.select_all(action='DESELECT')
+        active_object.select_set(True)
+        bpy.context.view_layer.objects.active = active_object
+
         bpy.ops.object.duplicate()
+
+        self.evaluated_geometry = context.active_object
 
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.active_object.evaluated_get(depsgraph)
-
-        self.evaluated_geometry = context.active_object
         
         self.evaluated_geometry.modifiers.clear()
         self.evaluated_geometry.show_in_front = True
@@ -278,8 +284,11 @@ SHIFT — Place modifiers at the top of the stack"""
         empty.empty_display_type = 'PLAIN_AXES'
         empty.location = location
         empty.rotation_euler = rotation.to_euler()
-        empty.parent = self.reference_objs[0]
-        empty.matrix_parent_inverse = self.reference_objs[0].matrix_world.inverted()
+
+        if len(self.reference_objs) == 1:
+            empty.parent = self.reference_objs[0]
+            empty.matrix_parent_inverse = self.reference_objs[0].matrix_world.inverted()
+
         empty.name = "ND — Mirror Geometry"
 
         move_to_utils_collection(empty)

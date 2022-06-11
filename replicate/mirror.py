@@ -115,9 +115,6 @@ SHIFT — Place modifiers at the top of the stack"""
         self.geometry_ready = False
         self.geometry_selection_type = 2 # ['VERT', 'EDGE', 'FACE']
 
-        if self.geometry_mode and len(context.selected_objects) > 1:
-            self.report({'ERROR'}, "Please select only one object")
-
         self.dirty = False
         self.axis = 2 if self.geometry_mode else 0
         self.flip = self.geometry_mode
@@ -170,20 +167,22 @@ SHIFT — Place modifiers at the top of the stack"""
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.active_object.evaluated_get(depsgraph)
 
-        context.active_object.modifiers.clear()
-        context.active_object.show_in_front = True
+        self.evaluated_geometry = context.active_object
+        
+        self.evaluated_geometry.modifiers.clear()
+        self.evaluated_geometry.show_in_front = True
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.active_object.data)
+        bm.to_mesh(self.evaluated_geometry.data)
         bm.free()
 
         mode = ['VERT', 'EDGE', 'FACE'][self.geometry_selection_type]
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
         bpy.ops.mesh.select_all(action='DESELECT')
 
-        context.active_object.name = 'ND — Mirror Geometry'
-        context.active_object.data.name = 'ND — Mirror Geometry'
+        self.evaluated_geometry.name = 'ND — Mirror Geometry'
+        self.evaluated_geometry.data.name = 'ND — Mirror Geometry'
 
     
     def get_face_transform(self, mesh, world_matrix):
@@ -252,7 +251,7 @@ SHIFT — Place modifiers at the top of the stack"""
     def complete_geometry_mode(self, context):
         if self.has_invalid_selection(context):
             bpy.ops.object.mode_set(mode='OBJECT')
-            context.active_object.show_in_front = False
+            self.evaluated_geometry.show_in_front = False
             bpy.ops.object.delete()
 
             self.select_reference_objs(context)
@@ -270,7 +269,7 @@ SHIFT — Place modifiers at the top of the stack"""
         (location, rotation) = self.get_geometry_transform(context)
 
         bpy.ops.object.mode_set(mode='OBJECT')
-        context.active_object.show_in_front = False
+        self.evaluated_geometry.show_in_front = False
         bpy.ops.object.delete()
 
         empty = bpy.data.objects.new("empty", None)
@@ -281,6 +280,7 @@ SHIFT — Place modifiers at the top of the stack"""
         empty.rotation_euler = rotation.to_euler()
         empty.parent = self.reference_objs[0]
         empty.matrix_parent_inverse = self.reference_objs[0].matrix_world.inverted()
+        empty.name = "ND — Mirror Geometry"
 
         move_to_utils_collection(empty)
         isolate_in_utils_collection([empty])
@@ -341,8 +341,6 @@ SHIFT — Place modifiers at the top of the stack"""
     def finish(self, context):
         self.select_reference_objs(context)
 
-        context.active_object.show_in_front = False
-
         unregister_draw_handler()
         unregister_axis_handler()
 
@@ -360,8 +358,6 @@ SHIFT — Place modifiers at the top of the stack"""
 
         if self.geometry_mode and self.geometry_ready:
             bpy.data.objects.remove(self.mirror_obj, do_unlink=True)
-
-        context.active_object.show_in_front = False
 
         unregister_draw_handler()
         unregister_axis_handler()

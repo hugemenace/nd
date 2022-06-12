@@ -91,7 +91,12 @@ ALT — Skip geometry selection and use the active object"""
         self.skip_geo_select = event.alt
         if self.skip_geo_select:
             bpy.ops.object.mode_set(mode='EDIT')
+            context.tool_settings.mesh_select_mode = (True, False, False)
             bpy.ops.mesh.select_all(action='SELECT')
+
+            self.determine_selection_type(context)
+            context.tool_settings.mesh_select_mode = (self.selection_type == 0, self.selection_type == 1, self.selection_type == 2)
+
             return self.finish(context)
         
         create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — View Align', not event.shift)
@@ -190,6 +195,25 @@ ALT — Skip geometry selection and use the active object"""
             return selected_faces != 1
 
         return False
+
+
+    def determine_selection_type(self, context):
+        self.selection_type = 0
+
+        mesh = bmesh.from_edit_mesh(context.active_object.data)
+
+        selected_vertices = len([v for v in mesh.verts if v.select])
+        selected_edges = len([e for e in mesh.edges if e.select])
+        selected_faces = len([f for f in mesh.faces if f.select])
+
+        if selected_vertices >= 1 and selected_faces == 0 and selected_edges == 0:
+            return
+
+        if selected_edges >= 1 and selected_faces == 0:
+            self.selection_type = 1
+
+        if selected_faces >= 1:
+            self.selection_type = 2
 
 
     def finish(self, context):

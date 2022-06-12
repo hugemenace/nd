@@ -64,7 +64,7 @@ def create_rotation_matrix_from_vertex(world_matrix, vertex):
         tangent = binormal.cross(normal).normalized()
         binormal = normal.cross(tangent).normalized()
     else:
-        up = calculate_object_up(normal)
+        up = calculate_object_up(world_matrix, normal)
         tangent = normal.cross(up).normalized()
         binormal = normal.cross(tangent).normalized()
 
@@ -79,14 +79,14 @@ def create_rotation_matrix_from_edge(world_matrix, edge):
         tangent = binormal.cross(normal).normalized()
         normal = tangent.cross(binormal).normalized()
     else:
-        up = calculate_object_up(binormal)
+        up = calculate_object_up(world_matrix, binormal)
         tangent = binormal.cross(up).normalized()
         normal = tangent.cross(binormal)
 
     return create_transposed_rotation_matrix(tangent, binormal, normal)
 
 
-def calculate_object_up(normal):
+def calculate_object_up(world_matrix, normal):
     up = (world_matrix.to_3x3() @ Vector((0, 0, 1)))
 
     dot = normal.dot(up)

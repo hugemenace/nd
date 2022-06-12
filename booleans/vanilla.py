@@ -29,7 +29,7 @@ class ND_OT_bool_vanilla(bpy.types.Operator):
     bl_label = "Boolean"
     bl_description = """Perform a boolean operation on the selected objects
 SHIFT — Protect the reference object (do not convert into utility)
-ALT — Do not clean reference object mesh before operation"""
+ALT — Do not clean the reference object's mesh"""
     bl_options = {'UNDO'}
 
     

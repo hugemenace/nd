@@ -28,7 +28,7 @@ class ND_OT_bool_slice(bpy.types.Operator):
     bl_idname = "nd.bool_slice"
     bl_label = "Slice"
     bl_description = """Perform a boolean operation on the selected objects
-ALT — Do not clean reference object mesh before operation"""
+ALT — Do not clean the reference object's mesh"""
     bl_options = {'UNDO'}
 
     

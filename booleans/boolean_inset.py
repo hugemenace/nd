@@ -152,8 +152,6 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.boolean_isect.solver = solver
         self.boolean_isect.show_expanded = False
 
-        remove_problematic_bevels(self.intersecting_obj)
-
         self.reference_obj_display_type_prev = self.reference_obj.display_type
         self.reference_obj_hide_render_prev = self.reference_obj.hide_render
         self.reference_obj_name_prev = self.reference_obj.name
@@ -163,11 +161,15 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.reference_obj.name = " — ".join(['Bool', self.reference_obj.name])
         self.reference_obj.data.name = self.reference_obj.name
         self.reference_obj.hide_set(True)
+
+        remove_problematic_bevels(self.reference_obj)
         
         self.intersecting_obj.display_type = 'WIRE'
         self.intersecting_obj.hide_render = True
         self.intersecting_obj.name = " — ".join(['Bool', self.intersecting_obj.name])
         self.intersecting_obj.data.name = self.intersecting_obj.name
+
+        remove_problematic_bevels(self.intersecting_obj)
 
         self.reference_obj.parent = self.target_obj
         self.intersecting_obj.parent = self.target_obj

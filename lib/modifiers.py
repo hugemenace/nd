@@ -61,10 +61,13 @@ def remove_problematic_bevels(object):
     remove_mods = []
 
     for mod in mods:
-        if mod.type == 'BEVEL' and mod.segments == 1 and mod.harden_normals:
+        if "— ND WNB" in mod.name:
             remove_mods.append(mod)
-        elif "— ND WNB" in mod.name:
-            remove_mods.append(mod)
+            continue
+        elif mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
+            if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
+                remove_mods.append(mod)
+                continue
 
     for mod in remove_mods:
         object.modifiers.remove(mod)

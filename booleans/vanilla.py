@@ -21,14 +21,15 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import rectify_mod_order
+from .. lib.modifiers import rectify_mod_order, remove_problematic_bevels
 
 
 class ND_OT_bool_vanilla(bpy.types.Operator):
     bl_idname = "nd.bool_vanilla"
     bl_label = "Boolean"
     bl_description = """Perform a boolean operation on the selected objects
-SHIFT — Protect the reference object (do not convert into utility)"""
+SHIFT — Protect the reference object (do not convert into utility)
+ALT — Do not clean reference object mesh before operation"""
     bl_options = {'UNDO'}
 
     
@@ -64,6 +65,9 @@ SHIFT — Protect the reference object (do not convert into utility)"""
             reference_obj.hide_render = True
             reference_obj.name = " — ".join(['Bool', reference_obj.name])
             reference_obj.data.name = reference_obj.name
+            
+            if not self.do_not_clean_mesh:
+                remove_problematic_bevels(reference_obj)
 
         reference_obj.parent = context.active_object
         reference_obj.matrix_parent_inverse = context.active_object.matrix_world.inverted()
@@ -81,6 +85,7 @@ SHIFT — Protect the reference object (do not convert into utility)"""
 
     def invoke(self, context, event):
         self.protect_reference_obj = event.shift
+        self.do_not_clean_mesh = event.alt
 
         return self.execute(context)
 

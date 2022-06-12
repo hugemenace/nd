@@ -160,6 +160,7 @@ ALT — Skip geometry selection and use the active object"""
                 self.selection_type = 2
 
         bpy.ops.view3d.view_axis(type='TOP', align_active=True)
+        context.space_data.region_3d.view_perspective = 'ORTHO'
         
         self.set_custom_transform_orientation()
 

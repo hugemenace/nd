@@ -231,6 +231,7 @@ class ND_OT_bevel(bpy.types.Operator):
         bevel = context.active_object.modifiers.new(mod_bevel, 'BEVEL')
         bevel.offset_type = 'WIDTH'
         bevel.miter_outer = 'MITER_ARC'
+        bevel.show_expanded = False
 
         self.bevel = bevel
 
@@ -243,6 +244,7 @@ class ND_OT_bevel(bpy.types.Operator):
         if not previous_op:
             weld = context.active_object.modifiers.new(mod_weld, type='WELD')
             weld.merge_threshold = 0.00001
+            weld.show_expanded = False
 
             self.weld = weld
 

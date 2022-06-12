@@ -219,6 +219,7 @@ class ND_OT_screw_head(bpy.types.Operator):
         displace.direction = 'Z'
         displace.space = 'LOCAL'
         displace.mid_level = 0
+        displace.show_expanded = False
 
         self.displace = displace
 

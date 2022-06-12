@@ -204,6 +204,7 @@ class ND_OT_solidify(bpy.types.Operator):
     def add_displace_modifier(self, context):
         displace = context.active_object.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0
+        displace.show_expanded = False
 
         self.displace = displace
 
@@ -211,6 +212,7 @@ class ND_OT_solidify(bpy.types.Operator):
     def add_solidify_modifier(self, context):
         solidify = context.active_object.modifiers.new(mod_solidify, 'SOLIDIFY')
         solidify.use_even_offset = True
+        solidify.show_expanded = False
 
         self.solidify = solidify
     

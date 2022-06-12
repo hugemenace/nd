@@ -39,6 +39,7 @@ class ND_OT_weld(bpy.types.Operator):
         for obj in context.selected_objects:
             modifier = obj.modifiers.new('Weld — ND SW', 'WELD')
             modifier.merge_threshold = 0.001
+            modifier.show_expanded = False
             rectify_mod_order(obj, modifier.name)
 
         return {'FINISHED'}

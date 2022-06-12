@@ -137,17 +137,20 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
         self.boolean_diff.object = self.intersecting_obj
         self.boolean_diff.solver = solver
+        self.boolean_diff.show_expanded = False
 
         rectify_mod_order(self.target_obj, self.boolean_diff.name)
 
         self.solidify = self.intersecting_obj.modifiers.new("Thickness — ND Bool", 'SOLIDIFY')
         self.solidify.use_even_offset = True
         self.solidify.offset = 0
+        self.solidify.show_expanded = False
 
         self.boolean_isect = self.intersecting_obj.modifiers.new("Intersection — ND Bool", 'BOOLEAN')
         self.boolean_isect.operation = 'INTERSECT'
         self.boolean_isect.object = self.reference_obj
         self.boolean_isect.solver = solver
+        self.boolean_isect.show_expanded = False
 
         remove_problematic_bevels(self.intersecting_obj)
 

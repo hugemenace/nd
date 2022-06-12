@@ -214,6 +214,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
     def add_array_modifier(self, context, name, axis):
         array = context.active_object.modifiers.new(name, 'ARRAY')
         array.use_relative_offset = True
+        array.show_expanded = False
 
         self.axes[axis] = [array, 1, 2]
     

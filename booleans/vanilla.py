@@ -55,6 +55,7 @@ SHIFT — Protect the reference object (do not convert into utility)"""
         boolean.operation = self.mode
         boolean.object = reference_obj
         boolean.solver = solver
+        boolean.show_expanded = False
 
         rectify_mod_order(context.active_object, boolean.name)
 

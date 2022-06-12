@@ -238,6 +238,7 @@ class ND_OT_screw(bpy.types.Operator):
         displace = context.active_object.modifiers.new(mod_displace, 'DISPLACE')
         displace.mid_level = 0
         displace.space = 'LOCAL'
+        displace.show_expanded = False
         
         self.displace = displace
 
@@ -248,6 +249,7 @@ class ND_OT_screw(bpy.types.Operator):
         screw.use_merge_vertices = True 
         screw.merge_threshold = 0.0001
         screw.use_normal_calculate = True
+        screw.show_expanded = False
 
         self.screw = screw
     

@@ -199,6 +199,7 @@ class ND_OT_simple_deform(bpy.types.Operator):
 
     def add_simple_deform_modifier(self, context):
         deform = context.active_object.modifiers.new(mod_deform, 'SIMPLE_DEFORM')
+        deform.show_expanded = False
 
         self.deform = deform
 

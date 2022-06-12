@@ -283,6 +283,7 @@ class ND_OT_lattice(bpy.types.Operator):
     def add_lattice_modifier(self, context):
         lattice = context.active_object.modifiers.new(mod_lattice, 'LATTICE')
         lattice.object = self.lattice_obj
+        lattice.show_expanded = False
 
         self.lattice = lattice
 

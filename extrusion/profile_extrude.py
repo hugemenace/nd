@@ -200,6 +200,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         offset = context.active_object.modifiers.new(mod_offset, 'DISPLACE')
         offset.space = 'LOCAL'
         offset.mid_level = 0
+        offset.show_expanded = False
 
         self.offset = offset
 
@@ -210,6 +211,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         screw.render_steps = 0
         screw.angle = 0
         screw.use_normal_calculate = True
+        screw.show_expanded = False
 
         self.screw = screw
     

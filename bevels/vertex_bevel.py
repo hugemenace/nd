@@ -266,6 +266,7 @@ ALT — Create a vertex group edge bevel"""
         bevel.limit_method = 'VGROUP'
         bevel.offset_type = 'WIDTH'
         bevel.vertex_group = self.vgroup.name
+        bevel.show_expanded = False
 
         self.bevel = bevel
 
@@ -282,6 +283,7 @@ ALT — Create a vertex group edge bevel"""
         if self.late_apply or not previous_op:
             weld = context.active_object.modifiers.new(mod_weld_la if self.late_apply else mod_weld, type='WELD')
             weld.merge_threshold = 0.00001
+            weld.show_expanded = False
 
             self.weld = weld
 

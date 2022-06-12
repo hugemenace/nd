@@ -100,6 +100,7 @@ SHIFT — Undo faux origin translation"""
         displace.space = 'GLOBAL'
         displace.mid_level = 0
         displace.strength = strength
+        displace.show_expanded = False
 
 
 def register():

@@ -279,6 +279,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         displace.mid_level = 0
         displace.direction = 'X'
         displace.space = 'LOCAL'
+        displace.show_expanded = False
         
         self.displace = displace
 
@@ -291,6 +292,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         screwX.render_steps = 1
         screwX.use_merge_vertices = True
         screwX.merge_threshold = 0.0001
+        screwX.show_expanded = False
 
         self.screwX = screwX
     
@@ -301,6 +303,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         screwZ.use_merge_vertices = True
         screwZ.merge_threshold = 0.0001
         screwZ.use_normal_calculate = True
+        screwZ.show_expanded = False
 
         self.screwZ = screwZ
 
@@ -309,6 +312,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         decimate = self.obj.modifiers.new(mod_decimate, 'DECIMATE')
         decimate.decimate_type = 'DISSOLVE'
         decimate.angle_limit = radians(1)
+        decimate.show_expanded = False
         
         self.decimate = decimate
 

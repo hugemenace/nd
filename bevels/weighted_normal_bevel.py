@@ -189,6 +189,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         bevel.segments = 1
         bevel.offset_type = 'WIDTH'
         bevel.face_strength_mode = 'FSTR_AFFECTED'
+        bevel.show_expanded = False
 
         self.bevel = bevel
     
@@ -197,6 +198,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
         wn = context.active_object.modifiers.new(mod_wn, 'WEIGHTED_NORMAL')
         wn.weight = 100
         wn.use_face_influence = True
+        wn.show_expanded = False
 
         self.wn = wn
 

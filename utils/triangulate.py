@@ -42,6 +42,7 @@ ALT — Do not preserve custom normals"""
             modifier = obj.modifiers.new('Triangulate — ND', 'TRIANGULATE')
             modifier.keep_custom_normals = self.preserve_normals
             modifier.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'
+            modifier.show_expanded = False
 
         return {'FINISHED'}
 

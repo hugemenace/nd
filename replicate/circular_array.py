@@ -289,6 +289,7 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
         array.use_relative_offset = False
         array.use_object_offset = True
         array.offset_object = self.rotator_obj
+        array.show_expanded = False
 
         self.array = array
 
@@ -305,6 +306,7 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
                 displace.show_in_editmode = True
                 displace.show_on_cage = True
                 displace.strength = self.reference_obj_prev_location[index] - self.reference_obj.location[index]
+                displace.show_expanded = False
 
                 self.displace_transforms.append(displace)
 
@@ -315,6 +317,7 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
         displace.mid_level = 0
         displace.show_in_editmode = True
         displace.show_on_cage = True
+        displace.show_expanded = False
 
         if self.single_obj_mode:
             self.offset = self.reference_obj.dimensions[self.axis]

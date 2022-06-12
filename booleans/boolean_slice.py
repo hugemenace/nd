@@ -54,6 +54,7 @@ class ND_OT_bool_slice(bpy.types.Operator):
         boolean_diff.operation = 'DIFFERENCE'
         boolean_diff.object = reference_obj
         boolean_diff.solver = solver
+        boolean_diff.show_expanded = False
 
         rectify_mod_order(difference_obj, boolean_diff.name)
 
@@ -61,6 +62,7 @@ class ND_OT_bool_slice(bpy.types.Operator):
         boolean_isect.operation = 'INTERSECT'
         boolean_isect.object = reference_obj
         boolean_isect.solver = solver
+        boolean_isect.show_expanded = False
         
         rectify_mod_order(intersecting_obj, boolean_isect.name)
 

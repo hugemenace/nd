@@ -74,7 +74,8 @@ class ND_OT_array_cubed(bpy.types.Operator):
         elif self.key_reset:
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = new_stream()
-                self.axes[self.axis][1] = 0
+                self.axes[self.axis][1] = 1
+                self.axes[self.axis][2] = abs(self.axes[self.axis][2])
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_streams[self.axis] = new_stream()
@@ -134,8 +135,7 @@ class ND_OT_array_cubed(bpy.types.Operator):
         if get_preferences().enable_mouse_values:
             if self.key_ctrl:
                 self.axes[self.axis][2] += self.mouse_value
-
-            self.dirty = True
+                self.dirty = True
         
         if self.dirty:
             self.operate(context)

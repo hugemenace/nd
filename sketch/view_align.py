@@ -24,12 +24,15 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
+from .. lib.objects import create_duplicate_liftable_geometry
 
 
 class ND_OT_view_align(bpy.types.Operator):
     bl_idname = "nd.view_align"
     bl_label = "View Align"
-    bl_description = "Orientate the view to the selected geometry"
+    bl_description = """Orientate the view to the selected geometry
+SHIFT — Do not clean duplicate mesh before extraction
+ALT — Skip geometry selection and use the active object"""
     bl_options = {'UNDO'}
 
 
@@ -84,7 +87,14 @@ class ND_OT_view_align(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
-        self.prepare_evaluated_geometry(context)
+
+        self.skip_geo_select = event.alt
+        if self.skip_geo_select:
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.mesh.select_all(action='SELECT')
+            return self.finish(context)
+        
+        create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — View Align', not event.shift)
 
         capture_modifier_keys(self)
         
@@ -107,28 +117,6 @@ class ND_OT_view_align(bpy.types.Operator):
         context.tool_settings.mesh_select_mode = (self.selection_type == 0, self.selection_type == 1, self.selection_type == 2)
 
 
-    def prepare_evaluated_geometry(self, context):
-        bpy.ops.object.duplicate()
-
-        depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.active_object.evaluated_get(depsgraph)
-
-        context.active_object.modifiers.clear()
-        context.active_object.show_in_front = True
-
-        bm = bmesh.new()
-        bm.from_mesh(object_eval.data)
-        bm.to_mesh(context.active_object.data)
-        bm.free()
-
-        mode = ['VERT', 'EDGE', 'FACE'][self.selection_type]
-        bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
-        bpy.ops.mesh.select_all(action='DESELECT')
-
-        context.active_object.name = 'ND — View Align'
-        context.active_object.data.name = 'ND — View Align'
-
-    
     def get_face_transform(self, mesh, world_matrix):
         selected_faces = [f for f in mesh.faces if f.select]
         center = v3_average([f.calc_center_median_weighted() for f in selected_faces])
@@ -223,9 +211,9 @@ class ND_OT_view_align(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
-        context.active_object.show_in_front = False
-
-        bpy.ops.object.delete()
+        if not self.skip_geo_select:
+            context.active_object.show_in_front = False
+            bpy.ops.object.delete()
 
         unregister_draw_handler()
     

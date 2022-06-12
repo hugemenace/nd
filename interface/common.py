@@ -21,14 +21,28 @@
 from .. import lib
 
 
-def create_box(text, icon, layout):
+def create_box(text, layout, props, prop_name, icons, shortcuts):
     box = layout.box()
-    if icon:
-        box.label(text=text, icon=icon)
-    else:
-        box.label(text=text)
+    row = box.row(align=True)
 
-    return box.column()
+    prop_active = getattr(props, prop_name)
+
+    row.prop(props, prop_name,
+        icon="TRIA_DOWN" if prop_active else "TRIA_RIGHT", icon_only=True, emboss=False
+    )
+
+    row.label(text=text)
+
+    for op, mode in shortcuts:
+        if mode:
+            row.operator(op, icon=icons[f'{op}+{mode}'], text="").mode = mode
+        else: 
+            row.operator(op, icon=icons[op], text="")
+
+    if prop_active:
+        return box.column()
+    else:
+        return None
 
 
 def render_ops(ops, layout, new_row=True, use_separator=False):

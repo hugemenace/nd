@@ -19,6 +19,7 @@
 # ---
 
 import bpy
+from bpy.props import BoolProperty, PointerProperty
 from .. import bl_info
 from .. import lib
 from . import ops
@@ -35,17 +36,61 @@ links = [
 
 
 op_sections = [
-    ("Standalone", ops.standalone_ops),
-    ("Sketch", ops.sketch_ops),
-    ("Booleans", ops.boolean_ops),
-    ("Bevels", ops.bevel_ops),
-    ("Extrusion", ops.extrusion_ops),
-    ("Replicate", ops.replicate_ops),
-    ("Deform", ops.deform_ops),
-    ("Simplify", ops.simplify_ops),
-    ("Utils", ops.util_ops),
-    ("Viewport", ops.viewport_ops),
+    ("Standalone", ops.standalone_ops, "standalone", [("nd.cycle", None)]),
+    ("Sketch", ops.sketch_ops, "sketch", [("nd.single_vertex", None), ("nd.panel", None), ("nd.recon_poly", None)]),
+    ("Booleans", ops.boolean_ops, "booleans", [("nd.bool_vanilla", "DIFFERENCE"), ("nd.bool_vanilla", "UNION"), ("nd.bool_vanilla", "INTERSECT")]),
+    ("Bevels", ops.bevel_ops, "bevels", [("nd.vertex_bevel", None), ("nd.bevel", None), ("nd.weighted_normal_bevel", None)]),
+    ("Extrusion", ops.extrusion_ops, "extrusion", [("nd.solidify", None), ("nd.screw", None), ("nd.profile_extrude", None)]),
+    ("Replicate", ops.replicate_ops, "replicate", [("nd.array_cubed", None), ("nd.circular_array", None), ("nd.mirror", None)]),
+    ("Deform", ops.deform_ops, "deform", [("nd.lattice", None), ("nd.simple_deform", None)]),
+    ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)]),
+    ("Utils", ops.util_ops, "utils", [("nd.snap_align", None), ("nd.clean_utils", None), ("nd.flare", None)]),
+    ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils_collection", None), ("nd.toggle_clear_view", None)]),
 ]
+
+
+icons = ops.build_icon_lookup_table()
+
+
+class MainUIPanelProps(bpy.types.PropertyGroup):
+    display_links: BoolProperty(default=False)
+    standalone: BoolProperty(default=False)
+    sketch: BoolProperty(default=False)
+    booleans: BoolProperty(default=False)
+    bevels: BoolProperty(default=False)
+    extrusion: BoolProperty(default=False)
+    replicate: BoolProperty(default=False)
+    deform: BoolProperty(default=False)
+    simplify: BoolProperty(default=False)
+    utils: BoolProperty(default=False)
+    viewport: BoolProperty(default=False)
+
+
+class ND_OT_toggle_sections(bpy.types.Operator):
+    bl_idname = "nd.toggle_sections"
+    bl_label = "Toggle Sections"
+    bl_description = "Toggle the visibility of all sections below"
+
+    def execute(self, context):
+        props = context.window_manager.nd_panel_props
+        toggle = True
+
+        for prop in list(props.keys()):
+            toggle = not getattr(props, prop)
+
+        props.display_links = toggle
+        props.standalone = toggle
+        props.sketch = toggle
+        props.booleans = toggle
+        props.bevels = toggle
+        props.extrusion = toggle
+        props.replicate = toggle
+        props.deform = toggle
+        props.simplify = toggle
+        props.utils = toggle
+        props.viewport = toggle
+
+        return {'FINISHED'}
 
 
 class ND_PT_main_ui_panel(bpy.types.Panel):
@@ -57,7 +102,12 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
 
     def draw(self, context):
+        props = context.window_manager.nd_panel_props
         layout = self.layout
+
+        row = layout.column()
+        row.operator("nd.toggle_sections")
+        row.separator()
 
         if lib.preferences.get_preferences().update_available:
             box = layout.box()
@@ -72,20 +122,30 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             row.scale_y = 1.2
             web_link("https://docs.nd.hugemenace.co/#/getting-started/changelog", "View Changelog", "DOCUMENTS", row)
         
-        box = create_box("Useful Links", None, layout)
-        for url, label, icon in links:
-            row = box.row(align=True)
-            row.scale_y = 1.2
-            web_link(url, label, icon, row)
+        box = create_box("Useful Links", layout, props, "display_links", icons, [])
+        if props.display_links:
+            for url, label, icon in links:
+                row = box.row(align=True)
+                row.scale_y = 1.2
+                web_link(url, label, icon, row)
 
-        for label, collection in op_sections:
-            box = create_box(label, None, layout)
-            render_ops(collection, box)
+        for label, collection, prop, shortcuts in op_sections:
+            box = create_box(label, layout, props, prop, icons, shortcuts)
+            if getattr(props, prop):
+                render_ops(collection, box)
 
         
 def register():
     bpy.utils.register_class(ND_PT_main_ui_panel)
+    bpy.utils.register_class(ND_OT_toggle_sections)
+    bpy.utils.register_class(MainUIPanelProps)
+
+    bpy.types.WindowManager.nd_panel_props = PointerProperty(type=MainUIPanelProps)
 
 
 def unregister():
     bpy.utils.unregister_class(ND_PT_main_ui_panel)
+    bpy.utils.unregister_class(ND_OT_toggle_sections)
+    bpy.utils.unregister_class(MainUIPanelProps)
+    
+    del bpy.types.WindowManager.nd_panel_props

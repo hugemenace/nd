@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.31.0](https://github.com/hugemenace/nd/compare/v1.30.0...v1.31.0) (2022-06-12)
+
+
+### Features
+
+* add clean geometry logic to view align, and allow view align to be immediately invoked on applicable geometry with an alt mode ([db144a6](https://github.com/hugemenace/nd/commit/db144a6b2073e4fad0b61ff4507c0581b7be2972))
+* add collapsible sections and common shortcuts to the N panel menu ([e57bc0d](https://github.com/hugemenace/nd/commit/e57bc0da79545af100c32844cac419cd6b20e0d2))
+* add inscribed and circumscribed options to recon_poly operator ([fa724c4](https://github.com/hugemenace/nd/commit/fa724c4c195f2b941ca7a9b1fd6308c054076913))
+* add the panel, geo_lift, and view_align operators to fast menu single object form predictions ([94ea2ca](https://github.com/hugemenace/nd/commit/94ea2ca99f5de9ee1ba339437ab89f81d254c6be))
+* automatically collapse new modifiers added to objects ([752de82](https://github.com/hugemenace/nd/commit/752de827b7c71ab48ceb355bfc8df4ab878e2cbd))
+* extend inscribed and circumscribed feature to recon_poly inner_radius option & fix recall/revert behaviour ([1611885](https://github.com/hugemenace/nd/commit/161188565b9cce2d40aba8454d1037bce0988a89))
+* remove problematic bevels from all boolean reference objects ([6349c4d](https://github.com/hugemenace/nd/commit/6349c4d658798cbe8774d119d27f0b3dda0f291d))
+
+
+### Bug Fixes
+
+* ensure viewport camera is always set to orthographic when using view_align operator ([ee5c03d](https://github.com/hugemenace/nd/commit/ee5c03db49deede90d5740a609a7606ce7750b3e))
+* fix array_cubed count reset behaviour while respecting the currently specified offset value ([a1d5ca5](https://github.com/hugemenace/nd/commit/a1d5ca5ec3c8f2faa05e7f7d7ab1d4df9aa799f9))
+* fix direct object view_align operation when utilising edges or vertices ([c5059eb](https://github.com/hugemenace/nd/commit/c5059eb58a37860c95d2f419eec985911d4f1cde))
+* fix mirror across geometry behaviour and unneeded show_in_front assignment for evaluated geometry ([bd0f14f](https://github.com/hugemenace/nd/commit/bd0f14f39d59ffc8656d8ceaa9a8fc423f715262))
+* fix up single and multi-object geometry mirror object evaluation and empty parenting ([e7220ad](https://github.com/hugemenace/nd/commit/e7220adbe7b6ba3d11a4a6677fe8c600bbc8a462))
+
 ## [1.30.0](https://github.com/hugemenace/nd/compare/v1.29.0...v1.30.0) (2022-06-06)
 
 

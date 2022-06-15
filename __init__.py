@@ -26,7 +26,7 @@ bl_info = {
     "location": "N Panel, Shift + 2",
     "description": "Non-destructive operations, tools, and generators.",
     "warning": "",
-    "doc_url": "https://hugemenace.co",
+    "doc_url": "https://docs.nd.hugemenace.co/",
     "category": "3D View"
 }
 

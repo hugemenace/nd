@@ -107,6 +107,11 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    enable_sidebar: BoolProperty(
+        name="Enable the sidebar / N-panel (requires restart)",
+        default=True,
+    )
+
     enable_axis_helper: BoolProperty(
         name="Enable Axis Visualization",
         default=True,
@@ -386,6 +391,7 @@ class NDPreferences(AddonPreferences):
             ["mouse_value_scalar"],
             ["enable_quick_favourites"],
             ["lock_overlay_pinning"],
+            ["enable_sidebar"],
             ["enable_axis_helper"],
             ["axis_base_thickness", "axis_active_thickness", "axis_inactive_opacity"]]
 
@@ -460,11 +466,11 @@ class NDPreferences(AddonPreferences):
 def register():
     lib.reload()
 
+    bpy.utils.register_class(NDPreferences)
+
     for registerable in registerables:
         registerable.reload()
         registerable.register()
-
-    bpy.utils.register_class(NDPreferences)
 
     version = '.'.join([str(v) for v in bl_info['version']])
     prefs = lib.preferences.get_preferences()

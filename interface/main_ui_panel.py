@@ -24,6 +24,7 @@ from .. import bl_info
 from .. import lib
 from . import ops
 from . common import create_box, render_ops, web_link
+from .. lib.preferences import get_preferences
 
 
 links = [
@@ -136,16 +137,18 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
 
         
 def register():
-    bpy.utils.register_class(ND_PT_main_ui_panel)
-    bpy.utils.register_class(ND_OT_toggle_sections)
-    bpy.utils.register_class(MainUIPanelProps)
+    if get_preferences().enable_sidebar:
+        bpy.utils.register_class(ND_PT_main_ui_panel)
+        bpy.utils.register_class(ND_OT_toggle_sections)
+        bpy.utils.register_class(MainUIPanelProps)
 
-    bpy.types.WindowManager.nd_panel_props = PointerProperty(type=MainUIPanelProps)
+        bpy.types.WindowManager.nd_panel_props = PointerProperty(type=MainUIPanelProps)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_PT_main_ui_panel)
-    bpy.utils.unregister_class(ND_OT_toggle_sections)
-    bpy.utils.unregister_class(MainUIPanelProps)
-    
-    del bpy.types.WindowManager.nd_panel_props
+    if get_preferences().enable_sidebar:
+        bpy.utils.unregister_class(ND_PT_main_ui_panel)
+        bpy.utils.unregister_class(ND_OT_toggle_sections)
+        bpy.utils.unregister_class(MainUIPanelProps)
+        
+        del bpy.types.WindowManager.nd_panel_props

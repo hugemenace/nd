@@ -489,7 +489,7 @@ def register():
             prefs.overlay_decrease_factor = "LEFT_BRACKET"
             prefs.lock_overlay_pinning = True
             prefs.enable_mouse_values = True
-            prefs.local_user_prefs_version = version
+        prefs.local_user_prefs_version = version
 
     print("""
 ███╗   ██╗██████╗ 

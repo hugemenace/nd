@@ -41,10 +41,10 @@ class ND_OT_clean_utils(bpy.types.Operator):
 
 
     def remove_utils(self):
-        removed_object_count = 0
+        removal_count = 0
 
         active_util_object_names = set()
-        all_scene_objects = [obj for obj in bpy.data.objects if obj.type == 'MESH']
+        all_scene_objects = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
         all_util_objects = get_all_util_objects()
         util_mods = ['BOOLEAN', 'ARRAY', 'MIRROR']
 
@@ -55,30 +55,34 @@ class ND_OT_clean_utils(bpy.types.Operator):
             for mod in mods:
                 if mod.type not in util_mods:
                     continue
-                
+
                 if mod.type == 'BOOLEAN':
-                    if mod.object:
+                    if mod.show_viewport and mod.object:
                         active_util_object_names.add(mod.object.name)
                     else:
                         remove_mods.append((obj, mod))
+                    continue 
 
                 if mod.type == 'ARRAY':
                     if mod.offset_object:
                         active_util_object_names.add(mod.offset_object.name)
+                    continue
 
                 if mod.type == 'MIRROR':
                     if mod.mirror_object:
                         active_util_object_names.add(mod.mirror_object.name)
+                    continue
         
-        for obj, mod in remove_mods:
-            obj.modifiers.remove(mod)
-
         for obj in all_util_objects:
             if obj.name not in active_util_object_names:
                 bpy.data.objects.remove(obj, do_unlink=True)
-                removed_object_count += 1
+                removal_count += 1
 
-        return removed_object_count
+        for obj, mod in remove_mods:
+            obj.modifiers.remove(mod)
+            removal_count += 1
+
+        return removal_count
 
     
 def register():

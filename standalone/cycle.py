@@ -59,7 +59,18 @@ SHIFT — Cycle through the modifier stack"""
             self.dirty = True
 
         elif pressed(event, {'F'}):
-            self.toggle_frozen_util(self.util_current_index)
+            if not self.mod_cycle:
+                self.toggle_frozen_util()
+                self.dirty = True
+
+        elif pressed(event, {'D'}):
+            if not self.mod_cycle:
+                self.toggle_mod()
+                self.dirty = True
+
+        elif pressed(event, {'W'}):
+            self.show_wireframe = not self.show_wireframe
+            self.dirty = True
 
         elif self.key_step_up:
             if self.mod_cycle:
@@ -97,17 +108,23 @@ SHIFT — Cycle through the modifier stack"""
         self.dirty = False
 
         self.mod_cycle = event.shift
-
+        self.show_wireframe = False
         self.target_obj = context.active_object
-        
-        self.mod_count = len(context.active_object.modifiers)
-        self.mod_names = [mod.name for mod in context.active_object.modifiers]
-        self.mod_snapshot = [(mod.show_viewport, mod.show_in_editmode) for mod in context.active_object.modifiers]
+
+        self.show_wireframe_prev = self.target_obj.show_wire
+
+        self.mod_count = len(self.target_obj.modifiers)
+        self.mod_names = [mod.name for mod in self.target_obj.modifiers]
+        self.mod_snapshot = [mod.show_viewport for mod in self.target_obj.modifiers]
         
         self.frozen_utils = set(())
-        self.util_objects = [mod for mod in context.active_object.modifiers if mod.type == 'BOOLEAN' and mod.object]
-        self.util_names = [mod.name for mod in self.util_objects]
-        self.util_count = len(self.util_objects)
+
+        self.util_mods = [mod for mod in self.target_obj.modifiers if mod.type == 'BOOLEAN' and mod.object]
+        self.util_mod_names = [mod.name for mod in self.util_mods]
+        self.util_count = len(self.util_mods)
+
+        self.mod_current_index = -1
+        self.util_current_index = 0
 
         self.prepare_mode(context)
 
@@ -126,45 +143,54 @@ SHIFT — Cycle through the modifier stack"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+            return len(context.selected_objects) == 1 and self.target_obj.type == 'MESH'
 
 
     def set_mod_visible(self, mod, visible):
         mod.show_viewport = visible
-        mod.show_in_editmode = visible
 
     
-    def toggle_frozen_util(self, index):
-        obj = self.util_objects[index].object
+    def toggle_frozen_util(self):
+        obj = self.util_mods[self.util_current_index].object
 
         if obj in self.frozen_utils:
             self.frozen_utils.remove(obj)
         else:
             self.frozen_utils.add(obj)
-    
+
+
+    def toggle_mod(self):
+        mod = self.util_mods[self.util_current_index]
+        mod.show_viewport = not mod.show_viewport
+
 
     def operate(self, context):
         if self.mod_cycle:
             for counter, mod in enumerate(self.target_obj.modifiers):
+                if not self.mod_snapshot[counter]:
+                    continue
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
-            util_obj = self.util_objects[self.util_current_index].object
+            util_obj = self.util_mods[self.util_current_index].object
             isolate_in_utils_collection(self.frozen_utils.union({util_obj}))
             bpy.ops.object.select_all(action='DESELECT')
             util_obj.select_set(True)
             bpy.context.view_layer.objects.active = util_obj
+
+        self.target_obj.show_wire = self.show_wireframe
 
         self.dirty = False
 
 
     def revert_mods(self, context):
         for counter, mod in enumerate(self.target_obj.modifiers):
-            mod.show_viewport = self.mod_snapshot[counter][0]
-            mod.show_in_editmode = self.mod_snapshot[counter][1]
+            mod.show_viewport = self.mod_snapshot[counter]
 
 
     def prepare_mode(self, context):
         hide_utils_collection(True)
+        
+        self.revert_mods(context)
 
         if self.mod_cycle:
             self.prepare_mod_cycle(context)
@@ -189,20 +215,21 @@ SHIFT — Cycle through the modifier stack"""
         self.util_current_index = 0
         self.frozen_utils.clear()
 
-        self.revert_mods(context)
-
 
     def finish(self, context):
         if self.mod_cycle:
             self.revert_mods(context)
-        elif self.util_count > 0:
+
+        if self.util_count > 0:
             bpy.ops.object.select_all(action='DESELECT')
 
-            all_objects = self.frozen_utils.union({self.util_objects[self.util_current_index].object})
+            all_objects = self.frozen_utils.union({self.util_mods[self.util_current_index].object})
             for obj in all_objects:
                 obj.select_set(True)
 
-            bpy.context.view_layer.objects.active = self.util_objects[self.util_current_index].object
+            bpy.context.view_layer.objects.active = self.util_mods[self.util_current_index].object
+
+        self.target_obj.show_wire = self.show_wireframe_prev
 
         unregister_draw_handler()
 
@@ -210,8 +237,8 @@ SHIFT — Cycle through the modifier stack"""
     def revert(self, context):
         hide_utils_collection(True)
 
-        if self.mod_cycle:
-            self.revert_mods(context)
+        self.revert_mods(context)
+        self.target_obj.show_wire = self.show_wireframe_prev
 
         unregister_draw_handler()
 
@@ -233,15 +260,20 @@ def draw_text_callback(self):
         if self.util_count > 0:
             draw_property(
                 self,
-                "Utility: {0}".format(self.util_names[self.util_current_index]),
+                "Utility: {0}".format(self.util_mod_names[self.util_current_index]),
                 "Current: {0}  /  Total: {1}".format(self.util_current_index + 1, self.util_count),
                 active=True,
                 alt_mode=False)
 
             draw_hint(
                 self,
-                "Frozen [F]: {0}".format("Yes" if self.util_objects[self.util_current_index].object in self.frozen_utils else "No"),
+                "Frozen [F]: {0}".format("Yes" if self.util_mods[self.util_current_index].object in self.frozen_utils else "No"),
                 "Keep the current utility selected while cycling")
+
+            draw_hint(
+                self,
+                "Disable Modifier [D]: {0}".format("Yes" if not self.util_mods[self.util_current_index].show_viewport else "No"),
+                "Disable the associated boolean modifier")
         else:
             draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
 
@@ -250,6 +282,11 @@ def draw_text_callback(self):
         "Mode [M]: {0}".format("Modifier" if self.mod_cycle else "Utility"),
         "Switch modes (Modifier, Utility)")
 
+    draw_hint(
+        self,
+        "Wireframe [W]: {0}".format("Yes" if self.show_wireframe else "No"),
+        "Display the object's wireframe while cycling")
+    
 
 def register():
     bpy.utils.register_class(ND_OT_cycle)

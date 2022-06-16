@@ -75,12 +75,18 @@ class ND_OT_clean_utils(bpy.types.Operator):
         
         for obj in all_util_objects:
             if obj.name not in active_util_object_names:
-                bpy.data.objects.remove(obj, do_unlink=True)
-                removal_count += 1
+                try:
+                    bpy.data.objects.remove(obj, do_unlink=True)
+                    removal_count += 1
+                except:
+                    pass
 
         for obj, mod in remove_mods:
-            obj.modifiers.remove(mod)
-            removal_count += 1
+            try:
+                obj.modifiers.remove(mod)
+                removal_count += 1
+            except:
+                pass
 
         return removal_count
 

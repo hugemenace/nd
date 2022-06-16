@@ -184,6 +184,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             if not self.manifold or has_mod_solidify:
                 layout.operator("nd.solidify", icon=icons['nd.solidify'])
+                has_mod_solidify = True
 
             if has_mod_profile_extrude:
                 layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])

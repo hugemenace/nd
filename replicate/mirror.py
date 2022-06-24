@@ -27,6 +27,8 @@ from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handle
 from .. lib.viewport import set_3d_cursor
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
+from .. lib.modifiers import rectify_mod_order
+
 
 class ND_OT_mirror(bpy.types.Operator):
     bl_idname = "nd.mirror"
@@ -320,6 +322,7 @@ SHIFT — Place modifiers at the top of the stack"""
                 mirror.mirror_object = self.mirror_obj
 
             self.mirrors.append(mirror)
+            rectify_mod_order(obj, mirror.name)
 
             if self.early_apply:
                 while obj.modifiers[0].name != mirror.name:

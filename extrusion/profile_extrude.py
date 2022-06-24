@@ -28,8 +28,9 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 
 
 mod_screw = "Extrusion — ND PE"
+mod_weighting = "Weighting — ND PE"
 mod_offset = "Offset — ND PE"
-mod_summon_list = [mod_screw, mod_offset]
+mod_summon_list = [mod_screw, mod_weighting, mod_offset]
 
 
 class ND_OT_profile_extrude(bpy.types.Operator):
@@ -43,6 +44,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         capture_modifier_keys(self, event)
 
         extrude_factor = (self.base_extrude_factor / 10.0) if self.key_shift else self.base_extrude_factor
+        offset_factor = (self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor
 
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
@@ -65,11 +67,19 @@ class ND_OT_profile_extrude(bpy.types.Operator):
                 self.extrusion_length_input_stream = update_stream(self.extrusion_length_input_stream, event.type)
                 self.extrusion_length = get_stream_value(self.extrusion_length_input_stream, 0.001)
                 self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.dirty = True
 
         elif self.key_reset:
             if self.key_no_modifiers:
                 self.extrusion_length_input_stream = new_stream()
                 self.extrusion_length = 0
+                self.dirty = True
+            elif self.key_ctrl:
+                self.offset_input_stream = new_stream()
+                self.offset = 0
                 self.dirty = True
 
         elif pressed(event, {'A'}):
@@ -85,19 +95,31 @@ class ND_OT_profile_extrude(bpy.types.Operator):
             self.dirty = True
 
         elif self.key_increase_factor:
-            self.base_extrude_factor = min(1, self.base_extrude_factor * 10.0)
+            if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
+                self.base_extrude_factor = min(1, self.base_extrude_factor * 10.0)
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
 
         elif self.key_decrease_factor:
-            self.base_extrude_factor = max(0.001, self.base_extrude_factor / 10.0)
+            if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
+                self.base_extrude_factor = max(0.001, self.base_extrude_factor / 10.0)
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
 
         elif self.key_step_up:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length += extrude_factor
                 self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.offset += offset_factor
+                self.dirty = True
             
         elif self.key_step_down:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length - extrude_factor)
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.offset -= offset_factor
                 self.dirty = True
         
         elif self.key_confirm:
@@ -112,6 +134,9 @@ class ND_OT_profile_extrude(bpy.types.Operator):
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length + self.mouse_value)
                 self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
+                self.offset += self.mouse_value
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -124,8 +149,10 @@ class ND_OT_profile_extrude(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_extrude_factor = 0.01
+        self.base_offset_factor = 0.001
 
         self.extrusion_length_input_stream = new_stream()
+        self.offset_input_stream = new_stream()
 
         if len(context.selected_objects) == 1:
             mods = context.active_object.modifiers
@@ -166,8 +193,10 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         self.axis = 0
         self.extrusion_length = 0
         self.weighting = 0
+        self.offset = 0
         self.calculate_edges = True
 
+        self.add_weighting_modifier(context)
         self.add_offset_modifier(context)
         self.add_screw_modifier(context)
 
@@ -177,16 +206,18 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
         self.calculate_edges = True
         self.screw = mods[mod_screw]
-        self.offset = mods[mod_offset]
+        self.weighting_offset = mods[mod_weighting]
+        self.displace = mods[mod_offset]
 
         self.axis_prev = self.axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
         self.extrusion_length_prev = self.extrusion_length = self.screw.screw_offset
         self.calculate_edges_prev = self.calculate_edges = self.screw.use_normal_calculate
         self.weighting = self.calculate_existing_weighting()
-        self.offset_strength_prev = self.offset.strength
+        self.weighting_offset_strength_prev = self.weighting_offset.strength
+        self.offset_prev = self.offset = self.displace.strength
 
 
-    def calculate_offset_strength(self):
+    def calculate_weighting_offset_strength(self):
         if self.weighting == -1:
             return self.extrusion_length * -1
         elif self.weighting == 0:
@@ -196,20 +227,29 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
     
     def calculate_existing_weighting(self):
-        offset = abs(self.offset.strength)
+        offset = abs(self.weighting_offset.strength)
         extrusion = self.screw.screw_offset
         factor = offset / (extrusion * 0.5)
 
         return max(-1, min(1, 1 - round(factor)))
 
 
+    def add_weighting_modifier(self, context):
+        offset = context.active_object.modifiers.new(mod_weighting, 'DISPLACE')
+        offset.space = 'LOCAL'
+        offset.mid_level = 0
+        offset.show_expanded = False
+
+        self.weighting_offset = offset
+
+    
     def add_offset_modifier(self, context):
         offset = context.active_object.modifiers.new(mod_offset, 'DISPLACE')
         offset.space = 'LOCAL'
         offset.mid_level = 0
         offset.show_expanded = False
 
-        self.offset = offset
+        self.displace = offset
 
 
     def add_screw_modifier(self, context):
@@ -228,8 +268,10 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         self.screw.axis = axis
         self.screw.screw_offset = self.extrusion_length
         self.screw.use_normal_calculate = self.calculate_edges
-        self.offset.direction = axis
-        self.offset.strength = self.calculate_offset_strength()
+        self.weighting_offset.direction = axis
+        self.weighting_offset.strength = self.calculate_weighting_offset_strength()
+        self.displace.direction = axis
+        self.displace.strength = self.offset
 
         self.dirty = False
 
@@ -241,7 +283,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
     def revert(self, context):
         if not self.summoned:
-            bpy.ops.object.modifier_remove(modifier=self.offset.name)
+            bpy.ops.object.modifier_remove(modifier=self.weighting_offset.name)
             bpy.ops.object.modifier_remove(modifier=self.screw.name)
 
         if self.summoned:
@@ -249,8 +291,10 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
             self.screw.axis = axis
             self.screw.screw_offset = self.extrusion_length_prev
-            self.offset.direction = axis
-            self.offset.strength = self.offset_strength_prev
+            self.weighting_offset.direction = axis
+            self.weighting_offset.strength = self.weighting_offset_strength_prev
+            self.displace.direction = axis
+            self.displace.strength = self.offset_prev
         
         unregister_draw_handler()
         unregister_axis_handler()
@@ -267,6 +311,15 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.extrusion_length_input_stream)
+
+    draw_property(
+        self, 
+        "Offset: {0:.1f}".format(self.offset * 1000), 
+        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        active=self.key_ctrl,
+        alt_mode=self.key_shift_ctrl,
+        mouse_value=True,
+        input_stream=self.offset_input_stream)
 
     draw_hint(
         self,

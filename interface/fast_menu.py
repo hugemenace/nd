@@ -156,8 +156,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
             self.faces = [face for face in bm.faces]
             self.sketch = len(self.faces) >= 1 and is_planar(bm)
             self.profile = len(self.faces) == 0 and len(self.edges) > 0
-            self.form = len(self.faces) > 1
+            self.has_faces = len(self.faces) >= 1
             self.manifold = all([len(edge.link_faces) == 2 for edge in self.edges])
+            self.has_loose_edges = any([len(edge.link_faces) == 0 for edge in self.edges])
 
             bm.free()
 
@@ -186,12 +187,13 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.cycle", icon=icons['nd.cycle'])
                 layout.separator()
 
-            if not self.manifold or has_mod_solidify:
+            if (not self.manifold and self.has_faces) or has_mod_solidify:
                 layout.operator("nd.solidify", icon=icons['nd.solidify'])
                 has_mod_solidify = True
 
-            if has_mod_profile_extrude:
+            if (not self.manifold and self.has_loose_edges) or has_mod_profile_extrude:
                 layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
+                has_mod_profile_extrude = True
             
             if has_mod_screw:
                 layout.operator("nd.screw", icon=icons['nd.screw'])
@@ -226,7 +228,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
                 return
 
-            if self.form:
+            if self.has_faces:
                 layout.separator()
                 layout.operator("nd.bevel", icon=icons['nd.bevel'])
                 layout.operator("nd.weighted_normal_bevel", icon=icons['nd.weighted_normal_bevel'])

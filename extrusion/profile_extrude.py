@@ -79,6 +79,10 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         elif pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             self.dirty = True
+        
+        elif pressed(event, {'E'}):
+            self.calculate_edges = not self.calculate_edges
+            self.dirty = True
 
         elif self.key_increase_factor:
             self.base_extrude_factor = min(1, self.base_extrude_factor * 10.0)
@@ -162,6 +166,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         self.axis = 0
         self.extrusion_length = 0
         self.weighting = 0
+        self.calculate_edges = True
 
         self.add_offset_modifier(context)
         self.add_screw_modifier(context)
@@ -170,11 +175,13 @@ class ND_OT_profile_extrude(bpy.types.Operator):
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
+        self.calculate_edges = True
         self.screw = mods[mod_screw]
         self.offset = mods[mod_offset]
 
         self.axis_prev = self.axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
         self.extrusion_length_prev = self.extrusion_length = self.screw.screw_offset
+        self.calculate_edges_prev = self.calculate_edges = self.screw.use_normal_calculate
         self.weighting = self.calculate_existing_weighting()
         self.offset_strength_prev = self.offset.strength
 
@@ -210,7 +217,6 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         screw.steps = 0
         screw.render_steps = 0
         screw.angle = 0
-        screw.use_normal_calculate = True
         screw.show_expanded = False
 
         self.screw = screw
@@ -221,6 +227,7 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
         self.screw.axis = axis
         self.screw.screw_offset = self.extrusion_length
+        self.screw.use_normal_calculate = self.calculate_edges
         self.offset.direction = axis
         self.offset.strength = self.calculate_offset_strength()
 
@@ -270,6 +277,11 @@ def draw_text_callback(self):
         self,
         "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
         "Axis to extrude along (X, Y, Z)")
+    
+    draw_hint(
+        self,
+        "Calculate Edges [E]: {}".format("Yes" if self.calculate_edges else "No"),
+        "Calculate the order of edges (affects normals)")
 
 
 def register():

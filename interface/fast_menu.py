@@ -23,6 +23,7 @@ import bmesh
 from .. import bl_info
 from .. lib.objects import is_planar
 from . ops import build_icon_lookup_table
+from .. lib.addons import is_addon_enabled
 
 
 keys = []
@@ -62,11 +63,14 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
 
         layout.separator()
+        
+        text = "F » Make Edge/Face"
+        icon = 'MOD_SIMPLIFY'
 
-        try:
-            layout.operator("mesh.f2", text="[F] Make Edge/Face", icon='MOD_SIMPLIFY')
-        except:
-            layout.operator("mesh.edge_face_add", text="[F] Make Edge/Face", icon='MOD_SIMPLIFY')
+        if is_addon_enabled("mesh_f2"):
+            layout.operator("mesh.f2", text=text, icon=icon)
+        else:
+            layout.operator("mesh.edge_face_add", text=text, icon=icon)
 
 
     def draw_no_object_predictions(self, context):

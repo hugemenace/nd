@@ -19,8 +19,15 @@
 # ---
 
 import bpy
-from . addons import get_registered_addon_name
 
 
-def get_preferences():
-    return bpy.context.preferences.addons[get_registered_addon_name()].preferences
+def get_registered_addon_name():
+    return __name__.partition('.')[0]
+
+
+def is_addon_enabled(addon):
+    for key in bpy.context.preferences.addons.keys():
+        if addon == key:
+            return True
+    
+    return False

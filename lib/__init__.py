@@ -29,6 +29,7 @@ from . import viewport
 from . import assets
 from . import updates
 from . import preferences
+from . import addons
 from . import collections
 from . import modifiers
 from . import numeric_input
@@ -46,6 +47,7 @@ registerables = (
     assets,
     updates,
     preferences,
+    addons,
     collections,
     modifiers,
     numeric_input,

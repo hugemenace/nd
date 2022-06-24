@@ -84,6 +84,10 @@ class ND_OT_solidify(bpy.types.Operator):
         elif pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             self.dirty = True
+        
+        elif pressed(event, {'M'}):
+            self.complex_mode = not self.complex_mode
+            self.dirty = True
 
         elif self.key_increase_factor:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
@@ -142,6 +146,8 @@ class ND_OT_solidify(bpy.types.Operator):
         self.base_thickness_factor = 0.01
         self.base_offset_factor = 0.001
 
+        self.complex_mode = False
+
         self.thickness_input_stream = new_stream()
         self.offset_input_stream = new_stream()
 
@@ -192,6 +198,7 @@ class ND_OT_solidify(bpy.types.Operator):
 
         self.thickness_prev = self.thickness = self.solidify.thickness
         self.weighting_prev = self.weighting = self.solidify.offset
+        self.complex_mode_prev = self.complex_mode = (self.solidify.solidify_mode == 'NON_MANIFOLD')
         self.offset_prev = self.offset = self.displace.strength
 
 
@@ -213,6 +220,7 @@ class ND_OT_solidify(bpy.types.Operator):
         solidify = context.active_object.modifiers.new(mod_solidify, 'SOLIDIFY')
         solidify.use_even_offset = True
         solidify.show_expanded = False
+        solidify.nonmanifold_thickness_mode = 'EVEN'
 
         self.solidify = solidify
     
@@ -220,6 +228,7 @@ class ND_OT_solidify(bpy.types.Operator):
     def operate(self, context):
         self.solidify.thickness = self.thickness
         self.solidify.offset = self.weighting
+        self.solidify.solidify_mode = 'NON_MANIFOLD' if self.complex_mode else 'EXTRUDE'
         self.displace.strength = self.offset
 
         self.dirty = False
@@ -237,6 +246,7 @@ class ND_OT_solidify(bpy.types.Operator):
         if self.summoned:
             self.solidify.thickness = self.thickness_prev
             self.solidify.offset = self.weighting_prev
+            self.solidify.solidify_mode = 'NON_MANIFOLD' if self.complex_mode_prev else 'EXTRUDE'
             self.displace.strength = self.offset_prev
         
         unregister_draw_handler()
@@ -267,6 +277,11 @@ def draw_text_callback(self):
         self,
         "Weighting [W]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
         "Negative, Neutral, Positive")
+
+    draw_hint(
+        self,
+        "Mode [M]: {}".format("Complex" if self.complex_mode else "Simple"),
+        "Extrusion Algorithm (Simple, Complex)")
 
 
 def register():

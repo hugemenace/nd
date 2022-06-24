@@ -116,6 +116,10 @@ class ND_OT_lattice(bpy.types.Operator):
 
             self.dirty = True
 
+        elif pressed(event, {'M'}):
+            self.interpolation_mode = (self.interpolation_mode + 1) % len(self.interpolation_modes)
+            self.dirty = True
+
         elif self.key_step_up:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u += 1
@@ -171,6 +175,11 @@ class ND_OT_lattice(bpy.types.Operator):
         self.dirty = False
 
         self.uniform = True
+
+        self.interpolation_mode = 0
+        self.interpolation_modes = ['KEY_LINEAR', 'KEY_CARDINAL', 'KEY_CATMULL_ROM', 'KEY_BSPLINE']
+        self.interpolation_labels = {'KEY_LINEAR': 'Linear', 'KEY_CARDINAL': 'Cardinal', 'KEY_CATMULL_ROM': 'Catmull-Rom', 'KEY_BSPLINE': 'B-Spline'}
+
         self.lattice_points_u = 2
         self.lattice_points_v = 2
         self.lattice_points_w = 2
@@ -233,6 +242,7 @@ class ND_OT_lattice(bpy.types.Operator):
             self.lattice_points_u = self.lattice_points_u_prev = self.lattice_obj.data.points_u
             self.lattice_points_v = self.lattice_points_v_prev = self.lattice_obj.data.points_v
             self.lattice_points_w = self.lattice_points_w_prev = self.lattice_obj.data.points_w
+            self.interpolation_mode = self.interpolation_mode_prev = self.interpolation_modes.index(self.lattice_obj.data.interpolation_type_u)
 
 
     def add_lattice_object(self, context):
@@ -292,6 +302,11 @@ class ND_OT_lattice(bpy.types.Operator):
         self.lattice_obj.data.points_u = self.lattice_points_u
         self.lattice_obj.data.points_v = self.lattice_points_v
         self.lattice_obj.data.points_w = self.lattice_points_w
+        
+        interpolation_mode = self.interpolation_modes[self.interpolation_mode]
+        self.lattice_obj.data.interpolation_type_u = interpolation_mode
+        self.lattice_obj.data.interpolation_type_v = interpolation_mode
+        self.lattice_obj.data.interpolation_type_w = interpolation_mode
 
         self.dirty = False
 
@@ -309,6 +324,11 @@ class ND_OT_lattice(bpy.types.Operator):
             self.lattice_obj.data.points_u = self.lattice_points_u_prev
             self.lattice_obj.data.points_v = self.lattice_points_v_prev
             self.lattice_obj.data.points_w = self.lattice_points_w_prev
+
+            interpolation_mode = self.interpolation_modes[self.interpolation_mode_prev]
+            self.lattice_obj.data.interpolation_type_u = interpolation_mode
+            self.lattice_obj.data.interpolation_type_v = interpolation_mode
+            self.lattice_obj.data.interpolation_type_w = interpolation_mode
 
             hide_utils_collection(True)
 
@@ -350,6 +370,12 @@ def draw_text_callback(self):
         self,
         "Uniform [U]: {}".format("Yes" if self.uniform else "No"),
         "Adjust all points uniformly")
+
+    interpolation_mode = self.interpolation_modes[self.interpolation_mode]
+    draw_hint(
+        self,
+        "Interpolation Mode [M]: {}".format(self.interpolation_labels[interpolation_mode]),
+        "Linear, Cardinal, Catmull-Rom, B-Spline")
 
 
 def register():

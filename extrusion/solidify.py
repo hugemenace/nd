@@ -220,7 +220,7 @@ class ND_OT_solidify(bpy.types.Operator):
         solidify = context.active_object.modifiers.new(mod_solidify, 'SOLIDIFY')
         solidify.use_even_offset = True
         solidify.show_expanded = False
-        solidify.nonmanifold_thickness_mode = 'EVEN'
+        solidify.nonmanifold_thickness_mode = 'CONSTRAINTS'
 
         self.solidify = solidify
     

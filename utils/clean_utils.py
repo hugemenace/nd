@@ -44,15 +44,12 @@ class ND_OT_clean_utils(bpy.types.Operator):
         removal_count = 0
 
         active_util_object_names = set()
-        all_scene_objects = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
-        all_util_objects = get_all_util_objects()
-        util_mods = ['BOOLEAN', 'ARRAY', 'MIRROR']
-
-        remove_mods = []
+        all_scene_objects = [obj for obj in bpy.context.view_layer.objects if obj.type == 'MESH']
+        util_mods = ['BOOLEAN', 'ARRAY', 'MIRROR', 'LATTICE']
 
         for obj in all_scene_objects:
-            mods = list(obj.modifiers)
-            for mod in mods:
+            remove_mods = []
+            for mod in obj.modifiers:
                 if mod.type not in util_mods:
                     continue
 
@@ -60,7 +57,8 @@ class ND_OT_clean_utils(bpy.types.Operator):
                     if mod.show_viewport and mod.object:
                         active_util_object_names.add(mod.object.name)
                     else:
-                        remove_mods.append((obj, mod))
+                        remove_mods.append(mod)
+                        removal_count += 1
                     continue 
 
                 if mod.type == 'ARRAY':
@@ -68,25 +66,28 @@ class ND_OT_clean_utils(bpy.types.Operator):
                         active_util_object_names.add(mod.offset_object.name)
                     continue
 
+                if mod.type == 'LATTICE':
+                    if mod.object:
+                        active_util_object_names.add(mod.object.name)
+                    continue
+
                 if mod.type == 'MIRROR':
                     if mod.mirror_object:
                         active_util_object_names.add(mod.mirror_object.name)
                     continue
-        
-        for obj in all_util_objects:
-            if obj.name not in active_util_object_names:
-                try:
-                    bpy.data.objects.remove(obj, do_unlink=True)
-                    removal_count += 1
-                except:
-                    pass
 
-        for obj, mod in remove_mods:
-            try:
+            for mod in remove_mods:
                 obj.modifiers.remove(mod)
+        
+        all_util_objects = get_all_util_objects()
+        deleted_objects = []
+
+        for obj in all_util_objects:
+            if obj and obj.name not in active_util_object_names:
+                deleted_objects.append(obj)
                 removal_count += 1
-            except:
-                pass
+                
+        bpy.ops.object.delete({'active_object': None, 'object': None, 'selected_objects': deleted_objects}, use_global=False)
 
         return removal_count
 

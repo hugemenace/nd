@@ -332,7 +332,7 @@ def draw_text_callback(self):
     
     draw_property(
         self, 
-        "Rotation: {0:.1f}".format(self.rotation),
+        "Rotation: {0:.2f}".format(self.rotation),
         "(±15)  |  Shift (±1)",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -341,7 +341,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Height Offset: {0:.1f}".format(self.height_offset),
+        "Height Offset: {0:.2f}".format(self.height_offset),
         "Alt (±1)  |  Shift + Alt (±0.1)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt,

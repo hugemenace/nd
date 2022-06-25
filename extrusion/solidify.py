@@ -256,8 +256,8 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Thickness: {0:.1f}".format(self.thickness * 1000), 
-        "(±{0:.1f})  |  Shift + (±{1:.1f})".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
+        "Thickness: {0:.2f}".format(self.thickness * 1000), 
+        "(±{0:.2f})  |  Shift + (±{1:.2f})".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -265,8 +265,8 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Offset: {0:.1f}".format(self.offset * 1000), 
-        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        "Offset: {0:.2f}".format(self.offset * 1000), 
+        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

@@ -248,7 +248,7 @@ def draw_text_callback(self):
     if self.is_angular[self.methods[self.current_method]]:
         draw_property(
             self,
-            "Angle: {0:.0f}°".format(self.angle),
+            "Angle: {0:.2f}°".format(self.angle),
             "(±10)  |  Shift (±1)",
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,

@@ -349,7 +349,7 @@ def draw_text_callback(self):
     
     draw_property(
         self,
-        "Weight: {0:.2f} ({1:.0f})".format(self.weight, self.width * 1000 * self.weight),
+        "Weight: {0:.2f} ({1:.2f})".format(self.weight, self.width * 1000 * self.weight),
         "(±0.1)  |  Shift (±0.01)",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -375,7 +375,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Width: {0:.1f}".format(self.width * 1000),
+        "Width: {0:.2f}".format(self.width * 1000),
         "Ctrl + Alt (±100) | Shift + Ctrl + Alt (±10)",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,

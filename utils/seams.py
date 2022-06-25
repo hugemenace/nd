@@ -176,7 +176,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Angle: {0:.0f}°".format(self.angle),
+        "Angle: {0:.2f}°".format(self.angle),
         "(±{0:.0f})  |  Shift + (±1)".format(self.base_angle_factor),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,

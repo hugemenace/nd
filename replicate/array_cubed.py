@@ -253,7 +253,7 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Count: {0:.0f}".format(self.axes[self.axis][1]),
+        "Count: {0}".format(self.axes[self.axis][1]),
         "Alt (±1)",
         active=self.key_no_modifiers,
         alt_mode=False,
@@ -261,8 +261,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Offset: {0:.3f}".format(self.axes[self.axis][2]),
-        "Ctrl (±{0:.1f})  |  Shift + Ctrl (±{1:.1f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        "Offset: {0:.2f}".format(self.axes[self.axis][2]),
+        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

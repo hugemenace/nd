@@ -143,7 +143,7 @@ SHIFT — Cycle through the modifier stack"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and self.target_obj.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
     def set_mod_visible(self, mod, visible):

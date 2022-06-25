@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.32.0](https://github.com/hugemenace/nd/compare/v1.31.0...v1.32.0) (2022-06-25)
+
+
+### Features
+
+* add an option to toggle the sidebar / N-panel ([0799e0b](https://github.com/hugemenace/nd/commit/0799e0b6608df8eeacd47beb325297b0e52a8821))
+* add calculate edges option to profile_extrude operator ([8d6ead4](https://github.com/hugemenace/nd/commit/8d6ead4785b12cd528d7cbb19a1f2ee7d248d392))
+* add extrusion mode option to solidify operator ([5011a6f](https://github.com/hugemenace/nd/commit/5011a6f682316603478cec461b1c80b6cf5d2bf5))
+* add interpolation mode to lattice operator and default to linear ([9fdd252](https://github.com/hugemenace/nd/commit/9fdd2520420dafe24c598af08892590679a92b70))
+* add offset option to profile_extrude operator ([e62687c](https://github.com/hugemenace/nd/commit/e62687c2d4e56c516f8974c38a95d73ccb82c178))
+* add solidify option to fast menu for non-manifold meshes ([a14b819](https://github.com/hugemenace/nd/commit/a14b8194156b4b8475ad21d5106202a9b99f6fdd))
+* add the ability to recall previous edge bevel weights ([e381ab3](https://github.com/hugemenace/nd/commit/e381ab3e3543e4f959ac5724a398e31cadcba784))
+* add toggle wireframe and disable utility modifier options to cycle operator ([a3a0bbc](https://github.com/hugemenace/nd/commit/a3a0bbc80857cd45cdbf60d1978ad5b175640027))
+* enhance profile extrusion and solidification predictions in the Fast menu ([539f413](https://github.com/hugemenace/nd/commit/539f4138aaa8ac44c56d20f656d955c7c94112d4))
+* ensure mirror modifiers are placed before finishing bevels in the modifier stack ([5751adb](https://github.com/hugemenace/nd/commit/5751adb9f421959a6aaac2f99a2e54724768cef7))
+* rectify the mod order for lattice, simple_deform, profile_extrude, screw, solidify, array_cubed, and circular_array operators ([2ccb087](https://github.com/hugemenace/nd/commit/2ccb0879217f8a13cabbca98c45a8a6676359b9e))
+* remove all disabled (viewport hidden) boolean modifiers when using the clean_utils operator ([96a82ab](https://github.com/hugemenace/nd/commit/96a82abebb86c0c7b198ac62e3d330d975a4680c))
+
+
+### Bug Fixes
+
+* add missing fast menu no prediction results section count ([ac391ae](https://github.com/hugemenace/nd/commit/ac391ae821c4a6435847714547416a8d79d1a857))
+* add missing new_modifier imports to recon_poly, screw_head, set_origin, and triangulate operators ([b832ca2](https://github.com/hugemenace/nd/commit/b832ca2a9aaa958ba085f95affca374a11df6964))
+* ensure single_vertex object has rotation and scale applied after creation ([7ce7f30](https://github.com/hugemenace/nd/commit/7ce7f3012ba5af7a42b0622b7c5b22cf15435313))
+* fix edge_bevel width shift/precision and value formatting ([78c1cac](https://github.com/hugemenace/nd/commit/78c1cac9e3bb4bfea2a7219f70ad18eca22273b8))
+* fix error/crash in clean_utils utility & add logic for lattice modifiers ([14cf8a8](https://github.com/hugemenace/nd/commit/14cf8a8b971f1a09f28420c0a195a724ee39847b))
+* fix mesh_f2 addon detection in the Fast Predict menu ([499d96a](https://github.com/hugemenace/nd/commit/499d96a710d9efda3818c8c6be573ce20259ed87))
+* fix no predictions logic in the fast menu ([1819997](https://github.com/hugemenace/nd/commit/1819997a673cee43bd006b98491e18467e813f75))
+* fix poll method target object type check in cycle operator ([a286253](https://github.com/hugemenace/nd/commit/a2862533c996214d99aeb73cd98c4d4a3a3488ea))
+* handle object/modifier removal errors more gracefully in clean_utils operator ([6da00af](https://github.com/hugemenace/nd/commit/6da00af63304bd8342059029c3a35f741c1b5a3b))
+* unify and lower the merge and bisect thresholds for the mirror operator ([843c126](https://github.com/hugemenace/nd/commit/843c126b2ea56f7a1d8a5265f837cdca856669f7))
+
 ## [1.31.0](https://github.com/hugemenace/nd/compare/v1.30.0...v1.31.0) (2022-06-12)
 
 

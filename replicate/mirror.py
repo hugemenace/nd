@@ -315,7 +315,8 @@ SHIFT — Place modifiers at the top of the stack"""
         for obj in self.reference_objs:
             mirror = new_modifier(obj, 'Mirror — ND', 'MIRROR', rectify=True)
             mirror.use_clip = True
-            mirror.merge_threshold = 0.0001
+            mirror.merge_threshold = 1e-05
+            mirror.bisect_threshold = 1e-05
 
             if self.mirror_obj != None:
                 mirror.mirror_object = self.mirror_obj

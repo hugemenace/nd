@@ -84,6 +84,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("mesh.primitive_plane_add", icon='MESH_PLANE')
         layout.operator("mesh.primitive_cube_add", icon='MESH_CUBE')
 
+        return SECTION_COUNT
+
 
     def draw_two_object_predictions(self, context):
         layout = self.layout

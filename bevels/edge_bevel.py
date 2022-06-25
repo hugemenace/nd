@@ -237,6 +237,7 @@ SHIFT — Place modifiers at the top of the stack"""
         self.segments_prev = self.segments = self.bevel.segments
         self.profile_prev = self.profile = self.bevel.profile
         self.harden_normals_prev = self.harden_normals = self.bevel.harden_normals
+        self.weight = self.edge_weight_average
 
 
     def add_smooth_shading(self, context):
@@ -279,6 +280,7 @@ SHIFT — Place modifiers at the top of the stack"""
 
     def take_edges_snapshot(self, context):
         self.edges_snapshot = {}
+        self.edge_weight_average = 0
         
         data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
@@ -287,6 +289,9 @@ SHIFT — Place modifiers at the top of the stack"""
         selected_edges = [edge for edge in bm.edges if edge.select]
         for edge in selected_edges:
             self.edges_snapshot[edge.index] = edge[bevel_weight_layer]
+            self.edge_weight_average += edge[bevel_weight_layer]
+
+        self.edge_weight_average /= len(selected_edges)
 
 
     def operate(self, context):

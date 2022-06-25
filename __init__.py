@@ -108,7 +108,7 @@ class NDPreferences(AddonPreferences):
     )
 
     enable_sidebar: BoolProperty(
-        name="Enable the sidebar / N-panel (requires restart)",
+        name="Enable the sidebar / N-panel (requires Blender restart)",
         default=True,
     )
 

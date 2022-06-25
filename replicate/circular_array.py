@@ -29,6 +29,7 @@ from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import rectify_mod_order
 
 
 mod_displace = 'Displace — ND CA'
@@ -291,6 +292,8 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
         array.offset_object = self.rotator_obj
         array.show_expanded = False
 
+        rectify_mod_order(self.reference_obj, array.name)
+
         self.array = array
 
 
@@ -308,6 +311,8 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
                 displace.strength = self.reference_obj_prev_location[index] - self.reference_obj.location[index]
                 displace.show_expanded = False
 
+                rectify_mod_order(self.reference_obj, displace.name)
+
                 self.displace_transforms.append(displace)
 
 
@@ -318,6 +323,8 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
         displace.show_in_editmode = True
         displace.show_on_cage = True
         displace.show_expanded = False
+
+        rectify_mod_order(self.reference_obj, displace.name)
 
         if self.single_obj_mode:
             self.offset = self.reference_obj.dimensions[self.axis]

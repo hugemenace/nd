@@ -25,6 +25,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import rectify_mod_order
 
 
 mod_screw = "Extrusion — ND PE"
@@ -240,6 +241,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         offset.mid_level = 0
         offset.show_expanded = False
 
+        rectify_mod_order(context.active_object, offset.name)
+
         self.weighting_offset = offset
 
     
@@ -248,6 +251,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         offset.space = 'LOCAL'
         offset.mid_level = 0
         offset.show_expanded = False
+
+        rectify_mod_order(context.active_object, offset.name)
 
         self.displace = offset
 
@@ -258,6 +263,8 @@ class ND_OT_profile_extrude(bpy.types.Operator):
         screw.render_steps = 0
         screw.angle = 0
         screw.show_expanded = False
+
+        rectify_mod_order(context.active_object, screw.name)
 
         self.screw = screw
     

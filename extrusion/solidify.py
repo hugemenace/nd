@@ -25,6 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import rectify_mod_order
 
 
 mod_displace = "Offset — ND SOL"
@@ -213,6 +214,8 @@ class ND_OT_solidify(bpy.types.Operator):
         displace.mid_level = 0
         displace.show_expanded = False
 
+        rectify_mod_order(context.active_object, displace.name)
+
         self.displace = displace
 
 
@@ -221,6 +224,8 @@ class ND_OT_solidify(bpy.types.Operator):
         solidify.use_even_offset = True
         solidify.show_expanded = False
         solidify.nonmanifold_thickness_mode = 'CONSTRAINTS'
+
+        rectify_mod_order(context.active_object, solidify.name)
 
         self.solidify = solidify
     

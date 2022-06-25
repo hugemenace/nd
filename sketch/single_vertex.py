@@ -34,6 +34,8 @@ class ND_OT_single_vertex(bpy.types.Operator):
 
         add_single_vertex_object(self, context, "Sketch")
         align_object_to_3d_cursor(self, context)
+        
+        bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
         self.start_sketch_editing(context)
 

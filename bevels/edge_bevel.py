@@ -44,6 +44,7 @@ SHIFT — Place modifiers at the top of the stack"""
         capture_modifier_keys(self, event)
 
         weight_factor = 0.01 if self.key_shift else 0.1
+        width_factor = 0.01 if self.key_shift else 0.1
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
 
@@ -123,7 +124,7 @@ SHIFT — Place modifiers at the top of the stack"""
                 self.profile = min(1, self.profile + profile_factor)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
-                self.width = max(0, self.width + 0.1)
+                self.width = max(0, self.width + width_factor)
                 self.dirty = True
             elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight + weight_factor))
@@ -137,7 +138,7 @@ SHIFT — Place modifiers at the top of the stack"""
                 self.profile = max(0, self.profile - profile_factor)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
-                self.width = max(0, self.width - 0.1)
+                self.width = max(0, self.width - width_factor)
                 self.dirty = True
             elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight - weight_factor))
@@ -370,7 +371,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Width: {0:.0f}".format(self.width * 1000),
+        "Width: {0:.1f}".format(self.width * 1000),
         "Ctrl + Alt (±100) | Shift + Ctrl + Alt (±10)",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,

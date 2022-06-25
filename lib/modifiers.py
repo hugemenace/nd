@@ -26,8 +26,11 @@ def new_modifier(object, mod_name, mod_type, rectify=True):
 
     mod.show_viewport = True
     mod.show_in_editmode = True
-    mod.show_on_cage = True
     mod.show_expanded = False
+
+    show_cage_mods = ['DISPLACE']
+    if mod_type in show_cage_mods:
+        mod.show_on_cage = True
 
     if rectify:
         rectify_mod_order(object, mod.name)

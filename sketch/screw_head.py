@@ -215,11 +215,10 @@ class ND_OT_screw_head(bpy.types.Operator):
 
 
     def add_displace_modifier(self, context):
-        displace = self.obj.modifiers.new(mod_displace, 'DISPLACE')
+        displace = new_modifier(self.obj, mod_displace, 'DISPLACE', rectify=False)
         displace.direction = 'Z'
         displace.space = 'LOCAL'
         displace.mid_level = 0
-        displace.show_expanded = False
 
         self.displace = displace
 

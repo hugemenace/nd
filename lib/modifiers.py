@@ -21,6 +21,20 @@
 import bpy
 
 
+def new_modifier(object, mod_name, mod_type, rectify=True):
+    mod = object.modifiers.new(mod_name, mod_type)
+
+    mod.show_viewport = True
+    mod.show_in_editmode = True
+    mod.show_on_cage = True
+    mod.show_expanded = False
+
+    if rectify:
+        rectify_mod_order(object, mod.name)
+
+    return mod
+
+
 def rectify_mod_order(object, mod_name):
     mods = list(object.modifiers)
 

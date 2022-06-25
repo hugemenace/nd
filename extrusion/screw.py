@@ -26,7 +26,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import rectify_mod_order
+from .. lib.modifiers import new_modifier, rectify_mod_order
 
 
 mod_displace = "Offset — ND SCR"
@@ -236,25 +236,19 @@ class ND_OT_screw(bpy.types.Operator):
 
 
     def add_displace_modifier(self, context):
-        displace = context.active_object.modifiers.new(mod_displace, 'DISPLACE')
+        displace = new_modifier(context.active_object, mod_displace, 'DISPLACE', rectify=True)
         displace.mid_level = 0
         displace.space = 'LOCAL'
-        displace.show_expanded = False
 
-        rectify_mod_order(context.active_object, displace.name)
-        
         self.displace = displace
 
 
     def add_screw_modifier(self, context):
-        screw = context.active_object.modifiers.new(mod_screw, 'SCREW')
+        screw = new_modifier(context.active_object, mod_screw, 'SCREW', rectify=True)
         screw.screw_offset = 0
         screw.use_merge_vertices = True 
         screw.merge_threshold = 0.0001
         screw.use_normal_calculate = True
-        screw.show_expanded = False
-
-        rectify_mod_order(context.active_object, screw.name)
 
         self.screw = screw
     

@@ -21,7 +21,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import rectify_mod_order, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, rectify_mod_order, remove_problematic_bevels
 
 
 class ND_OT_bool_vanilla(bpy.types.Operator):
@@ -52,13 +52,10 @@ ALT — Do not clean the reference object's mesh"""
         a, b = context.selected_objects
         reference_obj = a if a.name != context.active_object.name else b
         
-        boolean = context.active_object.modifiers.new(" — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN')
+        boolean = new_modifier(context.active_object, " — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN', rectify=True)
         boolean.operation = self.mode
         boolean.object = reference_obj
         boolean.solver = solver
-        boolean.show_expanded = False
-
-        rectify_mod_order(context.active_object, boolean.name)
 
         if not self.protect_reference_obj:
             reference_obj.display_type = 'WIRE'

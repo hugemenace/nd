@@ -19,7 +19,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import rectify_mod_order
+from .. lib.modifiers import new_modifier, rectify_mod_order
 
 
 class ND_OT_weld(bpy.types.Operator):
@@ -37,10 +37,8 @@ class ND_OT_weld(bpy.types.Operator):
 
     def invoke(self, context, event):
         for obj in context.selected_objects:
-            modifier = obj.modifiers.new('Weld — ND SW', 'WELD')
-            modifier.merge_threshold = 0.001
-            modifier.show_expanded = False
-            rectify_mod_order(obj, modifier.name)
+            weld = new_modifier(obj, 'Weld — ND SW', 'WELD', rectify=True)
+            weld.merge_threshold = 0.001
 
         return {'FINISHED'}
 

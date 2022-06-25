@@ -25,6 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import new_modifier
 
 
 mod_bevel = "Bevel — ND WNB"
@@ -185,20 +186,18 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.active_object.modifiers.new(mod_bevel, 'BEVEL')
+        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
         bevel.segments = 1
         bevel.offset_type = 'WIDTH'
         bevel.face_strength_mode = 'FSTR_AFFECTED'
-        bevel.show_expanded = False
 
         self.bevel = bevel
     
 
     def add_weighted_normal_modifer(self, context):
-        wn = context.active_object.modifiers.new(mod_wn, 'WEIGHTED_NORMAL')
+        wn = new_modifier(context.active_object, mod_wn, 'WEIGHTED_NORMAL', rectify=False)
         wn.weight = 100
         wn.use_face_influence = True
-        wn.show_expanded = False
 
         self.wn = wn
 

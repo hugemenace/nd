@@ -39,10 +39,9 @@ ALT — Do not preserve custom normals"""
         self.preserve_normals = not event.alt
 
         for obj in context.selected_objects:
-            modifier = obj.modifiers.new('Triangulate — ND', 'TRIANGULATE')
-            modifier.keep_custom_normals = self.preserve_normals
-            modifier.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'
-            modifier.show_expanded = False
+            triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
+            triangulate.keep_custom_normals = self.preserve_normals
+            triangulate.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'
 
         return {'FINISHED'}
 

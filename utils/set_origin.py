@@ -95,12 +95,11 @@ SHIFT — Undo faux origin translation"""
 
     
     def add_displace_modifier(self, reference_obj, axis, strength):
-        displace = reference_obj.modifiers.new("Translate {} — ND FO".format(axis), 'DISPLACE')
+        displace = new_modifier(reference_obj, "Translate {} — ND FO".format(axis), 'DISPLACE', rectify=False)
         displace.direction = axis 
         displace.space = 'GLOBAL'
         displace.mid_level = 0
         displace.strength = strength
-        displace.show_expanded = False
 
 
 def register():

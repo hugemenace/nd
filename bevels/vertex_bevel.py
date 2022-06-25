@@ -25,6 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import new_modifier
 
 
 mod_bevel = "Bevel — ND VB"
@@ -258,15 +259,11 @@ ALT — Create a vertex group edge bevel"""
 
 
     def add_bevel_modifier(self, context):
-        bevel = context.active_object.modifiers.new(mod_bevel, type='BEVEL')
-        if self.edge_mode:
-            bevel.affect = 'EDGES'
-        else:
-            bevel.affect = 'VERTICES'
+        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
+        bevel.affect = 'EDGES' if self.edge_mode else 'VERTICES'
         bevel.limit_method = 'VGROUP'
         bevel.offset_type = 'WIDTH'
         bevel.vertex_group = self.vgroup.name
-        bevel.show_expanded = False
 
         self.bevel = bevel
 
@@ -281,9 +278,8 @@ ALT — Create a vertex group edge bevel"""
         previous_op = all(m in mod_names for m in mod_summon_list)
 
         if self.late_apply or not previous_op:
-            weld = context.active_object.modifiers.new(mod_weld_la if self.late_apply else mod_weld, type='WELD')
+            weld = new_modifier(context.active_object, mod_weld_la if self.late_apply else mod_weld, 'WELD', rectify=False)
             weld.merge_threshold = 0.00001
-            weld.show_expanded = False
 
             self.weld = weld
 

@@ -25,7 +25,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import rectify_mod_order
+from .. lib.modifiers import new_modifier, rectify_mod_order
 
 
 mod_array_x = "Array³ X — ND"
@@ -213,14 +213,11 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
 
     def add_array_modifier(self, context, name, axis):
-        array = context.active_object.modifiers.new(name, 'ARRAY')
+        array = new_modifier(context.active_object, name, 'ARRAY', rectify=True)
         array.use_relative_offset = True
-        array.show_expanded = False
 
         self.axes[axis] = [array, 1, 2]
 
-        rectify_mod_order(context.active_object, array.name)
-    
 
     def operate(self, context):
         for axis, conf in enumerate(self.axes):

@@ -26,7 +26,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import rectify_mod_order, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, rectify_mod_order, remove_problematic_bevels
 
 
 class ND_OT_bool_inset(bpy.types.Operator):
@@ -133,20 +133,16 @@ class ND_OT_bool_inset(bpy.types.Operator):
         self.intersecting_obj.animation_data_clear()
         context.collection.objects.link(self.intersecting_obj)
 
-        self.boolean_diff = self.target_obj.modifiers.new("Inset/Outset — ND Bool", 'BOOLEAN')
+        self.boolean_diff = new_modifier(self.target_obj, "Inset/Outset — ND Bool", 'BOOLEAN', rectify=True)
         self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
         self.boolean_diff.object = self.intersecting_obj
         self.boolean_diff.solver = solver
-        self.boolean_diff.show_expanded = False
 
-        rectify_mod_order(self.target_obj, self.boolean_diff.name)
-
-        self.solidify = self.intersecting_obj.modifiers.new("Thickness — ND Bool", 'SOLIDIFY')
+        self.solidify = new_modifier(self.intersecting_obj, "Thickness — ND Bool", 'SOLIDIFY', rectify=False)
         self.solidify.use_even_offset = True
         self.solidify.offset = 0
-        self.solidify.show_expanded = False
 
-        self.boolean_isect = self.intersecting_obj.modifiers.new("Intersection — ND Bool", 'BOOLEAN')
+        self.boolean_isect = new_modifier(self.intersecting_obj, "Intersection — ND Bool", 'BOOLEAN', rectify=False)
         self.boolean_isect.operation = 'INTERSECT'
         self.boolean_isect.object = self.reference_obj
         self.boolean_isect.solver = solver

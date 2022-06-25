@@ -124,7 +124,7 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
     bpy.ops.mesh.customdata_custom_splitnormals_clear()
 
 
-def is_planar(bm, tolerance=0.001):
+def is_planar(bm, tolerance=0.0001):
     faces = list(bm.faces)
 
     if len(faces) < 1:

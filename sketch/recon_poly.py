@@ -26,6 +26,7 @@ from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import new_modifier
 
 
 mod_displace = "Radius — ND RCP"

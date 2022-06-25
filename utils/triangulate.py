@@ -19,6 +19,7 @@
 # ---
 
 import bpy
+from .. lib.modifiers import new_modifier
 
 
 class ND_OT_triangulate(bpy.types.Operator):

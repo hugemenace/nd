@@ -21,6 +21,7 @@
 import bpy
 from mathutils import Vector
 from .. lib.objects import set_origin
+from .. lib.modifiers import new_modifier
 
 
 class ND_OT_set_origin(bpy.types.Operator):

@@ -28,7 +28,8 @@ from .. lib.addons import is_addon_enabled
 
 keys = []
 icons = build_icon_lookup_table()
-
+SECTION_COUNT = 1
+NO_SECTION_COUNT = 0
 
 class ND_MT_fast_menu(bpy.types.Menu):
     bl_label = "ND v%s — Fast (Predict)" % ('.'.join([str(v) for v in bl_info['version']]))
@@ -38,19 +39,19 @@ class ND_MT_fast_menu(bpy.types.Menu):
     def draw(self, context):
         objs = context.selected_objects
 
+        total_sections = 0
+
         if len(objs) == 0:
-            return self.draw_no_object_predictions(context)
+            total_sections += self.draw_no_object_predictions(context)
+        elif len(objs) == 1:
+            total_sections += self.draw_single_object_predictions(context)
+        elif len(objs) == 2:
+            total_sections += self.draw_two_object_predictions(context)
+        elif len(objs) > 2:
+            total_sections += self.draw_many_object_predictions(context)
 
-        if len(objs) == 1:
-            return self.draw_single_object_predictions(context)
-
-        if len(objs) == 2:
-            return self.draw_two_object_predictions(context)
-
-        if len(objs) > 2:
-            return self.draw_many_object_predictions(context)
-
-        return self.draw_no_predictions(context)
+        if total_sections == 0:
+            return self.draw_no_predictions(context)
     
 
     def draw_no_predictions(self, context):
@@ -93,7 +94,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
             layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
-            return
+            return SECTION_COUNT
 
         layout.operator("nd.bool_vanilla", text="Difference", icon=icons['nd.bool_vanilla+DIFFERENCE']).mode = 'DIFFERENCE'
         layout.operator("nd.bool_vanilla", text="Union", icon=icons['nd.bool_vanilla+UNION']).mode = 'UNION'
@@ -104,6 +105,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.mirror", icon=icons['nd.mirror'])
         layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
         layout.operator("nd.snap_align", icon=icons['nd.snap_align'])
+
+        return SECTION_COUNT
 
 
     def draw_single_object_predictions(self, context):
@@ -139,10 +142,10 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 self.draw_make_edge_face_ops(context)
                 made_prediction = True
 
-            if not made_prediction:
-                self.draw_no_predictions(context)
-
-            return
+            if made_prediction:
+                return SECTION_COUNT
+            
+            return NO_SECTION_COUNT
 
         if context.mode == 'OBJECT':
             depsgraph = context.evaluated_depsgraph_get()
@@ -211,7 +214,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
                 layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
-                return
+                return SECTION_COUNT
 
             if was_profile_extrude or self.sketch:
                 layout.operator("nd.solidify", icon=icons['nd.solidify']) if not has_mod_solidify else None
@@ -219,14 +222,14 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.mirror", icon=icons['nd.mirror'])
                 layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
 
-                return
+                return SECTION_COUNT
             
             if self.profile:
                 layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
                 layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
                 layout.operator("nd.mirror", icon=icons['nd.mirror'])
 
-                return
+                return SECTION_COUNT
 
             if self.has_faces:
                 layout.separator()
@@ -241,8 +244,11 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.geo_lift", icon=icons['nd.geo_lift'])
                 layout.operator("nd.view_align", icon=icons['nd.view_align'])
 
-                return
+                return SECTION_COUNT
 
+            return NO_SECTION_COUNT
+
+        return NO_SECTION_COUNT
 
     def draw_many_object_predictions(self, context):
         layout = self.layout
@@ -253,7 +259,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
             layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
-            return
+            return SECTION_COUNT
 
         layout.operator("nd.mirror", icon=icons['nd.mirror'])
         layout.operator("nd.triangulate", icon=icons['nd.triangulate'])
@@ -261,6 +267,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.name_sync", icon=icons['nd.name_sync'])
         layout.operator("nd.set_lod_suffix", text="Low LOD", icon=icons['nd.set_lod_suffix+LOW']).mode = 'LOW'
         layout.operator("nd.set_lod_suffix", text="High LOD", icon=icons['nd.set_lod_suffix+HIGH']).mode = 'HIGH'
+
+        return SECTION_COUNT
 
 
 def register():

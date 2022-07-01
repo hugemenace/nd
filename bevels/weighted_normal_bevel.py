@@ -95,7 +95,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
             
         elif self.key_step_down:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(0.0001, self.width - width_factor)
+                self.width = max(0, self.width - width_factor)
                 self.dirty = True
         
         elif self.key_confirm:
@@ -108,7 +108,7 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(0.0001, self.width + self.mouse_value)
+                self.width = max(0, self.width + self.mouse_value)
                 self.dirty = True
 
         if self.dirty:

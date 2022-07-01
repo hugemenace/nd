@@ -26,10 +26,12 @@ from . ops import build_icon_lookup_table
 from .. lib.addons import is_addon_enabled
 
 
-keys = []
-icons = build_icon_lookup_table()
 SECTION_COUNT = 1
 NO_SECTION_COUNT = 0
+
+keys = []
+icons = build_icon_lookup_table()
+
 
 class ND_MT_fast_menu(bpy.types.Menu):
     bl_label = "ND v%s — Fast (Predict)" % ('.'.join([str(v) for v in bl_info['version']]))
@@ -140,14 +142,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
                 made_prediction = True
 
-            if verts_selected:
-                self.draw_make_edge_face_ops(context)
-                made_prediction = True
+            self.draw_make_edge_face_ops(context)
 
-            if made_prediction:
-                return SECTION_COUNT
-            
-            return NO_SECTION_COUNT
+            return SECTION_COUNT
 
         if context.mode == 'OBJECT':
             depsgraph = context.evaluated_depsgraph_get()

@@ -59,6 +59,10 @@ ALT — Skip geometry selection and use the active object"""
             self.selection_type = (self.selection_type + 1) % 3
             self.set_selection_mode(context)
 
+        elif pressed(event, {'E'}):
+            self.xray_mode = not self.xray_mode
+            self.dirty = True
+
         elif self.key_one:
             self.selection_type = 0
             self.set_selection_mode(context)
@@ -80,12 +84,17 @@ ALT — Skip geometry selection and use the active object"""
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if self.dirty:
+            self.operate(context)
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
 
 
     def invoke(self, context, event):
+        self.dirty = False
+        self.xray_mode = False
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
 
         self.skip_geo_select = event.alt
@@ -216,6 +225,11 @@ ALT — Skip geometry selection and use the active object"""
             self.selection_type = 2
 
 
+    def operate(self, context):
+        context.active_object.show_in_front = self.xray_mode
+        self.dirty = False
+
+
     def finish(self, context):
         if self.has_invalid_selection(context):
             self.clean_up(context)
@@ -252,6 +266,11 @@ def draw_text_callback(self):
         self,
         "Selection Type [S,1,2,3]: {0}".format(['Vertex', 'Edge', 'Face'][self.selection_type]),
         "Type of geometry to select (Vertex, Edge, Face)")
+
+    draw_hint(
+        self,
+        "Exclusive View [E]: {0}".format("On" if self.xray_mode else "Off"),
+        "Show the target object in front of all other objects")
 
 
 def register():

@@ -97,7 +97,6 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
     object_eval = context.active_object.evaluated_get(depsgraph)
 
     context.active_object.modifiers.clear()
-    context.active_object.show_in_front = True
 
     vertex_groups = context.active_object.vertex_groups.values()
     for vg in vertex_groups:

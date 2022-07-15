@@ -83,6 +83,10 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 self.individual = not self.individual
                 self.dirty = True
 
+        elif pressed(event, {'E'}):
+            self.xray_mode = not self.xray_mode
+            self.dirty = True
+
         elif self.key_step_up:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
@@ -136,6 +140,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         self.dirty = False
 
+        self.xray_mode = False
         self.individual = False
         self.inset = 0
         self.stage = 0
@@ -198,6 +203,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def operate(self, context):
+        self.panel_obj.show_in_front = self.xray_mode
+
         if self.stage == 1:
             bmesh.ops.delete(self.panel_bm, geom=self.panel_bm.verts, context='VERTS')
             self.panel_bm.from_mesh(self.panel_mesh_snapshot)
@@ -279,6 +286,11 @@ def draw_text_callback(self):
             self,
             "Individual Faces [F]: {}".format("Yes" if self.individual else "No"),
             "Inset individual faces (Yes, No)")
+
+    draw_hint(
+        self,
+        "Exclusive View [E]: {0}".format("On" if self.xray_mode else "Off"),
+        "Show the target object in front of all other objects")
 
 
 def register():

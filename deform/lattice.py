@@ -275,6 +275,7 @@ class ND_OT_lattice(bpy.types.Operator):
 
         self.lattice_obj = context.active_object
         self.lattice_obj.parent = self.reference_object
+        self.lattice_obj.matrix_parent_inverse = self.reference_object.matrix_world.inverted()
 
         bpy.data.meshes.remove(eval_obj.data, do_unlink=True)
 

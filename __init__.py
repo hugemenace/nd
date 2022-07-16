@@ -337,6 +337,86 @@ class NDPreferences(AddonPreferences):
         subtype='FILE_PATH',
     )
 
+    overlay_show_annotation: BoolProperty(
+        name="Show Annotations",
+        default=False
+    )
+
+    overlay_show_axis_x: BoolProperty(
+        name="Show X Axis",
+        default=False
+    )
+
+    overlay_show_axis_y: BoolProperty(
+        name="Show Y Axis",
+        default=False
+    )
+
+    overlay_show_axis_z: BoolProperty(
+        name="Show Z Axis",
+        default=False
+    )
+
+    overlay_show_bones: BoolProperty(
+        name="Show Bones",
+        default=False
+    )
+
+    overlay_show_cursor: BoolProperty(
+        name="Show Cursor",
+        default=False
+    )
+
+    overlay_show_extras: BoolProperty(
+        name="Show Extras",
+        default=False
+    )
+
+    overlay_show_floor: BoolProperty(
+        name="Show Floor",
+        default=False
+    )
+
+    overlay_show_motion_paths: BoolProperty(
+        name="Show Motion Paths",
+        default=False
+    )
+
+    overlay_show_object_origins: BoolProperty(
+        name="Show Object Origins",
+        default=False
+    )
+
+    overlay_show_object_origins_all: BoolProperty(
+        name="Show Object Origins (All)",
+        default=False
+    )
+
+    overlay_show_ortho_grid: BoolProperty(
+        name="Show Ortho Grid",
+        default=False
+    )
+
+    overlay_show_outline_selected: BoolProperty(
+        name="Show Outline Selected",
+        default=False
+    )
+
+    overlay_show_relationship_lines: BoolProperty(
+        name="Show Relationship Lines",
+        default=False
+    )
+
+    overlay_show_stats: BoolProperty(
+        name="Show Stats",
+        default=False
+    )
+
+    overlay_show_text: BoolProperty(
+        name="Show Text",
+        default=False
+    )
+
     def draw(self, context):
         layout = self.layout
 
@@ -400,6 +480,34 @@ class NDPreferences(AddonPreferences):
             row = column.row()
             for pref in prefs:
                 row.prop(self, pref)
+
+        overlay_prefs = [
+            "overlay_show_annotation",
+            "overlay_show_axis_x",
+            "overlay_show_axis_y",
+            "overlay_show_axis_z",
+            "overlay_show_bones",
+            "overlay_show_cursor",
+            "overlay_show_extras",
+            "overlay_show_floor",
+            "overlay_show_motion_paths",
+            "overlay_show_object_origins",
+            "overlay_show_object_origins_all",
+            "overlay_show_ortho_grid",
+            "overlay_show_outline_selected",
+            "overlay_show_relationship_lines",
+            "overlay_show_stats",
+            "overlay_show_text",
+        ]
+
+        pref_box = box.box()
+        column = pref_box.column(align=True)
+        row = column.row()
+        row.label(text="Custom Overlay Options")
+        for counter, pref in enumerate(overlay_prefs):
+            if counter % 4 == 0:
+                row = column.row()
+            row.prop(self, pref)
 
 
     def draw_keymap(self, box):

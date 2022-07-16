@@ -101,7 +101,9 @@ viewport_ops = [
     ("nd.toggle_wireframes", 'MOD_WIREFRAME', None, None, False),
     ("nd.toggle_face_orientation", "ORIENTATION_NORMAL", None, None, False),
     ("nd.toggle_utils_collection", "OUTLINER_COLLECTION", None, None, False),
-    ("nd.toggle_clear_view", "OUTLINER_DATA_VOLUME", None, None, False),
+    None, # Separator
+    ("nd.toggle_custom_view", "OVERLAY", None, None, False),
+    ("nd.toggle_clear_view", "OVERLAY", None, None, False),
 ]
 
 

@@ -19,28 +19,16 @@
 # ---
 
 import bpy
-from .. lib.preferences import get_preferences
 
 
 class ND_OT_toggle_clear_view(bpy.types.Operator):
     bl_idname = "nd.toggle_clear_view"
-    bl_label = "Clear View"
-    bl_description = "Toggle clear view mode"
+    bl_label = "Overlays (All)"
+    bl_description = "Toggle the visibility of all overlays"
 
 
     def execute(self, context):
-        enabled = not bpy.context.space_data.overlay.show_cursor
-
-        bpy.context.space_data.overlay.show_floor = enabled
-        bpy.context.space_data.overlay.show_object_origins = enabled
-        bpy.context.space_data.overlay.show_cursor = enabled
-        bpy.context.space_data.overlay.show_axis_x = enabled
-        bpy.context.space_data.overlay.show_axis_y = enabled
-        bpy.context.space_data.overlay.show_ortho_grid = enabled
-        bpy.context.space_data.overlay.show_relationship_lines = enabled
-        bpy.context.space_data.overlay.show_extras = enabled
-        bpy.context.space_data.overlay.show_bones = enabled
-        bpy.context.space_data.overlay.show_motion_paths = enabled
+        bpy.context.space_data.overlay.show_overlays = not bpy.context.space_data.overlay.show_overlays
 
         return {'FINISHED'}
 

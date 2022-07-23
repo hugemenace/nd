@@ -174,7 +174,7 @@ class ND_OT_simple_deform(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type in ['MESH', 'CURVE']
 
     
     def prepare_new_operator(self, context):

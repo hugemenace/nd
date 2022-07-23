@@ -147,107 +147,121 @@ class ND_MT_fast_menu(bpy.types.Menu):
             return SECTION_COUNT
 
         if context.mode == 'OBJECT':
-            depsgraph = context.evaluated_depsgraph_get()
-            object_eval = context.active_object.evaluated_get(depsgraph)
-
-            bm = bmesh.new()
-            bm.from_mesh(object_eval.data)
-
-            self.verts = [vert for vert in bm.verts]
-            self.edges = [edge for edge in bm.edges]
-            self.faces = [face for face in bm.faces]
-            self.sketch = len(self.faces) >= 1 and is_planar(bm)
-            self.profile = len(self.faces) == 0 and len(self.edges) > 0
-            self.has_faces = len(self.faces) >= 1
-            self.manifold = all([len(edge.link_faces) == 2 for edge in self.edges])
-            self.has_loose_edges = any([len(edge.link_faces) == 0 for edge in self.edges])
-
-            bm.free()
-
-            mod_names = [mod.name for mod in context.active_object.modifiers]
-
-            has_mod_profile_extrude = False
-            has_mod_solidify = False 
-            has_mod_boolean = False
-            has_mod_screw = False
-            has_mod_array_cubed = False
-            has_mod_circular_array = False
-            has_mod_recon_poly = False
-
-            for name in mod_names:
-                has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
-                has_mod_solidify = has_mod_solidify or bool("— ND SOL" in name)
-                has_mod_boolean = has_mod_boolean or bool("— ND Bool" in name)
-                has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
-                has_mod_array_cubed = has_mod_array_cubed or bool("Array³" in name)
-                has_mod_circular_array = has_mod_circular_array or bool("— ND CA" in name)
-                has_mod_recon_poly = has_mod_recon_poly or bool("— ND RCP" in name)
-
-            was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
-
-            if has_mod_boolean:
-                layout.operator("nd.cycle", icon=icons['nd.cycle'])
-                layout.separator()
-
-            if (not self.manifold and self.has_faces) or has_mod_solidify:
-                layout.operator("nd.solidify", icon=icons['nd.solidify'])
-                has_mod_solidify = True
-
-            if (not self.manifold and self.has_loose_edges) or has_mod_profile_extrude:
-                layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
-                has_mod_profile_extrude = True
-            
-            if has_mod_screw:
-                layout.operator("nd.screw", icon=icons['nd.screw'])
-            
-            if has_mod_array_cubed:
-                layout.operator("nd.array_cubed", icon=icons['nd.array_cubed'])
-
-            if has_mod_circular_array:
-                layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
-
-            if has_mod_recon_poly:
-                layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
-
-            if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
-                layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
-                layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
-
-                return SECTION_COUNT
-
-            if was_profile_extrude or self.sketch:
-                layout.operator("nd.solidify", icon=icons['nd.solidify']) if not has_mod_solidify else None
-                layout.separator()
-                layout.operator("nd.mirror", icon=icons['nd.mirror'])
-                layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
-
-                return SECTION_COUNT
-            
-            if self.profile:
-                layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
-                layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
-                layout.operator("nd.mirror", icon=icons['nd.mirror'])
-
-                return SECTION_COUNT
-
-            if self.has_faces:
-                layout.separator()
-                layout.operator("nd.bevel", icon=icons['nd.bevel'])
-                layout.operator("nd.weighted_normal_bevel", icon=icons['nd.weighted_normal_bevel'])
-                layout.separator()
-                layout.operator("nd.array_cubed", icon=icons['nd.array_cubed']) if not has_mod_array_cubed else None
-                layout.operator("nd.circular_array", icon=icons['nd.circular_array']) if not has_mod_circular_array else None
-                layout.operator("nd.mirror", icon=icons['nd.mirror'])
-                layout.separator()
-                layout.operator("nd.panel", icon=icons['nd.panel'])
-                layout.operator("nd.geo_lift", icon=icons['nd.geo_lift'])
-                layout.operator("nd.view_align", icon=icons['nd.view_align'])
-
-                return SECTION_COUNT
-
-            return NO_SECTION_COUNT
+            if context.active_object.type == 'MESH':
+                return self.draw_single_object_mesh_predictions(context, layout)
+            elif context.active_object.type == 'CURVE':
+                return self.draw_single_object_curve_predictions(context, layout)
 
         return NO_SECTION_COUNT
+
+
+    def draw_single_object_curve_predictions(self, context, layout):
+        layout.operator("nd.mirror", icon=icons['nd.mirror'])
+
+        return SECTION_COUNT
+
+    
+    def draw_single_object_mesh_predictions(self, context, layout):
+        depsgraph = context.evaluated_depsgraph_get()
+        object_eval = context.active_object.evaluated_get(depsgraph)
+
+        bm = bmesh.new()
+        bm.from_mesh(object_eval.data)
+
+        self.verts = [vert for vert in bm.verts]
+        self.edges = [edge for edge in bm.edges]
+        self.faces = [face for face in bm.faces]
+        self.sketch = len(self.faces) >= 1 and is_planar(bm)
+        self.profile = len(self.faces) == 0 and len(self.edges) > 0
+        self.has_faces = len(self.faces) >= 1
+        self.manifold = all([len(edge.link_faces) == 2 for edge in self.edges])
+        self.has_loose_edges = any([len(edge.link_faces) == 0 for edge in self.edges])
+
+        bm.free()
+
+        mod_names = [mod.name for mod in context.active_object.modifiers]
+
+        has_mod_profile_extrude = False
+        has_mod_solidify = False 
+        has_mod_boolean = False
+        has_mod_screw = False
+        has_mod_array_cubed = False
+        has_mod_circular_array = False
+        has_mod_recon_poly = False
+
+        for name in mod_names:
+            has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
+            has_mod_solidify = has_mod_solidify or bool("— ND SOL" in name)
+            has_mod_boolean = has_mod_boolean or bool("— ND Bool" in name)
+            has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
+            has_mod_array_cubed = has_mod_array_cubed or bool("Array³" in name)
+            has_mod_circular_array = has_mod_circular_array or bool("— ND CA" in name)
+            has_mod_recon_poly = has_mod_recon_poly or bool("— ND RCP" in name)
+
+        was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
+
+        if has_mod_boolean:
+            layout.operator("nd.cycle", icon=icons['nd.cycle'])
+            layout.separator()
+
+        if (not self.manifold and self.has_faces) or has_mod_solidify:
+            layout.operator("nd.solidify", icon=icons['nd.solidify'])
+            has_mod_solidify = True
+
+        if (not self.manifold and self.has_loose_edges) or has_mod_profile_extrude:
+            layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
+            has_mod_profile_extrude = True
+        
+        if has_mod_screw:
+            layout.operator("nd.screw", icon=icons['nd.screw'])
+        
+        if has_mod_array_cubed:
+            layout.operator("nd.array_cubed", icon=icons['nd.array_cubed'])
+
+        if has_mod_circular_array:
+            layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
+
+        if has_mod_recon_poly:
+            layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
+
+        if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
+            layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
+            layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
+
+            return SECTION_COUNT
+
+        if was_profile_extrude or self.sketch:
+            layout.operator("nd.solidify", icon=icons['nd.solidify']) if not has_mod_solidify else None
+            layout.separator()
+            layout.operator("nd.mirror", icon=icons['nd.mirror'])
+            layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
+
+            return SECTION_COUNT
+        
+        if self.profile:
+            layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
+            layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
+            layout.operator("nd.mirror", icon=icons['nd.mirror'])
+
+            return SECTION_COUNT
+
+        if self.has_faces:
+            layout.separator()
+            layout.operator("nd.bevel", icon=icons['nd.bevel'])
+            layout.operator("nd.weighted_normal_bevel", icon=icons['nd.weighted_normal_bevel'])
+            layout.separator()
+            layout.operator("nd.array_cubed", icon=icons['nd.array_cubed']) if not has_mod_array_cubed else None
+            layout.operator("nd.circular_array", icon=icons['nd.circular_array']) if not has_mod_circular_array else None
+            layout.operator("nd.mirror", icon=icons['nd.mirror'])
+            layout.separator()
+            layout.operator("nd.panel", icon=icons['nd.panel'])
+            layout.operator("nd.geo_lift", icon=icons['nd.geo_lift'])
+            layout.operator("nd.view_align", icon=icons['nd.view_align'])
+
+            return SECTION_COUNT
+
+        return NO_SECTION_COUNT
+
 
     def draw_many_object_predictions(self, context):
         layout = self.layout

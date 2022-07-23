@@ -156,7 +156,10 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
 
     def draw_single_object_curve_predictions(self, context, layout):
+        layout.operator("nd.screw", icon=icons['nd.screw'])
         layout.operator("nd.mirror", icon=icons['nd.mirror'])
+        layout.operator("nd.array_cubed", icon=icons['nd.array_cubed'])
+        layout.operator("nd.simple_deform", icon=icons['nd.simple_deform'])
 
         return SECTION_COUNT
 

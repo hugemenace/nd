@@ -123,6 +123,10 @@ SHIFT — Place modifiers at the top of the stack"""
         self.reference_objs = [context.active_object]
         self.mirror_obj = None
 
+        if context.active_object.type == 'CURVE' and self.geometry_mode:
+            self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used on curves")
+            return {'CANCELLED'}
+
         if len(context.selected_objects) >= 2:
             self.reference_objs = [obj for obj in context.selected_objects if obj != context.active_object]
             self.mirror_obj = context.active_object
@@ -151,11 +155,11 @@ SHIFT — Place modifiers at the top of the stack"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            if len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
+            if len(context.selected_objects) == 1 and context.active_object.type in ['MESH', 'CURVE']:
                 return True
 
             if len(context.selected_objects) >= 2:
-                return all(obj.type == 'MESH' for obj in context.selected_objects if obj.name != context.active_object.name)
+                return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != context.active_object.name)
 
 
     def set_selection_mode(self, context):

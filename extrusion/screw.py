@@ -31,7 +31,8 @@ from .. lib.modifiers import new_modifier, rectify_mod_order
 
 mod_displace = "Offset — ND SCR"
 mod_screw = "Screw — ND SCR"
-mod_summon_list = [mod_displace, mod_screw]
+mod_mesh_summon_list = [mod_displace, mod_screw]
+mod_curve_summon_list = [mod_screw]
 
 
 class ND_OT_screw(bpy.types.Operator):
@@ -161,6 +162,14 @@ class ND_OT_screw(bpy.types.Operator):
     def invoke(self, context, event):
         self.dirty = False
         self.base_offset_factor = 0.01
+        self.object_type = context.active_object.type
+
+        self.axis = 2 # X (0), Y (1), Z (2)
+        self.offset_axis = 1 # X (0), Y (1), Z (2)
+        self.segments = 3
+        self.angle = 360
+        self.offset = 0
+        self.flip_normals = True
 
         self.offset_input_stream = new_stream()
         self.angle_input_stream = new_stream()
@@ -169,7 +178,12 @@ class ND_OT_screw(bpy.types.Operator):
         if len(context.selected_objects) == 1:
             mods = context.active_object.modifiers
             mod_names = list(map(lambda x: x.name, mods))
-            previous_op = all(m in mod_names for m in mod_summon_list)
+            
+            previous_op = False 
+            if self.object_type == 'MESH':
+                previous_op = all(m in mod_names for m in mod_mesh_summon_list)
+            else:
+                previous_op = all(m in mod_names for m in mod_curve_summon_list)
 
             if previous_op:
                 self.summon_old_operator(context, mods)
@@ -196,32 +210,31 @@ class ND_OT_screw(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+            return len(context.selected_objects) == 1 and context.active_object.type in ['MESH', 'CURVE']
 
 
     def prepare_new_operator(self, context):
         self.summoned = False
 
-        self.axis = 2 # X (0), Y (1), Z (2)
-        self.offset_axis = 1 # X (0), Y (1), Z (2)
-        self.segments = 3
-        self.angle = 360
-        self.offset = 0
-        self.flip_normals = True
+        if self.object_type == 'MESH':
+            self.add_smooth_shading(context)
+            self.add_displace_modifier(context)
 
-        self.add_smooth_shading(context)
-        self.add_displace_modifier(context)
         self.add_screw_modifier(context)
 
 
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
-        self.displace = mods[mod_displace]
+        if self.object_type == 'MESH':
+            self.displace = mods[mod_displace]
+
         self.screw = mods[mod_screw]
 
-        self.offset_prev = self.offset = self.displace.strength
-        self.offset_axis_prev = self.offset_axis = {'X': 0, 'Y': 1, 'Z': 2}[self.displace.direction]
+        if self.object_type == 'MESH':
+            self.offset_prev = self.offset = self.displace.strength
+            self.offset_axis_prev = self.offset_axis = {'X': 0, 'Y': 1, 'Z': 2}[self.displace.direction]
+
         self.axis_prev = self.axis = {'X': 0, 'Y': 1, 'Z': 2}[self.screw.axis]
         self.segments_prev = self.segments = self.screw.steps
         self.segments_prev = self.segments = self.screw.render_steps
@@ -254,8 +267,10 @@ class ND_OT_screw(bpy.types.Operator):
     
 
     def operate(self, context):
-        self.displace.strength = self.offset
-        self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis]
+        if self.object_type == 'MESH':
+            self.displace.strength = self.offset
+            self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis]
+
         self.screw.axis = ['X', 'Y', 'Z'][self.axis]
         self.screw.steps = self.segments
         self.screw.render_steps = self.segments
@@ -273,11 +288,15 @@ class ND_OT_screw(bpy.types.Operator):
     def revert(self, context):
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.screw.name)
-            bpy.ops.object.modifier_remove(modifier=self.displace.name)
+
+            if self.object_type == 'MESH':
+                bpy.ops.object.modifier_remove(modifier=self.displace.name)
 
         if self.summoned:
-            self.displace.strength = self.offset_prev
-            self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis_prev]
+            if self.object_type == 'MESH':
+                self.displace.strength = self.offset_prev
+                self.displace.direction = ['X', 'Y', 'Z'][self.offset_axis_prev]
+
             self.screw.axis = ['X', 'Y', 'Z'][self.axis_prev]
             self.screw.steps = self.segments_prev
             self.screw.render_steps = self.segments_prev
@@ -307,24 +326,26 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.angle_input_stream)
 
-    draw_property(
-        self,
-        "Offset: {0:.2f}".format(self.offset),
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
-        active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl,
-        mouse_value=True,
-        input_stream=self.offset_input_stream)
+    if self.object_type == 'MESH':
+        draw_property(
+            self,
+            "Offset: {0:.2f}".format(self.offset),
+            "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+            active=self.key_ctrl,
+            alt_mode=self.key_shift_ctrl,
+            mouse_value=True,
+            input_stream=self.offset_input_stream)
 
     draw_hint(
         self,
         "Screw Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
         "Axis to revolve around (X, Y, Z)")
 
-    draw_hint(
-        self,
-        "Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.offset_axis]),
-        "Axis to offset origin along (X, Y, Z)")
+    if self.object_type == 'MESH':
+        draw_hint(
+            self,
+            "Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.offset_axis]),
+            "Axis to offset origin along (X, Y, Z)")
 
     draw_hint(
         self,

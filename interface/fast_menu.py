@@ -203,29 +203,38 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
 
+        replay_prediction_count = 0
+
         if has_mod_boolean:
             layout.operator("nd.cycle", icon=icons['nd.cycle'])
             layout.separator()
+            replay_prediction_count += 1
 
         if (not self.manifold and self.has_faces) or has_mod_solidify:
             layout.operator("nd.solidify", icon=icons['nd.solidify'])
             has_mod_solidify = True
+            replay_prediction_count += 1
 
         if (not self.manifold and self.has_loose_edges) or has_mod_profile_extrude:
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
             has_mod_profile_extrude = True
+            replay_prediction_count += 1
         
         if has_mod_screw:
             layout.operator("nd.screw", icon=icons['nd.screw'])
+            replay_prediction_count += 1
         
         if has_mod_array_cubed:
             layout.operator("nd.array_cubed", icon=icons['nd.array_cubed'])
+            replay_prediction_count += 1
 
         if has_mod_circular_array:
             layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
+            replay_prediction_count += 1
 
         if has_mod_recon_poly:
             layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
+            replay_prediction_count += 1
 
         if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
@@ -263,7 +272,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
             return SECTION_COUNT
 
-        return NO_SECTION_COUNT
+        return NO_SECTION_COUNT + replay_prediction_count
 
 
     def draw_many_object_predictions(self, context):

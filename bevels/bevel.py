@@ -30,7 +30,7 @@ from .. lib.modifiers import new_modifier
 
 mod_bevel = "Bevel — ND B"
 mod_weld = "Weld — ND B"
-mod_summon_list = [mod_bevel, mod_weld]
+mod_summon_list = [mod_bevel]
 
 
 class ND_OT_bevel(bpy.types.Operator):
@@ -237,15 +237,10 @@ class ND_OT_bevel(bpy.types.Operator):
 
     
     def add_weld_modifier(self, context):
-        mods = context.active_object.modifiers
-        mod_names = list(map(lambda x: x.name, mods))
-        previous_op = all(m in mod_names for m in mod_summon_list)
+        weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=False)
+        weld.merge_threshold = 0.00001
 
-        if not previous_op:
-            weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=False)
-            weld.merge_threshold = 0.00001
-
-            self.weld = weld
+        self.weld = weld
 
 
     def operate(self, context):
@@ -261,7 +256,10 @@ class ND_OT_bevel(bpy.types.Operator):
     def finish(self, context):
         self.target_object.show_wire = False
         self.target_object.show_in_front = False
-        self.add_weld_modifier(context)
+
+        if not self.summoned:
+            self.add_weld_modifier(context)
+
         unregister_draw_handler()
 
 

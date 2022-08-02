@@ -59,15 +59,22 @@ SHIFT — Hard apply (apply all modifiers)"""
             mods_to_remove = [mod.name for mod in mods]
 
         if not self.hard_apply:
-            for mod in mods:
+            skip_weld = False
+
+            for index, mod in enumerate(mods):
                 if mod.type in safe_mod_types:
                     continue
 
                 if "— ND WNB" in mod.name:
                     continue
 
+                if skip_weld and mod.type == 'WELD' and "— ND B" in mod.name:
+                    skip_weld = False
+                    continue
+
                 if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
                     if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
+                        skip_weld = True
                         continue
 
                 mods_to_remove.append(mod.name)

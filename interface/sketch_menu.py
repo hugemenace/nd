@@ -38,6 +38,18 @@ class ND_MT_sketch_menu(bpy.types.Menu):
 
         render_ops(ops.sketch_ops, layout, new_row=False, use_separator=True)
         
+        if context.mode == 'OBJECT':
+            layout.operator_context = 'INVOKE_DEFAULT'
+            layout.separator()
+
+            layout.operator("object.scale_clear", text="S » Clear Scale", icon='DRIVER_DISTANCE')
+        
+        if context.mode == 'EDIT_MESH':
+            layout.operator_context = 'INVOKE_DEFAULT'
+            layout.separator()
+
+            layout.operator("transform.shrink_fatten", text="S » Shrink/Fatten", icon='FACESEL')
+        
 
 def register():
     bpy.utils.register_class(ND_MT_sketch_menu)

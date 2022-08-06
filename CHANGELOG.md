@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.33.0](https://github.com/hugemenace/nd/compare/v1.32.0...v1.33.0) (2022-08-06)
+
+
+### Features
+
+* add clear scale and shrink/fatten to sketch menu for object and edit mode respectively ([7be4562](https://github.com/hugemenace/nd/commit/7be45625f952b338421281cfaef8fddff913af70))
+* add curve support to array_cubed operator ([c9b7c88](https://github.com/hugemenace/nd/commit/c9b7c881ef0e597aeb0361a4ba4a699922cb3417))
+* add curve support to screw operator ([a74a5e6](https://github.com/hugemenace/nd/commit/a74a5e6cb066ce150f5f7b6d76e57c2545714337))
+* add curve support to simple_deform operator ([bb0fa11](https://github.com/hugemenace/nd/commit/bb0fa1191ae7d1ede1b514a0426590d8d5acb7ea))
+* add mirror curve option to fast predict menu ([6a37a8b](https://github.com/hugemenace/nd/commit/6a37a8ba189b3ad9d4e58b88cf23e114f1260b1d))
+* add option to mirror curve(s) ([def7b2c](https://github.com/hugemenace/nd/commit/def7b2ccbded75ba7714bd96617c11e6fbe1c623))
+* add screw, array_cubed, and simple_deform curve operators to fast predict menu ([0602f21](https://github.com/hugemenace/nd/commit/0602f21b6a175a5fd4fab58a4b7234833de1cd7a))
+* add toggleable exclusive view (x-ray option) option to geo_lift, panel, and view_align operators ([9fc75c1](https://github.com/hugemenace/nd/commit/9fc75c1e2772c32622dbca5e85d7c82d08f760a2))
+* split clear_view into overlay (all & custom) options ([785fd60](https://github.com/hugemenace/nd/commit/785fd60057c63d2a606ed64738c518124d0bba93))
+
+
+### Bug Fixes
+
+* ensure make edge/face operation is always available in edit mode fast menu ([cbeffac](https://github.com/hugemenace/nd/commit/cbeffacdd72311429a5772f60a2b532bf6f692ea))
+* ensure weld modifier removal does not prevent standard bevels from being recalled, and avoid removing HN bevel welds during apply-modifier operations ([64c36bd](https://github.com/hugemenace/nd/commit/64c36bdf22583f115f96e48d0e6aaccd4d60b3f3))
+* fix lattice target object parenting behaviour ([3d8a16e](https://github.com/hugemenace/nd/commit/3d8a16eb9baad028050338b56d53a150b24783ed))
+* fix the "no predictions found" edge case in the Fast menu with only surfacing recallable operators ([b36a447](https://github.com/hugemenace/nd/commit/b36a44742b58fcb7020f7e648045d96e0e54c50b))
+* set width lower limit to zero on WN bevel operator ([5a5dd78](https://github.com/hugemenace/nd/commit/5a5dd7883ca04e8302bd201a1abf108f21798fb2))
+
 ## [1.32.0](https://github.com/hugemenace/nd/compare/v1.31.0...v1.32.0) (2022-06-25)
 
 

@@ -43,7 +43,7 @@ def register():
 
     for mapping in [('3D View', 'VIEW_3D'), ('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
-        entry = keymap.keymap_items.new("wm.call_menu", 'V', 'PRESS', alt = True)
+        entry = keymap.keymap_items.new("wm.call_menu", 'V', 'PRESS', alt=True)
         entry.properties.name = "ND_MT_viewport_menu"
         keys.append((keymap, entry))
    

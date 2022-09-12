@@ -80,21 +80,28 @@ simplify_ops = [
     ("nd.weld", 'AUTOMERGE_ON', None, None, False),
 ]
 
-util_ops = [
+export_ops = [
     ("nd.name_sync", 'FILE_REFRESH', None, None, False),
     ("nd.set_lod_suffix", 'ALIASED', "Low LOD", 'LOW', False),
     ("nd.set_lod_suffix", 'ANTIALIASED', "High LOD", 'HIGH', False),
     None, # Separator
+    ("nd.seams", 'UV_DATA', None, None, False),
+    ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
+    None, # Separator
+    ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
+    None, # Separator
+    ("nd.clean_utils", 'MOD_FLUIDSIM', None, None, False),
+]
+
+scene_ops = [
+    ("nd.flare", 'LIGHT_AREA', "Flare (Lighting)", None, False),
+]
+
+util_ops = [
     ("nd.set_origin", 'TRANSFORM_ORIGINS', None, None, False),
     ("nd.snap_align", 'SNAP_ON', None, None, False),
     None, # Separator
     ("nd.smooth", 'MOD_SMOOTH', None, None, False),
-    ("nd.seams", 'UV_DATA', None, None, False),
-    ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
-    ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
-    ("nd.clean_utils", 'MOD_FLUIDSIM', None, None, False),
-    None, # Separator
-    ("nd.flare", 'LIGHT_AREA', "Flare (Lighting)", None, False),
 ]
 
 viewport_ops = [
@@ -109,7 +116,7 @@ viewport_ops = [
 
 def build_icon_lookup_table():
     icon_lookup = {}
-    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + deform_ops + simplify_ops + util_ops + viewport_ops:
+    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + deform_ops + simplify_ops + scene_ops + export_ops + util_ops + viewport_ops:
         if op is None:
             continue
 

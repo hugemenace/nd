@@ -52,6 +52,8 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_replicate_menu", icon='MOD_ARRAY')
         layout.menu("ND_MT_deform_menu", icon='MOD_SIMPLEDEFORM')
         layout.menu("ND_MT_simplify_menu", icon='MOD_REMESH')
+        layout.menu("ND_MT_scene_menu", icon='SCENE_DATA')
+        layout.menu("ND_MT_export_menu", icon='OUTLINER_COLLECTION')
         layout.separator()
         layout.menu("ND_MT_utils_menu", text="Utils", icon='PLUGIN')
         layout.menu("ND_MT_viewport_menu", text="Viewport", icon='RESTRICT_VIEW_OFF')

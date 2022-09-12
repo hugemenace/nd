@@ -250,7 +250,7 @@ SHIFT — Place modifiers at the top of the stack"""
 
 
     def add_bevel_modifier(self, context):
-        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
+        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=True)
         bevel.offset_type = 'WIDTH'
         bevel.limit_method = 'WEIGHT'
 
@@ -267,7 +267,7 @@ SHIFT — Place modifiers at the top of the stack"""
         previous_op = all(m in mod_names for m in mod_summon_list)
 
         if not previous_op:
-            weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=False)
+            weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=True)
             weld.merge_threshold = 0.00001
 
             self.weld = weld

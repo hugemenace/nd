@@ -89,12 +89,12 @@ export_ops = [
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
     None, # Separator
     ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
-    None, # Separator
-    ("nd.clean_utils", 'MOD_FLUIDSIM', None, None, False),
 ]
 
 scene_ops = [
     ("nd.flare", 'LIGHT_AREA', "Flare (Lighting)", None, False),
+    None, # Separator
+    ("nd.clean_utils", 'MOD_FLUIDSIM', None, None, False),
 ]
 
 util_ops = [

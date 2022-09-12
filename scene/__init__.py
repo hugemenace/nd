@@ -20,10 +20,12 @@
 
 import importlib
 from . import flare
+from . import clean_utils
 
 
 registerables = (
     flare,
+    clean_utils,
 )
 
 

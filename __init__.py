@@ -218,6 +218,13 @@ class NDPreferences(AddonPreferences):
         size=3,
     )
 
+    overlay_base_color: FloatVectorProperty(
+        name="Overlay Base Color",
+        default=(255/255, 255/255, 255/255),
+        subtype='COLOR_GAMMA',
+        size=3,
+    )
+
     overlay_option_active_color: FloatVectorProperty(
         name="Overlay Option Active Color",
         default=(55/255, 174/255, 255/255),
@@ -556,6 +563,7 @@ class NDPreferences(AddonPreferences):
             "overlay_header_standard_color",
             "overlay_header_recalled_color",
             "overlay_header_paused_color",
+            "overlay_base_color",
             "overlay_option_active_color",
             "overlay_option_manual_override_color",
             "points_primary_color",

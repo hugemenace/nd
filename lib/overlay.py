@@ -162,9 +162,10 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.size(0, 28, cls.dpi)
 
     is_ok, is_value, is_raw = input_stream or (False, None, None)
+    base_r, base_g, base_b = get_preferences().overlay_base_color
     
     if cls.operator_passthrough:
-        blf.color(0, 255/255, 255/255, 255/255, 0.2)
+        blf.color(0, base_r, base_g, base_b, 0.2)
     elif is_value is not None and active:
         r, g, b = get_preferences().overlay_option_manual_override_color
         blf.color(0, r, g, b, 1.0)
@@ -172,7 +173,7 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
         r, g, b = get_preferences().overlay_option_active_color
         blf.color(0, r, g, b, 1.0)
     else:
-        blf.color(0, 255/255, 255/255, 255/255, 0.1)
+        blf.color(0, base_r, base_g, base_b, 0.1)
     
     blf.position(0, cls.overlay_x, cls.overlay_y - ((38 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     
@@ -189,9 +190,9 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.size(0, 16, cls.dpi)
 
     if cls.operator_passthrough:
-        blf.color(0, 255/255, 255/255, 255/255, 0.2)
+        blf.color(0, base_r, base_g, base_b, 0.2)
     else:
-        blf.color(0, 255/255, 255/255, 255/255, 1.0)
+        blf.color(0, base_r, base_g, base_b, 1.0)
 
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((25 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, property_content)
@@ -199,9 +200,9 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.size(0, 11, cls.dpi)
     
     if cls.operator_passthrough:
-        blf.color(0, 255/255, 255/255, 255/255, 0.2)
+        blf.color(0, base_r, base_g, base_b, 0.2)
     else:
-        blf.color(0, 255/255, 255/255, 255/255, 0.3)
+        blf.color(0, base_r, base_g, base_b, 0.3)
 
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((40 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
 
@@ -215,11 +216,13 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
 
 def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 22, cls.dpi)
+
+    base_r, base_g, base_b = get_preferences().overlay_base_color
     
     if cls.operator_passthrough:
-        blf.color(0, 255/255, 255/255, 255/255, 0.2)
+        blf.color(0, base_r, base_g, base_b, 0.2)
     else:
-        blf.color(0, 255/255, 255/255, 255/255, 0.5)
+        blf.color(0, base_r, base_g, base_b, 0.5)
 
     blf.position(0, cls.overlay_x - (3 * cls.dpi_scalar), cls.overlay_y - ((36 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, "◈")
@@ -227,9 +230,9 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 16, cls.dpi)
 
     if cls.operator_passthrough:
-        blf.color(0, 255/255, 255/255, 255/255, 0.2)
+        blf.color(0, base_r, base_g, base_b, 0.2)
     else:
-        blf.color(0, 255/255, 255/255, 255/255, 1.0)
+        blf.color(0, base_r, base_g, base_b, 1.0)
 
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((25 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, hint_content)
@@ -237,9 +240,9 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.size(0, 11, cls.dpi)
     
     if cls.operator_passthrough:
-        blf.color(0, 255/255, 255/255, 255/255, 0.2)
+        blf.color(0, base_r, base_g, base_b, 0.2)
     else:
-        blf.color(0, 255/255, 255/255, 255/255, 0.3)
+        blf.color(0, base_r, base_g, base_b, 0.3)
 
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((40 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, metadata_content)

@@ -43,6 +43,8 @@ from . import deform
 from . import extrusion
 from . import replicate
 from . import simplify
+from . import scene
+from . import export
 from . import sketch
 from . import standalone
 from . import utils
@@ -57,6 +59,8 @@ registerables = (
     extrusion,
     replicate,
     simplify,
+    scene,
+    export,
     sketch,
     standalone,
     utils,

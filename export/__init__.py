@@ -19,15 +19,21 @@
 # ---
 
 import importlib
-from . import set_origin
-from . import smooth
-from . import snap_align
+from . import apply_modifiers
+from . import clean_utils
+from . import name_sync
+from . import seams
+from . import set_lod_suffix
+from . import triangulate
 
 
 registerables = (
-    set_origin,
-    smooth,
-    snap_align,
+    apply_modifiers,
+    clean_utils,
+    name_sync,
+    seams,
+    set_lod_suffix,
+    triangulate,
 )
 
 

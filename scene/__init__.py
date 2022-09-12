@@ -19,15 +19,11 @@
 # ---
 
 import importlib
-from . import set_origin
-from . import smooth
-from . import snap_align
+from . import flare
 
 
 registerables = (
-    set_origin,
-    smooth,
-    snap_align,
+    flare,
 )
 
 

@@ -26,7 +26,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, rectify_mod_order, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, remove_problematic_bevels
 
 
 class ND_OT_bool_inset(bpy.types.Operator):

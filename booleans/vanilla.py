@@ -21,7 +21,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import new_modifier, rectify_mod_order, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, remove_problematic_bevels
 
 
 class ND_OT_bool_vanilla(bpy.types.Operator):

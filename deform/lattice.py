@@ -26,7 +26,7 @@ from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, rectify_mod_order
+from .. lib.modifiers import new_modifier
 
 
 mod_lattice = "Lattice — ND L"

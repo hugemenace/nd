@@ -25,7 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, rectify_mod_order
+from .. lib.modifiers import new_modifier
 
 
 mod_displace = "Offset — ND SOL"

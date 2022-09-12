@@ -20,7 +20,7 @@
 
 import bpy
 from math import radians
-from .. lib.modifiers import new_modifier, rectify_mod_order
+from .. lib.modifiers import new_modifier
 
 
 class ND_OT_decimate(bpy.types.Operator):

@@ -19,7 +19,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier, rectify_mod_order
+from .. lib.modifiers import new_modifier
 
 
 class ND_OT_weld(bpy.types.Operator):

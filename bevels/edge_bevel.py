@@ -154,7 +154,10 @@ SHIFT — Place modifiers at the top of the stack"""
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.width_input_stream) and self.key_ctrl_alt:
+            if no_stream(self.segments_input_stream) and self.key_alt:
+                self.segments = max(1, self.segments + self.mouse_step)
+                self.dirty = True
+            elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
                 self.width = max(0, self.width + self.mouse_value)
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
@@ -362,6 +365,7 @@ def draw_text_callback(self):
         "Alt (±2)  |  Shift (±1)",
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
+        mouse_value=True,
         input_stream=self.segments_input_stream)
 
     draw_property(

@@ -190,6 +190,13 @@ class NDPreferences(AddonPreferences):
         step=0.01,
     )
 
+    mouse_value_steps: IntProperty(
+        name="Mouse Value Steps",
+        default=100,
+        min=1,
+        step=1,
+    )
+
     utils_collection_name: StringProperty(
         name="Utils Collection Name",
         default="Utils",
@@ -482,6 +489,7 @@ class NDPreferences(AddonPreferences):
             ["overlay_dpi"],
             ["enable_mouse_values"],
             ["mouse_value_scalar"],
+            ["mouse_value_steps"],
             ["enable_quick_favourites"],
             ["lock_overlay_pinning"],
             ["enable_sidebar"],

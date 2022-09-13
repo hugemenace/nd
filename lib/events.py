@@ -18,6 +18,7 @@
 # Contributors: Tristo (HM)
 # ---
 
+from math import copysign
 from . preferences import get_preferences
 
 
@@ -61,9 +62,22 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
 
     cls.key_movement_passthrough = detected(event, {'MIDDLEMOUSE'}) or (has(event) and event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or (has(event) and event.type.startswith('NDOF'))
 
-    cls.mouse_delta = 0 if event == None else (event.mouse_x - cls.prev_mouse_x) * get_preferences().mouse_value_scalar
+    raw_mouse_delta = 0 if event == None else (event.mouse_x - cls.prev_mouse_x)
+
+    cls.mouse_delta = raw_mouse_delta * get_preferences().mouse_value_scalar
     cls.mouse_value = cls.mouse_delta * (0.1 if cls.key_shift else 1)
     cls.prev_mouse_x = mouse_x if event == None else event.mouse_x
+    
+    cls.prev_mouse_travel = 0 if event == None else cls.mouse_travel
+    cls.mouse_travel = 0 if event == None else cls.mouse_travel + raw_mouse_delta
+    if cls.mouse_travel < 0 and cls.prev_mouse_travel < cls.mouse_travel:
+        cls.mouse_travel = 0
+    elif cls.mouse_travel > 0 and cls.prev_mouse_travel > cls.mouse_travel:
+        cls.mouse_travel = 0
+
+    cls.prev_mouse_travel_div = 0 if event == None else cls.mouse_travel_div
+    cls.mouse_travel_div = cls.mouse_travel // get_preferences().mouse_value_steps
+    cls.mouse_step = int(1 * copysign(1, cls.mouse_travel)) if cls.prev_mouse_travel_div != cls.mouse_travel_div else 0
 
     if event == None or cls.mouse_warped:
         cls.mouse_delta = 0

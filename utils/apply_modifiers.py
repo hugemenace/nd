@@ -37,6 +37,8 @@ SHIFT — Hard apply (apply all modifiers)"""
 
 
     def execute(self, context):
+        bpy.ops.object.make_single_user(object=True, obdata=True, material=False, animation=False, obdata_animation=False)
+
         for obj in context.selected_objects:
             self.collapse_modifiers(obj)
 

@@ -29,6 +29,7 @@ from . import packaging_menu
 from . import scene_menu
 from . import bevel_menu
 from . import simplify_menu
+from . import shading_menu
 from . import extrude_menu
 from . import replicate_menu
 from . import deform_menu
@@ -49,6 +50,7 @@ registerables = (
     scene_menu,
     bevel_menu,
     simplify_menu,
+    shading_menu,
     extrude_menu,
     replicate_menu,
     deform_menu,

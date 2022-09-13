@@ -18,27 +18,25 @@
 # Contributors: Tristo (HM)
 # ---
 
-import importlib
-from . import set_origin
-from . import snap_align
+import bpy
+from . import ops
+from . common import render_ops
 
 
-registerables = (
-    set_origin,
-    snap_align,
-)
+class ND_MT_shading_menu(bpy.types.Menu):
+    bl_label = "Shading"
+    bl_idname = "ND_MT_shading_menu"
 
 
-def reload():
-    for registerable in registerables:
-        importlib.reload(registerable)
-
+    def draw(self, context):
+        layout = self.layout
+        layout.operator_context = 'INVOKE_DEFAULT'
+        render_ops(ops.shading_ops, layout, new_row=False, use_separator=True)
+        
 
 def register():
-    for registerable in registerables:
-        registerable.register()
-
+    bpy.utils.register_class(ND_MT_shading_menu)
+   
 
 def unregister():
-    for registerable in registerables:
-        registerable.unregister()
+    bpy.utils.unregister_class(ND_MT_shading_menu)

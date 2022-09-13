@@ -43,6 +43,7 @@ from . import deform
 from . import extrusion
 from . import replicate
 from . import simplify
+from . import shading
 from . import scene
 from . import packaging
 from . import sketch
@@ -59,6 +60,7 @@ registerables = (
     extrusion,
     replicate,
     simplify,
+    shading,
     scene,
     packaging,
     sketch,

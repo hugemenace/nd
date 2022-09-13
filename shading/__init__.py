@@ -19,13 +19,13 @@
 # ---
 
 import importlib
-from . import set_origin
-from . import snap_align
+from . import smooth
+from . import wn
 
 
 registerables = (
-    set_origin,
-    snap_align,
+    smooth,
+    wn,
 )
 
 

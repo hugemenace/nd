@@ -45,6 +45,7 @@ op_sections = [
     ("Replicate", ops.replicate_ops, "replicate", [("nd.array_cubed", None), ("nd.circular_array", None), ("nd.mirror", None)]),
     ("Deform", ops.deform_ops, "deform", [("nd.lattice", None), ("nd.simple_deform", None)]),
     ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)]),
+    ("Shading", ops.shading_ops, "shading", [("nd.smooth", None), ("nd.wn", None)]),
     ("Scene", ops.scene_ops, "scene", [("nd.flare", None)]),
     ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)]),
     ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None)]),
@@ -65,6 +66,7 @@ class MainUIPanelProps(bpy.types.PropertyGroup):
     replicate: BoolProperty(default=False)
     deform: BoolProperty(default=False)
     simplify: BoolProperty(default=False)
+    shading: BoolProperty(default=False)
     scene: BoolProperty(default=False)
     packaging: BoolProperty(default=False)
     utils: BoolProperty(default=False)
@@ -92,6 +94,7 @@ class ND_OT_toggle_sections(bpy.types.Operator):
         props.replicate = toggle
         props.deform = toggle
         props.simplify = toggle
+        props.shading = toggle
         props.scene = toggle
         props.export = toggle
         props.utils = toggle

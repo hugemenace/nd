@@ -44,7 +44,7 @@ from . import extrusion
 from . import replicate
 from . import simplify
 from . import scene
-from . import export
+from . import packaging
 from . import sketch
 from . import standalone
 from . import utils
@@ -60,7 +60,7 @@ registerables = (
     replicate,
     simplify,
     scene,
-    export,
+    packaging,
     sketch,
     standalone,
     utils,

@@ -23,20 +23,20 @@ from . import ops
 from . common import render_ops
 
 
-class ND_MT_export_menu(bpy.types.Menu):
-    bl_label = "Export"
-    bl_idname = "ND_MT_export_menu"
+class ND_MT_packaging_menu(bpy.types.Menu):
+    bl_label = "Packaging"
+    bl_idname = "ND_MT_packaging_menu"
 
 
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
-        render_ops(ops.export_ops, layout, new_row=False, use_separator=True)
+        render_ops(ops.packaging_ops, layout, new_row=False, use_separator=True)
         
 
 def register():
-    bpy.utils.register_class(ND_MT_export_menu)
+    bpy.utils.register_class(ND_MT_packaging_menu)
    
 
 def unregister():
-    bpy.utils.unregister_class(ND_MT_export_menu)
+    bpy.utils.unregister_class(ND_MT_packaging_menu)

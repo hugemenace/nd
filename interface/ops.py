@@ -80,7 +80,7 @@ simplify_ops = [
     ("nd.weld", 'AUTOMERGE_ON', None, None, False),
 ]
 
-export_ops = [
+packaging_ops = [
     ("nd.name_sync", 'FILE_REFRESH', None, None, False),
     ("nd.set_lod_suffix", 'ALIASED', "Low LOD", 'LOW', False),
     ("nd.set_lod_suffix", 'ANTIALIASED', "High LOD", 'HIGH', False),
@@ -116,7 +116,7 @@ viewport_ops = [
 
 def build_icon_lookup_table():
     icon_lookup = {}
-    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + deform_ops + simplify_ops + scene_ops + export_ops + util_ops + viewport_ops:
+    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + deform_ops + simplify_ops + scene_ops + packaging_ops + util_ops + viewport_ops:
         if op is None:
             continue
 

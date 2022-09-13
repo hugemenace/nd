@@ -46,9 +46,9 @@ op_sections = [
     ("Deform", ops.deform_ops, "deform", [("nd.lattice", None), ("nd.simple_deform", None)]),
     ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)]),
     ("Shading", ops.shading_ops, "shading", [("nd.smooth", None), ("nd.wn", None)]),
-    ("Scene", ops.scene_ops, "scene", [("nd.flare", None)]),
+    ("Scene", ops.scene_ops, "scene", [("nd.flare", None), ("nd.clean_utils", None)]),
     ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)]),
-    ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None)]),
+    ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None), ("nd.apply_modifiers", None)]),
     ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils_collection", None), ("nd.toggle_clear_view", None)]),
 ]
 

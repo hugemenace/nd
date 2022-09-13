@@ -92,8 +92,6 @@ packaging_ops = [
     None, # Separator
     ("nd.seams", 'UV_DATA', None, None, False),
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
-    None, # Separator
-    ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
 ]
 
 scene_ops = [
@@ -104,6 +102,8 @@ scene_ops = [
 util_ops = [
     ("nd.set_origin", 'TRANSFORM_ORIGINS', None, None, False),
     ("nd.snap_align", 'SNAP_ON', None, None, False),
+    None, # Separator
+    ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
 ]
 
 viewport_ops = [

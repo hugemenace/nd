@@ -19,11 +19,13 @@
 # ---
 
 import importlib
+from . import apply_modifiers
 from . import set_origin
 from . import snap_align
 
 
 registerables = (
+    apply_modifiers,
     set_origin,
     snap_align,
 )

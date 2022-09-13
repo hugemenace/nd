@@ -19,7 +19,6 @@
 # ---
 
 import importlib
-from . import apply_modifiers
 from . import name_sync
 from . import seams
 from . import set_lod_suffix
@@ -27,7 +26,6 @@ from . import triangulate
 
 
 registerables = (
-    apply_modifiers,
     name_sync,
     seams,
     set_lod_suffix,

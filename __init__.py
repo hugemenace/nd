@@ -93,6 +93,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    enable_experimental_features: BoolProperty(
+        name="Experimental Mode",
+        default=False,
+    )
+
     recon_poly_solidify: BoolProperty(
         name="Automatically run Solidify after Recon Poly",
         default=False,
@@ -472,7 +477,8 @@ class NDPreferences(AddonPreferences):
             ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False],
             ["Automatically check if addon is up to date when Blender starts", "enable_update_check", False],
-            ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False]]
+            ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False],
+            ["Enable experimental features. Use at your own risk!", "enable_experimental_features", False]]
 
         for label, prop, expanded in general_boxed_prefs:
             pref_box = box.box()

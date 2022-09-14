@@ -23,6 +23,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.viewport import set_3d_cursor
+from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.objects import create_duplicate_liftable_geometry
 
@@ -54,6 +55,18 @@ ALT — Skip geometry selection and use the active object"""
             self.clean_up(context)
 
             return {'CANCELLED'}
+
+        elif get_preferences().enable_experimental_features and self.key_undo:
+            return {'PASS_THROUGH'}
+        
+        elif get_preferences().enable_experimental_features and self.key_redo:
+            return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and pressed(event, {'W'}):
+            return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and pressed(event, {'C'}):
+            return {'PASS_THROUGH'}
 
         elif pressed(event, {'S'}):
             self.selection_type = (self.selection_type + 1) % 3

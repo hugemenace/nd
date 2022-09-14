@@ -54,6 +54,18 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             
             return {'PASS_THROUGH'}
 
+        elif get_preferences().enable_experimental_features and self.key_undo:
+            return {'PASS_THROUGH'}
+        
+        elif get_preferences().enable_experimental_features and self.key_redo:
+            return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and pressed(event, {'W'}):
+            return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and pressed(event, {'C'}):
+            return {'PASS_THROUGH'}
+
         elif self.key_increase_factor:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:

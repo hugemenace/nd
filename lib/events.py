@@ -38,6 +38,9 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.key_shift_ctrl_alt = has(event) and event.shift and cls.key_ctrl_alt
     cls.key_shift = has(event) and event.shift
     cls.key_shift_no_modifiers = has(event) and event.shift and cls.key_no_modifiers
+
+    cls.key_undo = cls.key_ctrl and pressed(event, {'Z'})
+    cls.key_redo = cls.key_ctrl and cls.key_shift and pressed(event, {'Z'})
     
     cls.key_one = pressed(event, {'ONE'})
     cls.key_two = pressed(event, {'TWO'})

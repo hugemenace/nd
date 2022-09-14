@@ -23,6 +23,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
+from .. lib.preferences import get_preferences
 from .. lib.objects import create_duplicate_liftable_geometry
 
 
@@ -48,11 +49,23 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             
             return {'PASS_THROUGH'}
 
-        elif self.key_confirm_alternative:
-            return self.finish(context)
-
         elif self.key_left_click:
             return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and self.key_undo:
+            return {'PASS_THROUGH'}
+        
+        elif get_preferences().enable_experimental_features and self.key_redo:
+            return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and pressed(event, {'W'}):
+            return {'PASS_THROUGH'}
+
+        elif get_preferences().enable_experimental_features and pressed(event, {'C'}):
+            return {'PASS_THROUGH'}
+
+        elif self.key_confirm_alternative:
+            return self.finish(context)
 
         elif self.key_cancel:
             self.clean_up(context)

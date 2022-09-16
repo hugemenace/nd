@@ -138,7 +138,6 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w += 1
                     self.dirty = True
-
         
         elif self.key_step_down:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
@@ -164,6 +163,23 @@ CTRL — Remove existing modifiers"""
 
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
+
+        if get_preferences().enable_mouse_values:
+            if no_stream(self.lattice_points_u_input_stream) and self.uniform:
+                self.lattice_points_u = max(2, self.lattice_points_u + self.mouse_step)
+                self.lattice_points_v = self.lattice_points_u
+                self.lattice_points_w = self.lattice_points_u
+                self.dirty = True
+            elif not self.uniform:
+                if no_stream(self.lattice_points_u_input_stream) and self.key_no_modifiers:
+                    self.lattice_points_u = max(2, self.lattice_points_u + self.mouse_step)
+                    self.dirty = True
+                elif no_stream(self.lattice_points_v_input_stream) and self.key_alt:
+                    self.lattice_points_v = max(2, self.lattice_points_v + self.mouse_step)
+                    self.dirty = True
+                elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
+                    self.lattice_points_w = max(2, self.lattice_points_w + self.mouse_step)
+                    self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -354,6 +370,7 @@ def draw_text_callback(self):
         "(±1)",
         active=(self.uniform or self.key_no_modifiers),
         alt_mode=False,
+        mouse_value=True,
         input_stream=self.lattice_points_u_input_stream)
 
     draw_property(
@@ -362,6 +379,7 @@ def draw_text_callback(self):
         "Alt (±1)",
         active=(self.uniform or self.key_alt),
         alt_mode=False,
+        mouse_value=True,
         input_stream=self.lattice_points_v_input_stream)
 
     draw_property(
@@ -370,6 +388,7 @@ def draw_text_callback(self):
         "Ctrl (±1)",
         active=(self.uniform or self.key_ctrl),
         alt_mode=False,
+        mouse_value=True,
         input_stream=self.lattice_points_w_input_stream)
 
     draw_hint(

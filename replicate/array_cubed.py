@@ -135,7 +135,20 @@ CTRL — Remove existing modifiers"""
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_ctrl:
+            if self.key_no_modifiers and abs(self.mouse_step) > 0:
+                if self.mouse_step > 0:
+                    new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
+                elif self.mouse_step < 0:
+                    new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
+
+                if new_count == 0:
+                    self.axes[self.axis][1] = 2
+                    self.axes[self.axis][2] = self.axes[self.axis][2] * -1
+                else:
+                    self.axes[self.axis][1] = new_count
+                
+                self.dirty = True
+            elif self.key_ctrl:
                 self.axes[self.axis][2] += self.mouse_value
                 self.dirty = True
         
@@ -262,6 +275,7 @@ def draw_text_callback(self):
         "Alt (±1)",
         active=self.key_no_modifiers,
         alt_mode=False,
+        mouse_value=True,
         input_stream=self.count_streams[self.axis])
 
     draw_property(

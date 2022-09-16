@@ -80,7 +80,10 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
 
     cls.prev_mouse_travel_div = 0 if event == None else cls.mouse_travel_div
     cls.mouse_travel_div = cls.mouse_travel // get_preferences().mouse_value_steps
-    cls.mouse_step = int(1 * copysign(1, cls.mouse_travel)) if cls.prev_mouse_travel_div != cls.mouse_travel_div else 0
+    if cls.prev_mouse_travel_div != cls.mouse_travel_div and abs(cls.mouse_travel) >= get_preferences().mouse_value_steps:
+        cls.mouse_step = int(1 * copysign(1, cls.mouse_travel))
+    else:
+        cls.mouse_step = 0
 
     if event == None or cls.mouse_warped:
         cls.mouse_delta = 0

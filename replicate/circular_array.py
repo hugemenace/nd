@@ -150,6 +150,9 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
                 self.dirty = True
+            elif no_stream(self.count_input_stream) and self.key_no_modifiers:
+                self.count = max(2, self.count + self.mouse_step)
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -403,6 +406,7 @@ def draw_text_callback(self):
         "(±2) | Shift (±1)",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
+        mouse_value=True,
         input_stream=self.count_input_stream)
 
     draw_property(

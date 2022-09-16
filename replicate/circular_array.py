@@ -29,7 +29,7 @@ from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_displace = 'Displace — ND CA'
@@ -41,7 +41,8 @@ class ND_OT_circular_array(bpy.types.Operator):
     bl_idname = "nd.circular_array"
     bl_label = "Circular Array"
     bl_description = """Array an object around another in a circular fashion
-ALT — Use faux origin translation (for origin-reliant geometry)"""
+ALT — Use faux origin translation (for origin-reliant geometry)
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -159,6 +160,10 @@ ALT — Use faux origin translation (for origin-reliant geometry)"""
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND CA')
+            return {'FINISHED'}
+
         self.dirty = False
 
         self.faux_origin = event.alt

@@ -25,7 +25,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 
 
 mod_array_x = "Array³ X — ND"
@@ -37,7 +37,8 @@ mod_summon_list = [mod_array_x, mod_array_y, mod_array_z]
 class ND_OT_array_cubed(bpy.types.Operator):
     bl_idname = "nd.array_cubed"
     bl_label = "Array³"
-    bl_description = "Array an object in up to three dimensions"
+    bl_description = """Array an object in up to three dimensions
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -147,6 +148,10 @@ class ND_OT_array_cubed(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_starting_with(context.selected_objects, 'Array³')
+            return {'FINISHED'}
+
         self.dirty = False
         self.base_offset_factor = 0.01
 

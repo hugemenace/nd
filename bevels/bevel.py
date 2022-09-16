@@ -25,7 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_bevel = "Bevel — ND B"
@@ -36,7 +36,8 @@ mod_summon_list = [mod_bevel]
 class ND_OT_bevel(bpy.types.Operator):
     bl_idname = "nd.bevel"
     bl_label = "Bevel"
-    bl_description = "Adds a bevel modifier to the selected object"
+    bl_description = """Adds a bevel modifier to the selected object
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -160,6 +161,10 @@ class ND_OT_bevel(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND B')
+            return {'FINISHED'}
+
         self.dirty = False
         self.base_width_factor = 0.01
         self.angles = [30, 45, 60]

@@ -26,7 +26,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_displace = "Offset — ND SCR"
@@ -38,7 +38,8 @@ mod_curve_summon_list = [mod_screw]
 class ND_OT_screw(bpy.types.Operator):
     bl_idname = "nd.screw"
     bl_label = "Screw"
-    bl_description = "Adds a screw modifier tuned for converting a sketch into a cylindrical object"
+    bl_description = """Adds a screw modifier tuned for converting a sketch into a cylindrical object
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -160,6 +161,10 @@ class ND_OT_screw(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND SCR')
+            return {'FINISHED'}
+
         self.dirty = False
         self.base_offset_factor = 0.01
         self.object_type = context.active_object.type

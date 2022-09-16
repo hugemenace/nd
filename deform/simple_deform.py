@@ -26,7 +26,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_deform = "Deform — ND SD"
@@ -36,7 +36,8 @@ mod_summon_list = [mod_deform]
 class ND_OT_simple_deform(bpy.types.Operator):
     bl_idname = "nd.simple_deform"
     bl_label = "Simple Deform"
-    bl_description = "Twist, bend, taper, or stretch the selected object"
+    bl_description = """Twist, bend, taper, or stretch the selected object
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -136,6 +137,10 @@ class ND_OT_simple_deform(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND SD')
+            return {'FINISHED'}
+
         self.dirty = False
         self.methods = ['TWIST', 'BEND', 'TAPER', 'STRETCH']
         self.current_method = 0

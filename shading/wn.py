@@ -19,13 +19,14 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 class ND_OT_weighted_normal(bpy.types.Operator):
     bl_idname = "nd.wn"
     bl_label = "Weighted Normals"
-    bl_description = "Add a weighted normal modifier to the selected objects"
+    bl_description = """Add a weighted normal modifier to the selected objects
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -36,6 +37,10 @@ class ND_OT_weighted_normal(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND WN')
+            return {'FINISHED'}
+
         for obj in context.selected_objects:
             new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)
 

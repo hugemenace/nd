@@ -25,7 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_bevel = "Bevel — ND VB"
@@ -39,7 +39,8 @@ class ND_OT_vertex_bevel(bpy.types.Operator):
     bl_label = "Vertex Bevel"
     bl_description = """Adds a vertex group bevel and weld modifier
 SHIFT — Place modifiers at the bottom of the stack
-ALT — Create a vertex group edge bevel"""
+ALT — Create a vertex group edge bevel
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -156,6 +157,11 @@ ALT — Create a vertex group edge bevel"""
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND VB')
+            remove_modifiers_ending_with(context.selected_objects, ' — ND VB LA')
+            return {'FINISHED'}
+
         self.late_apply = event.shift
         self.edge_mode = event.alt
 

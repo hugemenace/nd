@@ -25,7 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_bevel = "Bevel — ND EB"
@@ -37,7 +37,8 @@ class ND_OT_edge_bevel(bpy.types.Operator):
     bl_idname = "nd.edge_bevel"
     bl_label = "Edge Bevel"
     bl_description = """Adds a weighted edge bevel modifier to the selected object
-SHIFT — Place modifiers at the top of the stack"""
+SHIFT — Place modifiers at the top of the stack
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -176,6 +177,10 @@ SHIFT — Place modifiers at the top of the stack"""
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
+            return {'FINISHED'}
+
         self.dirty = False
         self.early_apply = event.shift
 

@@ -19,6 +19,7 @@
 # ---
 
 import bpy
+import re
 
 
 def new_modifier(object, mod_name, mod_type, rectify=True):
@@ -88,3 +89,23 @@ def remove_problematic_bevels(object):
 
     for mod in remove_mods:
         object.modifiers.remove(mod)
+
+
+def remove_modifiers_ending_with(objects, suffix):
+    for object in objects:
+        mods = object.modifiers
+        mod_names = [mod.name for mod in mods]
+        for mod_name in mod_names:
+            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
+            if base_name.endswith(suffix):
+                bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
+
+
+def remove_modifiers_starting_with(objects, suffix):
+    for object in objects:
+        mods = object.modifiers
+        mod_names = [mod.name for mod in mods]
+        for mod_name in mod_names:
+            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
+            if base_name.startswith(suffix):
+                bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)

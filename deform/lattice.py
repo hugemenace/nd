@@ -26,7 +26,7 @@ from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_lattice = "Lattice — ND L"
@@ -36,7 +36,8 @@ mod_summon_list = [mod_lattice]
 class ND_OT_lattice(bpy.types.Operator):
     bl_idname = "nd.lattice"
     bl_label = "Lattice"
-    bl_description = "Adds a lattice modifier to the selected object"
+    bl_description = """Adds a lattice modifier to the selected object
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -173,6 +174,10 @@ class ND_OT_lattice(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND L')
+            return {'FINISHED'}
+
         self.dirty = False
 
         self.uniform = True

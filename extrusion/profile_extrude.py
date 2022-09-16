@@ -25,7 +25,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_screw = "Extrusion — ND PE"
@@ -37,7 +37,8 @@ mod_summon_list = [mod_screw, mod_weighting, mod_offset]
 class ND_OT_profile_extrude(bpy.types.Operator):
     bl_idname = "nd.profile_extrude"
     bl_label = "Profile Extrude"
-    bl_description = "Extrudes a profile along a specified axis"
+    bl_description = """Extrudes a profile along a specified axis
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -148,6 +149,10 @@ class ND_OT_profile_extrude(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND PE')
+            return {'FINISHED'}
+
         self.dirty = False
         self.base_extrude_factor = 0.01
         self.base_offset_factor = 0.001

@@ -27,7 +27,7 @@ from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handle
 from .. lib.viewport import set_3d_cursor
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 
 
 class ND_OT_mirror(bpy.types.Operator):
@@ -35,7 +35,8 @@ class ND_OT_mirror(bpy.types.Operator):
     bl_label = "Mirror"
     bl_description = """Mirror an object in isolation, or across another object
 ALT — Mirror across selected object's geometry
-SHIFT — Place modifiers at the top of the stack"""
+SHIFT — Place modifiers at the top of the stack
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -112,6 +113,10 @@ SHIFT — Place modifiers at the top of the stack"""
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_starting_with(context.selected_objects, 'Mirror —')
+            return {'FINISHED'}
+
         self.geometry_mode = event.alt
         self.early_apply = event.shift
         self.geometry_ready = False

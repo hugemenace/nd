@@ -25,7 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 mod_bevel = "Bevel — ND WNB"
@@ -36,7 +36,8 @@ mod_summon_list = [mod_bevel, mod_wn]
 class ND_OT_weighted_normal_bevel(bpy.types.Operator):
     bl_idname = "nd.weighted_normal_bevel"
     bl_label = "WN Bevel"
-    bl_description = "Adds a single segment bevel and a weighted normal modifier"
+    bl_description = """Adds a single segment bevel and a weighted normal modifier
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -120,6 +121,10 @@ class ND_OT_weighted_normal_bevel(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND WNB')
+            return {'FINISHED'}
+
         self.dirty = False
         self.base_width_factor = 0.001
         self.angles = [30, 45, 60]

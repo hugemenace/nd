@@ -19,13 +19,14 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 class ND_OT_weld(bpy.types.Operator):
     bl_idname = "nd.weld"
     bl_label = "Weld"
-    bl_description = "Add a weld modifier to the selected objects"
+    bl_description = """Add a weld modifier to the selected objects
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -36,6 +37,10 @@ class ND_OT_weld(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND SW')
+            return {'FINISHED'}
+
         for obj in context.selected_objects:
             weld = new_modifier(obj, 'Weld — ND SW', 'WELD', rectify=True)
             weld.merge_threshold = 0.001

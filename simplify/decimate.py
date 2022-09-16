@@ -20,13 +20,14 @@
 
 import bpy
 from math import radians
-from .. lib.modifiers import new_modifier
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
 class ND_OT_decimate(bpy.types.Operator):
     bl_idname = "nd.decimate"
     bl_label = "Decimate"
-    bl_description = "Add a decimate modifier to the selected objects"
+    bl_description = """Add a decimate modifier to the selected objects
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -37,6 +38,10 @@ class ND_OT_decimate(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, ' — ND SD')
+            return {'FINISHED'}
+
         for obj in context.selected_objects:
             decimate = new_modifier(obj, 'Decimate — ND SD', 'DECIMATE', rectify=True)
             decimate.decimate_type = 'DISSOLVE'

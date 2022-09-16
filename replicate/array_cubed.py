@@ -97,7 +97,7 @@ CTRL — Remove existing modifiers"""
                 self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
 
         elif self.key_step_up:
-            if self.key_no_modifiers:
+            if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
                 new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
 
                 if new_count == 1:
@@ -107,12 +107,12 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][1] = new_count
                 
                 self.dirty = True
-            elif self.key_ctrl:
+            elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][2] += offset_factor
                 self.dirty = True
             
         elif self.key_step_down:
-            if self.key_no_modifiers:
+            if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
                 new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
 
                 if new_count == 0:
@@ -122,7 +122,7 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][1] = new_count
                 
                 self.dirty = True
-            elif self.key_ctrl:
+            elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][2] -= offset_factor
                 self.dirty = True
         
@@ -135,7 +135,7 @@ CTRL — Remove existing modifiers"""
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers and abs(self.mouse_step) > 0:
+            if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers and abs(self.mouse_step) > 0:
                 if self.mouse_step > 0:
                     new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
                 elif self.mouse_step < 0:
@@ -148,7 +148,7 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][1] = new_count
                 
                 self.dirty = True
-            elif self.key_ctrl:
+            elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][2] += self.mouse_value
                 self.dirty = True
         

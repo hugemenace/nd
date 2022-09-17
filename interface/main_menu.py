@@ -56,7 +56,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_shading_menu", icon='SHADING_RENDERED')
         layout.menu("ND_MT_scene_menu", icon='SCENE_DATA')
         layout.separator()
-        layout.menu("ND_MT_packaging_menu", icon='OUTLINER_COLLECTION')
+        layout.menu("ND_MT_packaging_menu", text="Packaging", icon='OUTLINER_COLLECTION')
         layout.menu("ND_MT_utils_menu", text="Utils", icon='PLUGIN')
         layout.menu("ND_MT_viewport_menu", text="Viewport", icon='RESTRICT_VIEW_OFF')
 

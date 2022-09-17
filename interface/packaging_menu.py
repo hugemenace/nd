@@ -21,13 +21,14 @@
 import bpy
 from . import ops
 from . common import render_ops
+from .. import bl_info
 
 
 keys = []
 
 
 class ND_MT_packaging_menu(bpy.types.Menu):
-    bl_label = "Packaging"
+    bl_label = "ND v%s — Packaging" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_packaging_menu"
 
 

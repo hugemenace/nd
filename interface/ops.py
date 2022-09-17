@@ -92,6 +92,8 @@ packaging_ops = [
     None, # Separator
     ("nd.seams", 'UV_DATA', None, None, False),
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
+    None, # Separator
+    ("nd.id_material", 'MATERIAL', None, None, False),
 ]
 
 scene_ops = [

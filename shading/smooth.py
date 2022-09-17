@@ -122,16 +122,18 @@ class ND_OT_smooth(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+            return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
     
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
+        for object in context.selected_objects:
+            object.data.use_auto_smooth = True
 
 
     def operate(self, context):
-        context.active_object.data.auto_smooth_angle = radians(self.angle)
+        for object in context.selected_objects:
+            object.data.auto_smooth_angle = radians(self.angle)
 
         self.dirty = False
 

@@ -51,8 +51,8 @@ ND_MATERIALS = {
 }
 
 
-class ND_OT_id_material(bpy.types.Operator):
-    bl_idname = "nd.id_material"
+class ND_OT_create_id_material(bpy.types.Operator):
+    bl_idname = "nd.create_id_material"
     bl_label = "Create ID Material"
     bl_description = "Create and assign a new ID material to the selected object or geometry"
     bl_options = {'UNDO'}
@@ -93,8 +93,8 @@ class ND_OT_id_material(bpy.types.Operator):
 
 
 def register():
-    bpy.utils.register_class(ND_OT_id_material)
+    bpy.utils.register_class(ND_OT_create_id_material)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_id_material)
+    bpy.utils.unregister_class(ND_OT_create_id_material)

@@ -26,6 +26,7 @@ from . import utils_menu
 from . import fast_menu
 from . import boolean_menu
 from . import packaging_menu
+from . import id_material_menu
 from . import scene_menu
 from . import bevel_menu
 from . import simplify_menu
@@ -47,6 +48,7 @@ registerables = (
     fast_menu,
     boolean_menu,
     packaging_menu,
+    id_material_menu,
     scene_menu,
     bevel_menu,
     simplify_menu,

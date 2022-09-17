@@ -92,8 +92,10 @@ packaging_ops = [
     None, # Separator
     ("nd.seams", 'UV_DATA', None, None, False),
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
-    None, # Separator
-    ("nd.id_material", 'MATERIAL', None, None, False),
+]
+
+id_material_ops = [
+    ("nd.create_id_material", 'MATERIAL', None, None, False),
 ]
 
 scene_ops = [
@@ -121,7 +123,7 @@ viewport_ops = [
 def build_icon_lookup_table():
     icon_lookup = {}
     for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + \
-    deform_ops + simplify_ops + shading_ops + scene_ops + packaging_ops + util_ops + viewport_ops:
+    deform_ops + simplify_ops + shading_ops + scene_ops + packaging_ops + id_material_ops + util_ops + viewport_ops:
         if op is None:
             continue
 

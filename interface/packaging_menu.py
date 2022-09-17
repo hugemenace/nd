@@ -35,7 +35,11 @@ class ND_MT_packaging_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
+        
         render_ops(ops.packaging_ops, layout, new_row=False, use_separator=True)
+
+        layout.separator()
+        layout.menu("ND_MT_id_material_menu", text="ID Materials", icon='COLOR')
         
 
 def register():

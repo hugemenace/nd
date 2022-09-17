@@ -109,6 +109,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.mirror", icon=icons['nd.mirror'])
         layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
         layout.operator("nd.snap_align", icon=icons['nd.snap_align'])
+        layout.separator()
+        layout.operator("nd.smooth", icon=icons['nd.smooth'])
+        layout.operator("nd.wn", icon=icons['nd.wn'])
 
         return SECTION_COUNT
 
@@ -269,6 +272,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.panel", icon=icons['nd.panel'])
             layout.operator("nd.geo_lift", icon=icons['nd.geo_lift'])
             layout.operator("nd.view_align", icon=icons['nd.view_align'])
+            layout.separator()
+            layout.operator("nd.smooth", icon=icons['nd.smooth'])
+            layout.operator("nd.wn", icon=icons['nd.wn'])
 
             return SECTION_COUNT
 
@@ -292,6 +298,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator("nd.name_sync", icon=icons['nd.name_sync'])
         layout.operator("nd.set_lod_suffix", text="Low LOD", icon=icons['nd.set_lod_suffix+LOW']).mode = 'LOW'
         layout.operator("nd.set_lod_suffix", text="High LOD", icon=icons['nd.set_lod_suffix+HIGH']).mode = 'HIGH'
+        layout.separator()
+        layout.operator("nd.smooth", icon=icons['nd.smooth'])
+        layout.operator("nd.wn", icon=icons['nd.wn'])
 
         return SECTION_COUNT
 

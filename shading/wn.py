@@ -42,7 +42,8 @@ CTRL — Remove existing modifiers"""
             return {'FINISHED'}
 
         for obj in context.selected_objects:
-            new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)
+            mod = new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)
+            mod.keep_sharp = True
 
         return {'FINISHED'}
 

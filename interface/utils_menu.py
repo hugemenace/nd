@@ -41,7 +41,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
 def register():
     bpy.utils.register_class(ND_MT_utils_menu)
 
-    for mapping in [('3D View', 'VIEW_3D'), ('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
+    for mapping in [('Object Mode', 'EMPTY')]:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
         entry = keymap.keymap_items.new("wm.call_menu", 'T', 'PRESS', alt=True)
         entry.properties.name = "ND_MT_utils_menu"

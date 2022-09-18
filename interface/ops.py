@@ -94,6 +94,7 @@ packaging_ops = [
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
     None, # Separator
     ("nd.clear_materials", 'NODE_MATERIAL', None, None, False),
+    ("nd.bulk_create_id_materials", 'NODE_COMPOSITING', None, None, False),
 ]
 
 scene_ops = [

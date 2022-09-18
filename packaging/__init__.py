@@ -19,6 +19,7 @@
 # ---
 
 import importlib
+from . import bulk_create_id_materials
 from . import clear_materials
 from . import create_id_material
 from . import name_sync
@@ -28,6 +29,7 @@ from . import triangulate
 
 
 registerables = (
+    bulk_create_id_materials,
     clear_materials,
     create_id_material,
     name_sync,

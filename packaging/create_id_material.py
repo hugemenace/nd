@@ -52,6 +52,22 @@ ND_MATERIALS = {
 }
 
 
+def create_id_material(name):
+    r, g, b = ND_MATERIALS[name]
+
+    r_ = pow(r / 255, 2.2)
+    g_ = pow(g / 255, 2.2)
+    b_ = pow(b / 255, 2.2)
+
+    material = bpy.data.materials.new(name)
+    material.diffuse_color = (r_, g_, b_, 1)
+    material.specular_intensity = 0.5
+    material.roughness = 0.75
+    material.use_fake_user = True
+
+    return material
+
+
 class ND_OT_create_id_material(bpy.types.Operator):
     bl_idname = "nd.create_id_material"
     bl_label = "Create ID Material"
@@ -72,20 +88,10 @@ class ND_OT_create_id_material(bpy.types.Operator):
         existing_material_names = bpy.data.materials.keys()
         
         material = None
-        if self.material_name not in existing_material_names:
-            r, g, b = ND_MATERIALS[self.material_name]
-
-            r_ = pow(r / 255, 2.2)
-            g_ = pow(g / 255, 2.2)
-            b_ = pow(b / 255, 2.2)
-
-            material = bpy.data.materials.new(self.material_name)
-            material.diffuse_color = (r_, g_, b_, 1)
-            material.specular_intensity = 0.5
-            material.roughness = 0.75
-            material.use_fake_user = True
-        else:
+        if self.material_name in existing_material_names:
             material = bpy.data.materials[self.material_name]
+        else:
+            material = create_id_material(self.material_name)
 
         if context.mode == 'OBJECT':
             for object in context.selected_objects:

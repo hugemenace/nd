@@ -240,6 +240,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
             replay_prediction_count += 1
 
         if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
+            layout.operator("nd.mirror", icon=icons['nd.mirror'])
+            layout.separator()
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
             layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 

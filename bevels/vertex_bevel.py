@@ -158,8 +158,20 @@ CTRL — Remove existing modifiers"""
 
     def invoke(self, context, event):
         if event.ctrl:
+            old_vgroup_names = []
+            for object in context.selected_objects:
+                active_vgroup_names = [vgroup.name for vgroup in object.vertex_groups]
+
+                for mod in object.modifiers:
+                    if mod.type == 'BEVEL' and ' — ND VB' in mod.name and mod.vertex_group and mod.vertex_group in active_vgroup_names:
+                        old_vgroup_names.append(mod.vertex_group)
+
+                for vgroup_name in old_vgroup_names:
+                    object.vertex_groups.remove(object.vertex_groups[vgroup_name])
+
             remove_modifiers_ending_with(context.selected_objects, ' — ND VB')
             remove_modifiers_ending_with(context.selected_objects, ' — ND VB LA')
+
             return {'FINISHED'}
 
         self.late_apply = event.shift

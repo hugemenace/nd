@@ -179,6 +179,15 @@ CTRL — Remove existing modifiers"""
     def invoke(self, context, event):
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
+            for object in context.selected_objects:
+                bm = bmesh.from_edit_mesh(object.data)
+                bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+            
+                for edge in bm.edges:
+                    edge[bevel_weight_layer] = 0
+            
+                bmesh.update_edit_mesh(object.data)
+                
             return {'FINISHED'}
 
         self.dirty = False

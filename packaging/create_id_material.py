@@ -19,6 +19,7 @@
 # ---
 
 import bpy
+import bmesh
 import numpy
 from random import choice
 
@@ -63,7 +64,7 @@ class ND_OT_create_id_material(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode in ['OBJECT', 'EDIT_MESH']:
             return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
 
@@ -86,8 +87,25 @@ class ND_OT_create_id_material(bpy.types.Operator):
         else:
             material = bpy.data.materials[self.material_name]
 
-        for object in context.selected_objects:
-            object.active_material = material
+        if context.mode == 'OBJECT':
+            for object in context.selected_objects:
+                object.data.materials.clear()
+                object.active_material = material
+        
+        if context.mode == 'EDIT_MESH':
+            for object in context.selected_objects:
+                previous_material_names = [m.name for m in object.material_slots]
+                if self.material_name not in previous_material_names:
+                    object.data.materials.append(material)
+
+                active_materials = [slot.name for slot in object.material_slots]
+
+                bm = bmesh.from_edit_mesh(object.data)
+                for face in bm.faces:
+                    if face.select:
+                        face.material_index = active_materials.index(self.material_name)
+                
+                bmesh.update_edit_mesh(object.data)
 
         return {'FINISHED'}
 

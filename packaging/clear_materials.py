@@ -23,7 +23,7 @@ import bpy
 
 class ND_OT_clear_materials(bpy.types.Operator):
     bl_idname = "nd.clear_materials"
-    bl_label = "Clear Materials"
+    bl_label = "Clear All Materials"
     bl_description = "Remove the material slots from all selected objects"
     bl_options = {'UNDO'}
 

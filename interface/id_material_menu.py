@@ -21,6 +21,8 @@
 import bpy
 from . import ops
 from . common import render_ops
+from .. icons import get_icon_value
+from .. packaging.create_id_material import ND_MATERIALS
 
 
 class ND_MT_id_material_menu(bpy.types.Menu):
@@ -32,15 +34,19 @@ class ND_MT_id_material_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        render_ops(ops.id_material_ops, layout, new_row=False, use_separator=True)
+        materials = list(ND_MATERIALS.keys())
+        
+        row = layout.row()
 
-        existing_material_names = bpy.data.materials.keys()
-        if any(name.startswith("ND_ID_MAT_") for name in existing_material_names):
-            layout.separator()
-            for material in bpy.data.materials:
-                if material.name.startswith("ND_ID_MAT_"):
-                    clean_name = material.name[len("ND_ID_MAT_"):].capitalize()
-                    layout.operator("nd.assign_id_material", text=clean_name, icon='LAYER_ACTIVE').material = material.name
+        column = row.column()
+        for material_name in materials[:11]:
+            clean_name = material_name[len("ND_ID_MAT_"):].capitalize()
+            column.operator("nd.create_id_material", text=clean_name, icon_value=get_icon_value(material_name)).material_name = material_name
+
+        column = row.column()
+        for material_name in materials[11:]:
+            clean_name = material_name[len("ND_ID_MAT_"):].capitalize()
+            column.operator("nd.create_id_material", text=clean_name, icon_value=get_icon_value(material_name)).material_name = material_name
         
 
 def register():

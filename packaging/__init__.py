@@ -20,7 +20,6 @@
 
 import importlib
 from . import create_id_material
-from . import assign_id_material
 from . import name_sync
 from . import seams
 from . import set_lod_suffix
@@ -29,7 +28,6 @@ from . import triangulate
 
 registerables = (
     create_id_material,
-    assign_id_material,
     name_sync,
     seams,
     set_lod_suffix,

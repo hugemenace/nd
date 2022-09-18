@@ -58,6 +58,9 @@ class ND_OT_create_id_material(bpy.types.Operator):
     bl_options = {'UNDO'}
 
 
+    material_name: bpy.props.StringProperty(name="Material Name")
+
+
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
@@ -66,25 +69,22 @@ class ND_OT_create_id_material(bpy.types.Operator):
 
     def execute(self, context):
         existing_material_names = bpy.data.materials.keys()
-        remaining_names = numpy.setdiff1d(list(ND_MATERIALS.keys()), existing_material_names)
+        
+        material = None
+        if self.material_name not in existing_material_names:
+            r, g, b = ND_MATERIALS[self.material_name]
 
-        if len(remaining_names) == 0:
-            self.report({'ERROR'}, "All potential ND ID material names have been exhausted.")
+            r_ = pow(r / 255, 2.2)
+            g_ = pow(g / 255, 2.2)
+            b_ = pow(b / 255, 2.2)
 
-            return {'CANCELLED'}
-            
-        material_name = choice(remaining_names)
-        r, g, b = ND_MATERIALS[material_name]
-
-        r_ = pow(r / 255, 2.2)
-        g_ = pow(g / 255, 2.2)
-        b_ = pow(b / 255, 2.2)
-
-        material = bpy.data.materials.new(material_name)
-        material.diffuse_color = (r_, g_, b_, 1)
-        material.specular_intensity = 0.5
-        material.roughness = 0.75
-        material.use_fake_user = True
+            material = bpy.data.materials.new(self.material_name)
+            material.diffuse_color = (r_, g_, b_, 1)
+            material.specular_intensity = 0.5
+            material.roughness = 0.75
+            material.use_fake_user = True
+        else:
+            material = bpy.data.materials[self.material_name]
 
         for object in context.selected_objects:
             object.active_material = material

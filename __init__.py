@@ -50,6 +50,7 @@ from . import sketch
 from . import standalone
 from . import utils
 from . import viewport
+from . import icons
 
 
 registerables = (
@@ -66,7 +67,8 @@ registerables = (
     sketch,
     standalone,
     utils,
-    viewport
+    viewport,
+    icons,
 )
 
 

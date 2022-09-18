@@ -38,7 +38,6 @@ class ND_MT_packaging_menu(bpy.types.Menu):
         
         render_ops(ops.packaging_ops, layout, new_row=False, use_separator=True)
 
-        layout.separator()
         layout.menu("ND_MT_id_material_menu", text="ID Materials", icon='COLOR')
         
 

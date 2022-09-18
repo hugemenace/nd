@@ -18,35 +18,32 @@
 # Contributors: Tristo (HM)
 # ---
 
-import importlib
-from . import clear_materials
-from . import create_id_material
-from . import name_sync
-from . import seams
-from . import set_lod_suffix
-from . import triangulate
+import bpy
 
 
-registerables = (
-    clear_materials,
-    create_id_material,
-    name_sync,
-    seams,
-    set_lod_suffix,
-    triangulate,
-)
+class ND_OT_clear_materials(bpy.types.Operator):
+    bl_idname = "nd.clear_materials"
+    bl_label = "Clear Materials"
+    bl_description = "Remove the material slots from all selected objects"
+    bl_options = {'UNDO'}
 
 
-def reload():
-    for registerable in registerables:
-        importlib.reload(registerable)
+    @classmethod
+    def poll(cls, context):
+        if context.mode == 'OBJECT':
+            return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
+
+
+    def execute(self, context):
+        for object in context.selected_objects:
+            object.data.materials.clear()
+
+        return {'FINISHED'}
 
 
 def register():
-    for registerable in registerables:
-        registerable.register()
+    bpy.utils.register_class(ND_OT_clear_materials)
 
 
 def unregister():
-    for registerable in registerables:
-        registerable.unregister()
+    bpy.utils.unregister_class(ND_OT_clear_materials)

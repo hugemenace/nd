@@ -26,7 +26,7 @@ from .. packaging.create_id_material import ND_MATERIALS
 
 
 class ND_MT_id_material_menu(bpy.types.Menu):
-    bl_label = "ID Material"
+    bl_label = "Material Selection"
     bl_idname = "ND_MT_id_material_menu"
 
 

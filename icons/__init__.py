@@ -1,5 +1,5 @@
 import os
-import bpy
+import bpy.utils.previews
 
 
 icons_collection = None

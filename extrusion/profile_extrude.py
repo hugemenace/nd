@@ -200,7 +200,7 @@ CTRL — Remove existing modifiers"""
         self.extrusion_length = 0
         self.weighting = 0
         self.offset = 0
-        self.calculate_edges = True
+        self.calculate_edges = False
 
         self.add_weighting_modifier(context)
         self.add_offset_modifier(context)
@@ -210,7 +210,7 @@ CTRL — Remove existing modifiers"""
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
-        self.calculate_edges = True
+        self.calculate_edges = False
         self.screw = mods[mod_screw]
         self.weighting_offset = mods[mod_weighting]
         self.displace = mods[mod_offset]

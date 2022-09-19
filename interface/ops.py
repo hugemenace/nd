@@ -86,15 +86,15 @@ shading_ops = [
 ]
 
 packaging_ops = [
+    ("nd.bulk_create_id_materials", 'NODE_COMPOSITING', None, None, False),
+    ("nd.clear_materials", 'NODE_MATERIAL', None, None, False),
+    None, # Separator
     ("nd.name_sync", 'FILE_REFRESH', None, None, False),
     ("nd.set_lod_suffix", 'ALIASED', "Low LOD", 'LOW', False),
     ("nd.set_lod_suffix", 'ANTIALIASED', "High LOD", 'HIGH', False),
     None, # Separator
     ("nd.seams", 'UV_DATA', None, None, False),
     ("nd.triangulate", 'MOD_TRIANGULATE', None, None, False),
-    None, # Separator
-    ("nd.clear_materials", 'NODE_MATERIAL', None, None, False),
-    ("nd.bulk_create_id_materials", 'NODE_COMPOSITING', None, None, False),
 ]
 
 scene_ops = [

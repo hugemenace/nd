@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.34.0](https://github.com/hugemenace/nd/compare/v1.33.0...v1.34.0) (2022-09-19)
+
+
+### Features
+
+* add a bulk assign ID materials operator ([fc3a4c6](https://github.com/hugemenace/nd/commit/fc3a4c671285bef41696b37fd2894aa5cb185ae3))
+* add a weighted_normal operator along with a new shading category, and move smooth shading into it ([8e17737](https://github.com/hugemenace/nd/commit/8e17737030ec33248bfd2f1a2e126e76c68b2fa1))
+* add clean_utils and apply_modifiers ops as shortcuts in main UI panel ([7aba702](https://github.com/hugemenace/nd/commit/7aba702b7b6acdc92e881738e2bb550309a508e7))
+* add clear_materials operator ([02c580b](https://github.com/hugemenace/nd/commit/02c580be622acbf4e08690580e3b3b9a145b567a))
+* add CTRL + click modifier removal behaviour to all applicable operators ([1fcb674](https://github.com/hugemenace/nd/commit/1fcb674a4bddfc0900af34673a698a6bf152632a))
+* add experimental mode toggle to preferences ([4a5a4d1](https://github.com/hugemenace/nd/commit/4a5a4d1b3d97dfe4703b1adc3a3a3c2d7c44df92))
+* add mirror operation to boolean object fast menu predictions ([7df0fea](https://github.com/hugemenace/nd/commit/7df0fea743c4ee074b4d4afb8983ddfc1e168ea4))
+* add mouse-step values to lattice, screw, array_cubed, circular_array operators ([22e53de](https://github.com/hugemenace/nd/commit/22e53def7c332bd9aca44fb1e9cf4d9f210c3096))
+* add Shift + Alt + E keybinding for the Packaging menu ([f92d434](https://github.com/hugemenace/nd/commit/f92d43433088d359b87394d421758c2fdf51dcd0))
+* add smooth shading and weighted normal operators to the fast-predict menu ([28b359a](https://github.com/hugemenace/nd/commit/28b359ae277221018e49079ac62d73411adbe725))
+* add the id_material operator ([20b77a0](https://github.com/hugemenace/nd/commit/20b77a02284c31f615660ebaca082fc89fda66a9))
+* add undo/redo/W/C event passthrough as experimental feature for geo_lift, panel, and view_align operators ([778b064](https://github.com/hugemenace/nd/commit/778b064b547fc1742f36509b65b716c885326772))
+* allow bevel segments to be set via mouse movement when mouse values are enabled ([c9713bd](https://github.com/hugemenace/nd/commit/c9713bdd96b8edc4cc013a3e84d34af7b39b2fc0))
+* allow customisation of the overlay base color ([b6fb7df](https://github.com/hugemenace/nd/commit/b6fb7df0c31d90139325cedbbf3c312b3751ea41))
+* allow ID Materials to be actioned in both object and edit mode (face select) ([021efe2](https://github.com/hugemenace/nd/commit/021efe21cccc5944c77821372e461c53523fbdad))
+* allow smooth shading operator to be used on multiple objects simultaneously ([3d52fc9](https://github.com/hugemenace/nd/commit/3d52fc9bd88bef3e03dd3a21ff47239ecef2bdb2))
+* create a dedicated ID materials menu under Packaging, and a new assign-existing ID material operator ([b383f14](https://github.com/hugemenace/nd/commit/b383f147c68dd9a1238b5f35956e1cffaf1f0bb2))
+* remove edge weights and vertex groups when clearing edge_bevel, or vertex_bevel operations ([bfac62e](https://github.com/hugemenace/nd/commit/bfac62e8eff638eba6f9ed74ce3e9b5347df4a95))
+* set keep_sharp for the weighted_normal operator by default ([3856be3](https://github.com/hugemenace/nd/commit/3856be3707735ef36bf1aa75fe48481dbf6855cc))
+* split applicable util ops into dedicated scene and export menus ([6422a49](https://github.com/hugemenace/nd/commit/6422a49a183e2fdf74136d995228f2ed3116275a))
+* update the ID Materials menu to show a static list of all available colours with previews ([bf9d5c1](https://github.com/hugemenace/nd/commit/bf9d5c1bd718e032676e7fe14657ad4e5ed14c86))
+
+
+### Bug Fixes
+
+* ensure mod order is rectified when using the edge_bevel operator ([ecd49d9](https://github.com/hugemenace/nd/commit/ecd49d90087292a59397a6e73a55c5845180a77c))
+* ensure select objects are made single-user when executing the apply_modifiers operator ([a5955fb](https://github.com/hugemenace/nd/commit/a5955fb6591f31d5a4869e52adc9dc4d4b2d5f06))
+* explicitly import bpy.utils.previews in icons/__init__.py ([03f9f2b](https://github.com/hugemenace/nd/commit/03f9f2bb5c4f927ee579980535f96703c9991487))
+* fix array_cubed manual input override locking ([374c00b](https://github.com/hugemenace/nd/commit/374c00b2cbef2c8eb8245c987c49e649a0314bb8))
+* set profile_extrude's calculate edges option to false by default ([d4c7537](https://github.com/hugemenace/nd/commit/d4c75371b132074d2e2e6ebe19f35cc40029963e))
+
 ## [1.33.0](https://github.com/hugemenace/nd/compare/v1.32.0...v1.33.0) (2022-08-06)
 
 

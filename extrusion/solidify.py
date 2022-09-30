@@ -225,6 +225,7 @@ CTRL — Remove existing modifiers"""
         solidify = new_modifier(context.active_object, mod_solidify, 'SOLIDIFY', rectify=True)
         solidify.use_even_offset = True
         solidify.nonmanifold_thickness_mode = 'CONSTRAINTS'
+        solidify.use_quality_normals = True
 
         self.solidify = solidify
     

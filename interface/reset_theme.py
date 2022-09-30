@@ -39,6 +39,7 @@ class ND_OT_reset_theme(bpy.types.Operator):
         get_preferences().overlay_header_standard_color = (255/255, 135/255, 55/255)
         get_preferences().overlay_header_recalled_color = (82/255, 224/255, 82/255)
         get_preferences().overlay_header_paused_color = (238/255, 59/255, 43/255)
+        get_preferences().overlay_option_active_color = (55/255, 174/255, 255/255)
         get_preferences().overlay_base_color = (255/255, 255/255, 255/255)
         get_preferences().overlay_option_manual_override_color = (237/255, 185/255, 94/255)
 

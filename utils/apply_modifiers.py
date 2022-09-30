@@ -41,6 +41,8 @@ SHIFT — Hard apply (apply all modifiers)"""
 
         for obj in context.selected_objects:
             self.collapse_modifiers(obj)
+            self.remove_vertex_groups(obj)
+            self.remove_edge_weights(obj)
 
         return {'FINISHED'}
 
@@ -87,6 +89,26 @@ SHIFT — Hard apply (apply all modifiers)"""
             except:
                 # If the modifier is disabled, just remove it.
                 bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+
+
+    def remove_vertex_groups(self, obj):
+        vertex_groups = obj.vertex_groups.values()
+        for vg in vertex_groups:
+            obj.vertex_groups.remove(vg)
+
+
+    def remove_edge_weights(self, obj):
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+
+        bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+
+        edges = list(bm.edges)
+        for edge in edges:
+            edge[bevel_weight_layer] = 0
+
+        bm.to_mesh(obj.data)
+        bm.free()
 
 
 def register():

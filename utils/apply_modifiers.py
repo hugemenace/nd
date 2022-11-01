@@ -57,10 +57,12 @@ SHIFT — Hard apply (apply all modifiers)"""
         safe_mod_types = ['WEIGHTED_NORMAL', 'TRIANGULATE', 'NODES']
         
         mods = [mod for mod in obj.modifiers]
+        mods_to_apply = []
         mods_to_remove = []
 
         if self.hard_apply:
-            mods_to_remove = [mod.name for mod in mods]
+            mods_to_apply = [mod.name for mod in mods if mod.show_viewport]
+            mods_to_remove = [mod.name for mod in mods if not mod.show_viewport]
 
         if not self.hard_apply:
             skip_weld = False
@@ -81,14 +83,20 @@ SHIFT — Hard apply (apply all modifiers)"""
                         skip_weld = True
                         continue
 
-                mods_to_remove.append(mod.name)
+                if not mod.show_viewport:
+                    mods_to_remove.append(mod.name)
+                else:
+                    mods_to_apply.append(mod.name)
 
-        for mod_name in mods_to_remove:
+        for mod_name in mods_to_apply:
             try:
                 bpy.ops.object.modifier_apply({'object': obj}, modifier=mod_name)
             except:
                 # If the modifier is disabled, just remove it.
                 bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+
+        for mod_name in mods_to_remove:
+            bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
 
 
     def remove_vertex_groups(self, obj):

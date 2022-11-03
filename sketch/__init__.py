@@ -24,6 +24,7 @@ from . import geo_lift
 from . import panel
 from . import single_vertex
 from . import recon_poly
+from . import circularize
 from . import screw_head
 from . import clear_vgs
 from . import make_manifold
@@ -35,6 +36,7 @@ registerables = (
     panel,
     single_vertex,
     recon_poly,
+    circularize,
     screw_head,
     clear_vgs,
     make_manifold,

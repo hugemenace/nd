@@ -193,6 +193,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         has_mod_screw = False
         has_mod_array_cubed = False
         has_mod_circular_array = False
+        has_mod_circularize = False
         has_mod_recon_poly = False
 
         for name in mod_names:
@@ -203,6 +204,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_mod_array_cubed = has_mod_array_cubed or bool("Array³" in name)
             has_mod_circular_array = has_mod_circular_array or bool("— ND CA" in name)
             has_mod_recon_poly = has_mod_recon_poly or bool("— ND RCP" in name)
+            has_mod_circularize = has_mod_circularize or bool("— ND CIRC" in name)
 
         was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
 
@@ -237,6 +239,10 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if has_mod_recon_poly:
             layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
+            replay_prediction_count += 1
+        
+        if has_mod_circularize:
+            layout.operator("nd.circularize", icon=icons['nd.circularize'])
             replay_prediction_count += 1
 
         if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:

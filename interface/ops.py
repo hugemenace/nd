@@ -34,6 +34,7 @@ sketch_ops = [
     ("nd.geo_lift", 'FACESEL', None, None, False),
     ("nd.panel", 'MOD_EXPLODE', None, None, False),
     None, # Separator
+    ("nd.circularize", 'MESH_CIRCLE', None, None, False),
     ("nd.recon_poly", 'SURFACE_NCURVE', None, None, False),
     ("nd.screw_head", 'CANCEL', None, None, False),
 ]

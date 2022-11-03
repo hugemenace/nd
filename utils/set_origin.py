@@ -42,6 +42,8 @@ SHIFT — Undo faux origin translation"""
             return reference_obj.type == 'MESH'
         elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
             return True
+        elif context.mode == 'EDIT_MESH' and len(context.selected_objects) == 1:
+            return True
 
 
     def execute(self, context):
@@ -64,6 +66,8 @@ SHIFT — Undo faux origin translation"""
         if len(context.selected_objects) == 1:
             if event.shift:
                 self.revert_faux_origin(context)
+            if context.mode == 'EDIT_MESH':
+                self.set_mesh_origin(context)
         else:
             if event.alt:
                 return self.execute(context)
@@ -93,6 +97,19 @@ SHIFT — Undo faux origin translation"""
             context.active_object.modifiers.remove(mod)
         
         context.active_object.location = location
+
+
+    def set_mesh_origin(self, context):
+        cursor_location = bpy.context.scene.cursor.location.copy()
+        cursor_rotation = bpy.context.scene.cursor.rotation_euler.copy()
+
+        bpy.ops.view3d.snap_cursor_to_selected()
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.origin_set(type='ORIGIN_CURSOR', center='MEDIAN')
+        bpy.ops.object.mode_set(mode='EDIT')
+
+        bpy.context.scene.cursor.location = cursor_location
+        bpy.context.scene.cursor.rotation_euler = cursor_rotation
 
     
     def add_displace_modifier(self, reference_obj, axis, strength):

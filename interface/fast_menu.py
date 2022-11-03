@@ -255,6 +255,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if was_profile_extrude or self.sketch:
             layout.operator("nd.solidify", icon=icons['nd.solidify']) if not has_mod_solidify else None
+            layout.operator("nd.circularize", icon=icons['nd.circularize']) if not has_mod_circularize else None
             layout.separator()
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None

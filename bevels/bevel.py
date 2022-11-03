@@ -104,6 +104,14 @@ CTRL — Remove existing modifiers"""
             self.harden_normals = not self.harden_normals
             self.dirty = True
 
+        elif pressed(event, {'C'}):
+            self.clamp_overlap = not self.clamp_overlap
+            self.dirty = True
+
+        elif pressed(event, {'S'}):
+            self.loop_slide = not self.loop_slide
+            self.dirty = True
+
         elif pressed(event, {'W'}):
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
@@ -174,6 +182,8 @@ CTRL — Remove existing modifiers"""
         self.profile = 0.5
         self.angle = self.angles.index(int(get_preferences().default_smoothing_angle))
         self.harden_normals = False
+        self.loop_slide = False
+        self.clamp_overlap = False
 
         self.segments_input_stream = new_stream()
         self.width_input_stream = new_stream()
@@ -224,6 +234,9 @@ CTRL — Remove existing modifiers"""
         self.segments_prev = self.segments = self.bevel.segments
         self.profile_prev = self.profile = self.bevel.profile
         self.harden_normals_prev = self.harden_normals = self.bevel.harden_normals
+        self.loop_slide_prev = self.loop_slide = self.bevel.loop_slide
+        self.clamp_overlap_prev = self.clamp_overlap = self.bevel.use_clamp_overlap
+
         try:
             self.angle_prev = self.angle = self.angles.index(int(degrees(self.bevel.angle_limit)))
         except:
@@ -257,6 +270,8 @@ CTRL — Remove existing modifiers"""
         self.bevel.profile = self.profile
         self.bevel.harden_normals = self.harden_normals
         self.bevel.angle_limit = radians(self.angles[self.angle])
+        self.bevel.loop_slide = self.loop_slide
+        self.bevel.use_clamp_overlap = self.clamp_overlap
 
         self.dirty = False
 
@@ -326,6 +341,16 @@ def draw_text_callback(self):
         self,
         "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
         "Display the objects's wireframe over solid shading")
+
+    draw_hint(
+        self,
+        "Clamp Overlap [C]: {0}".format("Yes" if self.clamp_overlap else "No"),
+        "Clamp the width to avoid overlap")
+
+    draw_hint(
+        self,
+        "Loop Slide [S]: {0}".format("Yes" if self.loop_slide else "No"),
+        "Prefer sliding along edges to having even widths")
 
     draw_hint(
         self,

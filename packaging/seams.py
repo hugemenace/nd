@@ -30,7 +30,8 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 class ND_OT_seams(bpy.types.Operator):
     bl_idname = "nd.seams"
     bl_label = "UV Seams"
-    bl_description = "Interactively set UV seams & sharp edges"
+    bl_description = """Interactively set UV seams & sharp edges
+SHIFT — Skip interactive mode and immediately apply the default settings"""
     bl_options = {'UNDO'}
 
 
@@ -104,9 +105,11 @@ class ND_OT_seams(bpy.types.Operator):
 
     def invoke(self, context, event):
         self.dirty = False
+        self.fast_apply = event.shift
+
         self.base_angle_factor = 15
-        self.angle = degrees(context.active_object.data.auto_smooth_angle)
-        self.commit_auto_smooth = False
+        self.angle = int(get_preferences().default_smoothing_angle)
+        self.commit_auto_smooth = True
 
         self.angle_input_stream = new_stream()
 
@@ -114,6 +117,11 @@ class ND_OT_seams(bpy.types.Operator):
         bpy.ops.mesh.select_all(action='DESELECT')
 
         self.operate(context)
+
+        if self.fast_apply:
+            self.finish(context)
+
+            return {'FINISHED'}
 
         capture_modifier_keys(self, None, event.mouse_x)
 
@@ -159,7 +167,7 @@ class ND_OT_seams(bpy.types.Operator):
         if self.commit_auto_smooth:
             bpy.ops.object.shade_smooth()
             context.active_object.data.use_auto_smooth = True
-            context.active_object.data.auto_smooth_angle = radians(self.angle)
+            context.active_object.data.auto_smooth_angle = radians(180)
 
         unregister_draw_handler()
 
@@ -185,8 +193,8 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Sync Auto Smooth [A]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
-        "Synchronize auto-smooth with seams angle on complete")
+        "Auto Smooth [A]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
+        "Set auto smooth angle to 180° on completion")
     
 
 def register():

@@ -206,8 +206,9 @@ CTRL — Remove existing modifiers"""
 
         self.target_object = context.active_object
 
-        if not context.active_object.data.use_customdata_edge_bevel:
-            context.active_object.data.use_customdata_edge_bevel = True
+        if bpy.app.version < (3, 4, 0):
+            if not context.active_object.data.use_customdata_edge_bevel:
+                context.active_object.data.use_customdata_edge_bevel = True
 
         self.take_edges_snapshot(context)
 

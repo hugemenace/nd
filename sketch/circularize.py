@@ -30,7 +30,8 @@ from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 mod_bevel = "Bevel — ND CIRC"
 mod_weld = "Weld — ND CIRC"
-mod_summon_list = [mod_bevel, mod_weld]
+mod_decimate = "Decimate — ND CIRC"
+mod_summon_list = [mod_bevel, mod_weld, mod_decimate]
 
 
 class ND_OT_circularize(bpy.types.Operator):
@@ -64,7 +65,7 @@ class ND_OT_circularize(bpy.types.Operator):
         elif self.key_numeric_input:
             if self.key_no_modifiers:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
-                self.segments = int(get_stream_value(self.segments_input_stream, min_value=1))
+                self.segments = int(get_stream_value(self.segments_input_stream, min_value=2))
                 self.dirty = True
 
         elif self.key_reset:
@@ -80,7 +81,7 @@ class ND_OT_circularize(bpy.types.Operator):
         
         elif self.key_step_down:
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
-                self.segments = max(1, self.segments - segment_factor)
+                self.segments = max(2, self.segments - segment_factor)
                 self.dirty = True
 
         elif self.key_confirm:
@@ -93,7 +94,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
-                self.segments = max(1, self.segments + self.mouse_step)
+                self.segments = max(2, self.segments + self.mouse_step)
                 self.dirty = True
 
         if self.dirty:
@@ -184,6 +185,14 @@ class ND_OT_circularize(bpy.types.Operator):
         self.weld = weld
 
 
+    def add_decimate_modifier(self, context):
+        decimate = new_modifier(context.active_object, mod_decimate, 'DECIMATE', rectify=False)
+        decimate.decimate_type = 'DISSOLVE'
+        decimate.angle_limit = radians(1)
+
+        self.decimate = decimate
+
+
     def operate(self, context):
         self.bevel.segments = self.segments
 
@@ -193,6 +202,7 @@ class ND_OT_circularize(bpy.types.Operator):
     def finish(self, context):
         if not self.summoned:
             self.add_weld_modifier(context)
+            self.add_decimate_modifier(context)
 
         unregister_draw_handler()
     

@@ -153,6 +153,9 @@ class ND_OT_recon_poly(bpy.types.Operator):
                 self.inner_radius = max(0, self.inner_radius + self.mouse_value)
                 self.width = max(self.computed_inner_radius() * -1, self.width)
                 self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_alt:
+                self.segments = max(3, self.segments + self.mouse_step)
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -425,6 +428,7 @@ def draw_text_callback(self):
         "Alt (±2)  |  Shift + Alt (±1)",
         active=self.key_alt, 
         alt_mode=self.key_shift_alt,
+        mouse_value=True,
         input_stream=self.segments_input_stream)
 
     draw_property(

@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.35.0](https://github.com/hugemenace/nd/compare/v1.34.0...v1.35.0) (2022-11-05)
+
+
+### Features
+
+* add circularize operator ([722a14a](https://github.com/hugemenace/nd/commit/722a14aee4f7075ef95f5e6e89b6c1838293c1d8))
+* add clamp_overlap and loop_slide options to bevel operator ([3f72296](https://github.com/hugemenace/nd/commit/3f722961f99e3574e63f4d62260403233ca6f201))
+* add decimate modifier to circularize operator and set min segments to 2 ([d08f5bc](https://github.com/hugemenace/nd/commit/d08f5bcad833a8790c3f6c09a2c4d02430888fd4))
+* add immediate apply mode to seams operator, default to angle set in preferences, and lock auto smooth to 180 degrees ([ad2b167](https://github.com/hugemenace/nd/commit/ad2b167b15c08b7d51010ab2e549207e06fb30f8))
+* add mesh mode set_origin behaviour ([f116a8d](https://github.com/hugemenace/nd/commit/f116a8d052ac5f29b35a13f84cf709f88ef394f3))
+* add the circularize operator as a fast menu PE/sketch prediction ([3b89d57](https://github.com/hugemenace/nd/commit/3b89d57775ced86b1c343d66807c42502b1b5096))
+
+
+### Bug Fixes
+
+* add edge_bevel and overlay fixes for Blender 3.4 ([2700e23](https://github.com/hugemenace/nd/commit/2700e2357f73adf5eaf3b7efcabd27e4b4761c41))
+* add overlay_option_active_color back into reset_theme operator ([4cbc00b](https://github.com/hugemenace/nd/commit/4cbc00b0f8f7b6e95bb8c1fb5b9ecaf1aee8878c))
+* ensure vertex groups and edge weights are remove when applying modifiers ([587c2af](https://github.com/hugemenace/nd/commit/587c2af52f4a80ceece33b9662a27ef3efd68b3d))
+* fix profile_extrude and solidify normal calculations ([3ded508](https://github.com/hugemenace/nd/commit/3ded508bf018c2d3bcc28dfd5a7b9bfee46671d5))
+* only apply viewport visible modifiers ([8b7b7c2](https://github.com/hugemenace/nd/commit/8b7b7c203d5d11280b2569d1090c67ee86039545))
+* register recon_poly segments with mouse values system ([64929d4](https://github.com/hugemenace/nd/commit/64929d40e258f965a2f1686466ed97ee81faaccb))
+
 ## [1.34.0](https://github.com/hugemenace/nd/compare/v1.33.0...v1.34.0) (2022-09-19)
 
 

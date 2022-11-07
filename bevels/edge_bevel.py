@@ -287,6 +287,7 @@ CTRL — Remove existing modifiers"""
         if not previous_op:
             weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=True)
             weld.merge_threshold = 0.00001
+            weld.mode = 'CONNECTED'
 
             self.weld = weld
 

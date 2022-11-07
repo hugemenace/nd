@@ -301,6 +301,7 @@ CTRL — Remove existing modifiers"""
         if self.late_apply or not previous_op:
             weld = new_modifier(context.active_object, mod_weld_la if self.late_apply else mod_weld, 'WELD', rectify=False)
             weld.merge_threshold = 0.00001
+            weld.mode = 'CONNECTED'
 
             self.weld = weld
 

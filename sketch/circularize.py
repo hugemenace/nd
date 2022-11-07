@@ -181,6 +181,7 @@ class ND_OT_circularize(bpy.types.Operator):
     def add_weld_modifier(self, context):
         weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=False)
         weld.merge_threshold = 0.00001
+        weld.mode = 'CONNECTED'
 
         self.weld = weld
 

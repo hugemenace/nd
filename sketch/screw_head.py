@@ -269,7 +269,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Type: {0}".format(self.objects[self.head_type_index][1]),
-        "Browsing {} types...".format("custom" if self.objects[self.head_type_index][2] else "built-in"),
+        "Select from {} types".format("custom" if self.objects[self.head_type_index][2] else "built-in"),
         active=self.key_no_modifiers,
         mouse_value=True,
         alt_mode=False)

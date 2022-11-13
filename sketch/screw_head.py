@@ -129,12 +129,16 @@ class ND_OT_screw_head(bpy.types.Operator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.offset_input_stream) and self.key_ctrl:
+            if self.key_no_modifiers:
+                self.head_type_index = (self.head_type_index + self.mouse_step) % len(self.objects)
+                self.update_head_type(context)
+                self.dirty = True
+            elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
+                self.dirty = True
             elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale += self.mouse_value
-
-            self.dirty = True
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)
@@ -267,6 +271,7 @@ def draw_text_callback(self):
         "Type: {0}".format(self.objects[self.head_type_index][1]),
         "Browsing {} types...".format("custom" if self.objects[self.head_type_index][2] else "built-in"),
         active=self.key_no_modifiers,
+        mouse_value=True,
         alt_mode=False)
 
     draw_property(

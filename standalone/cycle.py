@@ -23,6 +23,7 @@ import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import hide_utils_collection, isolate_in_utils_collection
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_cycle(bpy.types.Operator):
@@ -96,6 +97,14 @@ SHIFT — Cycle through the modifier stack"""
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if get_preferences().enable_mouse_values:
+            if self.mod_cycle:
+                self.mod_current_index = max(-1, min(self.mod_current_index + self.mouse_step, self.mod_count - 1))
+                self.dirty = True
+            elif not self.mod_cycle and self.util_count > 0:
+                self.util_current_index = (self.util_current_index + self.mouse_step) % self.util_count
+                self.dirty = True
+
         if self.dirty:
             self.operate(context)
             
@@ -130,7 +139,7 @@ SHIFT — Cycle through the modifier stack"""
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -253,6 +262,7 @@ def draw_text_callback(self):
                 "Modifier: {0}".format("None" if self.mod_current_index == -1 else self.mod_names[self.mod_current_index]),
                 "Active: {0}  /  Total: {1}".format(self.mod_current_index + 1, self.mod_count),
                 active=True,
+                mouse_value=True,
                 alt_mode=False)
         else:
             draw_hint(self, "Whoops", "Looks like there are no modifiers to view.")
@@ -263,6 +273,7 @@ def draw_text_callback(self):
                 "Utility: {0}".format(self.util_mod_names[self.util_current_index]),
                 "Current: {0}  /  Total: {1}".format(self.util_current_index + 1, self.util_count),
                 active=True,
+                mouse_value=True,
                 alt_mode=False)
 
             draw_hint(

@@ -143,7 +143,7 @@ CTRL — Remove existing modifiers"""
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)

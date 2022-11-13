@@ -113,7 +113,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         create_duplicate_liftable_geometry(context, {self.mode}, 'ND — Geo Lift', not event.shift)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
         
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)

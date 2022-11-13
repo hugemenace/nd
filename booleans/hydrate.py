@@ -22,6 +22,7 @@ import bpy
 import bmesh
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_hydrate(bpy.types.Operator):
@@ -72,6 +73,11 @@ class ND_OT_hydrate(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
+        if get_preferences().enable_mouse_values:
+            if self.key_no_modifiers:
+                self.active_collection = (self.active_collection + self.mouse_step) % (len(self.all_collections) + 1)
+                self.dirty = True
+
         if self.dirty:
             self.operate(context)
             
@@ -91,7 +97,7 @@ class ND_OT_hydrate(bpy.types.Operator):
 
         self.operate(context)
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
@@ -156,6 +162,7 @@ def draw_text_callback(self):
         "Collection: {0}".format("N/A — Scene" if self.active_collection >= len(self.all_collections) else self.all_collections[self.active_collection]),
         "Where to place the new object...",
         active=True,
+        mouse_value=True,
         alt_mode=False)
 
     draw_hint(

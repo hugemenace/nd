@@ -104,7 +104,7 @@ class ND_OT_swap_solver(bpy.types.Operator):
         elif exact_solver_count == len(self.boolean_mods):
             self.solve_mode = 'EXACT'
             
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)

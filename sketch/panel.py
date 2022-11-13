@@ -163,7 +163,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         self.inset_input_stream = new_stream()
 
-        capture_modifier_keys(self)
+        capture_modifier_keys(self, None, event.mouse_x)
         
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)

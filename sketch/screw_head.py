@@ -21,7 +21,7 @@
 import bpy
 import bmesh
 import re
-from mathutils import Vector
+from mathutils import Vector, Matrix
 from math import radians
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
@@ -174,11 +174,11 @@ class ND_OT_screw_head(bpy.types.Operator):
             data_to.objects = data_from.objects
         
         self.obj = None
+        self.obj_matrix_basis = None
         self.objects = data_to.objects + custom_objects
         self.objects = [(obj, re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", obj.name), True if obj in custom_objects else False) for obj in self.objects]
 
         self.update_head_type(context)
-
         self.operate(context)
 
         capture_modifier_keys(self, None, event.mouse_x)
@@ -198,7 +198,6 @@ class ND_OT_screw_head(bpy.types.Operator):
 
     def update_head_type(self, context):
         if self.obj != None:
-            bpy.ops.object.modifier_remove(modifier=self.displace.name)
             bpy.context.collection.objects.unlink(self.obj)
 
         self.obj = self.objects[self.head_type_index][0]
@@ -216,20 +215,12 @@ class ND_OT_screw_head(bpy.types.Operator):
         self.obj.select_set(True)
         bpy.context.view_layer.objects.active = self.obj
 
-        self.add_displace_modifier(context)
-
-
-    def add_displace_modifier(self, context):
-        displace = new_modifier(self.obj, mod_displace, 'DISPLACE', rectify=False)
-        displace.direction = 'Z'
-        displace.space = 'LOCAL'
-        displace.mid_level = 0
-
-        self.displace = displace
+        if self.obj_matrix_basis == None:
+            self.obj_matrix_basis = self.obj.matrix_basis.copy()
 
 
     def operate(self, context):
-        self.displace.strength = self.offset
+        self.obj.matrix_basis = self.obj_matrix_basis @ Matrix.Translation((0.0, 0.0, self.offset))
         self.obj.scale = Vector((self.scale, self.scale, self.scale))
 
         self.dirty = False
@@ -239,11 +230,6 @@ class ND_OT_screw_head(bpy.types.Operator):
         objects_to_remove = [obj[0] for obj in self.objects if obj[0].name != self.obj.name]
         for obj in objects_to_remove:
             bpy.data.meshes.remove(obj.data, do_unlink=True)
-
-        if self.offset != 0:
-            bpy.ops.object.modifier_apply(modifier=self.displace.name)
-        else:
-            bpy.ops.object.modifier_remove(modifier=self.displace.name)
 
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 

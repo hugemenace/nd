@@ -269,6 +269,8 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
+    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+
     draw_property(
         self, 
         "Count: {0}".format(self.axes[self.axis][1]),
@@ -281,7 +283,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Offset: {0:.2f}".format(self.axes[self.axis][2]),
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * unit_scale, (self.base_offset_factor / 10) * unit_scale),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

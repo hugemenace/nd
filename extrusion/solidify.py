@@ -260,19 +260,21 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
+    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+
     draw_property(
         self, 
-        "Thickness: {0:.2f}".format(self.thickness * 1000), 
-        "(±{0:.2f})  |  Shift + (±{1:.2f})".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
+        "Thickness: {0:.2f}".format(self.thickness * unit_scale), 
+        "(±{0:.2f})  |  Shift + (±{1:.2f})".format(self.base_thickness_factor * unit_scale, (self.base_thickness_factor / 10) * unit_scale),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.thickness_input_stream)
 
     draw_property(
-        self, 
-        "Offset: {0:.2f}".format(self.offset * 1000), 
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * 1000, (self.base_offset_factor / 10) * 1000),
+        self,
+        "Offset: {0:.2f}".format(self.offset * unit_scale), 
+        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * unit_scale, (self.base_offset_factor / 10) * unit_scale),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

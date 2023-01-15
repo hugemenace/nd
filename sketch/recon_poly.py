@@ -413,10 +413,12 @@ class ND_OT_recon_poly(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
+    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+
     draw_property(
         self,
-        "{0}: {1:.2f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * 1000),
-        "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_width_factor * 1000, (self.base_width_factor / 10) * 1000),
+        "{0}: {1:.2f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * unit_scale),
+        "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_width_factor * unit_scale, (self.base_width_factor / 10) * unit_scale),
         active=self.key_no_modifiers, 
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -433,8 +435,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Inner Radius: {0:.2f}".format(self.inner_radius * 1000), 
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_inner_radius_factor * 1000, (self.base_inner_radius_factor / 10) * 1000),
+        "Inner Radius: {0:.2f}".format(self.inner_radius * unit_scale), 
+        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_inner_radius_factor * unit_scale, (self.base_inner_radius_factor / 10) * unit_scale),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

@@ -233,10 +233,12 @@ class ND_OT_bool_inset(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
+    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+
     draw_property(
         self, 
-        "Thickness: {0:.2f}".format(self.thickness * 1000), 
-        "(±{0:.2f})  |  Shift + (±{1:.2f})".format(self.base_thickness_factor * 1000, (self.base_thickness_factor / 10) * 1000),
+        "Thickness: {0:.2f}".format(self.thickness * unit_scale), 
+        "(±{0:.2f})  |  Shift + (±{1:.2f})".format(self.base_thickness_factor * unit_scale, (self.base_thickness_factor / 10) * unit_scale),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,

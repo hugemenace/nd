@@ -281,14 +281,16 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 def draw_text_callback(self):
     draw_header(self)
 
+    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length    
+
     if self.stage == 0:
         draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
 
     if self.stage == 1:
         draw_property(
             self,
-            "Inset Amount: {0:.2f}".format(self.inset * 1000),
-            "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_inset_factor * 1000, (self.base_inset_factor / 10) * 1000),
+            "Inset Amount: {0:.2f}".format(self.inset * unit_scale),
+            "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_inset_factor * unit_scale, (self.base_inset_factor / 10) * unit_scale),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,

@@ -44,7 +44,7 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             # Remove Blender's .001, .002, etc naming convention
-            old_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", obj.name)
+            old_name = re.sub(r"(.+?)(?:\.[0-9]{3})+$", r"\1", obj.name)
 
             name_segments = old_name.split("_")
             

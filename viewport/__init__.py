@@ -24,6 +24,7 @@ from . import toggle_face_orientation
 from . import toggle_utils_collection
 from . import toggle_clear_view
 from . import toggle_custom_view
+from . import silhouette
 
 
 registerables = (
@@ -32,6 +33,7 @@ registerables = (
     toggle_utils_collection,
     toggle_clear_view,
     toggle_custom_view,
+    silhouette,
 )
 
 

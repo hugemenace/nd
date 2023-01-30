@@ -85,7 +85,6 @@ SHIFT — Undo faux origin translation"""
         location = context.active_object.location.copy()
 
         mods = [mod for mod in context.active_object.modifiers if mod.type == 'DISPLACE' and mod.name.endswith('— ND FO')]
-        print(mods)
         for mod in mods:
             if mod.direction == 'X':
                 location.x = mod.strength

@@ -21,6 +21,7 @@
 import bpy
 import bmesh
 from math import radians
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -33,40 +34,20 @@ mod_weld = "Weld — ND EB"
 mod_summon_list = [mod_bevel, mod_weld]
 
 
-class ND_OT_edge_bevel(bpy.types.Operator):
+class ND_OT_edge_bevel(BaseOperator):
     bl_idname = "nd.edge_bevel"
     bl_label = "Edge Bevel"
     bl_description = """Adds a weighted edge bevel modifier to the selected object
 SHIFT — Place modifiers at the top of the stack
 CTRL — Remove existing modifiers"""
-    bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
+    def do_modal(self, context, event):
         weight_factor = 0.01 if self.key_shift else 0.1
-        width_factor = 0.01 if self.key_shift else 0.1
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
 
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.weight_input_stream = update_stream(self.weight_input_stream, event.type)
                 self.weight = get_stream_value(self.weight_input_stream)
@@ -81,10 +62,10 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_ctrl_alt:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
-                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.width = get_stream_value(self.width_input_stream, self.unit_scaled_factor)
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_no_modifiers:
                 self.weight_input_stream = new_stream()
                 self.weight = 0
@@ -99,26 +80,18 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_ctrl_alt:
                 self.width_input_stream = new_stream()
-                self.width = 0.5
+                self.width = 0.05 * self.unit_factor
                 self.dirty = True
 
-        elif pressed(event, {'H'}):
+        if pressed(event, {'H'}):
             self.harden_normals = not self.harden_normals
             self.dirty = True
 
-        elif pressed(event, {'W'}):
+        if pressed(event, {'W'}):
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
 
-        elif self.key_increase_factor:
-            if no_stream(self.weight_input_stream) and self.key_no_modifiers:
-                self.base_weight_factor = min(1, self.base_weight_factor * 10.0)
-
-        elif self.key_decrease_factor:
-            if no_stream(self.weight_input_stream) and self.key_no_modifiers:
-                self.base_weight_factor = max(0.001, self.base_weight_factor / 10.0)
-        
-        elif self.key_step_up:
+        if self.key_step_up:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
@@ -126,13 +99,13 @@ CTRL — Remove existing modifiers"""
                 self.profile = min(1, self.profile + profile_factor)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
-                self.width = max(0, self.width + width_factor)
+                self.width = max(0, self.width + self.step_size)
                 self.dirty = True
             elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight + weight_factor))
                 self.dirty = True
         
-        elif self.key_step_down:
+        if self.key_step_down:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
                 self.dirty = True
@@ -140,18 +113,18 @@ CTRL — Remove existing modifiers"""
                 self.profile = max(0, self.profile - profile_factor)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
-                self.width = max(0, self.width - width_factor)
+                self.width = max(0, self.width - self.step_size)
                 self.dirty = True
             elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight - weight_factor))
                 self.dirty = True
         
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
@@ -168,15 +141,8 @@ CTRL — Remove existing modifiers"""
                 self.weight = max(0, min(1, self.weight + self.mouse_value))
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
             for object in context.selected_objects:
@@ -195,7 +161,7 @@ CTRL — Remove existing modifiers"""
 
         self.segments = 1
         self.weight = 0
-        self.width = 0.5
+        self.width = 0.05 * self.unit_factor
         self.profile = 0.5
         self.harden_normals = False
 
@@ -366,12 +332,10 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
-    
     draw_property(
         self,
-        "Weight: {0:.2f} ({1:.2f})".format(self.weight, self.width * unit_scale * self.weight),
-        "(±0.1)  |  Shift (±0.01)",
+        f"Weight: {(self.weight):.2f} ({(self.width * self.display_unit_scale * self.weight):.2f}{self.unit_suffix})",
+        self.generate_step_hint(0.1, 0.01),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -380,7 +344,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Segments: {}".format(self.segments), 
-        "Alt (±2)  |  Shift (±1)",
+        self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,
@@ -389,7 +353,7 @@ def draw_text_callback(self):
     draw_property(
         self, 
         "Profile: {0:.2f}".format(self.profile),
-        "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
+        self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,
@@ -397,8 +361,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Width: {0:.2f}".format(self.width * unit_scale),
-        "Ctrl + Alt (±100) | Shift + Ctrl + Alt (±10)",
+        f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
+        self.generate_key_hint("Ctrl + Alt", self.unit_step_hint),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
         mouse_value=True,

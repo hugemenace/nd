@@ -24,3 +24,48 @@ from . addons import get_registered_addon_name
 
 def get_preferences():
     return bpy.context.preferences.addons[get_registered_addon_name()].preferences
+
+
+def get_scene_unit_scale():
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        return 1.0
+
+    return bpy.context.scene.unit_settings.scale_length
+
+
+def get_scene_unit_factor():
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        return 1.0
+
+    units = {
+        'KILOMETERS' : 1000,
+        'METERS'     : 1,
+        'CENTIMETERS': 0.01,
+        'MILLIMETERS': 0.001,
+        'MICROMETERS': 1e-6,
+        'MILES'      : 1609.34,
+        'FEET'       : 0.3048,
+        'INCHES'     : 0.0254,
+        'THOU'       : 0.0254 / 1000,
+    }
+
+    return units[bpy.context.scene.unit_settings.length_unit]
+
+
+def get_scene_unit_suffix():
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        return ""
+
+    units = {
+        'KILOMETERS' : 'km',
+        'METERS'     : 'm',
+        'CENTIMETERS': 'cm',
+        'MILLIMETERS': 'mm',
+        'MICROMETERS': 'μm',
+        'MILES'      : 'mi',
+        'FEET'       : "'",
+        'INCHES'     : '"',
+        'THOU'       : 'thou',
+    }
+
+    return units[bpy.context.scene.unit_settings.length_unit]

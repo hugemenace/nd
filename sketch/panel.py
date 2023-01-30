@@ -22,6 +22,7 @@ import bpy
 import bmesh
 from math import radians
 from mathutils import Matrix
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
@@ -30,107 +31,81 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.objects import create_duplicate_liftable_geometry
 
 
-class ND_OT_panel(bpy.types.Operator):
+class ND_OT_panel(BaseOperator):
     bl_idname = "nd.panel"
     bl_label = "Panel"
     bl_description = """Combination operator which allows you to select faces, inset, and then solidify them
 SHIFT — Do not clean duplicate mesh before extraction"""
-    bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        inset_factor = (self.base_inset_factor / 10.0) if self.key_shift else self.base_inset_factor
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-            
-            return {'PASS_THROUGH'}
-
-        elif get_preferences().enable_experimental_features and self.key_undo:
+    def do_modal(self, context, event):
+        if get_preferences().enable_experimental_features and self.key_undo:
             return {'PASS_THROUGH'}
         
-        elif get_preferences().enable_experimental_features and self.key_redo:
+        if get_preferences().enable_experimental_features and self.key_redo:
             return {'PASS_THROUGH'}
 
-        elif get_preferences().enable_experimental_features and pressed(event, {'W'}):
+        if get_preferences().enable_experimental_features and pressed(event, {'W'}):
             return {'PASS_THROUGH'}
 
-        elif get_preferences().enable_experimental_features and pressed(event, {'C'}):
+        if get_preferences().enable_experimental_features and pressed(event, {'C'}):
             return {'PASS_THROUGH'}
 
-        elif self.key_increase_factor:
-            if self.stage == 1:
-                if no_stream(self.inset_input_stream) and self.key_no_modifiers:
-                    self.base_inset_factor = min(1, self.base_inset_factor * 10.0)
-
-        elif self.key_decrease_factor:
-            if self.stage == 1:
-                if no_stream(self.inset_input_stream) and self.key_no_modifiers:
-                    self.base_inset_factor = max(0.001, self.base_inset_factor / 10.0)
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.stage == 1:
                 if self.key_no_modifiers:
                     self.inset_input_stream = update_stream(self.inset_input_stream, event.type)
-                    self.inset = get_stream_value(self.inset_input_stream, 0.001)
+                    self.inset = get_stream_value(self.inset_input_stream, self.unit_scaled_factor)
                     self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.stage == 1:
                 if self.key_no_modifiers:
                     self.inset_input_stream = new_stream()
                     self.inset = 0
                     self.dirty = True
 
-        elif pressed(event, {'F'}):
+        if pressed(event, {'F'}):
             if self.stage == 1:
                 self.individual = not self.individual
                 self.dirty = True
 
-        elif pressed(event, {'E'}):
+        if pressed(event, {'E'}):
             self.xray_mode = not self.xray_mode
             self.dirty = True
 
-        elif self.key_step_up:
+        if self.key_step_up:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
-                    self.inset += inset_factor
+                    self.inset += self.step_size
                     self.dirty = True
         
-        elif self.key_step_down:
+        if self.key_step_down:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
-                    self.inset = max(0, self.inset - inset_factor)
+                    self.inset = max(0, self.inset - self.step_size)
                     self.dirty = True
 
-        elif self.stage == 0 and self.key_confirm_alternative:
+        if self.stage == 0 and self.key_confirm_alternative:
             if self.has_valid_selection(context):
                 self.isolate_geometry(context)
                 self.stage = 1
                 self.dirty = True
             
-        elif self.stage == 1 and self.key_confirm:
+        if self.stage == 1 and self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.stage == 0 and self.key_left_click:
+        if self.stage == 0 and self.key_left_click:
             return {'PASS_THROUGH'}
 
-        elif self.key_cancel:
+        if self.key_cancel:
             self.revert(context)
 
             return {'CANCELLED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
@@ -139,17 +114,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                     self.inset = max(0, self.inset + self.mouse_value)
                     self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
-        self.base_inset_factor = 0.01
-
+    def do_invoke(self, context, event):
         self.dirty = False
 
         self.xray_mode = False
@@ -281,16 +247,14 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length    
-
     if self.stage == 0:
         draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
 
     if self.stage == 1:
         draw_property(
             self,
-            "Inset Amount: {0:.2f}".format(self.inset * unit_scale),
-            "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_inset_factor * unit_scale, (self.base_inset_factor / 10) * unit_scale),
+            f"Inset Amount: {(self.inset * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.unit_step_hint,
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,

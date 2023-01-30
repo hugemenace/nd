@@ -52,9 +52,6 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.key_toggle_pin_overlay = pressed(event, {get_preferences().overlay_pin_key})
     cls.key_toggle_operator_passthrough = pressed(event, {get_preferences().overlay_pause_key})
     
-    cls.key_increase_factor = pressed(event, {get_preferences().overlay_increase_factor})
-    cls.key_decrease_factor = pressed(event, {get_preferences().overlay_decrease_factor})
-
     cls.key_step_up = detected(event, {'WHEELUPMOUSE'}) or pressed(event, {'UP_ARROW'}) or pressed(event, {'RIGHT_ARROW'})
     cls.key_step_down = detected(event, {'WHEELDOWNMOUSE'}) or pressed(event, {'DOWN_ARROW'}) or pressed(event, {'LEFT_ARROW'})
     

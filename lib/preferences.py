@@ -27,10 +27,16 @@ def get_preferences():
 
 
 def get_scene_unit_scale():
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        return 1.0
+
     return bpy.context.scene.unit_settings.scale_length
 
 
 def get_scene_unit_factor():
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        return 1.0
+
     units = {
         'KILOMETERS' : 1000,
         'METERS'     : 1,
@@ -47,6 +53,9 @@ def get_scene_unit_factor():
 
 
 def get_scene_unit_suffix():
+    if bpy.context.scene.unit_settings.system == 'NONE':
+        return ""
+
     units = {
         'KILOMETERS' : 'km',
         'METERS'     : 'm',

@@ -38,6 +38,7 @@ def get_scene_unit_factor():
         return 1.0
 
     units = {
+        'ADAPTIVE'   : 1,
         'KILOMETERS' : 1000,
         'METERS'     : 1,
         'CENTIMETERS': 0.01,
@@ -57,6 +58,7 @@ def get_scene_unit_suffix():
         return ""
 
     units = {
+        'ADAPTIVE'   : 'm',
         'KILOMETERS' : 'km',
         'METERS'     : 'm',
         'CENTIMETERS': 'cm',

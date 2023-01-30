@@ -347,18 +347,6 @@ class NDPreferences(AddonPreferences):
         default="X",
     )
 
-    overlay_increase_factor: EnumProperty(
-        name="Increase Option Factor",
-        items=lib.overlay_keys.overlay_keys_enum,
-        default="RIGHT_BRACKET",
-    )
-
-    overlay_decrease_factor: EnumProperty(
-        name="Decrease Option Factor",
-        items=lib.overlay_keys.overlay_keys_enum,
-        default="LEFT_BRACKET",
-    )
-
     custom_screw_heads_path: StringProperty(
         name="Custom Screw Heads",
         subtype='FILE_PATH',
@@ -544,9 +532,7 @@ class NDPreferences(AddonPreferences):
         overlay_prefs = [
             "overlay_pin_key",
             "overlay_pause_key",
-            "overlay_reset_key",
-            "overlay_increase_factor",
-            "overlay_decrease_factor"]
+            "overlay_reset_key"]
 
         column = box.column(align=True)
         row = column.row()
@@ -624,8 +610,6 @@ def register():
             prefs.overlay_pin_key = "P"
             prefs.overlay_pause_key = "BACK_SLASH"
             prefs.overlay_reset_key = "X"
-            prefs.overlay_increase_factor = "RIGHT_BRACKET"
-            prefs.overlay_decrease_factor = "LEFT_BRACKET"
             prefs.lock_overlay_pinning = True
             prefs.enable_mouse_values = True
         prefs.local_user_prefs_version = version

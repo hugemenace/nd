@@ -21,6 +21,7 @@
 import bpy
 import bmesh
 from math import radians, degrees
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -35,12 +36,11 @@ mod_mesh_summon_list = [mod_displace, mod_screw]
 mod_curve_summon_list = [mod_screw]
 
 
-class ND_OT_screw(bpy.types.Operator):
+class ND_OT_screw(BaseOperator):
     bl_idname = "nd.screw"
     bl_label = "Screw"
     bl_description = """Adds a screw modifier tuned for converting a sketch into a cylindrical object
 CTRL — Remove existing modifiers"""
-    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
@@ -48,7 +48,7 @@ CTRL — Remove existing modifiers"""
 
         segment_factor = 1 if self.key_shift else 2
         angle_factor = 1 if self.key_shift else 10
-        offset_factor = (self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor
+        offset_factor = ((self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor) * self.unit_factor
 
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
@@ -77,7 +77,7 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
-                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001 * self.unit_factor)
                 self.dirty = True
 
         elif self.key_reset:
@@ -163,7 +163,7 @@ CTRL — Remove existing modifiers"""
         return {'RUNNING_MODAL'}
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND SCR')
             return {'FINISHED'}
@@ -317,7 +317,7 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
 
     draw_property(
         self,
@@ -340,8 +340,8 @@ def draw_text_callback(self):
     if self.object_type == 'MESH':
         draw_property(
             self,
-            "Offset: {0:.2f}".format(self.offset),
-            "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * unit_scale, (self.base_offset_factor / 10) * unit_scale),
+            f"Offset: {(self.offset * unit_scale):.2f}{self.unit_suffix}",
+            f"Ctrl (±{(self.base_offset_factor * 1.0):.2f}{self.unit_suffix})  |  Shift + Ctrl (±{((self.base_offset_factor / 10) * 1.0):.2f}{self.unit_suffix})",
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
             mouse_value=True,

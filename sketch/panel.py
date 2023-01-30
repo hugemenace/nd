@@ -22,6 +22,7 @@ import bpy
 import bmesh
 from math import radians
 from mathutils import Matrix
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
@@ -30,18 +31,17 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.objects import create_duplicate_liftable_geometry
 
 
-class ND_OT_panel(bpy.types.Operator):
+class ND_OT_panel(BaseOperator):
     bl_idname = "nd.panel"
     bl_label = "Panel"
     bl_description = """Combination operator which allows you to select faces, inset, and then solidify them
 SHIFT — Do not clean duplicate mesh before extraction"""
-    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        inset_factor = (self.base_inset_factor / 10.0) if self.key_shift else self.base_inset_factor
+        inset_factor = ((self.base_inset_factor / 10.0) if self.key_shift else self.base_inset_factor) * self.unit_factor
 
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)
@@ -80,7 +80,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             if self.stage == 1:
                 if self.key_no_modifiers:
                     self.inset_input_stream = update_stream(self.inset_input_stream, event.type)
-                    self.inset = get_stream_value(self.inset_input_stream, 0.001)
+                    self.inset = get_stream_value(self.inset_input_stream, 0.001 * self.unit_factor)
                     self.dirty = True
 
         elif self.key_reset:
@@ -147,7 +147,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         return {'RUNNING_MODAL'}
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         self.base_inset_factor = 0.01
 
         self.dirty = False
@@ -281,7 +281,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length    
+    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
 
     if self.stage == 0:
         draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
@@ -289,8 +289,8 @@ def draw_text_callback(self):
     if self.stage == 1:
         draw_property(
             self,
-            "Inset Amount: {0:.2f}".format(self.inset * unit_scale),
-            "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_inset_factor * unit_scale, (self.base_inset_factor / 10) * unit_scale),
+            f"Inset Amount: {(self.inset * unit_scale):.2f}{self.unit_suffix}",
+            f"(±{(self.base_inset_factor * 1.0):.2f}{self.unit_suffix})  |  Shift (±{((self.base_inset_factor / 10) * 1.0):.2f}{self.unit_suffix})",
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,

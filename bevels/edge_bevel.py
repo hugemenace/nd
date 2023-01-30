@@ -21,6 +21,7 @@
 import bpy
 import bmesh
 from math import radians
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -33,20 +34,19 @@ mod_weld = "Weld — ND EB"
 mod_summon_list = [mod_bevel, mod_weld]
 
 
-class ND_OT_edge_bevel(bpy.types.Operator):
+class ND_OT_edge_bevel(BaseOperator):
     bl_idname = "nd.edge_bevel"
     bl_label = "Edge Bevel"
     bl_description = """Adds a weighted edge bevel modifier to the selected object
 SHIFT — Place modifiers at the top of the stack
 CTRL — Remove existing modifiers"""
-    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
         weight_factor = 0.01 if self.key_shift else 0.1
-        width_factor = 0.01 if self.key_shift else 0.1
+        width_factor = ((self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor) * self.unit_factor
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
 
@@ -81,7 +81,7 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_ctrl_alt:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
-                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.width = get_stream_value(self.width_input_stream, 0.001 * self.unit_factor)
                 self.dirty = True
 
         elif self.key_reset:
@@ -99,8 +99,16 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_ctrl_alt:
                 self.width_input_stream = new_stream()
-                self.width = 0.5
+                self.width = 0.05 * self.unit_factor
                 self.dirty = True
+
+        elif self.key_increase_factor:
+            if no_stream(self.width_input_stream) and self.key_ctrl_alt:
+                self.base_width_factor = min(1, self.base_width_factor * 10.0)
+
+        elif self.key_decrease_factor:
+            if no_stream(self.width_input_stream) and self.key_ctrl_alt:
+                self.base_width_factor = max(0.001, self.base_width_factor / 10.0)
 
         elif pressed(event, {'H'}):
             self.harden_normals = not self.harden_normals
@@ -176,7 +184,7 @@ CTRL — Remove existing modifiers"""
         return {'RUNNING_MODAL'}
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
             for object in context.selected_objects:
@@ -193,9 +201,11 @@ CTRL — Remove existing modifiers"""
         self.dirty = False
         self.early_apply = event.shift
 
+        self.base_width_factor = 0.01
+
         self.segments = 1
         self.weight = 0
-        self.width = 0.5
+        self.width = 0.05 * self.unit_factor
         self.profile = 0.5
         self.harden_normals = False
 
@@ -366,11 +376,11 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
     
     draw_property(
         self,
-        "Weight: {0:.2f} ({1:.2f})".format(self.weight, self.width * unit_scale * self.weight),
+        f"Weight: {(self.weight):.2f} ({(self.width * unit_scale * self.weight):.2f}{self.unit_suffix})",
         "(±0.1)  |  Shift (±0.01)",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -397,8 +407,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Width: {0:.2f}".format(self.width * unit_scale),
-        "Ctrl + Alt (±100) | Shift + Ctrl + Alt (±10)",
+        f"Width: {(self.width * unit_scale):.2f}{self.unit_suffix}",
+        f"(±{(self.base_width_factor * 1.0):.2f}{self.unit_suffix})  |  Shift (±{((self.base_width_factor / 10) * 1.0):.2f}{self.unit_suffix})",
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
         mouse_value=True,

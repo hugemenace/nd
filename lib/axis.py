@@ -87,7 +87,7 @@ def update_axis(cls):
 
         # Draw the axis through the origin point.
         coords.append(origin + mx.to_3x3() @ axis * -1000)
-        coords.append(origin + mx.to_3x3() @ axis * 1000)
+        coords.append(origin + mx.to_3x3() @ axis * 1.0)
 
         shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
         shader.bind()

@@ -21,6 +21,7 @@
 import bpy
 import bmesh
 from math import radians, degrees
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -33,18 +34,17 @@ mod_weld = "Weld — ND B"
 mod_summon_list = [mod_bevel]
 
 
-class ND_OT_bevel(bpy.types.Operator):
+class ND_OT_bevel(BaseOperator):
     bl_idname = "nd.bevel"
     bl_label = "Bevel"
     bl_description = """Adds a bevel modifier to the selected object
 CTRL — Remove existing modifiers"""
-    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
+        width_factor = ((self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor) * self.unit_factor
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
 
@@ -67,7 +67,7 @@ CTRL — Remove existing modifiers"""
         elif self.key_numeric_input:
             if self.key_no_modifiers:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
-                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.width = get_stream_value(self.width_input_stream, 0.001 * self.unit_factor)
                 self.dirty = True
             elif self.key_alt:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
@@ -168,7 +168,7 @@ CTRL — Remove existing modifiers"""
         return {'RUNNING_MODAL'}
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND B')
             return {'FINISHED'}
@@ -306,12 +306,12 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
     
     draw_property(
         self,
-        "Width: {0:.2f}".format(self.width * unit_scale), 
-        "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_width_factor * unit_scale, (self.base_width_factor / 10) * unit_scale),
+        f"Width: {(self.width * unit_scale):.2f}{self.unit_suffix}",
+        f"(±{(self.base_width_factor * 1.0):.2f}{self.unit_suffix})  |  Shift (±{((self.base_width_factor / 10) * 1.0):.2f}{self.unit_suffix})",
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,

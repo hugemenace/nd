@@ -23,6 +23,7 @@ import bmesh
 import re
 from mathutils import Vector, Matrix
 from math import radians
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.assets import get_asset_path
@@ -35,17 +36,16 @@ from .. lib.modifiers import new_modifier
 mod_displace = "Offset — ND SH"
 
 
-class ND_OT_screw_head(bpy.types.Operator):
+class ND_OT_screw_head(BaseOperator):
     bl_idname = "nd.screw_head"
     bl_label = "Screw Head"
     bl_description = "Quickly create a variety of common screw heads"
-    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        offset_factor = (self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor
+        offset_factor = ((self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor) * self.unit_factor
         scale_factor = (self.base_scale_factor / 10.0) if self.key_shift else self.base_scale_factor
 
         if self.key_toggle_operator_passthrough:
@@ -71,7 +71,7 @@ class ND_OT_screw_head(bpy.types.Operator):
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
-                self.offset = get_stream_value(self.offset_input_stream, 0.001)
+                self.offset = get_stream_value(self.offset_input_stream, 0.001 * self.unit_factor)
                 self.dirty = True
 
         elif self.key_reset:
@@ -148,7 +148,7 @@ class ND_OT_screw_head(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         self.dirty = False
         self.base_offset_factor = 0.01
         self.base_scale_factor = 0.01
@@ -252,7 +252,7 @@ class ND_OT_screw_head(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
     
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
 
     draw_property(
         self,
@@ -273,8 +273,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Offset: {0:.2f}".format(self.offset * unit_scale), 
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_offset_factor * unit_scale, (self.base_offset_factor / 10) * unit_scale),
+        f"Offset: {(self.offset * unit_scale):.2f}{self.unit_suffix}", 
+        f"Ctrl (±{(self.base_offset_factor * 1.0):.2f}{self.unit_suffix})  |  Shift + Ctrl (±{((self.base_offset_factor / 10) * 1.0):.2f}{self.unit_suffix})",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

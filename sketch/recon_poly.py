@@ -21,6 +21,7 @@
 import bpy
 import bmesh
 from math import radians, isclose, cos
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
@@ -36,18 +37,17 @@ mod_decimate = "Decimate — ND RCP"
 mod_summon_list = [mod_displace, mod_screw_1, mod_screw_2]
 
 
-class ND_OT_recon_poly(bpy.types.Operator):
+class ND_OT_recon_poly(BaseOperator):
     bl_idname = "nd.recon_poly"
     bl_label = "Recon Poly"
     bl_description = "Adds a regular convex polygon at the 3D cursor"
-    bl_options = {'UNDO'}
 
 
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        inner_radius_factor = (self.base_inner_radius_factor / 10.0) if self.key_shift else self.base_inner_radius_factor
-        width_factor = (self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor
+        inner_radius_factor = ((self.base_inner_radius_factor / 10.0) if self.key_shift else self.base_inner_radius_factor) * self.unit_factor
+        width_factor = ((self.base_width_factor / 10.0) if self.key_shift else self.base_width_factor) * self.unit_factor
         segment_factor = 1 if self.key_shift else 2
 
         if self.key_toggle_operator_passthrough:
@@ -69,11 +69,11 @@ class ND_OT_recon_poly(bpy.types.Operator):
         elif self.key_numeric_input:
             if self.key_no_modifiers:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
-                self.width = get_stream_value(self.width_input_stream, 0.001)
+                self.width = get_stream_value(self.width_input_stream, 0.001 * self.unit_factor)
                 self.dirty = True
             elif self.key_ctrl:
                 self.inner_radius_input_stream = update_stream(self.inner_radius_input_stream, event.type)
-                self.inner_radius = get_stream_value(self.inner_radius_input_stream, 0.001)
+                self.inner_radius = get_stream_value(self.inner_radius_input_stream, 0.001 * self.unit_factor)
                 self.dirty = True
             elif self.key_alt:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
@@ -165,7 +165,7 @@ class ND_OT_recon_poly(bpy.types.Operator):
         return {'RUNNING_MODAL'}
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         self.dirty = False
         self.base_inner_radius_factor = 0.001
         self.base_width_factor = 0.001
@@ -413,12 +413,12 @@ class ND_OT_recon_poly(bpy.types.Operator):
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = 1000 * bpy.data.scenes["Scene"].unit_settings.scale_length
+    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
 
     draw_property(
         self,
-        "{0}: {1:.2f}".format("Width" if self.inner_radius > 0 else "Radius", self.width * unit_scale),
-        "(±{0:.2f})  |  Shift (±{1:.2f})".format(self.base_width_factor * unit_scale, (self.base_width_factor / 10) * unit_scale),
+        f"{('Width' if self.inner_radius > 0 else 'Radius')}: {(self.width * unit_scale):.2f}{self.unit_suffix}",
+        f"(±{(self.base_width_factor * 1.0):.2f}{self.unit_suffix})  |  Shift (±{((self.base_width_factor / 10) * 1.0):.2f}{self.unit_suffix})",
         active=self.key_no_modifiers, 
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -435,8 +435,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Inner Radius: {0:.2f}".format(self.inner_radius * unit_scale), 
-        "Ctrl (±{0:.2f})  |  Shift + Ctrl (±{1:.2f})".format(self.base_inner_radius_factor * unit_scale, (self.base_inner_radius_factor / 10) * unit_scale),
+        f"Inner Radius: {(self.inner_radius * unit_scale):.2f}{self.unit_suffix}", 
+        f"Ctrl (±{(self.base_inner_radius_factor * 1.0):.2f}{self.unit_suffix})  |  Shift + Ctrl (±{((self.base_inner_radius_factor / 10) * 1.0):.2f}{self.unit_suffix})",
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

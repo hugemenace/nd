@@ -188,13 +188,13 @@ class NDPreferences(AddonPreferences):
         step=0.01,
     )
 
-    mouse_value_scalar: FloatProperty(
-        name="Mouse Value Scalar",
-        default=0.0025,
-        min=0.0001,
-        max=10,
-        precision=4,
-        step=0.01,
+    unit_increment_size: FloatProperty(
+        name="Unit Increment Size",
+        default=1,
+        min=0.01,
+        max=100,
+        precision=2,
+        step=0.1,
     )
 
     mouse_value_steps: IntProperty(
@@ -498,6 +498,7 @@ class NDPreferences(AddonPreferences):
             ["enable_mouse_values"],
             ["mouse_value_scalar"],
             ["mouse_value_steps"],
+            ["unit_increment_size"],
             ["enable_quick_favourites"],
             ["lock_overlay_pinning"],
             ["enable_sidebar"],

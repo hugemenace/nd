@@ -19,7 +19,7 @@
 # ---
 
 import bpy
-from . preferences import is_scene_compatible, get_scene_unit_factor, get_scene_unit_suffix, get_scene_unit_scale
+from . preferences import get_scene_unit_factor, get_scene_unit_suffix, get_scene_unit_scale, get_preferences
 from .. lib.overlay import update_overlay, toggle_pin_overlay, toggle_operator_passthrough
 from .. lib.events import capture_modifier_keys
 
@@ -50,7 +50,9 @@ class BaseOperator(bpy.types.Operator):
 
         self.unit_scaled_factor = self.unit_factor / self.unit_scale
         self.display_unit_scale = self.unit_scale / self.unit_factor
-        self.unit_step_hint = self.generate_step_hint(f"{(self.unit_scale * 0.1):.2f}{self.unit_suffix}", f"{(self.unit_scale * 0.01):.2f}{self.unit_suffix}")
+
+        unit_increment_size = get_preferences().unit_increment_size
+        self.unit_step_hint = self.generate_step_hint(f"{(self.unit_scale * unit_increment_size):.2f}{self.unit_suffix}", f"{(self.unit_scale * 0.1 * unit_increment_size):.2f}{self.unit_suffix}")
 
         return self.do_invoke(context, event)
 
@@ -58,7 +60,7 @@ class BaseOperator(bpy.types.Operator):
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
-        self.step_size = ((0.1 if self.key_shift else 1) * self.unit_factor) * 0.1
+        self.step_size = ((0.1 if self.key_shift else 1) * self.unit_factor) * get_preferences().unit_increment_size
 
         if self.key_toggle_operator_passthrough:
             toggle_operator_passthrough(self)

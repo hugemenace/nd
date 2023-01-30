@@ -43,30 +43,11 @@ class ND_OT_screw(BaseOperator):
 CTRL — Remove existing modifiers"""
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
+    def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
         angle_factor = 1 if self.key_shift else 10
-        offset_factor = ((self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor) * self.unit_factor
 
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-            
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
                 self.segments = int(get_stream_value(self.segments_input_stream, min_value=3))
@@ -77,10 +58,10 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
-                self.offset = get_stream_value(self.offset_input_stream, 0.001 * self.unit_factor)
+                self.offset = get_stream_value(self.offset_input_stream, self.unit_scaled_factor)
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_no_modifiers:
                 self.segments_input_stream = new_stream()
                 self.segments = 3
@@ -94,29 +75,21 @@ CTRL — Remove existing modifiers"""
                 self.offset = 0
                 self.dirty = True
 
-        elif pressed(event, {'A'}):
+        if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
-        elif pressed(event, {'O'}):
+        if pressed(event, {'O'}):
             self.offset_axis = (self.offset_axis + 1) % 3
             self.dirty = True
 
-        elif pressed(event, {'F'}):
+        if pressed(event, {'F'}):
             self.flip_normals = not self.flip_normals
             self.dirty = True
 
-        elif self.key_increase_factor:
+        if self.key_step_up:
             if no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
-
-        elif self.key_decrease_factor:
-            if no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
-
-        elif self.key_step_up:
-            if no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset += offset_factor
+                self.offset += self.step_size
                 self.dirty = True
             elif no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = min(360, self.angle + angle_factor)
@@ -125,9 +98,9 @@ CTRL — Remove existing modifiers"""
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
                 self.dirty = True
             
-        elif self.key_step_down:
+        if self.key_step_down:
             if no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset -= offset_factor
+                self.offset -= self.step_size
                 self.dirty = True
             elif no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, self.angle - angle_factor)
@@ -136,12 +109,12 @@ CTRL — Remove existing modifiers"""
                 self.segments = max(3, self.segments - segment_factor)
                 self.dirty = True
         
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
@@ -155,13 +128,6 @@ CTRL — Remove existing modifiers"""
                 self.segments = max(3, self.segments + self.mouse_step)
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
-
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
 
     def do_invoke(self, context, event):
         if event.ctrl:
@@ -169,7 +135,6 @@ CTRL — Remove existing modifiers"""
             return {'FINISHED'}
 
         self.dirty = False
-        self.base_offset_factor = 0.01
         self.object_type = context.active_object.type
 
         self.axis = 2 # X (0), Y (1), Z (2)
@@ -317,12 +282,10 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
-
     draw_property(
         self,
         "Segments: {}".format(self.segments),
-        "(±2)  |  Shift (±1)",
+        self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -331,7 +294,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Angle: {0:.2f}°".format(self.angle),
-        "Alt (±10)  |  Shift + Alt (±1)",
+        self.generate_key_hint("Alt", self.generate_step_hint(10, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,
@@ -340,8 +303,8 @@ def draw_text_callback(self):
     if self.object_type == 'MESH':
         draw_property(
             self,
-            f"Offset: {(self.offset * unit_scale):.2f}{self.unit_suffix}",
-            f"Ctrl (±{(self.base_offset_factor * 1.0):.2f}{self.unit_suffix})  |  Shift + Ctrl (±{((self.base_offset_factor / 10) * 1.0):.2f}{self.unit_suffix})",
+            f"Offset: {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.generate_key_hint("Ctrl", self.unit_step_hint),
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
             mouse_value=True,

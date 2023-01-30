@@ -42,39 +42,20 @@ class ND_OT_screw_head(BaseOperator):
     bl_description = "Quickly create a variety of common screw heads"
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
+    def do_modal(self, context, event):
+        scale_factor = 0.1 if self.key_shift else 1
 
-        offset_factor = ((self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor) * self.unit_factor
-        scale_factor = (self.base_scale_factor / 10.0) if self.key_shift else self.base_scale_factor
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_alt:
                 self.scale_input_stream = update_stream(self.scale_input_stream, event.type)
                 self.scale = get_stream_value(self.scale_input_stream, 0.01)
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
-                self.offset = get_stream_value(self.offset_input_stream, 0.001 * self.unit_factor)
+                self.offset = get_stream_value(self.offset_input_stream, self.unit_scaled_factor)
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_alt:
                 self.scale_input_stream = new_stream()
                 self.scale = 1
@@ -84,48 +65,36 @@ class ND_OT_screw_head(BaseOperator):
                 self.offset = 0
                 self.dirty = True
 
-        elif self.key_increase_factor:
-            if no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
-            elif no_stream(self.scale_input_stream) and self.key_alt:
-                self.base_scale_factor = min(1, self.base_scale_factor * 10.0)
-
-        elif self.key_decrease_factor:
-            if no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
-            elif no_stream(self.scale_input_stream) and self.key_alt:
-                self.base_scale_factor = max(0.001, self.base_scale_factor / 10.0)
-
-        elif self.key_step_up:
+        if self.key_step_up:
             if self.key_no_modifiers:
                 self.head_type_index = (self.head_type_index + 1) % len(self.objects)
                 self.update_head_type(context)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset += offset_factor
+                self.offset += self.step_size
                 self.dirty = True
             elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale += scale_factor
                 self.dirty = True
             
-        elif self.key_step_down:
+        if self.key_step_down:
             if self.key_no_modifiers:
                 self.head_type_index = (self.head_type_index - 1) % len(self.objects)
                 self.update_head_type(context)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset -= offset_factor
+                self.offset -= self.step_size
                 self.dirty = True
             elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale -= scale_factor
                 self.dirty = True
         
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
@@ -140,18 +109,9 @@ class ND_OT_screw_head(BaseOperator):
                 self.scale += self.mouse_value
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
-
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
 
     def do_invoke(self, context, event):
         self.dirty = False
-        self.base_offset_factor = 0.01
-        self.base_scale_factor = 0.01
 
         self.head_type_index = 0
         self.offset = 0
@@ -237,6 +197,8 @@ class ND_OT_screw_head(BaseOperator):
         self.obj.name = name
         self.obj.data.name = name
 
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
         unregister_draw_handler()
 
 
@@ -252,8 +214,6 @@ class ND_OT_screw_head(BaseOperator):
 def draw_text_callback(self):
     draw_header(self)
     
-    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
-
     draw_property(
         self,
         "Type: {0}".format(self.objects[self.head_type_index][1]),
@@ -265,7 +225,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Scale: {0:.2f}%".format(self.scale * 100),
-        "Alt (±{0:.2f}%)  |  Shift + Alt (±{1:.2f}%)".format(self.base_scale_factor * 100, (self.base_scale_factor / 10) * 100),
+        self.generate_key_hint("Alt", self.generate_step_hint("100%", "10%")),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,
@@ -273,8 +233,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Offset: {(self.offset * unit_scale):.2f}{self.unit_suffix}", 
-        f"Ctrl (±{(self.base_offset_factor * 1.0):.2f}{self.unit_suffix})  |  Shift + Ctrl (±{((self.base_offset_factor / 10) * 1.0):.2f}{self.unit_suffix})",
+        f"Offset: {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}", 
+        self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

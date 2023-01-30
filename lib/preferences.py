@@ -26,6 +26,10 @@ def get_preferences():
     return bpy.context.preferences.addons[get_registered_addon_name()].preferences
 
 
+def get_scene_unit_scale():
+    return bpy.context.scene.unit_settings.scale_length
+
+
 def get_scene_unit_factor():
     units = {
         'KILOMETERS' : 1000,

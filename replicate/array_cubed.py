@@ -42,38 +42,18 @@ class ND_OT_array_cubed(BaseOperator):
 CTRL — Remove existing modifiers"""
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        offset_factor = ((self.base_offset_factor / 10.0) if self.key_shift else self.base_offset_factor) * self.unit_factor
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+    def do_modal(self, context, event):
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = update_stream(self.count_streams[self.axis], event.type)
                 self.axes[self.axis][1] = int(get_stream_value(self.count_streams[self.axis]))
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_streams[self.axis] = update_stream(self.offset_streams[self.axis], event.type)
-                self.axes[self.axis][2] = get_stream_value(self.offset_streams[self.axis], 0.001 * self.unit_factor)
+                self.axes[self.axis][2] = get_stream_value(self.offset_streams[self.axis], self.unit_scaled_factor)
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = new_stream()
                 self.axes[self.axis][1] = 1
@@ -84,19 +64,11 @@ CTRL — Remove existing modifiers"""
                 self.axes[self.axis][2] = 0
                 self.dirty = True
 
-        elif pressed(event, {'A'}):
+        if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
-        elif self.key_increase_factor:
-            if self.key_ctrl:
-                self.base_offset_factor = min(1, self.base_offset_factor * 10.0)
-
-        elif self.key_decrease_factor:
-            if self.key_ctrl:
-                self.base_offset_factor = max(0.001, self.base_offset_factor / 10.0)
-
-        elif self.key_step_up:
+        if self.key_step_up:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
                 new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
 
@@ -108,10 +80,10 @@ CTRL — Remove existing modifiers"""
                 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][2] += offset_factor
+                self.axes[self.axis][2] += self.step_size
                 self.dirty = True
             
-        elif self.key_step_down:
+        if self.key_step_down:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
                 new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
 
@@ -123,15 +95,15 @@ CTRL — Remove existing modifiers"""
                 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][2] -= offset_factor
+                self.axes[self.axis][2] -= self.step_size
                 self.dirty = True
         
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
@@ -151,13 +123,6 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][2] += self.mouse_value
                 self.dirty = True
-        
-        if self.dirty:
-            self.operate(context)
-
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
 
 
     def do_invoke(self, context, event):
@@ -166,7 +131,6 @@ CTRL — Remove existing modifiers"""
             return {'FINISHED'}
 
         self.dirty = False
-        self.base_offset_factor = 0.01
 
         self.axis = 0
         self.axes = [None, None, None]
@@ -269,12 +233,10 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    unit_scale = (1000 * bpy.data.scenes["Scene"].unit_settings.scale_length) / self.unit_factor
-
     draw_property(
         self, 
         "Count: {0}".format(self.axes[self.axis][1]),
-        "Alt (±1)",
+        self.generate_step_hint(1),
         active=self.key_no_modifiers,
         alt_mode=False,
         mouse_value=True,
@@ -282,8 +244,8 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Offset: {(self.axes[self.axis][2] * unit_scale):.2f}{self.unit_suffix}",
-        f"Ctrl (±{(self.base_offset_factor * 1.0):.2f}{self.unit_suffix})  |  Shift + Ctrl (±{((self.base_offset_factor / 10) * 1.0):.2f}{self.unit_suffix})",
+        f"Offset: {(self.axes[self.axis][2] * self.display_unit_scale):.2f}{self.unit_suffix}",
+        self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,

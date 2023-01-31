@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.36.0](https://github.com/hugemenace/nd/compare/v1.35.0...v1.36.0) (2023-01-31)
+
+
+### Features
+
+* add adaptive unit fallback support for both metric (meters) and imperial (feet) ([23435b4](https://github.com/hugemenace/nd/commit/23435b4c1d3f54ad185390993ea9e544007911f1))
+* add constant displacement mode option to array_cubed operator ([5a79e34](https://github.com/hugemenace/nd/commit/5a79e3482b822b3d77576f7543465ebc5b81420c))
+* add full support for Blenders unit system (None, Metric, and Imperial) and unit scales ([456ddc4](https://github.com/hugemenace/nd/commit/456ddc4d094db82eb63b9e1f99420911e3af1517))
+* add mouse-value support to all non-keybound operator options ([99b21a6](https://github.com/hugemenace/nd/commit/99b21a68e3790452b845185aa2fda9fe40d3660c))
+* add scene unit scale support for operator overlay values ([f9b8368](https://github.com/hugemenace/nd/commit/f9b83686ac130af1d7627d95e2c2f81d5f17e577))
+* add silhouette operator ([f8ea2a3](https://github.com/hugemenace/nd/commit/f8ea2a3e6c9d7f31a20d7f087cf38b66ee119b59))
+
+
+### Bug Fixes
+
+* add fallback support for Blender's "Adaptive" unit length (default to meters) ([2443f0e](https://github.com/hugemenace/nd/commit/2443f0ee68834f4fa254f5d45f96caac07e52968))
+* ensure object names with multiple chained ".00n" suffixes are fixed before high and low LOD naming operations ([872fb09](https://github.com/hugemenace/nd/commit/872fb090f76562355bcc7b3f8f01f2018dee550d))
+* fix screw head z-axis displacement issue when altering scale ([f3340c1](https://github.com/hugemenace/nd/commit/f3340c12b643c33cd4b57179deb08a5d41aea53c))
+* fix XYZ axis visualisation extents ([0b61363](https://github.com/hugemenace/nd/commit/0b61363ff8c3f608c14d4ee695c8da1d55d09557))
+* set weld mode to connected for all bevel operators ([9b9d7d8](https://github.com/hugemenace/nd/commit/9b9d7d8ab4a6df02a0bda0793f28f12c3bdd3932))
+
 ## [1.35.0](https://github.com/hugemenace/nd/compare/v1.34.0...v1.35.0) (2022-11-05)
 
 

@@ -34,6 +34,10 @@ mod_array_y = "Array³ Y — ND"
 mod_array_z = "Array³ Z — ND"
 mod_summon_list = [mod_array_x, mod_array_y, mod_array_z]
 
+IDX_MOD      = 0
+IDX_COUNT    = 1
+IDX_OFFSET   = 2
+IDX_RELATIVE = 3
 
 class ND_OT_array_cubed(BaseOperator):
     bl_idname = "nd.array_cubed"
@@ -43,59 +47,69 @@ CTRL — Remove existing modifiers"""
 
 
     def do_modal(self, context, event):
+        relative_offset_step_size = 0.1 if self.key_shift else 1
+
         if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = update_stream(self.count_streams[self.axis], event.type)
-                self.axes[self.axis][1] = int(get_stream_value(self.count_streams[self.axis]))
+                self.axes[self.axis][IDX_COUNT] = int(get_stream_value(self.count_streams[self.axis]))
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_streams[self.axis] = update_stream(self.offset_streams[self.axis], event.type)
-                self.axes[self.axis][2] = get_stream_value(self.offset_streams[self.axis], self.unit_scaled_factor)
+                if self.axes[self.axis][IDX_RELATIVE]:
+                    self.axes[self.axis][IDX_OFFSET] = get_stream_value(self.offset_streams[self.axis])
+                else:
+                    self.axes[self.axis][IDX_OFFSET] = get_stream_value(self.offset_streams[self.axis], self.unit_scaled_factor)
                 self.dirty = True
 
         if self.key_reset:
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = new_stream()
-                self.axes[self.axis][1] = 1
-                self.axes[self.axis][2] = abs(self.axes[self.axis][2])
+                self.axes[self.axis][IDX_COUNT] = 1
+                self.axes[self.axis][IDX_OFFSET] = abs(self.axes[self.axis][IDX_OFFSET])
                 self.dirty = True
             elif self.key_ctrl:
                 self.offset_streams[self.axis] = new_stream()
-                self.axes[self.axis][2] = 0
+                self.axes[self.axis][IDX_OFFSET] = 0
                 self.dirty = True
 
         if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
+        if pressed(event, {'D'}):
+            relative = self.axes[self.axis][IDX_RELATIVE]
+            self.axes[self.axis][IDX_RELATIVE] = not relative
+            self.dirty = True
+
         if self.key_step_up:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
-                new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
+                new_count = self.axes[self.axis][IDX_COUNT] + (1 if self.axes[self.axis][IDX_OFFSET] >= 0 else -1)
 
                 if new_count == 1:
-                    self.axes[self.axis][1] = 1
-                    self.axes[self.axis][2] = self.axes[self.axis][2] * -1
+                    self.axes[self.axis][IDX_COUNT] = 1
+                    self.axes[self.axis][IDX_OFFSET] = self.axes[self.axis][IDX_OFFSET] * -1
                 else:
-                    self.axes[self.axis][1] = new_count
+                    self.axes[self.axis][IDX_COUNT] = new_count
                 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][2] += self.step_size
+                self.axes[self.axis][IDX_OFFSET] += relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
                 self.dirty = True
             
         if self.key_step_down:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
-                new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
+                new_count = self.axes[self.axis][IDX_COUNT] - (1 if self.axes[self.axis][IDX_OFFSET] >= 0 else -1)
 
                 if new_count == 0:
-                    self.axes[self.axis][1] = 2
-                    self.axes[self.axis][2] = self.axes[self.axis][2] * -1
+                    self.axes[self.axis][IDX_COUNT] = 2
+                    self.axes[self.axis][IDX_OFFSET] = self.axes[self.axis][IDX_OFFSET] * -1
                 else:
-                    self.axes[self.axis][1] = new_count
+                    self.axes[self.axis][IDX_COUNT] = new_count
                 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][2] -= self.step_size
+                self.axes[self.axis][IDX_OFFSET] -= relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
                 self.dirty = True
         
         if self.key_confirm:
@@ -109,19 +123,19 @@ CTRL — Remove existing modifiers"""
         if get_preferences().enable_mouse_values:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers and abs(self.mouse_step) > 0:
                 if self.mouse_step > 0:
-                    new_count = self.axes[self.axis][1] + (1 if self.axes[self.axis][2] >= 0 else -1)
+                    new_count = self.axes[self.axis][IDX_COUNT] + (1 if self.axes[self.axis][IDX_OFFSET] >= 0 else -1)
                 elif self.mouse_step < 0:
-                    new_count = self.axes[self.axis][1] - (1 if self.axes[self.axis][2] >= 0 else -1)
+                    new_count = self.axes[self.axis][IDX_COUNT] - (1 if self.axes[self.axis][IDX_OFFSET] >= 0 else -1)
 
                 if new_count == 0:
-                    self.axes[self.axis][1] = 2
-                    self.axes[self.axis][2] = self.axes[self.axis][2] * -1
+                    self.axes[self.axis][IDX_COUNT] = 2
+                    self.axes[self.axis][IDX_OFFSET] = self.axes[self.axis][IDX_OFFSET] * -1
                 else:
-                    self.axes[self.axis][1] = new_count
+                    self.axes[self.axis][IDX_COUNT] = new_count
                 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][2] += self.mouse_value
+                self.axes[self.axis][IDX_OFFSET] += self.mouse_value
                 self.dirty = True
 
 
@@ -190,22 +204,25 @@ CTRL — Remove existing modifiers"""
                     axis = i
                     offset = offset
                     break
-            self.axes_prev[axis] = [array, array.count, offset]
-            self.axes[axis] = [array, array.count, offset]
+            self.axes_prev[axis] = [array, array.count, offset, array.use_relative_offset]
+            self.axes[axis] = [array, array.count, offset, array.use_relative_offset]
 
 
     def add_array_modifier(self, context, name, axis):
         array = new_modifier(context.active_object, name, 'ARRAY', rectify=True)
         array.use_relative_offset = True
 
-        self.axes[axis] = [array, 1, 2]
+        self.axes[axis] = [array, 1, 2, True]
 
 
     def operate(self, context):
         for axis, conf in enumerate(self.axes):
-            array, count, offset = conf
+            array, count, offset, relative = conf
             array.count = count
             array.relative_offset_displace = [offset if i == axis else 0 for i in range(3)]
+            array.constant_offset_displace = [offset if i == axis else 0 for i in range(3)]
+            array.use_relative_offset = relative
+            array.use_constant_offset = not relative
 
         self.dirty = False
 
@@ -222,9 +239,11 @@ CTRL — Remove existing modifiers"""
 
         if self.summoned:
             for axis, conf in enumerate(self.axes_prev):
-                array, count, offset = conf
+                array, count, offset, relative = conf
                 array.count = count
                 array.relative_offset_displace = [offset if i == axis else 0 for i in range(3)]
+                array.use_relative_offset = relative
+                array.use_constant_offset = not relative
         
         unregister_draw_handler()
         unregister_axis_handler()
@@ -235,21 +254,36 @@ def draw_text_callback(self):
 
     draw_property(
         self, 
-        "Count: {0}".format(self.axes[self.axis][1]),
+        "Count: {0}".format(self.axes[self.axis][IDX_COUNT]),
         self.generate_step_hint(1),
         active=self.key_no_modifiers,
         alt_mode=False,
         mouse_value=True,
         input_stream=self.count_streams[self.axis])
 
-    draw_property(
+    if self.axes[self.axis][IDX_RELATIVE]:
+        draw_property(
+            self,
+            f"Offset: {(self.axes[self.axis][IDX_OFFSET]):.2f}",
+            self.generate_key_hint("Ctrl", self.generate_step_hint(1, 0.1)),
+            active=self.key_ctrl,
+            alt_mode=self.key_shift_ctrl,
+            mouse_value=True,
+            input_stream=self.offset_streams[self.axis])
+    else:
+        draw_property(
+            self,
+            f"Offset: {(self.axes[self.axis][IDX_OFFSET] * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.generate_key_hint("Ctrl", self.unit_step_hint),
+            active=self.key_ctrl,
+            alt_mode=self.key_shift_ctrl,
+            mouse_value=True,
+            input_stream=self.offset_streams[self.axis])
+
+    draw_hint(
         self,
-        f"Offset: {(self.axes[self.axis][2] * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.generate_key_hint("Ctrl", self.unit_step_hint),
-        active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl,
-        mouse_value=True,
-        input_stream=self.offset_streams[self.axis])
+        "Displacement [D]: {}".format("Relative" if self.axes[self.axis][IDX_RELATIVE] else "Constant"),
+        "Relative or constant displacement")
 
     draw_hint(
         self,

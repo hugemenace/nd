@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.36.1](https://github.com/hugemenace/nd/compare/v1.36.0...v1.36.1) (2023-02-06)
+
+
+### Bug Fixes
+
+* fix error in panel operator after geometry selection ([55b6250](https://github.com/hugemenace/nd/commit/55b62501ffb025cd08b09623cede3d5c43a2ffc2))
+
 ## [1.36.0](https://github.com/hugemenace/nd/compare/v1.35.0...v1.36.0) (2023-01-31)
 
 

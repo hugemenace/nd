@@ -85,17 +85,17 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = max(0, self.inset - self.step_size)
                     self.dirty = True
+            
+        if self.stage == 1 and self.key_confirm:
+            self.finish(context)
+
+            return {'FINISHED'}
 
         if self.stage == 0 and self.key_confirm_alternative:
             if self.has_valid_selection(context):
                 self.isolate_geometry(context)
                 self.stage = 1
                 self.dirty = True
-            
-        if self.stage == 1 and self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
 
         if self.stage == 0 and self.key_left_click:
             return {'PASS_THROUGH'}

@@ -44,14 +44,17 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
     def execute(self, context):
         for obj in context.selected_objects:
             # Remove Blender's .001, .002, etc naming convention
-            old_name = re.sub(r"(.+?)(?:\.[0-9]{3})+$", r"\1", obj.name)
+            old_name = re.sub(r"(.+?)(?:\.[0-9]+)+$", r"\1", obj.name)
+
+            # Remove ZenSet's _1, _2, etc naming convention
+            old_name = re.sub(r"(.+?)(?:_[0-9]+)+$", r"\1", old_name)
 
             name_segments = old_name.split("_")
             
             # Remove existing _high / _low suffixes.
-            if name_segments[-1].startswith("high") or name_segments[-1].startswith("low"):
-                name_segments = name_segments[:-1]
-            
+            if name_segments[-1].lower() in ['high', 'low']:
+                name_segments.pop()
+
             name_segments.append(self.mode.lower())
             new_name = "_".join(name_segments)
 

@@ -48,7 +48,7 @@ CTRL — Remove existing modifiers"""
         segment_factor = 1 if self.key_shift else 2
 
         if self.key_numeric_input:
-            if self.key_no_modifiers:
+            if self.key_ctrl_alt:
                 self.weight_input_stream = update_stream(self.weight_input_stream, event.type)
                 self.weight = get_stream_value(self.weight_input_stream)
                 self.dirty = True
@@ -60,13 +60,13 @@ CTRL — Remove existing modifiers"""
                 self.profile_input_stream = update_stream(self.profile_input_stream, event.type)
                 self.profile = get_stream_value(self.profile_input_stream)
                 self.dirty = True
-            elif self.key_ctrl_alt:
+            elif self.key_no_modifiers:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
                 self.width = get_stream_value(self.width_input_stream, self.unit_scaled_factor)
                 self.dirty = True
 
         if self.key_reset:
-            if self.key_no_modifiers:
+            if self.key_ctrl_alt:
                 self.weight_input_stream = new_stream()
                 self.weight = 0
                 self.dirty = True
@@ -78,13 +78,21 @@ CTRL — Remove existing modifiers"""
                 self.profile_input_stream = new_stream()
                 self.profile = 0.5
                 self.dirty = True
-            elif self.key_ctrl_alt:
+            elif self.key_no_modifiers:
                 self.width_input_stream = new_stream()
                 self.width = 0.05 * self.unit_factor
                 self.dirty = True
 
         if pressed(event, {'H'}):
             self.harden_normals = not self.harden_normals
+            self.dirty = True
+
+        if pressed(event, {'C'}):
+            self.clamp_overlap = not self.clamp_overlap
+            self.dirty = True
+
+        if pressed(event, {'S'}):
+            self.loop_slide = not self.loop_slide
             self.dirty = True
 
         if pressed(event, {'W'}):
@@ -98,10 +106,10 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, self.profile + profile_factor)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
+            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width + self.step_size)
                 self.dirty = True
-            elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
+            elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:
                 self.weight = max(0, min(1, self.weight + weight_factor))
                 self.dirty = True
         
@@ -112,10 +120,10 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, self.profile - profile_factor)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
+            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width - self.step_size)
                 self.dirty = True
-            elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
+            elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:
                 self.weight = max(0, min(1, self.weight - weight_factor))
                 self.dirty = True
         
@@ -131,13 +139,13 @@ CTRL — Remove existing modifiers"""
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments + self.mouse_step)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_ctrl_alt:
+            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width + self.mouse_value)
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, min(1, self.profile + self.mouse_value))
                 self.dirty = True
-            elif no_stream(self.weight_input_stream) and self.key_no_modifiers:
+            elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:
                 self.weight = max(0, min(1, self.weight + self.mouse_value))
                 self.dirty = True
 
@@ -160,10 +168,12 @@ CTRL — Remove existing modifiers"""
         self.early_apply = event.shift
 
         self.segments = 1
-        self.weight = 0
+        self.weight = 1
         self.width = 0.05 * self.unit_factor
         self.profile = 0.5
         self.harden_normals = False
+        self.loop_slide = False
+        self.clamp_overlap = False
 
         self.segments_input_stream = new_stream()
         self.weight_input_stream = new_stream()
@@ -223,6 +233,8 @@ CTRL — Remove existing modifiers"""
         self.profile_prev = self.profile = self.bevel.profile
         self.harden_normals_prev = self.harden_normals = self.bevel.harden_normals
         self.weight = self.edge_weight_average
+        self.loop_slide_prev = self.loop_slide = self.bevel.loop_slide
+        self.clamp_overlap_prev = self.clamp_overlap = self.bevel.use_clamp_overlap
 
 
     def add_smooth_shading(self, context):
@@ -237,6 +249,8 @@ CTRL — Remove existing modifiers"""
         bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=True)
         bevel.offset_type = 'WIDTH'
         bevel.limit_method = 'WEIGHT'
+        bevel.miter_outer = 'MITER_ARC'
+        bevel.face_strength_mode = 'FSTR_AFFECTED'
 
         self.bevel = bevel
 
@@ -283,6 +297,8 @@ CTRL — Remove existing modifiers"""
         self.bevel.segments = self.segments
         self.bevel.profile = self.profile
         self.bevel.harden_normals = self.harden_normals
+        self.bevel.loop_slide = self.loop_slide
+        self.bevel.use_clamp_overlap = self.clamp_overlap
 
         data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
@@ -315,6 +331,8 @@ CTRL — Remove existing modifiers"""
             self.bevel.width = self.width_prev
             self.bevel.segments = self.segments_prev
             self.bevel.profile = self.profile_prev
+            self.bevel.loop_slide = self.loop_slide_prev
+            self.bevel.use_clamp_overlap = self.clamp_overlap_prev
 
         data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
@@ -334,12 +352,12 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Weight: {(self.weight):.2f} ({(self.width * self.display_unit_scale * self.weight):.2f}{self.unit_suffix})",
-        self.generate_step_hint(0.1, 0.01),
+        f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
+        self.generate_key_hint("Ctrl + Alt", self.unit_step_hint),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
-        input_stream=self.weight_input_stream)
+        input_stream=self.width_input_stream)
 
     draw_property(
         self,
@@ -361,12 +379,12 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.generate_key_hint("Ctrl + Alt", self.unit_step_hint),
+        f"Weight: {(self.weight):.2f} ({(self.width * self.display_unit_scale * self.weight):.2f}{self.unit_suffix})",
+        self.generate_step_hint(0.1, 0.01),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
         mouse_value=True,
-        input_stream=self.width_input_stream)
+        input_stream=self.weight_input_stream)
 
     draw_hint(
         self,
@@ -377,6 +395,16 @@ def draw_text_callback(self):
         self,
         "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
         "Display the objects's wireframe over solid shading")
+
+    draw_hint(
+        self,
+        "Clamp Overlap [C]: {0}".format("Yes" if self.clamp_overlap else "No"),
+        "Clamp the width to avoid overlap")
+
+    draw_hint(
+        self,
+        "Loop Slide [S]: {0}".format("Yes" if self.loop_slide else "No"),
+        "Prefer sliding along edges to having even widths")
 
 
 def register():

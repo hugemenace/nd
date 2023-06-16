@@ -40,7 +40,7 @@ op_sections = [
     ("Standalone", ops.standalone_ops, "standalone", [("nd.cycle", None)]),
     ("Sketch", ops.sketch_ops, "sketch", [("nd.single_vertex", None), ("nd.panel", None), ("nd.recon_poly", None)]),
     ("Booleans", ops.boolean_ops, "booleans", [("nd.bool_vanilla", "DIFFERENCE"), ("nd.bool_vanilla", "UNION"), ("nd.bool_vanilla", "INTERSECT")]),
-    ("Bevels", ops.bevel_ops, "bevels", [("nd.vertex_bevel", None), ("nd.bevel", None), ("nd.weighted_normal_bevel", None)]),
+    ("Bevels", ops.bevel_ops, "bevels", [("nd.bevel", None), ("nd.vertex_bevel", None), ("nd.edge_bevel", None)]),
     ("Extrusion", ops.extrusion_ops, "extrusion", [("nd.solidify", None), ("nd.screw", None), ("nd.profile_extrude", None)]),
     ("Replicate", ops.replicate_ops, "replicate", [("nd.array_cubed", None), ("nd.circular_array", None), ("nd.mirror", None)]),
     ("Deform", ops.deform_ops, "deform", [("nd.lattice", None), ("nd.simple_deform", None)]),

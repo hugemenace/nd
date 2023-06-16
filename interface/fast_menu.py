@@ -272,7 +272,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
         if self.has_faces:
             layout.separator()
             layout.operator("nd.bevel", icon=icons['nd.bevel'])
-            layout.operator("nd.weighted_normal_bevel", icon=icons['nd.weighted_normal_bevel'])
             layout.separator()
             layout.operator("nd.array_cubed", icon=icons['nd.array_cubed']) if not has_mod_array_cubed else None
             layout.operator("nd.circular_array", icon=icons['nd.circular_array']) if not has_mod_circular_array else None

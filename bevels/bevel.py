@@ -218,6 +218,7 @@ CTRL — Remove existing modifiers"""
         bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
         bevel.offset_type = 'WIDTH'
         bevel.miter_outer = 'MITER_ARC'
+        bevel.face_strength_mode = 'FSTR_AFFECTED'
 
         self.bevel = bevel
 
@@ -264,6 +265,8 @@ CTRL — Remove existing modifiers"""
             self.bevel.segments = self.segments_prev
             self.bevel.profile = self.profile_prev
             self.bevel.angle_limit = radians(self.angles[self.angle_prev])
+            self.bevel.loop_slide = self.loop_slide_prev
+            self.bevel.use_clamp_overlap = self.clamp_overlap_prev
 
         unregister_draw_handler()
 

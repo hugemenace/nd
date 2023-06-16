@@ -26,6 +26,7 @@ class ND_OT_weighted_normal(bpy.types.Operator):
     bl_idname = "nd.wn"
     bl_label = "Weighted Normals"
     bl_description = """Add a weighted normal modifier to the selected objects
+SHIFT — Don't keep sharp edges
 CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
@@ -41,9 +42,13 @@ CTRL — Remove existing modifiers"""
             remove_modifiers_ending_with(context.selected_objects, ' — ND WN')
             return {'FINISHED'}
 
+        self.keep_sharp = not event.shift
+
         for obj in context.selected_objects:
             mod = new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)
-            mod.keep_sharp = True
+            mod.keep_sharp = self.keep_sharp
+            mod.weight = 100
+            mod.use_face_influence = True
 
         return {'FINISHED'}
 

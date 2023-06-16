@@ -19,14 +19,12 @@
 # ---
 
 import importlib
-from . import weighted_normal_bevel
 from . import vertex_bevel
 from . import edge_bevel
 from . import bevel
 
 
 registerables = (
-    weighted_normal_bevel,
     vertex_bevel,
     edge_bevel,
     bevel,

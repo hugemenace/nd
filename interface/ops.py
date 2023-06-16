@@ -52,11 +52,10 @@ boolean_ops = [
 ]
 
 bevel_ops = [
+    ("nd.bevel", 'MOD_BEVEL', None, None, False),
+    None, # Separator
     ("nd.vertex_bevel", 'VERTEXSEL', None, None, False),
     ("nd.edge_bevel", 'EDGESEL', None, None, False),
-    None, # Separator
-    ("nd.bevel", 'MOD_BEVEL', None, None, False),
-    ("nd.weighted_normal_bevel", 'NORMALS_VERTEX_FACE', None, None, False),
 ]
 
 extrusion_ops = [

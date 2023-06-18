@@ -547,7 +547,7 @@ class NDPreferences(AddonPreferences):
         wm = bpy.context.window_manager
         kc = wm.keyconfigs.user
         
-        for keymap in ['3D View', 'Mesh', 'Object Mode']:
+        for keymap in ['Mesh', 'Object Mode']:
             km = kc.keymaps.get(keymap)
 
             column = box.column(align=True)
@@ -555,7 +555,7 @@ class NDPreferences(AddonPreferences):
             row.label(text=keymap)
 
             for kmi in km.keymap_items:
-                if kmi.idname == "wm.call_menu" and kmi.name.startswith(name):
+                if (kmi.idname == "wm.call_menu" and kmi.name.startswith(name)) or kmi.idname.startswith("nd."):
                     column = box.column(align=True)
                     row = column.row()
                     rna_keymap_ui.draw_kmi(["ADDON", "USER", "DEFAULT"], kc, km, kmi, row, 0)

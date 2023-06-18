@@ -24,6 +24,9 @@ from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_bevels
 
 
+keys = []
+
+
 class ND_OT_bool_slice(bpy.types.Operator):
     bl_idname = "nd.bool_slice"
     bl_label = "Slice"
@@ -94,6 +97,16 @@ ALT — Do not clean the reference object's mesh"""
 def register():
     bpy.utils.register_class(ND_OT_bool_slice)
 
+    for mapping in [('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
+        keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
+        entry = keymap.keymap_items.new("nd.bool_slice", 'NUMPAD_SLASH', 'PRESS', ctrl = True)
+        keys.append((keymap, entry))
+
 
 def unregister():
+    for keymap, entry in keys:
+        keymap.keymap_items.remove(entry)
+
+    keys.clear()
+
     bpy.utils.unregister_class(ND_OT_bool_slice)

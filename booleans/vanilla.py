@@ -24,6 +24,9 @@ from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_bevels
 
 
+keys = []
+
+
 class ND_OT_bool_vanilla(bpy.types.Operator):
     bl_idname = "nd.bool_vanilla"
     bl_label = "Boolean"
@@ -90,6 +93,26 @@ ALT — Do not clean the reference object's mesh"""
 def register():
     bpy.utils.register_class(ND_OT_bool_vanilla)
 
+    for mapping in [('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
+        keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
+
+        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_MINUS', 'PRESS', ctrl = True)
+        entry.properties.mode = "DIFFERENCE"
+        keys.append((keymap, entry))
+
+        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_PLUS', 'PRESS', ctrl = True)
+        entry.properties.mode = "UNION"
+        keys.append((keymap, entry))
+
+        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_ASTERIX', 'PRESS', ctrl = True)
+        entry.properties.mode = "INTERSECT"
+        keys.append((keymap, entry))
+
 
 def unregister():
+    for keymap, entry in keys:
+        keymap.keymap_items.remove(entry)
+
+    keys.clear()
+
     bpy.utils.unregister_class(ND_OT_bool_vanilla)

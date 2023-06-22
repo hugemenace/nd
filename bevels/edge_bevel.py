@@ -353,7 +353,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.generate_key_hint("Ctrl + Alt", self.unit_step_hint),
+        self.generate_step_hint(0.1, 0.01),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -380,7 +380,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         f"Weight: {(self.weight):.2f} ({(self.width * self.display_unit_scale * self.weight):.2f}{self.unit_suffix})",
-        self.generate_step_hint(0.1, 0.01),
+        self.generate_key_hint("Ctrl + Alt", self.unit_step_hint),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
         mouse_value=True,

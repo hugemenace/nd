@@ -44,6 +44,7 @@ CTRL — Remove existing modifiers"""
     def do_modal(self, context, event):
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
+        angle_factor = 1 if self.key_shift else 15
 
         if self.key_numeric_input:
             if self.key_no_modifiers:
@@ -58,6 +59,10 @@ CTRL — Remove existing modifiers"""
                 self.profile_input_stream = update_stream(self.profile_input_stream, event.type)
                 self.profile = get_stream_value(self.profile_input_stream)
                 self.dirty = True
+            elif self.key_ctrl_alt:
+                self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
+                self.angle = get_stream_value(self.angle_input_stream, min_value=0, max_value=360)
+                self.dirty = True
 
         if self.key_reset:
             if self.key_no_modifiers:
@@ -71,6 +76,10 @@ CTRL — Remove existing modifiers"""
             elif self.key_ctrl:
                 self.profile_input_stream = new_stream()
                 self.profile = 0.5
+                self.dirty = True
+            elif self.key_ctrl_alt:
+                self.angle_input_stream = new_stream()
+                self.angle = int(get_preferences().default_smoothing_angle)
                 self.dirty = True
 
         if pressed(event, {'H'}):
@@ -89,15 +98,15 @@ CTRL — Remove existing modifiers"""
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
 
-        if pressed(event, {'A'}):
-            self.angle = (self.angle + 1) % len(self.angles)
-
         if self.key_step_up:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, self.profile + profile_factor)
+                self.dirty = True
+            elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
+                self.angle = min(360, self.angle + angle_factor)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width += self.step_size
@@ -109,6 +118,9 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, self.profile - profile_factor)
+                self.dirty = True
+            elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
+                self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width - self.step_size)
@@ -129,6 +141,9 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, min(1, self.profile + self.mouse_value))
                 self.dirty = True
+            elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
+                self.angle = self.angle = max(0, min(360, self.angle + self.mouse_value_mag))
+                self.dirty = True
             elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width + self.mouse_value)
                 self.dirty = True
@@ -140,12 +155,11 @@ CTRL — Remove existing modifiers"""
             return {'FINISHED'}
 
         self.dirty = False
-        self.angles = [30, 45, 60]
 
         self.segments = 1
         self.width = 0
         self.profile = 0.5
-        self.angle = self.angles.index(int(get_preferences().default_smoothing_angle))
+        self.angle = int(get_preferences().default_smoothing_angle)
         self.harden_normals = False
         self.loop_slide = False
         self.clamp_overlap = False
@@ -153,6 +167,7 @@ CTRL — Remove existing modifiers"""
         self.segments_input_stream = new_stream()
         self.width_input_stream = new_stream()
         self.profile_input_stream = new_stream()
+        self.angle_input_stream = new_stream()
 
         self.target_object = context.active_object
 
@@ -201,11 +216,7 @@ CTRL — Remove existing modifiers"""
         self.harden_normals_prev = self.harden_normals = self.bevel.harden_normals
         self.loop_slide_prev = self.loop_slide = self.bevel.loop_slide
         self.clamp_overlap_prev = self.clamp_overlap = self.bevel.use_clamp_overlap
-
-        try:
-            self.angle_prev = self.angle = self.angles.index(int(degrees(self.bevel.angle_limit)))
-        except:
-            self.angle_prev = self.angle = self.angles.index(int(get_preferences().default_smoothing_angle))
+        self.angle_prev = self.angle = degrees(self.bevel.angle_limit)
 
 
     def add_smooth_shading(self, context):
@@ -236,7 +247,7 @@ CTRL — Remove existing modifiers"""
         self.bevel.segments = self.segments
         self.bevel.profile = self.profile
         self.bevel.harden_normals = self.harden_normals
-        self.bevel.angle_limit = radians(self.angles[self.angle])
+        self.bevel.angle_limit = radians(self.angle)
         self.bevel.loop_slide = self.loop_slide
         self.bevel.use_clamp_overlap = self.clamp_overlap
 
@@ -264,7 +275,7 @@ CTRL — Remove existing modifiers"""
             self.bevel.width = self.width_prev
             self.bevel.segments = self.segments_prev
             self.bevel.profile = self.profile_prev
-            self.bevel.angle_limit = radians(self.angles[self.angle_prev])
+            self.bevel.angle_limit = radians(self.angle_prev)
             self.bevel.loop_slide = self.loop_slide_prev
             self.bevel.use_clamp_overlap = self.clamp_overlap_prev
 
@@ -301,6 +312,15 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.profile_input_stream)
 
+    draw_property(
+        self, 
+        "Angle: {0:.0f}°".format(self.angle),
+        self.generate_key_hint("Ctrl + Alt", self.generate_step_hint(15, 1)),
+        active=self.key_ctrl_alt,
+        alt_mode=self.key_shift_ctrl_alt,
+        mouse_value=True,
+        input_stream=self.angle_input_stream)
+
     draw_hint(
         self,
         "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
@@ -320,11 +340,6 @@ def draw_text_callback(self):
         self,
         "Loop Slide [S]: {0}".format("Yes" if self.loop_slide else "No"),
         "Prefer sliding along edges to having even widths")
-
-    draw_hint(
-        self,
-        "Angle [A]: {0}°".format(self.angles[self.angle]),
-        "Edge angle limit ({})".format(", ".join(["{0}°".format(a) for a in self.angles])))
 
 
 def register():

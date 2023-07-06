@@ -26,7 +26,8 @@ class ND_OT_triangulate(bpy.types.Operator):
     bl_idname = "nd.triangulate"
     bl_label = "Triangulate"
     bl_description = """Add a triangulate modifier to the selected objects
-ALT — Do not preserve custom normals"""
+ALT — Do not preserve custom normals
+SHIFT — Only triangulate ngons (5+ vertices)"""
     bl_options = {'UNDO'}
 
 
@@ -38,11 +39,13 @@ ALT — Do not preserve custom normals"""
 
     def invoke(self, context, event):
         self.preserve_normals = not event.alt
+        self.only_ngons = event.shift
 
         for obj in context.selected_objects:
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
             triangulate.keep_custom_normals = self.preserve_normals
             triangulate.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'
+            triangulate.min_vertices = 5 if self.only_ngons else 4
 
         return {'FINISHED'}
 

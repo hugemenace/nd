@@ -64,6 +64,11 @@ SHIFT — Cycle through the modifier stack"""
                 self.toggle_frozen_util()
                 self.dirty = True
 
+        elif pressed(event, {'A'}):
+            if not self.mod_cycle:
+                self.toggle_applied_util()
+                self.dirty = True
+
         elif pressed(event, {'D'}):
             if not self.mod_cycle:
                 self.toggle_mod()
@@ -127,6 +132,7 @@ SHIFT — Cycle through the modifier stack"""
         self.mod_snapshot = [mod.show_viewport for mod in self.target_obj.modifiers]
         
         self.frozen_utils = set(())
+        self.applied_utils = set(())
 
         self.util_mods = [mod for mod in self.target_obj.modifiers if mod.type == 'BOOLEAN' and mod.object]
         self.util_mod_names = [mod.name for mod in self.util_mods]
@@ -166,6 +172,15 @@ SHIFT — Cycle through the modifier stack"""
             self.frozen_utils.remove(obj)
         else:
             self.frozen_utils.add(obj)
+
+    
+    def toggle_applied_util(self):
+        obj = self.util_mods[self.util_current_index].object
+
+        if obj in self.applied_utils:
+            self.applied_utils.remove(obj)
+        else:
+            self.applied_utils.add(obj)
 
 
     def toggle_mod(self):
@@ -236,6 +251,11 @@ SHIFT — Cycle through the modifier stack"""
             for obj in all_objects:
                 obj.select_set(True)
 
+            for apply_obj in self.applied_utils:
+                for mod in self.target_obj.modifiers:
+                    if mod.type == 'BOOLEAN' and mod.object == apply_obj:
+                        bpy.ops.object.modifier_apply({'object': self.target_obj}, modifier=mod.name)
+
             bpy.context.view_layer.objects.active = self.util_mods[self.util_current_index].object
 
         self.target_obj.show_wire = self.show_wireframe_prev
@@ -285,6 +305,11 @@ def draw_text_callback(self):
                 self,
                 "Disable Modifier [D]: {0}".format("Yes" if not self.util_mods[self.util_current_index].show_viewport else "No"),
                 "Disable the associated boolean modifier")
+
+            draw_hint(
+                self,
+                "Apply Modifier [A]: {0}".format("Yes" if self.util_mods[self.util_current_index].object in self.applied_utils else "No"),
+                "Apply the associated boolean modifier")
         else:
             draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
 

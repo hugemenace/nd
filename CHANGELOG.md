@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.37.0](https://github.com/hugemenace/nd/compare/v1.36.1...v1.37.0) (2023-07-14)
+
+
+### Features
+
+* add an apply modifier option to the cycle operator ([33a035a](https://github.com/hugemenace/nd/commit/33a035acab0aa072f0b0079caf6b349253c72d43))
+* add keymaps for difference, union, intersect, and slice boolean operations ([402857d](https://github.com/hugemenace/nd/commit/402857d82b2149a3a3bb36525b215fe6047618c9))
+* add loop slide and clamp overlap options to the edge bevel modifier and swap the weight and width options ([7747f33](https://github.com/hugemenace/nd/commit/7747f33a1fc8c95e1933d0577a6d518f4bd26569))
+* add only ngons option to triangulate modifier ([1a8221b](https://github.com/hugemenace/nd/commit/1a8221b11147bac8c66f3ae60cf9d504fd6ce6a7))
+* add support to high/low LOD for ZenSet's object naming convention ([074f2ff](https://github.com/hugemenace/nd/commit/074f2ff2c6653318ff5bc46e2545d86d6e15ab62))
+* remove the WN bevel operator and update the standard bevel and weighted normal operators so that the functionality can be replicated ([3e55ba0](https://github.com/hugemenace/nd/commit/3e55ba0eb7a5cf07c4c4d5fc845074dc624d788b))
+* set the angle parameter on the bevel operator as a mouse-driven value ([8d059c4](https://github.com/hugemenace/nd/commit/8d059c4bc21ced68533c265f9bc73115d7c5a96c))
+
+
+### Bug Fixes
+
+* fix the edge bevel operator's width and weight hints ([ab7e3f4](https://github.com/hugemenace/nd/commit/ab7e3f49ebc12bf63693a689163b26b419ea3cf6))
+
 ### [1.36.1](https://github.com/hugemenace/nd/compare/v1.36.0...v1.36.1) (2023-02-06)
 
 

@@ -105,11 +105,17 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
     bm = bmesh.new()
     bm.from_mesh(object_eval.data)
 
-    bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+    bevel_weight_layer = None
 
-    selected_edges = list(bm.edges)
-    for edge in selected_edges:
-        edge[bevel_weight_layer] = 0
+    if bpy.app.version < (4, 0, 0):
+        bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+    else:
+        bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
+
+    if bevel_weight_layer is not None:
+        selected_edges = list(bm.edges)
+        for edge in selected_edges:
+            edge[bevel_weight_layer] = 0
 
     bm.to_mesh(context.active_object.data)
     bm.free()

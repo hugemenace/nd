@@ -138,7 +138,11 @@ def draw_header(cls):
         blf.color(0, r, g, b, 1.0)
 
     if cls.operator_passthrough or is_summoned or cls.pin_overlay:
-        blf.size(0, 11, cls.dpi)
+        if bpy.app.version < (4, 0, 0):
+            blf.size(0, 11, cls.dpi)
+        else:
+            blf.size(0, 11 * cls.dpi_scalar)
+
         blf.position(0, cls.overlay_x + (1 * cls.dpi_scalar), cls.overlay_y + (26 * cls.dpi_scalar), 0)
 
         states = []
@@ -151,7 +155,10 @@ def draw_header(cls):
 
         blf.draw(0, " // ".join(states))
 
-    blf.size(0, 24, cls.dpi) 
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 24, cls.dpi)
+    else:
+        blf.size(0, 24 * cls.dpi_scalar) 
     blf.position(0, cls.overlay_x, cls.overlay_y, 0)
     blf.draw(0, "ND — " + cls.bl_label)
 
@@ -159,7 +166,10 @@ def draw_header(cls):
 
 
 def draw_property(cls, property_content, metadata_content, active=False, alt_mode=False, mouse_value=False, input_stream=None):
-    blf.size(0, 28, cls.dpi)
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 28, cls.dpi)
+    else:
+        blf.size(0, 28 * cls.dpi_scalar)
 
     is_ok, is_value, is_raw = input_stream or (False, None, None)
     base_r, base_g, base_b = get_preferences().overlay_base_color
@@ -178,7 +188,10 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.position(0, cls.overlay_x, cls.overlay_y - ((38 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     
     if bpy.app.version >= (3, 4, 0):
-        blf.size(0, 14, cls.dpi)
+        if bpy.app.version < (4, 0, 0):
+            blf.size(0, 14, cls.dpi)
+        else:
+            blf.size(0, 14 * cls.dpi_scalar)
         blf.position(0, cls.overlay_x, cls.overlay_y - ((31 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
 
     if not cls.operator_passthrough and alt_mode:
@@ -187,11 +200,18 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
         blf.draw(0, "●")
 
     if get_preferences().enable_mouse_values and mouse_value:
-        blf.size(0, 22, cls.dpi)
-        blf.position(0, cls.overlay_x - (15 * cls.dpi_scalar), cls.overlay_y - ((34 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
+        if bpy.app.version < (4, 0, 0):
+            blf.size(0, 22, cls.dpi)
+            blf.position(0, cls.overlay_x - (15 * cls.dpi_scalar), cls.overlay_y - ((34 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
+        else:
+            blf.size(0, 22 * cls.dpi_scalar)
+            blf.position(0, cls.overlay_x - (15 * cls.dpi_scalar), cls.overlay_y - ((33 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
         blf.draw(0, "»")
 
-    blf.size(0, 16, cls.dpi)
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 16, cls.dpi)
+    else:
+        blf.size(0, 16 * cls.dpi_scalar)
 
     if cls.operator_passthrough:
         blf.color(0, base_r, base_g, base_b, 0.2)
@@ -201,7 +221,10 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((25 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, property_content)
     
-    blf.size(0, 11, cls.dpi)
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 11, cls.dpi)
+    else:
+        blf.size(0, 11 * cls.dpi_scalar)
     
     if cls.operator_passthrough:
         blf.color(0, base_r, base_g, base_b, 0.2)
@@ -219,7 +242,10 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
 
 
 def draw_hint(cls, hint_content, metadata_content):
-    blf.size(0, 22, cls.dpi)
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 22, cls.dpi)
+    else:
+        blf.size(0, 16 * cls.dpi_scalar)
 
     base_r, base_g, base_b = get_preferences().overlay_base_color
     
@@ -231,7 +257,10 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.position(0, cls.overlay_x - (3 * cls.dpi_scalar), cls.overlay_y - ((36 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, "◈")
 
-    blf.size(0, 16, cls.dpi)
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 16, cls.dpi)
+    else:
+        blf.size(0, 16 * cls.dpi_scalar)
 
     if cls.operator_passthrough:
         blf.color(0, base_r, base_g, base_b, 0.2)
@@ -241,7 +270,10 @@ def draw_hint(cls, hint_content, metadata_content):
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((25 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
     blf.draw(0, hint_content)
     
-    blf.size(0, 11, cls.dpi)
+    if bpy.app.version < (4, 0, 0):
+        blf.size(0, 11, cls.dpi)
+    else:
+        blf.size(0, 11 * cls.dpi_scalar)
     
     if cls.operator_passthrough:
         blf.color(0, base_r, base_g, base_b, 0.2)

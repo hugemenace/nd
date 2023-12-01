@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.38.0](https://github.com/hugemenace/nd/compare/v1.37.0...v1.38.0) (2023-12-01)
+
+
+### Bug Fixes
+
+* fix additional Blender 4 compatibility issues ([2ffe4af](https://github.com/hugemenace/nd/commit/2ffe4afa743722d058921915457ffdcd6573aa9e))
+* fix Blender 4 compatibility issues ([6c25e01](https://github.com/hugemenace/nd/commit/6c25e013c01cd950e4b4881fdc81bde7b2d60a4e))
+* fix Blender 4 shader issues for Axis and Point visualisation ([460d2a3](https://github.com/hugemenace/nd/commit/460d2a3ae243af0528f2ac8d26b80a83019ec1fb))
+
 ## [1.37.0](https://github.com/hugemenace/nd/compare/v1.36.1...v1.37.0) (2023-07-14)
 
 

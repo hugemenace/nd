@@ -90,13 +90,25 @@ SHIFT — Hard apply (apply all modifiers)"""
 
         for mod_name in mods_to_apply:
             try:
-                bpy.ops.object.modifier_apply({'object': obj}, modifier=mod_name)
+                if bpy.app.version < (4, 0, 0):
+                    bpy.ops.object.modifier_apply({'object': obj}, modifier=mod_name)
+                else:
+                    with bpy.context.temp_override(object=obj):
+                        bpy.ops.object.modifier_apply(modifier=mod_name)
             except:
                 # If the modifier is disabled, just remove it.
-                bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+                if bpy.app.version < (4, 0, 0):
+                    bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+                else:
+                    with bpy.context.temp_override(object=obj):
+                        bpy.ops.object.modifier_remove(modifier=mod_name)
 
         for mod_name in mods_to_remove:
-            bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+            if bpy.app.version < (4, 0, 0):
+                bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+            else:
+                with bpy.context.temp_override(object=obj):
+                    bpy.ops.object.modifier_remove(modifier=mod_name)
 
 
     def remove_vertex_groups(self, obj):
@@ -109,11 +121,17 @@ SHIFT — Hard apply (apply all modifiers)"""
         bm = bmesh.new()
         bm.from_mesh(obj.data)
 
-        bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+        bevel_weight_layer = None
 
-        edges = list(bm.edges)
-        for edge in edges:
-            edge[bevel_weight_layer] = 0
+        if bpy.app.version < (4, 0, 0):
+            bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+        else:
+            bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
+
+        if bevel_weight_layer is not None:
+            edges = list(bm.edges)
+            for edge in edges:
+                edge[bevel_weight_layer] = 0
 
         bm.to_mesh(obj.data)
         bm.free()

@@ -155,10 +155,17 @@ CTRL — Remove existing modifiers"""
             remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
             for object in context.selected_objects:
                 bm = bmesh.from_edit_mesh(object.data)
-                bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
-            
-                for edge in bm.edges:
-                    edge[bevel_weight_layer] = 0
+
+                bevel_weight_layer = None
+
+                if bpy.app.version < (4, 0, 0):
+                    bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+                else:
+                    bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
+
+                if bevel_weight_layer is not None:
+                    for edge in bm.edges:
+                        edge[bevel_weight_layer] = 0
             
                 bmesh.update_edit_mesh(object.data)
                 
@@ -282,14 +289,21 @@ CTRL — Remove existing modifiers"""
         
         data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
-        bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
-    
-        selected_edges = [edge for edge in bm.edges if edge.select]
-        for edge in selected_edges:
-            self.edges_snapshot[edge.index] = edge[bevel_weight_layer]
-            self.edge_weight_average += edge[bevel_weight_layer]
 
-        self.edge_weight_average /= len(selected_edges)
+        bevel_weight_layer = None
+
+        if bpy.app.version < (4, 0, 0):
+            bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+        else:
+            bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
+
+        if bevel_weight_layer is not None:
+            selected_edges = [edge for edge in bm.edges if edge.select]
+            for edge in selected_edges:
+                self.edges_snapshot[edge.index] = edge[bevel_weight_layer]
+                self.edge_weight_average += edge[bevel_weight_layer]
+
+            self.edge_weight_average /= len(selected_edges)
 
 
     def operate(self, context):
@@ -302,8 +316,16 @@ CTRL — Remove existing modifiers"""
 
         data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
-        bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
-    
+
+        bevel_weight_layer = None
+
+        if bpy.app.version < (4, 0, 0):
+            bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+        else:
+            bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
+            if bevel_weight_layer is None:
+                bevel_weight_layer = bm.edges.layers.float.new("bevel_weight_edge")
+        
         selected_edges = [edge for edge in bm.edges if edge.select]
         for edge in selected_edges:
             edge[bevel_weight_layer] = self.weight
@@ -336,11 +358,18 @@ CTRL — Remove existing modifiers"""
 
         data = context.active_object.data
         bm = bmesh.from_edit_mesh(data)
-        bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+
+        bevel_weight_layer = None
+
+        if bpy.app.version < (4, 0, 0):
+            bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
+        else:
+            bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
     
-        selected_edges = [edge for edge in bm.edges if edge.select]
-        for edge in selected_edges:
-            edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
+        if bevel_weight_layer is not None:
+            selected_edges = [edge for edge in bm.edges if edge.select]
+            for edge in selected_edges:
+                edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
     
         bmesh.update_edit_mesh(data)
 

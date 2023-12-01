@@ -71,7 +71,11 @@ def rectify_mod_order(object, mod_name):
     if matching_mod_index is None:
         return
 
-    bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=matching_mod_index)
+    if bpy.app.version < (4, 0, 0):
+        bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=matching_mod_index)
+    else:
+        with bpy.context.temp_override(object=object):
+            bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=matching_mod_index)
 
 
 def remove_problematic_bevels(object):
@@ -98,7 +102,11 @@ def remove_modifiers_ending_with(objects, suffix):
         for mod_name in mod_names:
             base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
             if base_name.endswith(suffix):
-                bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
+                if bpy.app.version < (4, 0, 0):
+                    bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
+                else:
+                    with bpy.context.temp_override(object=object):
+                        bpy.ops.object.modifier_remove(modifier=mod_name)
 
 
 def remove_modifiers_starting_with(objects, suffix):
@@ -108,4 +116,8 @@ def remove_modifiers_starting_with(objects, suffix):
         for mod_name in mod_names:
             base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
             if base_name.startswith(suffix):
-                bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
+                if bpy.app.version < (4, 0, 0):
+                    bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
+                else:
+                    with bpy.context.temp_override(object=object):
+                        bpy.ops.object.modifier_remove(modifier=mod_name)

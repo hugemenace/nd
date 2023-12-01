@@ -254,7 +254,11 @@ SHIFT — Cycle through the modifier stack"""
             for apply_obj in self.applied_utils:
                 for mod in self.target_obj.modifiers:
                     if mod.type == 'BOOLEAN' and mod.object == apply_obj:
-                        bpy.ops.object.modifier_apply({'object': self.target_obj}, modifier=mod.name)
+                        if bpy.app.version < (4, 0, 0):
+                            bpy.ops.object.modifier_apply({'object': self.target_obj}, modifier=mod.name)
+                        else:
+                            with bpy.context.temp_override(object=self.target_obj):
+                                bpy.ops.object.modifier_apply(modifier=mod.name)
 
             bpy.context.view_layer.objects.active = self.util_mods[self.util_current_index].object
 

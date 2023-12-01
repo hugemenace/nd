@@ -86,8 +86,12 @@ class ND_OT_clean_utils(bpy.types.Operator):
             if obj and obj.name not in active_util_object_names:
                 deleted_objects.append(obj)
                 removal_count += 1
-                
-        bpy.ops.object.delete({'active_object': None, 'object': None, 'selected_objects': deleted_objects}, use_global=False)
+        
+        if bpy.app.version < (4, 0, 0):
+            bpy.ops.object.delete({'active_object': None, 'object': None, 'selected_objects': deleted_objects}, use_global=False)
+        else:
+            with bpy.context.temp_override(active_object=None, object=None, selected_objects=deleted_objects):
+                bpy.ops.object.delete(use_global=False)
 
         return removal_count
 

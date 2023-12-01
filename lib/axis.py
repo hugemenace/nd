@@ -89,11 +89,13 @@ def update_axis(cls):
         coords.append(origin + mx.to_3x3() @ axis * -10000)
         coords.append(origin + mx.to_3x3() @ axis * 10000)
 
+        shader = None
+        
         if bpy.app.version < (4, 0, 0):
             shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
         else:
             shader = gpu.shader.from_builtin('UNIFORM_COLOR')
-            
+
         shader.bind()
         shader.uniform_float("color", (*color, 1 if counter == cls.axis else cls.axis_inactive_opacity))
 

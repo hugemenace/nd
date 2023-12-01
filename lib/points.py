@@ -81,7 +81,12 @@ def draw_guideline(shader, line, size, color):
 
 
 def update_points(cls):
-    shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    shader = None
+    
+    if bpy.app.version < (4, 0, 0):
+        shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    else:
+        shader = gpu.shader.from_builtin('UNIFORM_COLOR')
 
     draw_points(shader, cls.primary_points, 10, get_preferences().points_primary_color)
     draw_points(shader, cls.secondary_points, 6, get_preferences().points_secondary_color)

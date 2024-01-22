@@ -369,7 +369,8 @@ CTRL — Remove existing modifiers"""
         if bevel_weight_layer is not None:
             selected_edges = [edge for edge in bm.edges if edge.select]
             for edge in selected_edges:
-                edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
+                if edge.index in self.edges_snapshot:
+                    edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
     
         bmesh.update_edit_mesh(data)
 

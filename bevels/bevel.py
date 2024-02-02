@@ -38,7 +38,8 @@ class ND_OT_bevel(BaseOperator):
     bl_idname = "nd.bevel"
     bl_label = "Bevel"
     bl_description = """Adds a bevel modifier to the selected object
-CTRL — Remove existing modifiers"""
+CTRL — Remove existing modifiers
+SHIFT — Create a stacked bevel modifier"""
 
 
     def do_modal(self, context, event):
@@ -98,6 +99,11 @@ CTRL — Remove existing modifiers"""
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
 
+        if pressed(event, {'R'}) and len(self.current_bevel_mods) > 1:
+            self.summoned_mod_index = (self.summoned_mod_index + 1) % len(self.current_bevel_mods)
+            self.revert(context, True)
+            self.summon_old_operator(context)
+
         if self.key_step_up:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
@@ -150,10 +156,27 @@ CTRL — Remove existing modifiers"""
 
 
     def do_invoke(self, context, event):
+        self.mods = context.active_object.modifiers
+        self.mod_names = list(map(lambda x: x.name, self.mods))
+        self.current_bevel_mods = list(filter(lambda x: any(m in x for m in mod_summon_list), self.mod_names))
+
         if event.ctrl:
-            remove_modifiers_ending_with(context.selected_objects, ' — ND B')
+            if len(self.current_bevel_mods) == 0:
+                return {'FINISHED'}
+
+            last_bevel_mod = self.current_bevel_mods[-1] if self.current_bevel_mods else None
+
+            if last_bevel_mod == None:
+                return {'FINISHED'}
+
+            last_bevel_mod_tail = last_bevel_mod.split(' — ')[-1]
+
+            remove_modifiers_ending_with(context.selected_objects, f'Bevel — {last_bevel_mod_tail}', True)
+            remove_modifiers_ending_with(context.selected_objects, f'Weld — {last_bevel_mod_tail}', True)
+
             return {'FINISHED'}
 
+        self.stacked = event.shift
         self.dirty = False
 
         self.segments = 1
@@ -170,13 +193,12 @@ CTRL — Remove existing modifiers"""
         self.angle_input_stream = new_stream()
 
         self.target_object = context.active_object
+        self.summoned_mod_index = 0
 
-        mods = context.active_object.modifiers
-        mod_names = list(map(lambda x: x.name, mods))
-        previous_op = all(m in mod_names for m in mod_summon_list)
+        previous_op = all(m in self.mod_names for m in mod_summon_list)
 
-        if previous_op:
-            self.summon_old_operator(context, mods)
+        if not self.stacked and previous_op:
+            self.summon_old_operator(context)
         else:
             self.prepare_new_operator(context)
 
@@ -205,10 +227,11 @@ CTRL — Remove existing modifiers"""
         self.add_bevel_modifier(context)
 
 
-    def summon_old_operator(self, context, mods):
+    def summon_old_operator(self, context):
         self.summoned = True
 
-        self.bevel = mods[mod_bevel]
+        mod_name = self.current_bevel_mods[self.summoned_mod_index]
+        self.bevel = self.mods[mod_name]
 
         self.width_prev = self.width = self.bevel.width
         self.segments_prev = self.segments = self.bevel.segments
@@ -264,7 +287,7 @@ CTRL — Remove existing modifiers"""
         unregister_draw_handler()
 
 
-    def revert(self, context):
+    def revert(self, context, soft=False):
         self.target_object.show_wire = False
         self.target_object.show_in_front = False
 
@@ -279,7 +302,8 @@ CTRL — Remove existing modifiers"""
             self.bevel.loop_slide = self.loop_slide_prev
             self.bevel.use_clamp_overlap = self.clamp_overlap_prev
 
-        unregister_draw_handler()
+        if not soft:
+            unregister_draw_handler()
 
 
 def draw_text_callback(self):
@@ -340,6 +364,12 @@ def draw_text_callback(self):
         self,
         "Loop Slide [S]: {0}".format("Yes" if self.loop_slide else "No"),
         "Prefer sliding along edges to having even widths")
+
+    if len(self.current_bevel_mods) > 1:
+        draw_hint(
+            self,
+            "Recall bevel [R]: {0}".format(self.current_bevel_mods[self.summoned_mod_index]),
+            "Switch between summoned bevels")
 
 
 def register():

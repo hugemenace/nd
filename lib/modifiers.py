@@ -95,12 +95,12 @@ def remove_problematic_bevels(object):
         object.modifiers.remove(mod)
 
 
-def remove_modifiers_ending_with(objects, suffix):
+def remove_modifiers_ending_with(objects, suffix, strict=False):
     for object in objects:
         mods = object.modifiers
         mod_names = [mod.name for mod in mods]
         for mod_name in mod_names:
-            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
+            base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name) if not strict else mod_name
             if base_name.endswith(suffix):
                 if bpy.app.version < (4, 0, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)

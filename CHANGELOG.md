@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.39.0](https://github.com/hugemenace/nd/compare/v1.38.0...v1.39.0) (2024-02-03)
+
+
+### Features
+
+* add the option to stack bevel modifiers, and cycle through stacked bevels when recalling ([41ba743](https://github.com/hugemenace/nd/commit/41ba7435703e572f27291b24744e9b4579d75ec0))
+
+
+### Bug Fixes
+
+* ensure that the edge.index exists in the edges_snapshot before reverting an edge bevel operation ([8b15a57](https://github.com/hugemenace/nd/commit/8b15a571609e43083e7b72fa44928bf821503909))
+
 ## [1.38.0](https://github.com/hugemenace/nd/compare/v1.37.0...v1.38.0) (2023-12-01)
 
 

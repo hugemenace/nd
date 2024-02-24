@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.39.1](https://github.com/hugemenace/nd/compare/v1.39.0...v1.39.1) (2024-02-24)
+
+
+### Bug Fixes
+
+* [Blender 4] fix an error when hydrating cutter utilities with the clear-parent option selected ([3fb0b05](https://github.com/hugemenace/nd/commit/3fb0b058e1b1eff197b81b07c75784cda218e765))
+* [Blender 4] fix an error when mirroring an object with the SHIFT (place on top of the stack) alt-mode selected ([49d5e38](https://github.com/hugemenace/nd/commit/49d5e38c62f2d145b253cdd6fb23857ceb003524))
+* ensure that hydrated object names do not include additional leading spaces ([7a41891](https://github.com/hugemenace/nd/commit/7a418911d9b3a992f70a9fce53e205861e4c11a0))
+* ensure that the clear parent behaviour on hydrated utils does not clear the initially selected object(s) ([8f9f69f](https://github.com/hugemenace/nd/commit/8f9f69fff15271e53b723d72155951fe453799cd))
+
 ## [1.39.0](https://github.com/hugemenace/nd/compare/v1.38.0...v1.39.0) (2024-02-03)
 
 

@@ -334,7 +334,11 @@ CTRL — Remove existing modifiers"""
 
             if self.early_apply:
                 while obj.modifiers[0].name != mirror.name:
-                    bpy.ops.object.modifier_move_up({'object': obj}, modifier=mirror.name)
+                    if bpy.app.version < (4, 0, 0):
+                        bpy.ops.object.modifier_move_up({'object': obj}, modifier=mirror.name)
+                    else:
+                        with bpy.context.temp_override(object=obj):
+                            bpy.ops.object.modifier_move_up(modifier=mirror.name)
     
 
     def operate(self, context):

@@ -139,7 +139,11 @@ class ND_OT_hydrate(bpy.types.Operator):
             new_objects.append((new_obj, obj))
 
             if self.clear_parent:
-                bpy.ops.object.parent_clear({'object': new_obj}, type='CLEAR_KEEP_TRANSFORM')
+                if bpy.app.version < (4, 0, 0):
+                    bpy.ops.object.parent_clear({'object': new_obj}, type='CLEAR_KEEP_TRANSFORM')
+                else:
+                    with bpy.context.temp_override(object=new_obj):
+                        bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
 
         bpy.ops.object.select_all(action='DESELECT')
         for new_obj, orig_obj in new_objects:

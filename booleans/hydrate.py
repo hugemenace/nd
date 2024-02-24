@@ -125,7 +125,7 @@ class ND_OT_hydrate(bpy.types.Operator):
             new_obj.animation_data_clear()
 
             if new_obj.name.startswith("Bool — "):
-                new_obj.name = new_obj.name[6:]
+                new_obj.name = new_obj.name[7:]
                 new_obj.data.name = new_obj.name
             
             if self.active_collection >= len(self.all_collections):

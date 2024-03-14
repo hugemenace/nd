@@ -32,8 +32,7 @@ class ND_OT_view_align(bpy.types.Operator):
     bl_idname = "nd.view_align"
     bl_label = "View Align"
     bl_description = """Orientate the view to the selected geometry
-SHIFT — Do not clean duplicate mesh before extraction
-ALT — Skip geometry selection and use the active object"""
+SHIFT — Do not clean duplicate mesh before extraction"""
     bl_options = {'UNDO'}
 
 
@@ -52,7 +51,7 @@ ALT — Skip geometry selection and use the active object"""
             return {'PASS_THROUGH'}
 
         elif self.key_cancel:
-            self.clean_up(context)
+            self.clean_up(context, True)
 
             return {'CANCELLED'}
 
@@ -110,17 +109,8 @@ ALT — Skip geometry selection and use the active object"""
         self.xray_mode = False
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
 
-        self.skip_geo_select = event.alt
-        if self.skip_geo_select:
-            bpy.ops.object.mode_set(mode='EDIT')
-            context.tool_settings.mesh_select_mode = (True, False, False)
-            bpy.ops.mesh.select_all(action='SELECT')
+        self.active_object = context.active_object
 
-            self.determine_selection_type(context)
-            context.tool_settings.mesh_select_mode = (self.selection_type == 0, self.selection_type == 1, self.selection_type == 2)
-
-            return self.finish(context)
-        
         create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — View Align', not event.shift)
 
         capture_modifier_keys(self, None, event.mouse_x)
@@ -259,13 +249,16 @@ ALT — Skip geometry selection and use the active object"""
         return {'FINISHED'}
 
     
-    def clean_up(self, context):
+    def clean_up(self, context, revert=False):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 
-        if not self.skip_geo_select:
-            context.active_object.show_in_front = False
-            bpy.ops.object.delete()
+        context.active_object.show_in_front = False
+        bpy.ops.object.delete()
+
+        if revert:
+            context.view_layer.objects.active = self.active_object
+            self.active_object.select_set(True)
 
         unregister_draw_handler()
     

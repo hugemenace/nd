@@ -243,6 +243,9 @@ SHIFT — Create a stacked bevel modifier"""
 
 
     def add_smooth_shading(self, context):
+        if bpy.app.version >= (4, 1, 0):
+            return
+        
         bpy.ops.object.shade_smooth()
         context.active_object.data.use_auto_smooth = True
         context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))

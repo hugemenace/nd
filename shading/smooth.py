@@ -127,6 +127,7 @@ class ND_OT_smooth(bpy.types.Operator):
     
     def add_smooth_shading(self, context):
         bpy.ops.object.shade_smooth()
+        
         for object in context.selected_objects:
             object.data.use_auto_smooth = True
 

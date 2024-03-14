@@ -245,6 +245,9 @@ CTRL — Remove existing modifiers"""
 
 
     def add_smooth_shading(self, context):
+        if bpy.app.version >= (4, 1, 0):
+            return
+        
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
         context.active_object.data.use_auto_smooth = True

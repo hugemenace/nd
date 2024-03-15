@@ -42,7 +42,7 @@ class ND_OT_circular_array(BaseOperator):
     bl_idname = "nd.circular_array"
     bl_label = "Circular Array"
     bl_description = """Array an object around another in a circular fashion
-ALT — Use faux origin translation (for origin-reliant geometry)
+ALT — Use faux origin (for origin-reliant procedural geometry)
 CTRL — Remove existing modifiers"""
 
 
@@ -208,19 +208,17 @@ CTRL — Remove existing modifiers"""
 
         self.rotator_obj = bpy.data.objects.new("empty", None)
         self.rotator_obj.name = "ND — Circular Array Rotator"
-        bpy.context.scene.collection.objects.link(self.rotator_obj)
         self.rotator_obj.empty_display_size = 1
         self.rotator_obj.empty_display_type = 'PLAIN_AXES'
+
+        bpy.context.scene.collection.objects.link(self.rotator_obj)
 
         if self.single_obj_mode or self.faux_origin:
             self.rotator_obj.location = (0, 0, 0)
         else:
             self.rotator_obj.location = self.target_obj.location.copy()
 
-        self.rotator_obj.rotation_euler = self.reference_obj.rotation_euler.copy()
-        self.rotator_obj_rotation_snapshot = self.reference_obj.rotation_euler.copy()
-        bpy.data.objects[self.reference_obj.name]["NDCA_rotator_obj_rotation_snapshot"] = self.rotator_obj_rotation_snapshot
-
+        self.rotator_obj.rotation_euler = (0, 0, 0)
         self.rotator_obj.scale = (1, 1, 1)
 
         self.rotator_obj.parent = self.reference_obj
@@ -256,7 +254,6 @@ CTRL — Remove existing modifiers"""
         self.displace_axis = self.displace_axis_prev = ['X', 'Y', 'Z'].index(self.displace.direction)
         self.count = self.count_prev = self.array.count
         self.offset = self.offset_prev = self.displace.strength
-        self.rotator_obj_rotation_snapshot = bpy.data.objects[self.reference_obj.name]["NDCA_rotator_obj_rotation_snapshot"]
 
 
     def add_array_modifier(self):
@@ -299,7 +296,7 @@ CTRL — Remove existing modifiers"""
         rotation = radians(self.angle / altered_count)
         rotation_axis = ['X', 'Y', 'Z'][self.axis]
 
-        self.rotator_obj.rotation_euler = self.rotator_obj_rotation_snapshot
+        self.rotator_obj.rotation_euler = (0, 0, 0)
         self.rotator_obj.rotation_euler.rotate_axis(rotation_axis, rotation)
 
         self.array.count = self.count
@@ -339,6 +336,7 @@ CTRL — Remove existing modifiers"""
             self.axis = self.axis_prev
             self.count = self.count_prev
             self.offset = self.offset_prev
+            self.displace_axis = self.displace_axis_prev
 
             self.operate(context)
 

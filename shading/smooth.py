@@ -102,8 +102,9 @@ class ND_OT_smooth(bpy.types.Operator):
         self.dirty = False
         self.base_angle_factor = 15
         self.angle = float(get_preferences().default_smoothing_angle)
-
         self.angle_input_stream = new_stream()
+
+        self.mods = []
 
         self.add_smooth_shading(context)
 
@@ -126,6 +127,29 @@ class ND_OT_smooth(bpy.types.Operator):
 
     
     def add_smooth_shading(self, context):
+        if bpy.app.version >= (4, 1, 0):
+            for object in context.selected_objects:
+                with bpy.context.temp_override(object=object):
+                    # Check if the object already has a modifier with the name "Smooth — ND SBA"
+                    found_existing_modifier = False
+                    for mod in object.modifiers:
+                        if mod.name == "Smooth — ND SBA":
+                            self.mods.append((object, mod))
+                            found_existing_modifier = True
+                            break
+
+                    if found_existing_modifier:
+                        continue
+                        
+                    bpy.ops.object.shade_smooth()
+                    bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
+                    
+                    mod = object.modifiers[-1]
+                    mod.name = "Smooth — ND SBA"
+
+                    self.mods.append((object, mod))
+            return
+        
         bpy.ops.object.shade_smooth()
         
         for object in context.selected_objects:
@@ -133,8 +157,13 @@ class ND_OT_smooth(bpy.types.Operator):
 
 
     def operate(self, context):
-        for object in context.selected_objects:
-            object.data.auto_smooth_angle = radians(self.angle)
+        if bpy.app.version >= (4, 1, 0):
+            for object, mod in self.mods:
+                mod["Input_1"] = radians(self.angle)
+                object.data.update()
+        else:
+            for object in context.selected_objects:
+                object.data.auto_smooth_angle = radians(self.angle)
 
         self.dirty = False
 

@@ -164,6 +164,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
+            bpy.ops.object.shade_flat()
             return
         
         bpy.ops.object.shade_smooth()

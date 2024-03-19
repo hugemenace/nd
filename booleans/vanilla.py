@@ -21,7 +21,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import new_modifier, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, remove_problematic_bevels, rectify_smooth_by_angle
 
 
 keys = []
@@ -52,10 +52,12 @@ ALT — Do not clean the reference object's mesh"""
     def execute(self, context):
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
+        target_obj = context.active_object
+
         a, b = context.selected_objects
-        reference_obj = a if a.name != context.active_object.name else b
+        reference_obj = a if a.name != target_obj.name else b
         
-        boolean = new_modifier(context.active_object, " — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN', rectify=True)
+        boolean = new_modifier(target_obj, " — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN', rectify=True)
         boolean.operation = self.mode
         boolean.object = reference_obj
         boolean.solver = solver
@@ -69,8 +71,8 @@ ALT — Do not clean the reference object's mesh"""
             if not self.do_not_clean_mesh:
                 remove_problematic_bevels(reference_obj)
 
-        reference_obj.parent = context.active_object
-        reference_obj.matrix_parent_inverse = context.active_object.matrix_world.inverted()
+        reference_obj.parent = target_obj
+        reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 
         if not self.protect_reference_obj:
             move_to_utils_collection(reference_obj)
@@ -79,6 +81,8 @@ ALT — Do not clean the reference object's mesh"""
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)
         bpy.context.view_layer.objects.active = reference_obj
+
+        rectify_smooth_by_angle(target_obj)
 
         return {'FINISHED'}
 

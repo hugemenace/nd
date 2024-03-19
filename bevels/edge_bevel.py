@@ -26,7 +26,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
 mod_bevel = "Bevel — ND EB"
@@ -190,12 +190,12 @@ CTRL — Remove existing modifiers"""
         self.target_object = context.active_object
 
         if bpy.app.version < (3, 4, 0):
-            if not context.active_object.data.use_customdata_edge_bevel:
-                context.active_object.data.use_customdata_edge_bevel = True
+            if not self.target_object.data.use_customdata_edge_bevel:
+                self.target_object.data.use_customdata_edge_bevel = True
 
         self.take_edges_snapshot(context)
 
-        mods = context.active_object.modifiers
+        mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
 
@@ -229,6 +229,8 @@ CTRL — Remove existing modifiers"""
         self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
 
+        rectify_smooth_by_angle(self.target_object)
+
 
     def summon_old_operator(self, context, mods):
         self.summoned = True
@@ -246,18 +248,20 @@ CTRL — Remove existing modifiers"""
 
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
-            bpy.ops.object.shade_flat()
+            bpy.ops.object.mode_set(mode='OBJECT')
+            add_smooth_by_angle(self.target_object)
+            bpy.ops.object.mode_set(mode='EDIT')
             return
         
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
-        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
         bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_bevel_modifier(self, context):
-        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=True)
+        bevel = new_modifier(self.target_object, mod_bevel, 'BEVEL', rectify=True)
         bevel.offset_type = 'WIDTH'
         bevel.limit_method = 'WEIGHT'
         bevel.miter_outer = 'MITER_ARC'
@@ -266,24 +270,24 @@ CTRL — Remove existing modifiers"""
         self.bevel = bevel
 
         if self.early_apply:
-            while context.active_object.modifiers[0].name != self.bevel.name:
+            while self.target_object.modifiers[0].name != self.bevel.name:
                 bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
 
 
     def add_weld_modifier(self, context):
-        mods = context.active_object.modifiers
+        mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
 
         if not previous_op:
-            weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=True)
+            weld = new_modifier(self.target_object, mod_weld, 'WELD', rectify=True)
             weld.merge_threshold = 0.00001
             weld.mode = 'CONNECTED'
 
             self.weld = weld
 
             if self.early_apply:
-                while context.active_object.modifiers[1].name != self.weld.name:
+                while self.target_object.modifiers[1].name != self.weld.name:
                     bpy.ops.object.modifier_move_up(modifier=self.weld.name)
 
 
@@ -291,7 +295,7 @@ CTRL — Remove existing modifiers"""
         self.edges_snapshot = {}
         self.edge_weight_average = 0
         
-        data = context.active_object.data
+        data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
 
         bevel_weight_layer = None
@@ -318,7 +322,7 @@ CTRL — Remove existing modifiers"""
         self.bevel.loop_slide = self.loop_slide
         self.bevel.use_clamp_overlap = self.clamp_overlap
 
-        data = context.active_object.data
+        data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
 
         bevel_weight_layer = None
@@ -343,6 +347,9 @@ CTRL — Remove existing modifiers"""
         self.target_object.show_wire = False
         self.target_object.show_in_front = False
         self.add_weld_modifier(context)
+
+        rectify_smooth_by_angle(self.target_object)
+
         unregister_draw_handler()
 
 
@@ -360,7 +367,7 @@ CTRL — Remove existing modifiers"""
             self.bevel.loop_slide = self.loop_slide_prev
             self.bevel.use_clamp_overlap = self.clamp_overlap_prev
 
-        data = context.active_object.data
+        data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
 
         bevel_weight_layer = None

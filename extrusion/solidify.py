@@ -26,7 +26,7 @@ from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
 mod_displace = "Offset — ND SOL"
@@ -111,10 +111,12 @@ CTRL — Remove existing modifiers"""
         self.dirty = False
         self.complex_mode = False
 
+        self.target_object = context.active_object
+
         self.thickness_input_stream = new_stream()
         self.offset_input_stream = new_stream()
 
-        mods = context.active_object.modifiers
+        mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
 
@@ -152,6 +154,8 @@ CTRL — Remove existing modifiers"""
         self.add_displace_modifier(context)
         self.add_solidify_modifier(context)
 
+        rectify_smooth_by_angle(self.target_object)
+
 
     def summon_old_operator(self, context, mods):
         self.summoned = True
@@ -167,23 +171,23 @@ CTRL — Remove existing modifiers"""
 
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
-            bpy.ops.object.shade_flat()
+            add_smooth_by_angle(self.target_object)
             return
         
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
-        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_displace_modifier(self, context):
-        displace = new_modifier(context.active_object, mod_displace, 'DISPLACE', rectify=True)
+        displace = new_modifier(self.target_object, mod_displace, 'DISPLACE', rectify=True)
         displace.mid_level = 0
 
         self.displace = displace
 
 
     def add_solidify_modifier(self, context):
-        solidify = new_modifier(context.active_object, mod_solidify, 'SOLIDIFY', rectify=True)
+        solidify = new_modifier(self.target_object, mod_solidify, 'SOLIDIFY', rectify=True)
         solidify.use_even_offset = True
         solidify.nonmanifold_thickness_mode = 'CONSTRAINTS'
         solidify.use_quality_normals = True

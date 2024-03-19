@@ -21,7 +21,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import new_modifier, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, remove_problematic_bevels, rectify_smooth_by_angle
 
 
 keys = []
@@ -44,17 +44,17 @@ ALT — Do not clean the reference object's mesh"""
     def execute(self, context):
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
-        a, b = context.selected_objects
-        reference_obj = a if a.name != context.active_object.name else b
-        
-        difference_obj = context.active_object
+        target_obj = context.active_object
 
-        intersecting_obj = context.active_object.copy()
-        intersecting_obj.data = context.active_object.data.copy()
+        a, b = context.selected_objects
+        reference_obj = a if a.name != target_obj.name else b
+        
+        intersecting_obj = target_obj.copy()
+        intersecting_obj.data = target_obj.data.copy()
         intersecting_obj.animation_data_clear()
         context.collection.objects.link(intersecting_obj)
 
-        boolean_diff = new_modifier(difference_obj, "Difference — ND Bool", 'BOOLEAN', rectify=True)
+        boolean_diff = new_modifier(target_obj, "Difference — ND Bool", 'BOOLEAN', rectify=True)
         boolean_diff.operation = 'DIFFERENCE'
         boolean_diff.object = reference_obj
         boolean_diff.solver = solver
@@ -72,11 +72,11 @@ ALT — Do not clean the reference object's mesh"""
         if not self.do_not_clean_mesh:
             remove_problematic_bevels(reference_obj)
 
-        reference_obj.parent = difference_obj
-        intersecting_obj.parent = difference_obj
+        reference_obj.parent = target_obj
+        intersecting_obj.parent = target_obj
 
-        reference_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
-        intersecting_obj.matrix_parent_inverse = difference_obj.matrix_world.inverted()
+        reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
+        intersecting_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 
         move_to_utils_collection(reference_obj)
         isolate_in_utils_collection([reference_obj])
@@ -84,6 +84,9 @@ ALT — Do not clean the reference object's mesh"""
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)
         bpy.context.view_layer.objects.active = reference_obj
+
+        rectify_smooth_by_angle(target_obj)
+        rectify_smooth_by_angle(intersecting_obj)
 
         return {'FINISHED'}
 

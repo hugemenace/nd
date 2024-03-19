@@ -27,7 +27,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
 
 
 mod_displace = "Offset — ND SCR"
@@ -135,7 +135,8 @@ CTRL — Remove existing modifiers"""
             return {'FINISHED'}
 
         self.dirty = False
-        self.object_type = context.active_object.type
+        self.target_object = context.active_object
+        self.object_type = self.target_object.type
 
         self.axis = 2 # X (0), Y (1), Z (2)
         self.offset_axis = 1 # X (0), Y (1), Z (2)
@@ -148,20 +149,17 @@ CTRL — Remove existing modifiers"""
         self.angle_input_stream = new_stream()
         self.segments_input_stream = new_stream()
 
-        if len(context.selected_objects) == 1:
-            mods = context.active_object.modifiers
-            mod_names = list(map(lambda x: x.name, mods))
-            
-            previous_op = False 
-            if self.object_type == 'MESH':
-                previous_op = all(m in mod_names for m in mod_mesh_summon_list)
-            else:
-                previous_op = all(m in mod_names for m in mod_curve_summon_list)
+        mods = self.target_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = False 
 
-            if previous_op:
-                self.summon_old_operator(context, mods)
-            else:
-                self.prepare_new_operator(context)
+        if self.object_type == 'MESH':
+            previous_op = all(m in mod_names for m in mod_mesh_summon_list)
+        else:
+            previous_op = all(m in mod_names for m in mod_curve_summon_list)
+
+        if previous_op:
+            self.summon_old_operator(context, mods)
         else:
             self.prepare_new_operator(context)
 
@@ -172,7 +170,7 @@ CTRL — Remove existing modifiers"""
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
-        init_axis(self, context.active_object, self.axis)
+        init_axis(self, self.target_object, self.axis)
         register_axis_handler(self)
 
         context.window_manager.modal_handler_add(self)
@@ -194,6 +192,8 @@ CTRL — Remove existing modifiers"""
             self.add_displace_modifier(context)
 
         self.add_screw_modifier(context)
+
+        rectify_smooth_by_angle(self.target_object)
 
 
     def summon_old_operator(self, context, mods):
@@ -217,16 +217,16 @@ CTRL — Remove existing modifiers"""
 
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
-            bpy.ops.object.shade_flat()
+            add_smooth_by_angle(self.target_object)
             return
             
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
-        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_displace_modifier(self, context):
-        displace = new_modifier(context.active_object, mod_displace, 'DISPLACE', rectify=True)
+        displace = new_modifier(self.target_object, mod_displace, 'DISPLACE', rectify=True)
         displace.mid_level = 0
         displace.space = 'LOCAL'
 
@@ -234,7 +234,7 @@ CTRL — Remove existing modifiers"""
 
 
     def add_screw_modifier(self, context):
-        screw = new_modifier(context.active_object, mod_screw, 'SCREW', rectify=True)
+        screw = new_modifier(self.target_object, mod_screw, 'SCREW', rectify=True)
         screw.screw_offset = 0
         screw.use_merge_vertices = True 
         screw.merge_threshold = 0.0001

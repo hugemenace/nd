@@ -26,7 +26,7 @@ from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
 mod_lattice = "Lattice — ND L"
@@ -210,9 +210,9 @@ CTRL — Remove existing modifiers"""
         self.lattice_points_v_input_stream = new_stream()
         self.lattice_points_w_input_stream = new_stream()
 
-        self.reference_object = context.active_object
+        self.target_object = context.active_object
 
-        mods = context.active_object.modifiers
+        mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
 
@@ -252,6 +252,8 @@ CTRL — Remove existing modifiers"""
         self.add_lattice_object(context)
         self.select_reference_object(context)
         self.add_lattice_modifier(context)
+
+        rectify_smooth_by_angle(self.target_object)
 
     
     def summon_old_operator(self, context, mods):
@@ -295,16 +297,16 @@ CTRL — Remove existing modifiers"""
         context.active_object.data.use_outside = True
 
         self.lattice_obj = context.active_object
-        self.lattice_obj.parent = self.reference_object
-        self.lattice_obj.matrix_parent_inverse = self.reference_object.matrix_world.inverted()
+        self.lattice_obj.parent = self.target_object
+        self.lattice_obj.matrix_parent_inverse = self.target_object.matrix_world.inverted()
 
         bpy.data.meshes.remove(eval_obj.data, do_unlink=True)
 
 
     def select_reference_object(self, context):
         bpy.ops.object.select_all(action='DESELECT')
-        self.reference_object.select_set(True)
-        bpy.context.view_layer.objects.active = self.reference_object
+        self.target_object.select_set(True)
+        bpy.context.view_layer.objects.active = self.target_object
 
 
     def select_lattice_object(self, context):

@@ -25,6 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.modifiers import add_smooth_by_angle, set_smoothing_angle
 
 
 class ND_OT_seams(bpy.types.Operator):
@@ -113,6 +114,8 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
         self.angle_input_stream = new_stream()
 
+        self.target_object = context.active_object
+
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={'EDGE'})
         bpy.ops.mesh.select_all(action='DESELECT')
 
@@ -165,9 +168,13 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         bpy.ops.object.mode_set(mode='OBJECT')
 
         if self.commit_auto_smooth:
-            bpy.ops.object.shade_smooth()
-            context.active_object.data.use_auto_smooth = True
-            context.active_object.data.auto_smooth_angle = radians(180)
+            if bpy.app.version >= (4, 1, 0):
+                mod = add_smooth_by_angle(self.target_object)
+                set_smoothing_angle(self.target_object, mod, radians(180), False)
+            else:
+                bpy.ops.object.shade_smooth()
+                self.target_object.data.use_auto_smooth = True
+                self.target_object.data.auto_smooth_angle = radians(180)
 
         unregister_draw_handler()
 

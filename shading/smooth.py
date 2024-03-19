@@ -21,8 +21,8 @@
 import bpy
 import bmesh
 from math import radians
-from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
-from .. lib.events import capture_modifier_keys
+from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
+from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
@@ -76,6 +76,10 @@ class ND_OT_smooth(bpy.types.Operator):
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
+
+        elif bpy.app.version >= (4, 1, 0) and pressed(event, {'S'}):
+            self.ignore_sharpness = not self.ignore_sharpness
+            self.dirty = True
         
         elif self.key_confirm:
             self.finish(context)
@@ -103,6 +107,7 @@ class ND_OT_smooth(bpy.types.Operator):
         self.base_angle_factor = 15
         self.angle = float(get_preferences().default_smoothing_angle)
         self.angle_input_stream = new_stream()
+        self.ignore_sharpness = True
 
         self.mods = []
 
@@ -140,7 +145,7 @@ class ND_OT_smooth(bpy.types.Operator):
 
                     if found_existing_modifier:
                         continue
-                        
+
                     bpy.ops.object.shade_smooth()
                     bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
                     
@@ -160,6 +165,7 @@ class ND_OT_smooth(bpy.types.Operator):
         if bpy.app.version >= (4, 1, 0):
             for object, mod in self.mods:
                 mod["Input_1"] = radians(self.angle)
+                mod["Socket_1"] = self.ignore_sharpness
                 object.data.update()
         else:
             for object in context.selected_objects:
@@ -187,6 +193,12 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.angle_input_stream)
+
+    if bpy.app.version >= (4, 1, 0):
+        draw_hint(
+            self,
+            "Ignore Sharpness [S]: {}".format("Yes" if self.ignore_sharpness else "No"),
+            "Ignore sharpness when smoothing")
 
 
 def register():

@@ -97,7 +97,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         elif self.key_confirm_alternative:
             return self.finish(context)
 
-        elif self.key_left_click:
+        elif self.key_select:
             return {'PASS_THROUGH'}
 
         elif self.key_movement_passthrough:

@@ -97,7 +97,7 @@ CTRL — Remove existing modifiers"""
             if self.geometry_mode and not self.geometry_ready:
                 return self.complete_geometry_mode(context)
 
-        elif self.key_left_click and self.geometry_mode and not self.geometry_ready:
+        elif self.key_select and self.geometry_mode and not self.geometry_ready:
             return {'PASS_THROUGH'}
 
         elif self.key_confirm:

@@ -97,6 +97,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    enable_right_click_select: BoolProperty(
+        name="Enable Right Click Select",
+        default=False,
+    )
+
     enable_deprecated_features: BoolProperty(
         name="Compatibility Mode",
         default=False,
@@ -463,7 +468,8 @@ class NDPreferences(AddonPreferences):
             "utils_collection_name",
             "use_fast_booleans",
             "recon_poly_solidify",
-            "recon_poly_inscribed"]
+            "recon_poly_inscribed",
+            "enable_right_click_select"]
 
         for pref in general_prefs:
             column = box.column(align=True)

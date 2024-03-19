@@ -104,7 +104,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 self.stage = 1
                 self.dirty = True
 
-        if self.stage == 0 and self.key_left_click:
+        if self.stage == 0 and self.key_select:
             return {'PASS_THROUGH'}
 
         if self.key_cancel:

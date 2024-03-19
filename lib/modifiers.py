@@ -93,12 +93,9 @@ def add_smooth_by_angle(object):
         bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
         
         mod = object.modifiers[-1]
-
         mod.name = "Smooth — ND SBA"
-        mod["Input_1"] = radians(float(get_preferences().default_smoothing_angle))
-        mod["Socket_1"] = True
 
-        object.data.update()
+        set_smoothing_angle(object, mod, radians(float(get_preferences().default_smoothing_angle)), True)
 
         return mod
 

@@ -25,7 +25,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
 mod_bevel = "Bevel — ND CIRC"
@@ -120,7 +120,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
         self.target_object = context.active_object
 
-        mods = context.active_object.modifiers
+        mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
 
@@ -161,19 +161,21 @@ class ND_OT_circularize(bpy.types.Operator):
         self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
 
+        rectify_smooth_by_angle(self.target_object)
+
 
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
-            bpy.ops.object.shade_flat()
+            add_smooth_by_angle(self.target_object)
             return
         
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
-        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_bevel_modifier(self, context):
-        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
+        bevel = new_modifier(self.target_object, mod_bevel, 'BEVEL', rectify=False)
         bevel.affect = 'VERTICES'
         bevel.limit_method = 'NONE'
         bevel.offset_type = 'PERCENT'
@@ -183,7 +185,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
 
     def add_weld_modifier(self, context):
-        weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=False)
+        weld = new_modifier(self.target_object, mod_weld, 'WELD', rectify=False)
         weld.merge_threshold = 0.00001
         weld.mode = 'CONNECTED'
 
@@ -191,7 +193,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
 
     def add_decimate_modifier(self, context):
-        decimate = new_modifier(context.active_object, mod_decimate, 'DECIMATE', rectify=False)
+        decimate = new_modifier(self.target_object, mod_decimate, 'DECIMATE', rectify=False)
         decimate.decimate_type = 'DISSOLVE'
         decimate.angle_limit = radians(1)
 
@@ -208,6 +210,8 @@ class ND_OT_circularize(bpy.types.Operator):
         if not self.summoned:
             self.add_weld_modifier(context)
             self.add_decimate_modifier(context)
+
+            rectify_smooth_by_angle(self.target_object)
 
         unregister_draw_handler()
     

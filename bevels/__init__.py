@@ -5,15 +5,22 @@
 # ██║ ╚████║██████╔╝
 # ╚═╝  ╚═══╝╚═════╝ 
 # 
-# “Commons Clause” License Condition v1.0
-# 
-# See LICENSE for license details. If you did not receive a copy of the license,
-# it may be obtained at https://github.com/hugemenace/nd/blob/main/LICENSE.
-# 
-# Software: ND Blender Addon
-# License: MIT
-# Licensor: T.S. & I.J. (HugeMenace)
-# 
+# ND (Non-Destructive) Blender Add-on
+# Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
 # ---
 # Contributors: Tristo (HM)
 # ---

@@ -42,17 +42,17 @@ _All proceeds from the Blender Marketplace go to the Blender Development Fund_
 
 Check out the [written documentation](https://docs.nd.hugemenace.co/) — we're in the process of creating video walkthroughs of the addon & general ND/hard-surface tutorials which will be available soon! Subscribe to our [YouTube channel](https://www.youtube.com/channel/UCS9HsDPcaWQbo-4Brd7Yjmg) so you don't miss anything!
 
-If you encounter a bug, want to send through a feature request, have feedback, or otherwise generally need support, you can get in touch on our [Discord](https://discord.gg/FbhkhvKAn3) server, or via [email](hello+nd@hugemenace.co).
+If you encounter a bug, want to send through a feature request, have feedback, or otherwise generally need support, you can get in touch on our [Discord](https://hugemenace.co/discord) server, or via [email](hello+nd@hugemenace.co).
 
 # Contributing
 
 ## I just have a question or idea
 
-Awesome! The best place to post your question, idea, or feedback is in our [Discord](https://discord.gg/FbhkhvKAn3) channel.
+Awesome! The best place to post your question, idea, or feedback is in our [Discord](https://hugemenace.co/discord) channel.
 
 ## What should I know before I get started?
 
 1. Start by familiarising yourself with the project (build something cool with it in Blender), and the [documentation](https://docs.nd.hugemenace.co/).
-1. Have a look at the current [task list](https://feedback.nd.hugemenace.co/).
-1. If you don't see anything related to your bug fix or enhancement, you can [create a new task](https://feedback.nd.hugemenace.co/feedback/add).
-1. The best way to ensure your enhancements make their way into the codebase is to chat about them in [Discord](https://discord.gg/FbhkhvKAn3) and gauge the general appetite of the community / maintainers based on their votes. There is also a special **#contributors** channel where you can discuss your idea further before you begin coding.
+1. Have a look at the current [issues](https://github.com/hugemenace/nd/issues).
+1. If you don't see anything related to your bug fix or enhancement, you can [create a new issue](https://github.com/hugemenace/nd/issues/new).
+1. The best way to ensure your enhancements make their way into the codebase is to chat about them in [Discord](https://hugemenace.co/discord) and gauge the general appetite of the community / maintainers based on their votes. There is also a special **#contributors** channel where you can discuss your idea further before you begin coding.

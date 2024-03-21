@@ -291,10 +291,14 @@ CTRL — Remove existing modifiers"""
 
         context.active_object.location = eval_obj.matrix_world @ center
         context.active_object.rotation_euler = eval_obj.rotation_euler
-        context.active_object.dimensions = eval_obj.dimensions * 1.001
         context.active_object.name = "ND — Lattice"
         context.active_object.data.name = "ND — Lattice"
         context.active_object.data.use_outside = True
+
+        if bpy.app.version >= (4, 1, 0):
+            context.active_object.scale = eval_obj.dimensions * 1.001
+        else:
+            context.active_object.dimensions = eval_obj.dimensions * 1.001
 
         self.lattice_obj = context.active_object
         self.lattice_obj.parent = self.target_object

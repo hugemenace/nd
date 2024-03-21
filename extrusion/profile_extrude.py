@@ -20,13 +20,14 @@
 
 import bpy
 import bmesh
+from math import radians
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
 mod_screw = "Extrusion — ND PE"
@@ -118,15 +119,14 @@ CTRL — Remove existing modifiers"""
         self.extrusion_length_input_stream = new_stream()
         self.offset_input_stream = new_stream()
 
-        if len(context.selected_objects) == 1:
-            mods = context.active_object.modifiers
-            mod_names = list(map(lambda x: x.name, mods))
-            previous_op = all(m in mod_names for m in mod_summon_list)
+        self.target_object = context.active_object
 
-            if previous_op:
-                self.summon_old_operator(context, mods)
-            else:
-                self.prepare_new_operator(context)
+        mods = self.target_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
+
+        if previous_op:
+            self.summon_old_operator(context, mods)
         else:
             self.prepare_new_operator(context)
 
@@ -137,7 +137,7 @@ CTRL — Remove existing modifiers"""
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
-        init_axis(self, context.active_object, self.axis)
+        init_axis(self, self.target_object, self.axis)
         register_axis_handler(self)
 
         context.window_manager.modal_handler_add(self)
@@ -160,9 +160,12 @@ CTRL — Remove existing modifiers"""
         self.offset = 0
         self.calculate_edges = True
 
+        self.add_smooth_shading(context)
         self.add_weighting_modifier(context)
         self.add_offset_modifier(context)
         self.add_screw_modifier(context)
+
+        rectify_smooth_by_angle(self.target_object)
 
 
     def summon_old_operator(self, context, mods):
@@ -197,9 +200,19 @@ CTRL — Remove existing modifiers"""
 
         return max(-1, min(1, 1 - round(factor)))
 
+    
+    def add_smooth_shading(self, context):
+        if bpy.app.version >= (4, 1, 0):
+            self.smoothing = add_smooth_by_angle(self.target_object)
+            return
+        
+        bpy.ops.object.shade_smooth()
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+
 
     def add_weighting_modifier(self, context):
-        offset = new_modifier(context.active_object, mod_weighting, 'DISPLACE', rectify=True)
+        offset = new_modifier(self.target_object, mod_weighting, 'DISPLACE', rectify=True)
         offset.space = 'LOCAL'
         offset.mid_level = 0
 
@@ -207,7 +220,7 @@ CTRL — Remove existing modifiers"""
 
     
     def add_offset_modifier(self, context):
-        offset = new_modifier(context.active_object, mod_offset, 'DISPLACE', rectify=True)
+        offset = new_modifier(self.target_object, mod_offset, 'DISPLACE', rectify=True)
         offset.space = 'LOCAL'
         offset.mid_level = 0
 
@@ -215,7 +228,7 @@ CTRL — Remove existing modifiers"""
 
 
     def add_screw_modifier(self, context):
-        screw = new_modifier(context.active_object, mod_screw, 'SCREW', rectify=True)
+        screw = new_modifier(self.target_object, mod_screw, 'SCREW', rectify=True)
         screw.steps = 0
         screw.render_steps = 0
         screw.angle = 0
@@ -244,8 +257,10 @@ CTRL — Remove existing modifiers"""
 
     def revert(self, context):
         if not self.summoned:
+            bpy.ops.object.modifier_remove(modifier=self.displace.name)
             bpy.ops.object.modifier_remove(modifier=self.weighting_offset.name)
             bpy.ops.object.modifier_remove(modifier=self.screw.name)
+            bpy.ops.object.modifier_remove(modifier=self.smoothing.name)
 
         if self.summoned:
             axis = ['X', 'Y', 'Z'][self.axis_prev]

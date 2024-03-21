@@ -20,6 +20,8 @@
 
 import bpy
 import re
+from math import radians
+from .. lib.preferences import get_preferences
 
 
 def new_modifier(object, mod_name, mod_type, rectify=True):
@@ -76,6 +78,49 @@ def rectify_mod_order(object, mod_name):
     else:
         with bpy.context.temp_override(object=object):
             bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=matching_mod_index)
+
+
+def add_smooth_by_angle(object):
+    if bpy.app.version < (4, 1, 0):
+        return
+
+    for mod in object.modifiers:
+        if mod.name == "Smooth — ND SBA":
+            return mod
+
+    with bpy.context.temp_override(object=object):
+        bpy.ops.object.shade_smooth()
+        bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
+        
+        mod = object.modifiers[-1]
+        mod.name = "Smooth — ND SBA"
+
+        set_smoothing_angle(object, mod, radians(float(get_preferences().default_smoothing_angle)), True)
+
+        return mod
+
+
+def set_smoothing_angle(object, mod, angle, ignore_sharpness=False):
+    mod["Input_1"] = angle
+    mod["Socket_1"] = ignore_sharpness
+
+    object.data.update()
+
+
+def rectify_smooth_by_angle(object):
+    if bpy.app.version < (4, 1, 0):
+        return
+
+    mods = list(object.modifiers)
+    smoothing_mods = ['Smooth — ND SBA']
+    smoothing_mods = [mod for mod in mods if mod.name in smoothing_mods]
+
+    for index, mod in enumerate(smoothing_mods):
+        if bpy.app.version < (4, 0, 0):
+            bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod.name, index=len(mods) - 1)
+        else:
+            with bpy.context.temp_override(object=object):
+                bpy.ops.object.modifier_move_to_index(modifier=mod.name, index=len(mods) - 1)
 
 
 def remove_problematic_bevels(object):

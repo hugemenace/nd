@@ -20,7 +20,7 @@
 
 import bpy
 from math import radians
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
 class ND_OT_decimate(bpy.types.Operator):
@@ -46,6 +46,8 @@ CTRL — Remove existing modifiers"""
             decimate = new_modifier(obj, 'Decimate — ND SD', 'DECIMATE', rectify=True)
             decimate.decimate_type = 'DISSOLVE'
             decimate.angle_limit = radians(1)
+
+            rectify_smooth_by_angle(obj)
 
         return {'FINISHED'}
 

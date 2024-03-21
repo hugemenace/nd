@@ -19,7 +19,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
 class ND_OT_weld(bpy.types.Operator):
@@ -44,6 +44,8 @@ CTRL — Remove existing modifiers"""
         for obj in context.selected_objects:
             weld = new_modifier(obj, 'Weld — ND SW', 'WELD', rectify=True)
             weld.merge_threshold = 0.001
+
+            rectify_smooth_by_angle(obj)
 
         return {'FINISHED'}
 

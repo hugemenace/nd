@@ -26,7 +26,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
 mod_deform = "Deform — ND SD"
@@ -149,15 +149,14 @@ CTRL — Remove existing modifiers"""
         self.angle_input_stream = new_stream()
         self.factor_input_stream = new_stream()
 
-        if len(context.selected_objects) == 1:
-            mods = context.active_object.modifiers
-            mod_names = list(map(lambda x: x.name, mods))
-            previous_op = all(m in mod_names for m in mod_summon_list)
+        self.target_object = context.active_object
 
-            if previous_op:
-                self.summon_old_operator(context, mods)
-            else:
-                self.prepare_new_operator(context)
+        mods = self.target_object.modifiers
+        mod_names = list(map(lambda x: x.name, mods))
+        previous_op = all(m in mod_names for m in mod_summon_list)
+
+        if previous_op:
+            self.summon_old_operator(context, mods)
         else:
             self.prepare_new_operator(context)
 
@@ -168,7 +167,7 @@ CTRL — Remove existing modifiers"""
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
-        init_axis(self, context.active_object, self.axis)
+        init_axis(self, self.target_object, self.axis)
         register_axis_handler(self)
 
         context.window_manager.modal_handler_add(self)
@@ -191,6 +190,8 @@ CTRL — Remove existing modifiers"""
 
         self.add_simple_deform_modifier(context)
 
+        rectify_smooth_by_angle(self.target_object)
+
 
     def summon_old_operator(self, context, mods):
         self.summoned = True
@@ -204,7 +205,7 @@ CTRL — Remove existing modifiers"""
 
 
     def add_simple_deform_modifier(self, context):
-        deform = new_modifier(context.active_object, mod_deform, 'SIMPLE_DEFORM', rectify=True)
+        deform = new_modifier(self.target_object, mod_deform, 'SIMPLE_DEFORM', rectify=True)
 
         self.deform = deform
 

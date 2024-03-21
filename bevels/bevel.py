@@ -26,7 +26,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
 
 
 mod_bevel = "Bevel — ND B"
@@ -226,6 +226,8 @@ SHIFT — Create a stacked bevel modifier"""
         self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
 
+        rectify_smooth_by_angle(self.target_object)
+
 
     def summon_old_operator(self, context):
         self.summoned = True
@@ -243,13 +245,17 @@ SHIFT — Create a stacked bevel modifier"""
 
 
     def add_smooth_shading(self, context):
+        if bpy.app.version >= (4, 1, 0):
+            add_smooth_by_angle(self.target_object)
+            return
+        
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
-        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
     def add_bevel_modifier(self, context):
-        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
+        bevel = new_modifier(self.target_object, mod_bevel, 'BEVEL', rectify=False)
         bevel.offset_type = 'WIDTH'
         bevel.miter_outer = 'MITER_ARC'
         bevel.face_strength_mode = 'FSTR_AFFECTED'
@@ -258,7 +264,7 @@ SHIFT — Create a stacked bevel modifier"""
 
     
     def add_weld_modifier(self, context):
-        weld = new_modifier(context.active_object, mod_weld, 'WELD', rectify=False)
+        weld = new_modifier(self.target_object, mod_weld, 'WELD', rectify=False)
         weld.merge_threshold = 0.00001
         weld.mode = 'CONNECTED'
 
@@ -283,6 +289,7 @@ SHIFT — Create a stacked bevel modifier"""
 
         if not self.summoned:
             self.add_weld_modifier(context)
+            rectify_smooth_by_angle(self.target_object)
 
         unregister_draw_handler()
 

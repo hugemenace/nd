@@ -27,7 +27,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_problematic_bevels
+from .. lib.modifiers import new_modifier, remove_problematic_bevels, rectify_smooth_by_angle
 
 
 class ND_OT_bool_inset(BaseOperator):
@@ -139,6 +139,8 @@ class ND_OT_bool_inset(BaseOperator):
         self.intersecting_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
 
         bpy.ops.object.select_all(action='DESELECT')
+
+        rectify_smooth_by_angle(self.target_obj)
 
         self.operate(context)   
 

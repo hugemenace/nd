@@ -39,10 +39,11 @@ def add_single_vertex_object(cls, context, name):
     obj.select_set(True)
     
     context.view_layer.objects.active = obj
-    
-    bpy.ops.object.shade_smooth()
-    obj.data.use_auto_smooth = True
-    obj.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+
+    if bpy.app.version < (4, 1, 0):
+        bpy.ops.object.shade_smooth()
+        obj.data.use_auto_smooth = True
+        obj.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
     
     cls.obj = obj
 

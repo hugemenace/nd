@@ -26,7 +26,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
 mod_bevel = "Bevel — ND VB"
@@ -157,12 +157,12 @@ CTRL — Remove existing modifiers"""
 
         previous_op = False
 
-        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(self.target_object.data)
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
 
         self.vgroup_match = None
-        for group in context.active_object.vertex_groups:
-            vgroup_vert_indices = [vert.index for vert in context.active_object.data.vertices if group.index in [i.group for i in vert.groups]]
+        for group in self.target_object.vertex_groups:
+            vgroup_vert_indices = [vert.index for vert in self.target_object.data.vertices if group.index in [i.group for i in vert.groups]]
             if len(set(vgroup_vert_indices) & set(selected_vert_indices)) > 0:
                 if self.vgroup_match:
                     self.report({'ERROR_INVALID_INPUT'}, "Multiple vertex groups selected, unable to continue operation.")
@@ -183,7 +183,7 @@ CTRL — Remove existing modifiers"""
             bpy.ops.object.vertex_group_set_active(group=self.group.name)
             bpy.ops.object.vertex_group_select()
 
-            for mod in context.active_object.modifiers:
+            for mod in self.target_object.modifiers:
                 if mod.type == "BEVEL" and mod.vertex_group == self.group.name:
                     previous_op = True
                     self.bevel = mod
@@ -228,24 +228,32 @@ CTRL — Remove existing modifiers"""
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
 
+        rectify_smooth_by_angle(self.target_object)
+
 
     def add_smooth_shading(self, context):
+        if bpy.app.version >= (4, 1, 0):
+            bpy.ops.object.mode_set(mode='OBJECT')
+            add_smooth_by_angle(self.target_object)
+            bpy.ops.object.mode_set(mode='EDIT')
+            return
+        
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
-        context.active_object.data.use_auto_smooth = True
-        context.active_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+        self.target_object.data.use_auto_smooth = True
+        self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
         bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_vertex_group(self, context):
-        vgroup = context.active_object.vertex_groups.new(name="ND — Bevel")
+        vgroup = self.target_object.vertex_groups.new(name="ND — Bevel")
         bpy.ops.object.vertex_group_assign()
 
         self.vgroup = vgroup
 
 
     def add_bevel_modifier(self, context):
-        bevel = new_modifier(context.active_object, mod_bevel, 'BEVEL', rectify=False)
+        bevel = new_modifier(self.target_object, mod_bevel, 'BEVEL', rectify=False)
         bevel.affect = 'EDGES' if self.edge_mode else 'VERTICES'
         bevel.limit_method = 'VGROUP'
         bevel.offset_type = 'WIDTH'
@@ -254,24 +262,24 @@ CTRL — Remove existing modifiers"""
         self.bevel = bevel
 
         if not self.late_apply:
-            while context.active_object.modifiers[0].name != self.bevel.name:
+            while self.target_object.modifiers[0].name != self.bevel.name:
                 bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
     
 
     def add_weld_modifier(self, context):
-        mods = context.active_object.modifiers
+        mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
 
         if self.late_apply or not previous_op:
-            weld = new_modifier(context.active_object, mod_weld_la if self.late_apply else mod_weld, 'WELD', rectify=False)
+            weld = new_modifier(self.target_object, mod_weld_la if self.late_apply else mod_weld, 'WELD', rectify=False)
             weld.merge_threshold = 0.00001
             weld.mode = 'CONNECTED'
 
             self.weld = weld
 
             if not self.late_apply:
-                while context.active_object.modifiers[1].name != self.weld.name:
+                while self.target_object.modifiers[1].name != self.weld.name:
                     bpy.ops.object.modifier_move_up(modifier=self.weld.name)
 
 
@@ -287,6 +295,8 @@ CTRL — Remove existing modifiers"""
         self.target_object.show_wire = False
         self.target_object.show_in_front = False
         self.add_weld_modifier(context)
+
+        rectify_smooth_by_angle(self.target_object)
 
         # TODO: Find a better solution. This is a workaround for the fact that
         # the vertex group <> modifier combo's are not being detected by the recall 
@@ -313,7 +323,7 @@ CTRL — Remove existing modifiers"""
 
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
-            context.active_object.vertex_groups.remove(self.vgroup)
+            self.target_object.vertex_groups.remove(self.vgroup)
 
         unregister_draw_handler()
 

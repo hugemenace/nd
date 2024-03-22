@@ -3,6 +3,10 @@
         {
             "filename": "__init__.py",
             "updater": "addon-version-updater.js"
+        },
+        {
+            "filename": "blender_manifest.toml",
+            "updater": "manifest-version-updater.js"
         }
     ]
 }

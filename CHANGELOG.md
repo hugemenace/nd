@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.40.0](https://github.com/hugemenace/nd/compare/v1.39.1...v1.40.0) (2024-03-22)
+
+
+### Features
+
+* add right-click select support (toggle via add-on preferences) ([7e7aad4](https://github.com/hugemenace/nd/commit/7e7aad4d0ac46041fa76a4afb3689fa5a5d73fa8))
+* add support for Blender 4.1's new smoothing process ([316ecdc](https://github.com/hugemenace/nd/commit/316ecdca0d0ebe5cfc295f27aa9068bcde47fcac))
+
+
+### Bug Fixes
+
+* fix circular array empty rotation in single-object mode and tidy up operator ([e39bfc1](https://github.com/hugemenace/nd/commit/e39bfc199136e2fff2623370647a6d0b39b3c6a7))
+* fix lattice scaling in Blender >= 4.1 ([14bf1aa](https://github.com/hugemenace/nd/commit/14bf1aa973df9f98d6ba48a07c9d2d36a5acfd2b))
+
 ### [1.39.1](https://github.com/hugemenace/nd/compare/v1.39.0...v1.39.1) (2024-02-24)
 
 

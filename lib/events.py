@@ -62,12 +62,12 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.key_step_up = detected(event, {'WHEELUPMOUSE'}) or pressed(event, {'UP_ARROW'}) or pressed(event, {'RIGHT_ARROW'})
     cls.key_step_down = detected(event, {'WHEELDOWNMOUSE'}) or pressed(event, {'DOWN_ARROW'}) or pressed(event, {'LEFT_ARROW'})
     
+    cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
+
     if get_preferences().enable_right_click_select:
-        cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
         cls.key_select = detected(event, {'RIGHTMOUSE'})
         cls.key_cancel = pressed(event, {'ESC'})
     else:
-        cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
         cls.key_select = detected(event, {'LEFTMOUSE'})
         cls.key_cancel = clicked(event, {'RIGHTMOUSE'}) or pressed(event, {'ESC'})
 

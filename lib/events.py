@@ -63,9 +63,15 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.key_step_down = detected(event, {'WHEELDOWNMOUSE'}) or pressed(event, {'DOWN_ARROW'}) or pressed(event, {'LEFT_ARROW'})
     
     cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
-    cls.key_left_click = detected(event, {'LEFTMOUSE'})
+
+    if get_preferences().enable_right_click_select:
+        cls.key_select = detected(event, {'RIGHTMOUSE'})
+        cls.key_cancel = pressed(event, {'ESC'})
+    else:
+        cls.key_select = detected(event, {'LEFTMOUSE'})
+        cls.key_cancel = clicked(event, {'RIGHTMOUSE'}) or pressed(event, {'ESC'})
+
     cls.key_confirm_alternative = pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
-    cls.key_cancel = clicked(event, {'RIGHTMOUSE'}) or pressed(event, {'ESC'})
 
     cls.key_movement_passthrough = detected(event, {'MIDDLEMOUSE'}) or (has(event) and event.alt and event.type in {'LEFTMOUSE', 'RIGHTMOUSE'}) or (has(event) and event.type.startswith('NDOF'))
 

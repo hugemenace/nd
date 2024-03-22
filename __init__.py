@@ -149,7 +149,7 @@ class NDPreferences(AddonPreferences):
 
     enable_update_check: BoolProperty(
         name="Enable Update Check",
-        default=True,
+        default=False,
     )
 
     overlay_pin_x: IntProperty(
@@ -473,7 +473,7 @@ class NDPreferences(AddonPreferences):
         general_boxed_prefs = [
             ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False],
-            ["Automatically check if addon is up to date when Blender starts", "enable_update_check", False],
+            ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False],
             ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False],
             ["Enable experimental features. Use at your own risk!", "enable_experimental_features", False]]
 

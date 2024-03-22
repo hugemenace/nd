@@ -13,7 +13,7 @@ website = "https://docs.nd.hugemenace.co/"
 
 tags = ["3D View", "Lighting", "Material", "Modeling", "Mesh", "Object", "Scene", "UV"]
 
-blender_version_min = "2.93.0"
+blender_version_min = "4.2.0"
 
 license = [
   "SPDX:GPL-3.0-or-later",

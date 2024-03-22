@@ -1,0 +1,25 @@
+schema_version = "1.0.0"
+
+id = "nd"
+version = "1.39.1"
+name = "ND"
+tagline = "Non-Destructive Modeling Toolkit"
+maintainer = "HugeMenace <hello@hugemenace.co>"
+type = "add-on"
+
+permissions = ["files", "network"]
+
+website = "https://docs.nd.hugemenace.co/"
+
+tags = ["3D View", "Lighting", "Material", "Modeling", "Mesh", "Object", "Scene", "UV"]
+
+blender_version_min = "2.93.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+copyright = [
+  "2024 Tristan S. & Ian J.",
+  "2024 HugeMenace",
+]

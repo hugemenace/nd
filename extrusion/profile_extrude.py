@@ -267,7 +267,6 @@ CTRL — Remove existing modifiers"""
             bpy.ops.object.modifier_remove(modifier=self.displace.name)
             bpy.ops.object.modifier_remove(modifier=self.weighting_offset.name)
             bpy.ops.object.modifier_remove(modifier=self.screw.name)
-            bpy.ops.object.modifier_remove(modifier=self.smoothing.name)
 
         if self.summoned:
             axis = ['X', 'Y', 'Z'][self.axis_prev]

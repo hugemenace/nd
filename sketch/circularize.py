@@ -113,9 +113,12 @@ class ND_OT_circularize(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND CIRC')
-
             return {'FINISHED'}
 
         self.dirty = False
@@ -150,7 +153,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 

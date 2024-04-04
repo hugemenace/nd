@@ -47,16 +47,19 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
     def draw(self, context):
         objs = context.selected_objects
+        has_target = context.active_object is not None
 
         total_sections = 0
 
         if len(objs) == 0:
             total_sections += self.draw_no_object_predictions(context)
-        elif len(objs) == 1:
+        elif not has_target and len(objs) > 0:
+            total_sections += self.draw_no_active_target(context)
+        elif has_target and len(objs) == 1:
             total_sections += self.draw_single_object_predictions(context)
-        elif len(objs) == 2:
+        elif has_target and len(objs) == 2:
             total_sections += self.draw_two_object_predictions(context)
-        elif len(objs) > 2:
+        elif has_target and len(objs) > 2:
             total_sections += self.draw_many_object_predictions(context)
 
         if total_sections == 0:
@@ -65,7 +68,14 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
     def draw_no_predictions(self, context):
         layout = self.layout
-        layout.label(text="No predictions available", icon='ZOOM_SELECTED')
+        layout.label(text="No predictions available", icon='GHOST_DISABLED')
+
+    
+    def draw_no_active_target(self, context):
+        layout = self.layout
+        layout.label(text="No active target object selected", icon='RESTRICT_SELECT_OFF')
+
+        return NO_SECTION_COUNT
 
 
     def draw_make_edge_face_ops(self, context):

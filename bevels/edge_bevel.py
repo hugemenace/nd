@@ -158,6 +158,10 @@ CTRL — Remove existing modifiers"""
 
 
     def do_invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
             for object in context.selected_objects:
@@ -225,7 +229,7 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'EDIT_MESH':
+        if context.mode == 'EDIT_MESH' and context.active_object is not None:
             mesh = bmesh.from_edit_mesh(context.active_object.data)
             return len([edge for edge in mesh.edges if edge.select]) >= 1
 

@@ -112,6 +112,10 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
         self.fast_apply = event.shift
 
@@ -145,7 +149,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
     

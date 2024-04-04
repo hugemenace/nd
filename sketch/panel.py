@@ -123,6 +123,10 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def do_invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
 
         self.xray_mode = False
@@ -148,7 +152,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 

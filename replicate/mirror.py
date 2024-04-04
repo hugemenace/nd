@@ -120,6 +120,10 @@ CTRL — Remove existing modifiers"""
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         if event.ctrl:
             remove_modifiers_starting_with(context.selected_objects, 'Mirror —')
             return {'FINISHED'}
@@ -167,10 +171,10 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT':
-            if len(context.selected_objects) == 1 and context.active_object.type in ['MESH', 'CURVE']:
+            if len(context.selected_objects) == 1 and context.active_object is not None and context.active_object.type in ['MESH', 'CURVE']:
                 return True
 
-            if len(context.selected_objects) >= 2:
+            if len(context.selected_objects) >= 2 and context.active_object is not None:
                 return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != context.active_object.name)
 
 

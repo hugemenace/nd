@@ -42,12 +42,12 @@ SHIFT — Undo faux origin translation"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
+        if context.mode == 'OBJECT' and len(context.selected_objects) == 2 and context.active_object is not None:
             a, b = context.selected_objects
             reference_obj = a if a.name != context.active_object.name else b
 
             return reference_obj.type == 'MESH'
-        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
+        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object is not None and context.active_object.type == 'MESH':
             return True
         elif context.mode == 'EDIT_MESH' and len(context.selected_objects) == 1:
             return True
@@ -70,6 +70,10 @@ SHIFT — Undo faux origin translation"""
 
     
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         if len(context.selected_objects) == 1:
             if event.shift:
                 self.revert_faux_origin(context)

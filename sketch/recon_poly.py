@@ -141,6 +141,10 @@ class ND_OT_recon_poly(BaseOperator):
         self.width_input_stream = new_stream()
 
         if len(context.selected_objects) == 1:
+            if context.active_object is None:
+                self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+                return {'CANCELLED'}
+
             mods = context.active_object.modifiers
             mod_names = list(map(lambda x: x.name, mods))
             previous_op = all(m in mod_names for m in mod_summon_list)

@@ -126,6 +126,10 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
 
         self.mod_cycle = event.shift
@@ -164,7 +168,7 @@ SHIFT — Cycle through the modifier stack"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 

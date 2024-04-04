@@ -85,6 +85,10 @@ class ND_OT_bool_inset(BaseOperator):
 
 
     def do_invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
         self.base_thickness_factor = 0.01
 
@@ -163,7 +167,7 @@ class ND_OT_bool_inset(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 2 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
     

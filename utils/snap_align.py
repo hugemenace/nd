@@ -99,6 +99,10 @@ class ND_OT_snap_align(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
         self.hit_location = None
         self.capture_points = []
@@ -167,7 +171,7 @@ class ND_OT_snap_align(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 2 and context.active_object.type == 'MESH'
 
     

@@ -127,7 +127,7 @@ class ND_OT_screw_head(BaseOperator):
         self.offset_input_stream = new_stream()
         self.scale_input_stream = new_stream()
 
-        self.target_object = context.active_object if len(context.selected_objects) > 0 else None
+        self.target_object = context.active_object if context.active_object is not None else None
 
         custom_objects = []
         custom_file = get_preferences().custom_screw_heads_path

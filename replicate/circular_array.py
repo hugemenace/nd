@@ -136,6 +136,10 @@ CTRL — Remove existing modifiers"""
 
 
     def do_invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND CA')
             return {'FINISHED'}
@@ -183,12 +187,12 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) == 2:
+        if context.mode == 'OBJECT' and context.active_object is not None and len(context.selected_objects) == 2:
             a, b = context.selected_objects
             reference_obj = a if a.name != context.active_object.name else b
 
             return reference_obj.type == 'MESH'
-        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
+        elif context.mode == 'OBJECT' and context.active_object is not None and len(context.selected_objects) == 1 and context.active_object.type == 'MESH':
             return True
         else:
             return False

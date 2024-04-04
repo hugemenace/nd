@@ -163,6 +163,10 @@ SHIFT — Create a stacked bevel modifier"""
 
 
     def do_invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.mods = context.active_object.modifiers
         self.mod_names = list(map(lambda x: x.name, self.mods))
         self.current_bevel_mods = list(filter(lambda x: any(m in x for m in mod_summon_list), self.mod_names))
@@ -223,7 +227,7 @@ SHIFT — Create a stacked bevel modifier"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 

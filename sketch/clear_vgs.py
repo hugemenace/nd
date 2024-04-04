@@ -38,12 +38,16 @@ class ND_OT_clear_vgs(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'EDIT_MESH':
+        if context.mode == 'EDIT_MESH' and context.active_object is not None:
             mesh = bmesh.from_edit_mesh(context.active_object.data)
             return len([vert for vert in mesh.verts if vert.select]) >= 1
 
 
     def execute(self, context):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         bm = bmesh.from_edit_mesh(context.active_object.data)
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
         bm.free()

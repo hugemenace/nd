@@ -175,6 +175,10 @@ class ND_OT_flare(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
         self.summoned = False
         self.regenerated_rig = False
@@ -223,7 +227,7 @@ class ND_OT_flare(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type in {'MESH', 'EMPTY'}
 
 

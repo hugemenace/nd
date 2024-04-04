@@ -94,6 +94,10 @@ class ND_OT_hydrate(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+        if context.active_object is None:
+            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            return {'CANCELLED'}
+        
         self.dirty = False
 
         self.active_object = context.active_object
@@ -116,7 +120,7 @@ class ND_OT_hydrate(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
+        if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) > 0 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
     

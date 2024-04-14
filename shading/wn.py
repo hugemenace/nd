@@ -52,6 +52,9 @@ CTRL — Remove existing modifiers"""
         self.keep_sharp = not event.shift
 
         for obj in context.selected_objects:
+            if any(' — ND WN' in mod.name for mod in obj.modifiers):
+                continue
+            
             mod = new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)
             mod.keep_sharp = self.keep_sharp
             mod.weight = 100

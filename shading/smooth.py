@@ -142,7 +142,17 @@ class ND_OT_smooth(bpy.types.Operator):
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
             for object in context.selected_objects:
-                self.mods.append((object, add_smooth_by_angle(object)))
+                smooth_mod = add_smooth_by_angle(object)
+
+                # If the object has a WN modifier, place the smoothig mod before it.
+                object_mods = list(object.modifiers)
+                for index, mod in enumerate(object_mods):
+                    if mod.name == "Weighted Normal — ND WN":
+                        with bpy.context.temp_override(object=object):
+                            bpy.ops.object.modifier_move_to_index(modifier=smooth_mod.name, index=index-1)
+                        break
+                
+                self.mods.append((object, smooth_mod))
             return
         
         bpy.ops.object.shade_smooth()

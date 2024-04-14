@@ -26,13 +26,14 @@
 # ---
 
 import bpy
-from .. lib.collections import hide_utils_collection, get_utils_layer
+from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection
 
 
 class ND_OT_toggle_utils_collection(bpy.types.Operator):
     bl_idname = "nd.toggle_utils_collection"
     bl_label = "Utils Visibility"
-    bl_description = "Toggle utils collection visibility"
+    bl_description = """Toggle utils collection visibility
+SHIFT — Display all utils for the selected objects"""
 
 
     def execute(self, context):
@@ -42,6 +43,30 @@ class ND_OT_toggle_utils_collection(bpy.types.Operator):
             hide_utils_collection(not layer.hide_viewport)
 
         return {'FINISHED'}
+
+    
+    def invoke(self, context, event):
+        if event.shift and len(context.selected_objects) > 0:
+            data = get_utils_layer()
+            if data is None:
+                return {'FINISHED'}
+
+            layer, collection = data
+            visible = not layer.hide_viewport
+
+            if not visible:
+                hide_utils_collection(visible)
+
+            all_util_objects = set(())
+            for obj in context.selected_objects:
+                local_util_objects = [mod.object for mod in obj.modifiers if mod.type == 'BOOLEAN' and mod.object]
+                all_util_objects.update(local_util_objects)
+
+            isolate_in_utils_collection(all_util_objects)
+            
+            return {'FINISHED'}
+
+        return self.execute(context)
 
 
 def register():

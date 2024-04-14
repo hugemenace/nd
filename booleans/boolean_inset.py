@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
-from .. lib.modifiers import new_modifier, remove_problematic_bevels, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
 
 
 class ND_OT_bool_inset(BaseOperator):
@@ -134,14 +134,14 @@ class ND_OT_bool_inset(BaseOperator):
         self.reference_obj.data.name = self.reference_obj.name
         self.reference_obj.hide_set(True)
 
-        remove_problematic_bevels(self.reference_obj)
+        remove_problematic_boolean_mods(self.reference_obj)
         
         self.intersecting_obj.display_type = 'WIRE'
         self.intersecting_obj.hide_render = True
         self.intersecting_obj.name = " — ".join(['Bool', self.intersecting_obj.name])
         self.intersecting_obj.data.name = self.intersecting_obj.name
 
-        remove_problematic_bevels(self.intersecting_obj)
+        remove_problematic_boolean_mods(self.intersecting_obj)
 
         self.reference_obj.parent = self.target_obj
         self.intersecting_obj.parent = self.target_obj

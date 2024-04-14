@@ -28,7 +28,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import new_modifier, remove_problematic_bevels, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
 
 
 keys = []
@@ -81,7 +81,7 @@ ALT — Do not clean the reference object's mesh"""
         reference_obj.data.name = reference_obj.name
 
         if not self.do_not_clean_mesh:
-            remove_problematic_bevels(reference_obj)
+            remove_problematic_boolean_mods(reference_obj)
 
         reference_obj.parent = target_obj
         intersecting_obj.parent = target_obj

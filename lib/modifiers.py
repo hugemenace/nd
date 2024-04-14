@@ -56,6 +56,10 @@ def rectify_mod_order(object, mod_name):
 
     matching_mod_index = None
     for index, mod in enumerate(mods):
+        if "Weighted Normal — ND WN" in mod.name:
+            matching_mod_index = index
+            break
+
         if "Weld — ND SW" in mod.name:
             matching_mod_index = index
             break
@@ -126,11 +130,15 @@ def rectify_smooth_by_angle(object):
                 bpy.ops.object.modifier_move_to_index(modifier=mod.name, index=len(mods) - 1)
 
 
-def remove_problematic_bevels(object):
+def remove_problematic_boolean_mods(object):
     mods = [mod for mod in object.modifiers]
     remove_mods = []
 
     for mod in mods:
+        if mod.name == "Weighted Normal — ND WN":
+            remove_mods.append(mod)
+            continue
+
         if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
             if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
                 remove_mods.append(mod)

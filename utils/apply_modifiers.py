@@ -78,9 +78,6 @@ SHIFT — Hard apply (apply all modifiers)"""
                 if mod.type in safe_mod_types:
                     continue
 
-                if "— ND WNB" in mod.name:
-                    continue
-
                 if skip_weld and mod.type == 'WELD' and "— ND B" in mod.name:
                     skip_weld = False
                     continue

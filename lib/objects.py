@@ -96,10 +96,6 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
                 if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
                     bpy.ops.object.modifier_remove(modifier=name)
                     continue
-            
-            if "— ND WNB" in mod.name:
-                bpy.ops.object.modifier_remove(modifier=name)
-                continue
 
     depsgraph = context.evaluated_depsgraph_get()
     object_eval = context.active_object.evaluated_get(depsgraph)

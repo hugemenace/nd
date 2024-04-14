@@ -115,7 +115,7 @@ def rectify_smooth_by_angle(object):
         return
 
     mods = list(object.modifiers)
-    smoothing_mods = ['Smooth — ND SBA']
+    smoothing_mods = ['Smooth — ND SBA', 'Weighted Normal — ND WN']
     smoothing_mods = [mod for mod in mods if mod.name in smoothing_mods]
 
     for index, mod in enumerate(smoothing_mods):

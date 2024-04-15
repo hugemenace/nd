@@ -7,7 +7,7 @@ tagline = "Non-Destructive Modeling Toolkit"
 maintainer = "HugeMenace <hello@hugemenace.co>"
 type = "add-on"
 
-permissions = ["files"]
+permissions = ["files", "network"]
 
 website = "https://docs.nd.hugemenace.co/"
 

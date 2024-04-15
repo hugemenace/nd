@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.41.0](https://github.com/hugemenace/nd/compare/v1.40.0...v1.41.0) (2024-04-15)
+
+
+### Features
+
+* add an option to toggle the visibility of utils for only the selected objects ([d06cea6](https://github.com/hugemenace/nd/commit/d06cea69d0ad19bbc3ff3e5784d676ad66149242))
+* add robertson, torx tamper proof, and triangle recess screw head types ([98e7fd1](https://github.com/hugemenace/nd/commit/98e7fd16a84006539db5ffa13ea83183ccb3cfda))
+
+
+### Bug Fixes
+
+* ensure that boolean ops handle the presence of WN mods correctly ([fff5894](https://github.com/hugemenace/nd/commit/fff5894b291324bf1ca630e3b73f160b0086e532))
+* ensure that the SBA and WN mod order is maintained when new mods are added to the stack ([e8f8c7e](https://github.com/hugemenace/nd/commit/e8f8c7ef6fbf9da735f24c6c1fca2fa74bf80572))
+* ensure that the WN modifier doesn't add additional mods to an object with the WN mod already applied ([c1b9607](https://github.com/hugemenace/nd/commit/c1b960737a825b3c3bfbe345686df2777a20aa2d))
+* ensure the SBA mod places itself before any WN mod present in the stack ([c562b27](https://github.com/hugemenace/nd/commit/c562b277cf79aa3db9f022c62772debb28804b1e))
+* fix NoneType error and add additional guard clauses for when the active target object is excluded from the view layer ([322c4bd](https://github.com/hugemenace/nd/commit/322c4bdea91faea91ab315da8b8fc69259bde488))
+* fix smoothing mod removal error on profile extrude when cancelling a new (non-recalled) operation ([839c75c](https://github.com/hugemenace/nd/commit/839c75c4bd5bac073c968bfaccc31be1ac7f38b0))
+
 ## [1.40.0](https://github.com/hugemenace/nd/compare/v1.39.1...v1.40.0) (2024-03-22)
 
 

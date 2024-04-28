@@ -37,8 +37,7 @@ from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify
 
 mod_bevel = "Bevel — ND CIRC"
 mod_weld = "Weld — ND CIRC"
-mod_decimate = "Decimate — ND CIRC"
-mod_summon_list = [mod_bevel, mod_weld, mod_decimate]
+mod_summon_list = [mod_bevel, mod_weld]
 
 
 class ND_OT_circularize(bpy.types.Operator):
@@ -202,14 +201,6 @@ class ND_OT_circularize(bpy.types.Operator):
         self.weld = weld
 
 
-    def add_decimate_modifier(self, context):
-        decimate = new_modifier(self.target_object, mod_decimate, 'DECIMATE', rectify=False)
-        decimate.decimate_type = 'DISSOLVE'
-        decimate.angle_limit = radians(1)
-
-        self.decimate = decimate
-
-
     def operate(self, context):
         self.bevel.segments = self.segments
 
@@ -219,7 +210,6 @@ class ND_OT_circularize(bpy.types.Operator):
     def finish(self, context):
         if not self.summoned:
             self.add_weld_modifier(context)
-            self.add_decimate_modifier(context)
 
             rectify_smooth_by_angle(self.target_object)
 

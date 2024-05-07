@@ -29,7 +29,7 @@ bl_info = {
     "name": "HugeMenace — ND",
     "author": "HugeMenace",
     "version": (1, 41, 0),
-    "blender": (4, 0, 0),
+    "blender": (4, 2, 0),
     "location": "N Panel, Shift + 2",
     "description": "Non-destructive operations, tools, and generators.",
     "warning": "",
@@ -556,7 +556,9 @@ class NDPreferences(AddonPreferences):
             row = column.row()
             row.prop(self, pref)
 
-        name = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
+        version = (1, 41, 0)
+
+        name = "ND v%s" % ('.'.join([str(v) for v in version]))
         wm = bpy.context.window_manager
         kc = wm.keyconfigs.user
         
@@ -610,22 +612,25 @@ def register():
         registerable.reload()
         registerable.register()
 
-    version = '.'.join([str(v) for v in bl_info['version']])
+    version = (1, 41, 0)
+    version_str = '.'.join([str(v) for v in version])
+
     prefs = lib.preferences.get_preferences()
 
     if prefs.enable_update_check:
-        prefs.update_available = lib.updates.update_available(bl_info['version'])
+        
+        prefs.update_available = lib.updates.update_available(version_str)
     else:
         prefs.update_available = False
 
-    if prefs.local_user_prefs_version != version:
-        if version.startswith("1.28"):
+    if prefs.local_user_prefs_version != version_str:
+        if version_str.startswith("1.28"):
             prefs.overlay_pin_key = "P"
             prefs.overlay_pause_key = "BACK_SLASH"
             prefs.overlay_reset_key = "X"
             prefs.lock_overlay_pinning = True
             prefs.enable_mouse_values = True
-        prefs.local_user_prefs_version = version
+        prefs.local_user_prefs_version = version_str
 
     print("""
 ███╗   ██╗██████╗ 
@@ -635,7 +640,7 @@ def register():
 ██║ ╚████║██████╔╝
 ╚═╝  ╚═══╝╚═════╝
 HugeMenace — ND Addon v%s
-    """ % (version));
+    """ % (version_str));
 
 
 def unregister():

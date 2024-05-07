@@ -29,7 +29,10 @@ import bpy
 
 
 def get_registered_addon_name():
-    return __name__.partition('.')[0]
+    path = __name__.split('.')
+    extension = path[0:3]
+    
+    return '.'.join(extension)
 
 
 def is_addon_enabled(addon):

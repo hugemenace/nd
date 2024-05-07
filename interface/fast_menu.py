@@ -27,7 +27,7 @@
 
 import bpy
 import bmesh
-from .. import bl_info
+from .. __init__ import bl_info
 from .. lib.objects import is_planar
 from . ops import build_icon_lookup_table
 from .. lib.addons import is_addon_enabled

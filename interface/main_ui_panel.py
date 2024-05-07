@@ -27,7 +27,7 @@
 
 import bpy
 from bpy.props import BoolProperty, PointerProperty
-from .. import bl_info
+from .. __init__ import bl_info
 from .. import lib
 from . import ops
 from . common import create_box, render_ops, web_link

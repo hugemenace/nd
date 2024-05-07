@@ -28,7 +28,7 @@
 import bpy
 from . import ops
 from . common import render_ops
-from .. import bl_info
+from .. __init__ import bl_info
 
 
 keys = []

@@ -28,8 +28,18 @@
 import bpy
 
 
+def is_extension():
+    return __name__.startswith('bl_ext.')
+
+
 def get_registered_addon_name():
-    return __name__.partition('.')[0]
+    if is_extension():
+        path = __name__.split('.')
+        extension = path[0:3]
+        return '.'.join(extension)
+    
+    path = __name__.split('.')
+    return path[0]
 
 
 def is_addon_enabled(addon):

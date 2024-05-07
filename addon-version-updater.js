@@ -39,5 +39,5 @@ module.exports.writeVersion = function (contents, version) {
 
     return contents
         .replace(objRegex, `"version": (${v[0]}, ${v[1]}, ${v[2]}),`)
-        .replace(varRegex, `version = (${v[0]}, ${v[1]}, ${v[2]}),`);
+        .replace(varRegex, `version = (${v[0]}, ${v[1]}, ${v[2]})`);
 }

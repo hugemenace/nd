@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -66,12 +66,12 @@ class ND_OT_hydrate(bpy.types.Operator):
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection + 1) % (len(self.all_collections) + 1)
                 self.dirty = True
-            
+
         elif self.key_step_down:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection - 1) % (len(self.all_collections) + 1)
                 self.dirty = True
-        
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -87,7 +87,7 @@ class ND_OT_hydrate(bpy.types.Operator):
 
         if self.dirty:
             self.operate(context)
-            
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
@@ -97,7 +97,7 @@ class ND_OT_hydrate(bpy.types.Operator):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
 
         self.active_object = context.active_object
@@ -123,7 +123,7 @@ class ND_OT_hydrate(bpy.types.Operator):
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) > 0 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
-    
+
     def operate(self, context):
         self.dirty = False
 
@@ -138,7 +138,7 @@ class ND_OT_hydrate(bpy.types.Operator):
             if new_obj.name.startswith("Bool — "):
                 new_obj.name = new_obj.name[7:]
                 new_obj.data.name = new_obj.name
-            
+
             if self.active_collection >= len(self.all_collections):
                 bpy.context.collection.objects.link(new_obj)
             else:
@@ -146,7 +146,7 @@ class ND_OT_hydrate(bpy.types.Operator):
 
             new_obj.display_type = 'SOLID'
             new_obj.hide_render = False
-            
+
             new_objects.append((new_obj, obj))
 
             if self.clear_parent:
@@ -177,7 +177,7 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
+        self,
         "Collection: {0}".format("N/A — Scene" if self.active_collection >= len(self.all_collections) else self.all_collections[self.active_collection]),
         "Where to place the new object...",
         active=True,

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -41,7 +41,7 @@ class ND_OT_single_vertex(bpy.types.Operator):
 
         add_single_vertex_object(self, context, "Sketch")
         align_object_to_3d_cursor(self, context)
-        
+
         bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
 
         self.start_sketch_editing(context)

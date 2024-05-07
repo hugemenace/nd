@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -92,7 +92,7 @@ SHIFT — Cycle through the modifier stack"""
             elif not self.mod_cycle and self.util_count > 0:
                 self.util_current_index = (self.util_current_index + 1) % self.util_count
                 self.dirty = True
-            
+
         elif self.key_step_down:
             if self.mod_cycle:
                 self.mod_current_index = max(self.mod_current_index - 1, -1)
@@ -100,7 +100,7 @@ SHIFT — Cycle through the modifier stack"""
             elif not self.mod_cycle and self.util_count > 0:
                 self.util_current_index = (self.util_current_index - 1) % self.util_count
                 self.dirty = True
-        
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -119,7 +119,7 @@ SHIFT — Cycle through the modifier stack"""
 
         if self.dirty:
             self.operate(context)
-            
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
@@ -129,7 +129,7 @@ SHIFT — Cycle through the modifier stack"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
 
         self.mod_cycle = event.shift
@@ -141,7 +141,7 @@ SHIFT — Cycle through the modifier stack"""
         self.mod_count = len(self.target_obj.modifiers)
         self.mod_names = [mod.name for mod in self.target_obj.modifiers]
         self.mod_snapshot = [mod.show_viewport for mod in self.target_obj.modifiers]
-        
+
         self.frozen_utils = set(())
         self.applied_utils = set(())
 
@@ -175,7 +175,7 @@ SHIFT — Cycle through the modifier stack"""
     def set_mod_visible(self, mod, visible):
         mod.show_viewport = visible
 
-    
+
     def toggle_frozen_util(self):
         obj = self.util_mods[self.util_current_index].object
 
@@ -184,7 +184,7 @@ SHIFT — Cycle through the modifier stack"""
         else:
             self.frozen_utils.add(obj)
 
-    
+
     def toggle_applied_util(self):
         obj = self.util_mods[self.util_current_index].object
 
@@ -224,7 +224,7 @@ SHIFT — Cycle through the modifier stack"""
 
     def prepare_mode(self, context):
         hide_utils_collection(True)
-        
+
         self.revert_mods(context)
 
         if self.mod_cycle:
@@ -337,7 +337,7 @@ def draw_text_callback(self):
         self,
         "Wireframe [W]: {0}".format("Yes" if self.show_wireframe else "No"),
         "Display the object's wireframe while cycling")
-    
+
 
 def register():
     bpy.utils.register_class(ND_OT_cycle)

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -145,7 +145,7 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w += 1
                     self.dirty = True
-        
+
         elif self.key_step_down:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u = max(2, self.lattice_points_u - 1)
@@ -162,7 +162,7 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w = max(2, self.lattice_points_w - 1)
                     self.dirty = True
-        
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -200,7 +200,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND L')
             return {'FINISHED'}
@@ -235,7 +235,7 @@ CTRL — Remove existing modifiers"""
         if self.lattice_obj is None:
             bpy.ops.object.modifier_remove(modifier=self.lattice.name)
             self.prepare_new_operator(context)
-        
+
         if self.summoned:
             isolate_in_utils_collection([self.lattice_obj])
 
@@ -266,7 +266,7 @@ CTRL — Remove existing modifiers"""
 
         rectify_smooth_by_angle(self.target_object)
 
-    
+
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
@@ -336,12 +336,12 @@ CTRL — Remove existing modifiers"""
 
         self.lattice = lattice
 
-    
+
     def operate(self, context):
         self.lattice_obj.data.points_u = self.lattice_points_u
         self.lattice_obj.data.points_v = self.lattice_points_v
         self.lattice_obj.data.points_w = self.lattice_points_w
-        
+
         interpolation_mode = self.interpolation_modes[self.interpolation_mode]
         self.lattice_obj.data.interpolation_type_u = interpolation_mode
         self.lattice_obj.data.interpolation_type_v = interpolation_mode
@@ -380,7 +380,7 @@ CTRL — Remove existing modifiers"""
 
 def draw_text_callback(self):
     draw_header(self)
-    
+
     draw_property(
         self,
         "U Points: {}".format(self.lattice_points_u),

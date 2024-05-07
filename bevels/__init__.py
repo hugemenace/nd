@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -51,4 +51,3 @@ def register():
 def unregister():
     for registerable in registerables:
         registerable.unregister()
-    

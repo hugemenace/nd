@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -123,7 +123,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_starting_with(context.selected_objects, 'Mirror —')
             return {'FINISHED'}
@@ -196,7 +196,7 @@ CTRL — Remove existing modifiers"""
 
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.active_object.evaluated_get(depsgraph)
-        
+
         self.evaluated_geometry.modifiers.clear()
         self.evaluated_geometry.show_in_front = True
 
@@ -212,7 +212,7 @@ CTRL — Remove existing modifiers"""
         self.evaluated_geometry.name = 'ND — Mirror Geometry'
         self.evaluated_geometry.data.name = 'ND — Mirror Geometry'
 
-    
+
     def get_face_transform(self, mesh, world_matrix):
         selected_faces = [f for f in mesh.faces if f.select]
         center = v3_average([f.calc_center_median_weighted() for f in selected_faces])
@@ -230,7 +230,7 @@ CTRL — Remove existing modifiers"""
 
         return (location, rotation)
 
-    
+
     def get_vertex_transform(self, mesh, world_matrix):
         selected_vertices = [v for v in mesh.verts if v.select]
         center = v3_average([v.co for v in selected_vertices])
@@ -350,11 +350,11 @@ CTRL — Remove existing modifiers"""
                     else:
                         with bpy.context.temp_override(object=obj):
                             bpy.ops.object.modifier_move_up(modifier=mirror.name)
-    
+
 
     def operate(self, context):
         if self.geometry_mode and not self.geometry_ready:
-            pass 
+            pass
 
         elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
             for mirror in self.mirrors:

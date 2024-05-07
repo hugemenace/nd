@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -56,7 +56,7 @@ SHIFT — Undo faux origin translation"""
     def execute(self, context):
         a, b = context.selected_objects
         reference_obj = a if a.name != context.active_object.name else b
-        
+
         (x_dest, y_dest, z_dest) = reference_obj.location
         (x_orig, y_orig, z_orig) = context.active_object.location
 
@@ -68,12 +68,12 @@ SHIFT — Undo faux origin translation"""
 
         return {'FINISHED'}
 
-    
+
     def invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if len(context.selected_objects) == 1:
             if event.shift:
                 self.revert_faux_origin(context)
@@ -105,7 +105,7 @@ SHIFT — Undo faux origin translation"""
                 location.z = mod.strength
 
             context.active_object.modifiers.remove(mod)
-        
+
         context.active_object.location = location
 
 
@@ -121,10 +121,10 @@ SHIFT — Undo faux origin translation"""
         bpy.context.scene.cursor.location = cursor_location
         bpy.context.scene.cursor.rotation_euler = cursor_rotation
 
-    
+
     def add_displace_modifier(self, reference_obj, axis, strength):
         displace = new_modifier(reference_obj, "Translate {} — ND FO".format(axis), 'DISPLACE', rectify=False)
-        displace.direction = axis 
+        displace.direction = axis
         displace.space = 'GLOBAL'
         displace.mid_level = 0
         displace.strength = strength

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -64,13 +64,13 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if total_sections == 0:
             return self.draw_no_predictions(context)
-    
+
 
     def draw_no_predictions(self, context):
         layout = self.layout
         layout.label(text="No predictions available", icon='GHOST_DISABLED')
 
-    
+
     def draw_no_active_target(self, context):
         layout = self.layout
         layout.label(text="No active target object selected", icon='RESTRICT_SELECT_OFF')
@@ -83,7 +83,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
 
         layout.separator()
-        
+
         text = "F » Make Edge/Face"
         icon = 'MOD_SIMPLIFY'
 
@@ -153,7 +153,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.vertex_bevel", icon=icons['nd.vertex_bevel'])
                 layout.operator("nd.clear_vgs", icon=icons['nd.clear_vgs'])
                 made_prediction = True
-            
+
             if edges_selected:
                 layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
                 made_prediction = True
@@ -183,7 +183,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         return SECTION_COUNT
 
-    
+
     def draw_single_object_mesh_predictions(self, context, layout):
         depsgraph = context.evaluated_depsgraph_get()
         object_eval = context.active_object.evaluated_get(depsgraph)
@@ -205,7 +205,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         mod_names = [mod.name for mod in context.active_object.modifiers]
 
         has_mod_profile_extrude = False
-        has_mod_solidify = False 
+        has_mod_solidify = False
         has_mod_boolean = False
         has_mod_screw = False
         has_mod_array_cubed = False
@@ -241,11 +241,11 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
             has_mod_profile_extrude = True
             replay_prediction_count += 1
-        
+
         if has_mod_screw:
             layout.operator("nd.screw", icon=icons['nd.screw'])
             replay_prediction_count += 1
-        
+
         if has_mod_array_cubed:
             layout.operator("nd.array_cubed", icon=icons['nd.array_cubed'])
             replay_prediction_count += 1
@@ -257,7 +257,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         if has_mod_recon_poly:
             layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
             replay_prediction_count += 1
-        
+
         if has_mod_circularize:
             layout.operator("nd.circularize", icon=icons['nd.circularize'])
             replay_prediction_count += 1
@@ -278,7 +278,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
 
             return SECTION_COUNT
-        
+
         if self.profile:
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
             layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
@@ -338,7 +338,7 @@ def register():
         entry = keymap.keymap_items.new("wm.call_menu", 'F', 'PRESS')
         entry.properties.name = "ND_MT_fast_menu"
         keys.append((keymap, entry))
-   
+
 
 def unregister():
     for keymap, entry in keys:

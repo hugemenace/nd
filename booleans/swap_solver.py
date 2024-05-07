@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -87,7 +87,7 @@ class ND_OT_swap_solver(bpy.types.Operator):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
 
         self.solve_mode = None
@@ -103,18 +103,18 @@ class ND_OT_swap_solver(bpy.types.Operator):
             for mod in mods:
                 if mod.object and mod.object.name in selected_object_names:
                     self.boolean_mods.append(mod)
-            
+
         for mod in self.boolean_mods:
             if mod.solver == 'FAST':
                 fast_solver_count += 1
             elif mod.solver == 'EXACT':
                 exact_solver_count += 1
-        
+
         if fast_solver_count == len(self.boolean_mods):
             self.solve_mode = 'FAST'
         elif exact_solver_count == len(self.boolean_mods):
             self.solve_mode = 'EXACT'
-            
+
         capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
@@ -130,14 +130,14 @@ class ND_OT_swap_solver(bpy.types.Operator):
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) > 0 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
-    
+
     def operate(self, context):
         for mod in self.boolean_mods:
             mod.solver = self.solve_mode
 
         self.dirty = False
 
-    
+
     def finish(self, context):
         unregister_draw_handler()
 

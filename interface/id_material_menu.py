@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -42,7 +42,7 @@ class ND_MT_id_material_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
 
         materials = list(ND_MATERIALS.keys())
-        
+
         row = layout.row()
 
         column = row.column()
@@ -54,11 +54,11 @@ class ND_MT_id_material_menu(bpy.types.Menu):
         for material_name in materials[11:]:
             clean_name = material_name[len("ND_ID_MAT_"):].capitalize()
             column.operator("nd.create_id_material", text=clean_name, icon_value=get_icon_value(material_name)).material_name = material_name
-        
+
 
 def register():
     bpy.utils.register_class(ND_MT_id_material_menu)
-   
+
 
 def unregister():
     bpy.utils.unregister_class(ND_MT_id_material_menu)

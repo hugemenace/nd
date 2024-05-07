@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -64,12 +64,12 @@ class ND_OT_bool_inset(BaseOperator):
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness += self.step_size
                 self.dirty = True
-            
+
         if self.key_step_down:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - self.step_size)
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -88,7 +88,7 @@ class ND_OT_bool_inset(BaseOperator):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
         self.base_thickness_factor = 0.01
 
@@ -101,7 +101,7 @@ class ND_OT_bool_inset(BaseOperator):
 
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.active_object.name else b
-        
+
         self.target_obj = context.active_object
 
         self.intersecting_obj = context.active_object.copy()
@@ -135,7 +135,7 @@ class ND_OT_bool_inset(BaseOperator):
         self.reference_obj.hide_set(True)
 
         remove_problematic_boolean_mods(self.reference_obj)
-        
+
         self.intersecting_obj.display_type = 'WIRE'
         self.intersecting_obj.hide_render = True
         self.intersecting_obj.name = " — ".join(['Bool', self.intersecting_obj.name])
@@ -153,7 +153,7 @@ class ND_OT_bool_inset(BaseOperator):
 
         rectify_smooth_by_angle(self.target_obj)
 
-        self.operate(context)   
+        self.operate(context)
 
         capture_modifier_keys(self, None, event.mouse_x)
 
@@ -170,7 +170,7 @@ class ND_OT_bool_inset(BaseOperator):
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 2 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
-    
+
     def operate(self, context):
         self.solidify.thickness = self.thickness
         self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
@@ -204,7 +204,7 @@ class ND_OT_bool_inset(BaseOperator):
         self.reference_obj.data.name = self.reference_obj_name_prev
         self.reference_obj.parent = None
         self.reference_obj.hide_set(False)
-        
+
         unregister_draw_handler()
 
 
@@ -214,7 +214,7 @@ def draw_text_callback(self):
     display_unit_scale = self.unit_scale / self.unit_factor
 
     draw_property(
-        self, 
+        self,
         f"Thickness: {(self.thickness * display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,

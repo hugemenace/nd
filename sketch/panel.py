@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -48,7 +48,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     def do_modal(self, context, event):
         if get_preferences().enable_experimental_features and self.key_undo:
             return {'PASS_THROUGH'}
-        
+
         if get_preferences().enable_experimental_features and self.key_redo:
             return {'PASS_THROUGH'}
 
@@ -86,13 +86,13 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset += self.step_size
                     self.dirty = True
-        
+
         if self.key_step_down:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = max(0, self.inset - self.step_size)
                     self.dirty = True
-            
+
         if self.stage == 1 and self.key_confirm:
             self.finish(context)
 
@@ -126,7 +126,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
 
         self.xray_mode = False
@@ -141,7 +141,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         self.inset_input_stream = new_stream()
 
         capture_modifier_keys(self, None, event.mouse_x)
-        
+
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -164,7 +164,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         self.panel_mesh_snapshot = self.panel_obj.data.copy()
 
-    
+
     def delete_unselected_panel_geometry(self):
         verts = [v for v in self.panel_bm.verts if not v.select]
         bmesh.ops.delete(self.panel_bm, geom=verts, context='VERTS')
@@ -179,8 +179,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         loose_edges = [e for e in self.panel_bm.edges if not e.link_faces]
         bmesh.ops.delete(self.panel_bm, geom=loose_edges, context='EDGES')
-    
-    
+
+
     def update_panel_edit_mesh(self, update_data=False):
         bmesh.update_edit_mesh(self.panel_obj.data)
         if update_data:
@@ -206,9 +206,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             else:
                 result = self.inset_faces(self.panel_bm.faces)
                 self.delete_panel_faces(result['faces'])
-            
+
             self.update_panel_edit_mesh()
-        
+
         self.dirty = False
 
 
@@ -229,7 +229,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     def has_valid_selection(self, context):
         mesh = bmesh.from_edit_mesh(context.active_object.data)
         selected_faces = len([f for f in mesh.faces if f.select])
-        
+
         return selected_faces > 0
 
 
@@ -238,12 +238,12 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         self.panel_obj.show_in_front = False
 
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
-        
+
         unregister_draw_handler()
 
         bpy.ops.nd.solidify('INVOKE_DEFAULT')
 
-    
+
     def revert(self, context):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.data.objects.remove(self.panel_obj, do_unlink=True)
@@ -253,7 +253,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         bpy.context.view_layer.objects.active = self.target_obj
 
         unregister_draw_handler()
-    
+
 
 def draw_text_callback(self):
     draw_header(self)

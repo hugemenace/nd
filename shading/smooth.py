@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -79,7 +79,7 @@ class ND_OT_smooth(bpy.types.Operator):
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = min(180, self.angle + angle_factor)
                 self.dirty = True
-            
+
         elif self.key_step_down:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, self.angle - angle_factor)
@@ -88,7 +88,7 @@ class ND_OT_smooth(bpy.types.Operator):
         elif bpy.app.version >= (4, 1, 0) and pressed(event, {'S'}):
             self.ignore_sharpness = not self.ignore_sharpness
             self.dirty = True
-        
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -104,7 +104,7 @@ class ND_OT_smooth(bpy.types.Operator):
 
         if self.dirty:
             self.operate(context)
-            
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
@@ -138,7 +138,7 @@ class ND_OT_smooth(bpy.types.Operator):
         if context.mode == 'OBJECT':
             return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
 
-    
+
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
             for object in context.selected_objects:
@@ -151,12 +151,12 @@ class ND_OT_smooth(bpy.types.Operator):
                         with bpy.context.temp_override(object=object):
                             bpy.ops.object.modifier_move_to_index(modifier=smooth_mod.name, index=index-1)
                         break
-                
+
                 self.mods.append((object, smooth_mod))
             return
-        
+
         bpy.ops.object.shade_smooth()
-        
+
         for object in context.selected_objects:
             object.data.use_auto_smooth = True
 

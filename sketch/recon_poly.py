@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -114,12 +114,12 @@ class ND_OT_recon_poly(BaseOperator):
 
         if self.key_confirm:
             self.finish(context)
-            
+
             return {'FINISHED'}
 
         if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
-        
+
         if get_preferences().enable_mouse_values:
             if no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(self.computed_inner_radius() * -1, self.width + self.mouse_value)
@@ -155,7 +155,7 @@ class ND_OT_recon_poly(BaseOperator):
                 self.prepare_new_operator(context)
         else:
             self.prepare_new_operator(context)
-        
+
         self.operate(context)
 
         capture_modifier_keys(self, None, event.mouse_x)
@@ -166,7 +166,7 @@ class ND_OT_recon_poly(BaseOperator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-    
+
 
     def prepare_new_operator(self, context):
         self.summoned = False
@@ -188,7 +188,7 @@ class ND_OT_recon_poly(BaseOperator):
 
         self.rotation_snapshot = self.obj.rotation_euler.copy()
 
-    
+
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
@@ -197,7 +197,7 @@ class ND_OT_recon_poly(BaseOperator):
         self.displace = mods[mod_displace]
         self.screwX = mods[mod_screw_1]
         self.screwZ = mods[mod_screw_2]
-        
+
         self.obj = context.active_object
 
         self.computed_width_prev = self.screwX.screw_offset
@@ -211,14 +211,14 @@ class ND_OT_recon_poly(BaseOperator):
         except:
             pass
         self.inner_radius_prev = self.inner_radius = computed_inner_radius
-        
+
         computed_width = self.screwX.screw_offset
         try:
             computed_width = float(bpy.data.objects[self.obj.name]["NDRCP_width"])
         except:
             pass
         self.width_prev = self.width = computed_width
-        
+
         computed_natural_rotation = False
         try:
             computed_natural_rotation = bool(bpy.data.objects[self.obj.name]["NDRCP_natural_rotation"])
@@ -253,7 +253,7 @@ class ND_OT_recon_poly(BaseOperator):
         displace.mid_level = 0
         displace.direction = 'X'
         displace.space = 'LOCAL'
-        
+
         self.displace = displace
 
 
@@ -267,7 +267,7 @@ class ND_OT_recon_poly(BaseOperator):
         screwX.merge_threshold = 0.0001
 
         self.screwX = screwX
-    
+
 
     def add_screw_z_modifer(self):
         screwZ = new_modifier(self.obj, mod_screw_2, 'SCREW', rectify=False)
@@ -278,12 +278,12 @@ class ND_OT_recon_poly(BaseOperator):
 
         self.screwZ = screwZ
 
-    
+
     def add_decimate_modifier(self):
         decimate = new_modifier(self.obj, mod_decimate, 'DECIMATE', rectify=False)
         decimate.decimate_type = 'DISSOLVE'
         decimate.angle_limit = radians(1)
-        
+
         self.decimate = decimate
 
         all_mods = self.obj.modifiers.values()
@@ -303,7 +303,7 @@ class ND_OT_recon_poly(BaseOperator):
         except:
             self.had_decimate_mod = False
 
-    
+
     def computed_width(self):
         if self.inscribed or self.inner_radius > 0:
             return self.width
@@ -376,7 +376,7 @@ class ND_OT_recon_poly(BaseOperator):
             bpy.data.objects[self.obj.name]["NDRCP_inscribed"] = self.inscribed_prev
             bpy.data.objects[self.obj.name]["NDRCP_width"] = self.width_prev
             bpy.data.objects[self.obj.name]["NDRCP_inner_radius"] = self.inner_radius_prev
-            
+
         unregister_draw_handler()
 
 
@@ -387,23 +387,23 @@ def draw_text_callback(self):
         self,
         f"{('Width' if self.inner_radius > 0 else 'Radius')}: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
-        active=self.key_no_modifiers, 
+        active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.width_input_stream)
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments), 
+        "Segments: {}".format(self.segments),
         self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
-        active=self.key_alt, 
+        active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,
         input_stream=self.segments_input_stream)
 
     draw_property(
         self,
-        f"Inner Radius: {(self.inner_radius * self.display_unit_scale):.2f}{self.unit_suffix}", 
+        f"Inner Radius: {(self.inner_radius * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,

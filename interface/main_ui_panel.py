@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -138,7 +138,7 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             row = column.row(align=True)
             row.scale_y = 1.2
             web_link("https://docs.nd.hugemenace.co/#/getting-started/changelog", "View Changelog", "DOCUMENTS", row)
-        
+
         box = create_box("Useful Links", layout, props, "display_links", icons, [])
         if props.display_links:
             for url, label, icon in links:
@@ -151,7 +151,7 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             if getattr(props, prop):
                 render_ops(collection, box)
 
-        
+
 def register():
     if get_preferences().enable_sidebar:
         bpy.utils.register_class(ND_PT_main_ui_panel)
@@ -166,5 +166,5 @@ def unregister():
         bpy.utils.unregister_class(ND_PT_main_ui_panel)
         bpy.utils.unregister_class(ND_OT_toggle_sections)
         bpy.utils.unregister_class(MainUIPanelProps)
-        
+
         del bpy.types.WindowManager.nd_panel_props

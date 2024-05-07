@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -42,7 +42,7 @@ SHIFT — Protect the reference object (do not convert into utility)
 ALT — Do not clean the reference object's mesh"""
     bl_options = {'UNDO'}
 
-    
+
     mode: bpy.props.EnumProperty(items=[
         ('DIFFERENCE', 'Difference', 'Perform a difference operation'),
         ('UNION', 'Union', 'Perform a union operation'),
@@ -60,14 +60,14 @@ ALT — Do not clean the reference object's mesh"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
         target_obj = context.active_object
 
         a, b = context.selected_objects
         reference_obj = a if a.name != target_obj.name else b
-        
+
         boolean = new_modifier(target_obj, " — ".join([self.mode.capitalize(), "ND Bool"]), 'BOOLEAN', rectify=True)
         boolean.operation = self.mode
         boolean.object = reference_obj
@@ -78,7 +78,7 @@ ALT — Do not clean the reference object's mesh"""
             reference_obj.hide_render = True
             reference_obj.name = " — ".join(['Bool', reference_obj.name])
             reference_obj.data.name = reference_obj.name
-            
+
             if not self.do_not_clean_mesh:
                 remove_problematic_boolean_mods(reference_obj)
 
@@ -104,7 +104,7 @@ ALT — Do not clean the reference object's mesh"""
 
         return self.execute(context)
 
-    
+
 def register():
     bpy.utils.register_class(ND_OT_bool_vanilla)
 

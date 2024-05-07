@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -54,7 +54,7 @@ CTRL — Remove existing modifiers"""
         for obj in context.selected_objects:
             if any(' — ND WN' in mod.name for mod in obj.modifiers):
                 continue
-            
+
             mod = new_modifier(obj, 'Weighted Normal — ND WN', 'WEIGHTED_NORMAL', rectify=False)
             mod.keep_sharp = self.keep_sharp
             mod.weight = 100
@@ -62,7 +62,7 @@ CTRL — Remove existing modifiers"""
 
         return {'FINISHED'}
 
-    
+
 def register():
     bpy.utils.register_class(ND_OT_weighted_normal)
 

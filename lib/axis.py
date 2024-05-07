@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -97,7 +97,7 @@ def update_axis(cls):
         coords.append(origin + mx.to_3x3() @ axis * 10000)
 
         shader = None
-        
+
         if bpy.app.version < (4, 0, 0):
             shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
         else:
@@ -118,7 +118,7 @@ def update_axis(cls):
             {"pos": coords},
             indices=[(i, i + 1) for i in range(0, len(coords), 2)]
         )
-        
+
         batch.draw(shader)
 
     redraw_regions()

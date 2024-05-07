@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -41,7 +41,7 @@ class ND_OT_bool_slice(bpy.types.Operator):
 ALT — Do not clean the reference object's mesh"""
     bl_options = {'UNDO'}
 
-    
+
     @classmethod
     def poll(cls, context):
         if context.mode == 'OBJECT' and context.active_object is not None:
@@ -52,14 +52,14 @@ ALT — Do not clean the reference object's mesh"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
 
         target_obj = context.active_object
 
         a, b = context.selected_objects
         reference_obj = a if a.name != target_obj.name else b
-        
+
         intersecting_obj = target_obj.copy()
         intersecting_obj.data = target_obj.data.copy()
         intersecting_obj.animation_data_clear()
@@ -74,7 +74,7 @@ ALT — Do not clean the reference object's mesh"""
         boolean_isect.operation = 'INTERSECT'
         boolean_isect.object = reference_obj
         boolean_isect.solver = solver
-        
+
         reference_obj.display_type = 'WIRE'
         reference_obj.hide_render = True
         reference_obj.name = " — ".join(['Bool', reference_obj.name])
@@ -107,7 +107,7 @@ ALT — Do not clean the reference object's mesh"""
 
         return self.execute(context)
 
-    
+
 def register():
     bpy.utils.register_class(ND_OT_bool_slice)
 

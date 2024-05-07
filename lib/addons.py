@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -37,7 +37,7 @@ def get_registered_addon_name():
         path = __name__.split('.')
         extension = path[0:3]
         return '.'.join(extension)
-    
+
     path = __name__.split('.')
     return path[0]
 
@@ -46,5 +46,5 @@ def is_addon_enabled(addon):
     for key in bpy.context.preferences.addons.keys():
         if addon == key:
             return True
-    
+
     return False

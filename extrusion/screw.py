@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -104,7 +104,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
                 self.dirty = True
-            
+
         if self.key_step_down:
             if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset -= self.step_size
@@ -115,7 +115,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = max(3, self.segments - segment_factor)
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -162,7 +162,7 @@ CTRL — Remove existing modifiers"""
 
         mods = self.target_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
-        previous_op = False 
+        previous_op = False
 
         if self.object_type == 'MESH':
             previous_op = all(m in mod_names for m in mod_mesh_summon_list)
@@ -230,7 +230,7 @@ CTRL — Remove existing modifiers"""
         if bpy.app.version >= (4, 1, 0):
             add_smooth_by_angle(self.target_object)
             return
-            
+
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
         self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
@@ -247,12 +247,12 @@ CTRL — Remove existing modifiers"""
     def add_screw_modifier(self, context):
         screw = new_modifier(self.target_object, mod_screw, 'SCREW', rectify=True)
         screw.screw_offset = 0
-        screw.use_merge_vertices = True 
+        screw.use_merge_vertices = True
         screw.merge_threshold = 0.0001
         screw.use_normal_calculate = True
 
         self.screw = screw
-    
+
 
     def operate(self, context):
         if self.object_type == 'MESH':
@@ -305,7 +305,7 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.segments_input_stream)
-    
+
     draw_property(
         self,
         "Angle: {0:.2f}°".format(self.angle),

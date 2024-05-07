@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -44,7 +44,7 @@ SHIFT — Display all utils for the selected objects"""
 
         return {'FINISHED'}
 
-    
+
     def invoke(self, context, event):
         if event.shift and len(context.selected_objects) > 0:
             data = get_utils_layer()
@@ -63,7 +63,7 @@ SHIFT — Display all utils for the selected objects"""
                 all_util_objects.update(local_util_objects)
 
             isolate_in_utils_collection(all_util_objects)
-            
+
             return {'FINISHED'}
 
         return self.execute(context)

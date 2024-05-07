@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -72,7 +72,7 @@ CTRL — Remove existing modifiers"""
         if pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             self.dirty = True
-        
+
         if pressed(event, {'M'}):
             self.complex_mode = not self.complex_mode
             self.dirty = True
@@ -84,7 +84,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.step_size
                 self.dirty = True
-            
+
         if self.key_step_down:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness - self.step_size)
@@ -92,7 +92,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset -= self.step_size
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -153,7 +153,7 @@ CTRL — Remove existing modifiers"""
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
-    
+
     def prepare_new_operator(self, context):
         self.summoned = False
 
@@ -184,7 +184,7 @@ CTRL — Remove existing modifiers"""
         if bpy.app.version >= (4, 1, 0):
             add_smooth_by_angle(self.target_object)
             return
-        
+
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
         self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
@@ -204,7 +204,7 @@ CTRL — Remove existing modifiers"""
         solidify.use_quality_normals = True
 
         self.solidify = solidify
-    
+
 
     def operate(self, context):
         self.solidify.thickness = self.thickness
@@ -229,7 +229,7 @@ CTRL — Remove existing modifiers"""
             self.solidify.offset = self.weighting_prev
             self.solidify.solidify_mode = 'NON_MANIFOLD' if self.complex_mode_prev else 'EXTRUDE'
             self.displace.strength = self.offset_prev
-        
+
         unregister_draw_handler()
 
 
@@ -237,8 +237,8 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
-        f"Thickness: {(self.thickness * self.display_unit_scale):.2f}{self.unit_suffix}", 
+        self,
+        f"Thickness: {(self.thickness * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -48,20 +48,20 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
 
     cls.key_undo = cls.key_ctrl and pressed(event, {'Z'})
     cls.key_redo = cls.key_ctrl and cls.key_shift and pressed(event, {'Z'})
-    
+
     cls.key_one = pressed(event, {'ONE'})
     cls.key_two = pressed(event, {'TWO'})
     cls.key_three = pressed(event, {'THREE'})
 
     cls.key_numeric_input = pressed(event, {'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'ZERO', 'PERIOD', 'MINUS', 'NUMPAD_0', 'NUMPAD_1', 'NUMPAD_2', 'NUMPAD_3', 'NUMPAD_4', 'NUMPAD_5', 'NUMPAD_6', 'NUMPAD_7', 'NUMPAD_8', 'NUMPAD_9', 'NUMPAD_PERIOD', 'NUMPAD_MINUS', 'BACK_SPACE'})
     cls.key_reset = pressed(event, {get_preferences().overlay_reset_key})
-    
+
     cls.key_toggle_pin_overlay = pressed(event, {get_preferences().overlay_pin_key})
     cls.key_toggle_operator_passthrough = pressed(event, {get_preferences().overlay_pause_key})
-    
+
     cls.key_step_up = detected(event, {'WHEELUPMOUSE'}) or pressed(event, {'UP_ARROW'}) or pressed(event, {'RIGHT_ARROW'})
     cls.key_step_down = detected(event, {'WHEELDOWNMOUSE'}) or pressed(event, {'DOWN_ARROW'}) or pressed(event, {'LEFT_ARROW'})
-    
+
     cls.key_confirm = clicked(event, {'LEFTMOUSE'}) or pressed(event, {'SPACE', 'RET', 'NUMPAD_ENTER'})
 
     if get_preferences().enable_right_click_select:
@@ -80,7 +80,7 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     cls.mouse_delta = raw_mouse_delta * get_preferences().mouse_value_scalar
     cls.mouse_value = cls.mouse_delta * (0.1 if cls.key_shift else 1)
     cls.prev_mouse_x = mouse_x if event == None else event.mouse_x
-    
+
     cls.prev_mouse_travel = 0 if event == None else cls.mouse_travel
     cls.mouse_travel = 0 if event == None else cls.mouse_travel + raw_mouse_delta
     if cls.mouse_travel < 0 and cls.prev_mouse_travel < cls.mouse_travel:

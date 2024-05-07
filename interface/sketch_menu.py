@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -44,19 +44,19 @@ class ND_MT_sketch_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
 
         render_ops(ops.sketch_ops, layout, new_row=False, use_separator=True)
-        
+
         if context.mode == 'OBJECT':
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.separator()
 
             layout.operator("object.scale_clear", text="S » Clear Scale", icon='DRIVER_DISTANCE')
-        
+
         if context.mode == 'EDIT_MESH':
             layout.operator_context = 'INVOKE_DEFAULT'
             layout.separator()
 
             layout.operator("transform.shrink_fatten", text="S » Shrink/Fatten", icon='FACESEL')
-        
+
 
 def register():
     bpy.utils.register_class(ND_MT_sketch_menu)
@@ -66,7 +66,7 @@ def register():
         entry = keymap.keymap_items.new("wm.call_menu", 'S', 'PRESS', alt=True)
         entry.properties.name = "ND_MT_sketch_menu"
         keys.append((keymap, entry))
-   
+
 
 def unregister():
     for keymap, entry in keys:

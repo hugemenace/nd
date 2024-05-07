@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -39,11 +39,11 @@ class ND_MT_boolean_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
         render_ops(ops.boolean_ops, layout, new_row=False, use_separator=True)
-        
+
 
 def register():
     bpy.utils.register_class(ND_MT_boolean_menu)
-   
+
 
 def unregister():
     bpy.utils.unregister_class(ND_MT_boolean_menu)

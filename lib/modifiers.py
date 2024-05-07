@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -63,20 +63,20 @@ def rectify_mod_order(object, mod_name):
         if "Weld — ND SW" in mod.name:
             matching_mod_index = index
             break
-        
+
         if "Weld — ND B" in mod.name:
             matching_mod_index = index
             break
-        
+
         if "Decimate — ND SD" in mod.name:
             matching_mod_index = index
             break
-        
+
         if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
             if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
                 matching_mod_index = index
                 break
-    
+
     if matching_mod_index is None:
         return
 
@@ -98,7 +98,7 @@ def add_smooth_by_angle(object):
     with bpy.context.temp_override(object=object):
         bpy.ops.object.shade_smooth()
         bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
-        
+
         mod = object.modifiers[-1]
         mod.name = "Smooth — ND SBA"
 

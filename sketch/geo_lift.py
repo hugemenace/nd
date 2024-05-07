@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -53,7 +53,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         elif self.operator_passthrough:
             update_overlay(self, context, event)
-            
+
             return {'PASS_THROUGH'}
 
         elif self.key_select:
@@ -61,7 +61,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         elif get_preferences().enable_experimental_features and self.key_undo:
             return {'PASS_THROUGH'}
-        
+
         elif get_preferences().enable_experimental_features and self.key_redo:
             return {'PASS_THROUGH'}
 
@@ -114,18 +114,18 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
         self.xray_mode = False
         self.register_mode()
-        
+
         self.target_obj = context.active_object
 
         create_duplicate_liftable_geometry(context, {self.mode}, 'ND — Geo Lift', not event.shift)
 
         capture_modifier_keys(self, None, event.mouse_x)
-        
+
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -191,7 +191,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         return {'FINISHED'}
 
-    
+
     def clean_up(self, context, remove_lifted_geometry=True):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
@@ -205,7 +205,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             bpy.context.view_layer.objects.active = self.target_obj
 
         unregister_draw_handler()
-    
+
 
 def draw_text_callback(self):
     draw_header(self)

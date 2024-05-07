@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -93,7 +93,7 @@ class ND_OT_create_id_material(bpy.types.Operator):
 
     def execute(self, context):
         existing_material_names = bpy.data.materials.keys()
-        
+
         material = None
         if self.material_name in existing_material_names:
             material = bpy.data.materials[self.material_name]
@@ -104,7 +104,7 @@ class ND_OT_create_id_material(bpy.types.Operator):
             for object in context.selected_objects:
                 object.data.materials.clear()
                 object.active_material = material
-        
+
         if context.mode == 'EDIT_MESH':
             for object in context.selected_objects:
                 previous_material_names = [m.name for m in object.material_slots]
@@ -117,7 +117,7 @@ class ND_OT_create_id_material(bpy.types.Operator):
                 for face in bm.faces:
                     if face.select:
                         face.material_index = active_materials.index(self.material_name)
-                
+
                 bmesh.update_edit_mesh(object.data)
 
         return {'FINISHED'}

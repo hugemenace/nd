@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -43,7 +43,7 @@ def create_box(text, layout, props, prop_name, icons, shortcuts):
     for op, mode in shortcuts:
         if mode:
             row.operator(op, icon=icons[f'{op}+{mode}'], text="").mode = mode
-        else: 
+        else:
             row.operator(op, icon=icons[op], text="")
 
     if prop_active:
@@ -69,7 +69,7 @@ def render_ops(ops, layout, new_row=True, use_separator=False):
 
             if mode:
                 row.operator(op, icon=icon, text=label).mode = mode
-            else: 
+            else:
                 row.operator(op, icon=icon, text=label)
 
 

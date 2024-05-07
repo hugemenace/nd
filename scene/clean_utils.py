@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -66,7 +66,7 @@ class ND_OT_clean_utils(bpy.types.Operator):
                     else:
                         remove_mods.append(mod)
                         removal_count += 1
-                    continue 
+                    continue
 
                 if mod.type == 'ARRAY':
                     if mod.offset_object:
@@ -85,7 +85,7 @@ class ND_OT_clean_utils(bpy.types.Operator):
 
             for mod in remove_mods:
                 obj.modifiers.remove(mod)
-        
+
         all_util_objects = get_all_util_objects()
         deleted_objects = []
 
@@ -93,7 +93,7 @@ class ND_OT_clean_utils(bpy.types.Operator):
             if obj and obj.name not in active_util_object_names:
                 deleted_objects.append(obj)
                 removal_count += 1
-        
+
         if bpy.app.version < (4, 0, 0):
             bpy.ops.object.delete({'active_object': None, 'object': None, 'selected_objects': deleted_objects}, use_global=False)
         else:
@@ -102,7 +102,7 @@ class ND_OT_clean_utils(bpy.types.Operator):
 
         return removal_count
 
-    
+
 def register():
     bpy.utils.register_class(ND_OT_clean_utils)
 

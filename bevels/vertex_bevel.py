@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -97,7 +97,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width += self.step_size
                 self.dirty = True
-        
+
         if self.key_step_down:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
@@ -113,7 +113,7 @@ CTRL — Remove existing modifiers"""
             self.finish(context)
 
             return {'FINISHED'}
-        
+
         if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
@@ -133,7 +133,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             old_vgroup_names = []
             for object in context.selected_objects:
@@ -179,7 +179,7 @@ CTRL — Remove existing modifiers"""
                     self.report({'ERROR_INVALID_INPUT'}, "Multiple vertex groups selected, unable to continue operation.")
                     return {'CANCELLED'}
                 self.vgroup_match = (group, vgroup_vert_indices)
-        
+
         if self.vgroup_match:
             group, vgroup_vert_indices = self.vgroup_match
 
@@ -248,7 +248,7 @@ CTRL — Remove existing modifiers"""
             add_smooth_by_angle(self.target_object)
             bpy.ops.object.mode_set(mode='EDIT')
             return
-        
+
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
@@ -275,7 +275,7 @@ CTRL — Remove existing modifiers"""
         if not self.late_apply:
             while self.target_object.modifiers[0].name != self.bevel.name:
                 bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
-    
+
 
     def add_weld_modifier(self, context):
         mods = self.target_object.modifiers
@@ -310,13 +310,13 @@ CTRL — Remove existing modifiers"""
         rectify_smooth_by_angle(self.target_object)
 
         # TODO: Find a better solution. This is a workaround for the fact that
-        # the vertex group <> modifier combo's are not being detected by the recall 
+        # the vertex group <> modifier combo's are not being detected by the recall
         # algorithm directly after they've been created while in edit mode.
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.mode_set(mode='EDIT')
 
         unregister_draw_handler()
-    
+
 
     def revert(self, context):
         self.target_object.show_wire = False
@@ -344,7 +344,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}", 
+        f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -361,7 +361,7 @@ def draw_text_callback(self):
         input_stream=self.segments_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Profile: {0:.2f}".format(self.profile),
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,

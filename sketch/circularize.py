@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -60,7 +60,7 @@ class ND_OT_circularize(bpy.types.Operator):
 
         elif self.operator_passthrough:
             update_overlay(self, context, event)
-            
+
             return {'PASS_THROUGH'}
 
         elif self.key_cancel:
@@ -84,7 +84,7 @@ class ND_OT_circularize(bpy.types.Operator):
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
-        
+
         elif self.key_step_down:
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = max(2, self.segments - segment_factor)
@@ -94,7 +94,7 @@ class ND_OT_circularize(bpy.types.Operator):
             self.finish(context)
 
             return {'FINISHED'}
-        
+
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
@@ -115,7 +115,7 @@ class ND_OT_circularize(bpy.types.Operator):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND CIRC')
             return {'FINISHED'}
@@ -177,7 +177,7 @@ class ND_OT_circularize(bpy.types.Operator):
         if bpy.app.version >= (4, 1, 0):
             add_smooth_by_angle(self.target_object)
             return
-        
+
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
         self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
@@ -214,7 +214,7 @@ class ND_OT_circularize(bpy.types.Operator):
             rectify_smooth_by_angle(self.target_object)
 
         unregister_draw_handler()
-    
+
 
     def revert(self, context):
         if self.summoned:
@@ -231,7 +231,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments), 
+        "Segments: {}".format(self.segments),
         "Alt (±2)  |  Shift (±1)",
         active=self.key_no_modifiers,
         mouse_value=True,

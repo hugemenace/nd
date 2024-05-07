@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -64,7 +64,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         elif get_preferences().enable_experimental_features and self.key_undo:
             return {'PASS_THROUGH'}
-        
+
         elif get_preferences().enable_experimental_features and self.key_redo:
             return {'PASS_THROUGH'}
 
@@ -115,7 +115,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
         self.xray_mode = False
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
@@ -125,7 +125,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — View Align', not event.shift)
 
         capture_modifier_keys(self, None, event.mouse_x)
-        
+
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -162,7 +162,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         return (location, rotation)
 
-    
+
     def get_vertex_transform(self, mesh, world_matrix):
         selected_vertices = [v for v in mesh.verts if v.select]
         center = v3_average([v.co for v in selected_vertices])
@@ -189,7 +189,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         bpy.ops.view3d.view_axis(type='TOP', align_active=True)
         context.space_data.region_3d.view_perspective = 'ORTHO'
-        
+
         self.set_custom_transform_orientation()
 
         if self.selection_type == 0:
@@ -259,7 +259,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         return {'FINISHED'}
 
-    
+
     def clean_up(self, context, revert=False):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
@@ -272,7 +272,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             self.active_object.select_set(True)
 
         unregister_draw_handler()
-    
+
 
 def draw_text_callback(self):
     draw_header(self)

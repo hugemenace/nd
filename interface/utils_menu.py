@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -43,7 +43,7 @@ class ND_MT_utils_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
         render_ops(ops.util_ops, layout, new_row=False, use_separator=True)
-        
+
 
 def register():
     bpy.utils.register_class(ND_MT_utils_menu)
@@ -53,7 +53,7 @@ def register():
         entry = keymap.keymap_items.new("wm.call_menu", 'T', 'PRESS', alt=True)
         entry.properties.name = "ND_MT_utils_menu"
         keys.append((keymap, entry))
-   
+
 
 def unregister():
     for keymap, entry in keys:

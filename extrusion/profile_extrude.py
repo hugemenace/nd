@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -78,7 +78,7 @@ CTRL — Remove existing modifiers"""
         if pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1
             self.dirty = True
-        
+
         if pressed(event, {'E'}):
             self.calculate_edges = not self.calculate_edges
             self.dirty = True
@@ -90,7 +90,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.step_size
                 self.dirty = True
-            
+
         if self.key_step_down:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length - self.step_size)
@@ -98,7 +98,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset -= self.step_size
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -120,7 +120,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND PE')
             return {'FINISHED'}
@@ -161,7 +161,7 @@ CTRL — Remove existing modifiers"""
         if context.mode == 'OBJECT' and context.object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
-    
+
     def prepare_new_operator(self, context):
         self.summoned = False
 
@@ -203,7 +203,7 @@ CTRL — Remove existing modifiers"""
         elif self.weighting == 1:
             return 0
 
-    
+
     def calculate_existing_weighting(self):
         offset = abs(self.weighting_offset.strength)
         extrusion = self.screw.screw_offset
@@ -211,12 +211,12 @@ CTRL — Remove existing modifiers"""
 
         return max(-1, min(1, 1 - round(factor)))
 
-    
+
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
             self.smoothing = add_smooth_by_angle(self.target_object)
             return
-        
+
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
         self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
@@ -229,7 +229,7 @@ CTRL — Remove existing modifiers"""
 
         self.weighting_offset = offset
 
-    
+
     def add_offset_modifier(self, context):
         offset = new_modifier(self.target_object, mod_offset, 'DISPLACE', rectify=True)
         offset.space = 'LOCAL'
@@ -245,7 +245,7 @@ CTRL — Remove existing modifiers"""
         screw.angle = 0
 
         self.screw = screw
-    
+
 
     def operate(self, context):
         axis = ['X', 'Y', 'Z'][self.axis]
@@ -281,7 +281,7 @@ CTRL — Remove existing modifiers"""
             self.weighting_offset.strength = self.weighting_offset_strength_prev
             self.displace.direction = axis
             self.displace.strength = self.offset_prev
-        
+
         unregister_draw_handler()
         unregister_axis_handler()
 
@@ -316,7 +316,7 @@ def draw_text_callback(self):
         self,
         "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
         "Axis to extrude along (X, Y, Z)")
-    
+
     draw_hint(
         self,
         "Calculate Edges [E]: {}".format("Yes" if self.calculate_edges else "No"),

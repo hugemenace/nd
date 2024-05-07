@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -83,7 +83,7 @@ class ND_OT_screw_head(BaseOperator):
             elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale += scale_factor
                 self.dirty = True
-            
+
         if self.key_step_down:
             if self.key_no_modifiers:
                 self.head_type_index = (self.head_type_index - 1) % len(self.objects)
@@ -95,7 +95,7 @@ class ND_OT_screw_head(BaseOperator):
             elif no_stream(self.scale_input_stream) and self.key_alt:
                 self.scale -= scale_factor
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -139,7 +139,7 @@ class ND_OT_screw_head(BaseOperator):
         filepath = get_asset_path('screw_heads')
         with bpy.data.libraries.load(filepath) as (data_from, data_to):
             data_to.objects = data_from.objects
-        
+
         self.obj = None
         self.obj_matrix_basis = None
         self.objects = data_to.objects + custom_objects
@@ -220,7 +220,7 @@ class ND_OT_screw_head(BaseOperator):
 
 def draw_text_callback(self):
     draw_header(self)
-    
+
     draw_property(
         self,
         "Type: {0}".format(self.objects[self.head_type_index][1]),
@@ -240,7 +240,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"Offset: {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}", 
+        f"Offset: {(self.offset * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,

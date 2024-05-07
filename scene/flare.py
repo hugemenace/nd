@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -121,7 +121,7 @@ class ND_OT_flare(bpy.types.Operator):
                 self.energy_offset += energy_factor
 
             self.dirty = True
-            
+
         elif self.key_step_down:
             if no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation - rotation_factor) % 360
@@ -151,7 +151,7 @@ class ND_OT_flare(bpy.types.Operator):
                 self.energy_offset += self.mouse_value * 2500
             elif no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation + self.mouse_value_mag) % 360
-            
+
             self.dirty = True
 
         if self.dirty:
@@ -178,7 +178,7 @@ class ND_OT_flare(bpy.types.Operator):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
         self.summoned = False
         self.regenerated_rig = False
@@ -202,7 +202,7 @@ class ND_OT_flare(bpy.types.Operator):
             self.scale_prev = self.scale = self.empty.scale[0]
 
             existing_lights = [light for light in self.empty.children if light.type == 'LIGHT' and light.data.type == 'AREA']
-            
+
             if not existing_lights:
                 self.report({'ERROR'}, "Please select a valid Flare Lighting Rig")
                 return {'CANCELLED'}
@@ -254,7 +254,7 @@ class ND_OT_flare(bpy.types.Operator):
     def generate_rig(self, context):
         self.regenerated_rig = True
         self.lights = getattr(self, 'lights', [])
-        
+
         self.remove_lights(context)
 
         for i in range(0, randrange(3, 5)):
@@ -263,16 +263,16 @@ class ND_OT_flare(bpy.types.Operator):
         self.reset_values(context)
         self.operate(context)
 
-    
+
     def randomise_colors(self, context):
         for light, height, energy in self.lights:
             light.data.color = (random(), random(), random())
 
-    
+
     def randomise_energy(self, context):
         self.energy_offset_input_stream = new_stream()
         self.energy_offset = 0
-        
+
         for light, height, energy in self.lights:
             light.data.energy = uniform(1000, 25000)
 
@@ -327,7 +327,7 @@ class ND_OT_flare(bpy.types.Operator):
         if self.summoned:
             self.empty.rotation_euler = (0, 0, radians(self.rotation_prev))
             self.empty.scale = (self.scale_prev, self.scale_prev, self.scale_prev)
-            
+
             self.remove_lights(context)
             for energy, size, color, location in self.prev_lights_snapshot:
                 self.lights.append(self.add_light(context, energy, size, color, location))
@@ -340,9 +340,9 @@ class ND_OT_flare(bpy.types.Operator):
 
 def draw_text_callback(self):
     draw_header(self)
-    
+
     draw_property(
-        self, 
+        self,
         "Rotation: {0:.2f}".format(self.rotation),
         "(±15)  |  Shift (±1)",
         active=self.key_no_modifiers,
@@ -351,7 +351,7 @@ def draw_text_callback(self):
         input_stream=self.rotation_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Height Offset: {0:.2f}".format(self.height_offset),
         "Alt (±1)  |  Shift + Alt (±0.1)",
         active=self.key_alt,
@@ -360,7 +360,7 @@ def draw_text_callback(self):
         input_stream=self.height_offset_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Scale: {0:.2f}".format(self.scale),
         "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
         active=self.key_ctrl,
@@ -369,7 +369,7 @@ def draw_text_callback(self):
         input_stream=self.scale_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Energy Offset: {0:.1e}".format(self.energy_offset),
         "Ctrl + Alt (±10k)  |  Shift + Ctrl + Alt (±1k)",
         active=self.key_ctrl_alt,

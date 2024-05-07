@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -492,7 +492,7 @@ class NDPreferences(AddonPreferences):
             row = column.row()
             row.prop(self, prop, expand=expanded)
 
-    
+
     def draw_ui(self, box):
         ui_prefs = [
             ["overlay_dpi"],
@@ -561,7 +561,7 @@ class NDPreferences(AddonPreferences):
         name = "ND v%s" % ('.'.join([str(v) for v in version]))
         wm = bpy.context.window_manager
         kc = wm.keyconfigs.user
-        
+
         for keymap in ['Mesh', 'Object Mode']:
             km = kc.keymaps.get(keymap)
 
@@ -618,7 +618,7 @@ def register():
     prefs = lib.preferences.get_preferences()
 
     if prefs.enable_update_check:
-        
+
         prefs.update_available = lib.updates.update_available(version_str)
     else:
         prefs.update_available = False
@@ -633,7 +633,7 @@ def register():
         prefs.local_user_prefs_version = version_str
 
     print("""
-███╗   ██╗██████╗ 
+███╗   ██╗██████╗
 ████╗  ██║██╔══██╗
 ██╔██╗ ██║██║  ██║
 ██║╚██╗██║██║  ██║

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -49,7 +49,7 @@ class ND_OT_toggle_custom_view(bpy.types.Operator):
             return self.handle_recovery_mode()
 
         return self.handle_standard_mode()
-    
+
 
     def handle_standard_mode(self):
         bpy.context.space_data.overlay.show_overlays = True
@@ -74,7 +74,7 @@ class ND_OT_toggle_custom_view(bpy.types.Operator):
                 setattr(self.overlay, option, self.prefs[pref_option])
             else:
                 setattr(self.overlay, option, False)
-        
+
         return {'FINISHED'}
 
 

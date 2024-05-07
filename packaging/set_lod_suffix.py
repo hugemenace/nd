@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -57,7 +57,7 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
             old_name = re.sub(r"(.+?)(?:_[0-9]+)+$", r"\1", old_name)
 
             name_segments = old_name.split("_")
-            
+
             # Remove existing _high / _low suffixes.
             if name_segments[-1].lower() in ['high', 'low']:
                 name_segments.pop()

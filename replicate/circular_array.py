@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -56,7 +56,7 @@ CTRL — Remove existing modifiers"""
     def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else 15
         count_factor = 1 if self.key_shift else 2
-        
+
         if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.count_input_stream = update_stream(self.count_input_stream, event.type)
@@ -103,7 +103,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = 2 if self.count == 1 else self.count + count_factor
                 self.dirty = True
-            
+
         if self.key_step_down:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, self.angle - angle_factor)
@@ -114,7 +114,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = max(2, self.count - count_factor)
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -122,7 +122,7 @@ CTRL — Remove existing modifiers"""
 
         if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
-        
+
         if get_preferences().enable_mouse_values:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
@@ -139,7 +139,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND CA')
             return {'FINISHED'}
@@ -163,7 +163,7 @@ CTRL — Remove existing modifiers"""
         mods = context.active_object.modifiers
         mod_names = list(map(lambda x: x.name, mods))
         previous_op = all(m in mod_names for m in mod_summon_list)
-        
+
         if previous_op:
             self.summon_old_operator(context, mods)
         else:
@@ -233,9 +233,9 @@ CTRL — Remove existing modifiers"""
         self.rotator_obj.scale = (1, 1, 1)
 
         self.rotator_obj.parent = self.reference_obj
-        if not self.faux_origin and not self.single_obj_mode: 
+        if not self.faux_origin and not self.single_obj_mode:
             self.rotator_obj.matrix_parent_inverse = self.reference_obj.matrix_world.inverted()
-        
+
         if self.faux_origin:
             self.add_displace_tranform_modifiers()
         elif not self.faux_origin and not self.single_obj_mode:
@@ -247,7 +247,7 @@ CTRL — Remove existing modifiers"""
 
         self.select_reference_obj()
 
-    
+
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
@@ -300,7 +300,7 @@ CTRL — Remove existing modifiers"""
             displace.strength = self.offset
 
         self.displace = displace
-    
+
 
     def operate(self, context):
         altered_count = self.count if abs(self.angle) == 360 else self.count - 1
@@ -355,12 +355,12 @@ CTRL — Remove existing modifiers"""
             if self.faux_origin:
                 for displace in self.displace_transforms:
                     self.reference_obj.modifiers.remove(displace)
-            
+
             self.reference_obj.modifiers.remove(self.displace)
             self.reference_obj.modifiers.remove(self.array)
-            
+
             bpy.data.objects.remove(self.rotator_obj, do_unlink=True)
-            
+
             if not self.single_obj_mode:
                 if not self.faux_origin:
                     set_origin(self.reference_obj, self.reference_obj_matrix_world_backup)
@@ -378,7 +378,7 @@ def draw_text_callback(self):
     display_unit_scale = self.unit_scale / self.unit_factor
 
     draw_property(
-        self, 
+        self,
         "Count: {}".format(self.count),
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
@@ -387,7 +387,7 @@ def draw_text_callback(self):
         input_stream=self.count_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({0:.2f}°)".format(self.angle)),
         self.generate_key_hint("Alt", self.generate_step_hint(15, 1)),
         active=self.key_alt,
@@ -396,8 +396,8 @@ def draw_text_callback(self):
         input_stream=self.angle_input_stream)
 
     draw_property(
-        self, 
-        f"Offset: {(self.offset * display_unit_scale):.2f}{self.unit_suffix}", 
+        self,
+        f"Offset: {(self.offset * display_unit_scale):.2f}{self.unit_suffix}",
         self.generate_key_hint("Ctrl", self.unit_step_hint),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,

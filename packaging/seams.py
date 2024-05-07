@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -84,12 +84,12 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = min(180, self.angle + angle_factor)
                 self.dirty = True
-            
+
         elif self.key_step_down:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
-        
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -115,7 +115,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
         self.fast_apply = event.shift
 
@@ -152,7 +152,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
-    
+
     def operate(self, context):
         self.clear_edges(context)
 
@@ -213,7 +213,7 @@ def draw_text_callback(self):
         self,
         "Auto Smooth [A]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
         "Set auto smooth angle to 180° on completion")
-    
+
 
 def register():
     bpy.utils.register_class(ND_OT_seams)

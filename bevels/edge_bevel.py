@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -119,7 +119,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:
                 self.weight = max(0, min(1, self.weight + weight_factor))
                 self.dirty = True
-        
+
         if self.key_step_down:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
@@ -133,7 +133,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:
                 self.weight = max(0, min(1, self.weight - weight_factor))
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -161,7 +161,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND EB')
             for object in context.selected_objects:
@@ -177,9 +177,9 @@ CTRL — Remove existing modifiers"""
                 if bevel_weight_layer is not None:
                     for edge in bm.edges:
                         edge[bevel_weight_layer] = 0
-            
+
                 bmesh.update_edit_mesh(object.data)
-                
+
             return {'FINISHED'}
 
         self.dirty = False
@@ -263,7 +263,7 @@ CTRL — Remove existing modifiers"""
             add_smooth_by_angle(self.target_object)
             bpy.ops.object.mode_set(mode='EDIT')
             return
-        
+
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
@@ -305,7 +305,7 @@ CTRL — Remove existing modifiers"""
     def take_edges_snapshot(self, context):
         self.edges_snapshot = {}
         self.edge_weight_average = 0
-        
+
         data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
 
@@ -344,11 +344,11 @@ CTRL — Remove existing modifiers"""
             bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
             if bevel_weight_layer is None:
                 bevel_weight_layer = bm.edges.layers.float.new("bevel_weight_edge")
-        
+
         selected_edges = [edge for edge in bm.edges if edge.select]
         for edge in selected_edges:
             edge[bevel_weight_layer] = self.weight
-    
+
         bmesh.update_edit_mesh(data)
 
         self.dirty = False
@@ -387,13 +387,13 @@ CTRL — Remove existing modifiers"""
             bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
         else:
             bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
-    
+
         if bevel_weight_layer is not None:
             selected_edges = [edge for edge in bm.edges if edge.select]
             for edge in selected_edges:
                 if edge.index in self.edges_snapshot:
                     edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
-    
+
         bmesh.update_edit_mesh(data)
 
         unregister_draw_handler()
@@ -413,7 +413,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments), 
+        "Segments: {}".format(self.segments),
         self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -421,7 +421,7 @@ def draw_text_callback(self):
         input_stream=self.segments_input_stream)
 
     draw_property(
-        self, 
+        self,
         "Profile: {0:.2f}".format(self.profile),
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,12 +20,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
 
-import bpy 
+import bpy
 import bmesh
 from math import radians
 from mathutils.geometry import distance_point_to_plane, normal
@@ -42,16 +42,16 @@ def add_single_vertex_object(cls, context, name):
     bm.verts.new()
     bm.to_mesh(mesh)
     bm.free()
-    
+
     obj.select_set(True)
-    
+
     context.view_layer.objects.active = obj
 
     if bpy.app.version < (4, 1, 0):
         bpy.ops.object.shade_smooth()
         obj.data.use_auto_smooth = True
         obj.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
-    
+
     cls.obj = obj
 
 
@@ -91,7 +91,7 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
             if mod.type == 'SUBSURF':
                 bpy.ops.object.modifier_remove(modifier=name)
                 continue
-            
+
             if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
                 if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
                     bpy.ops.object.modifier_remove(modifier=name)
@@ -138,7 +138,7 @@ def is_planar(bm, tolerance=0.0001):
 
     if len(faces) < 1:
         return True
-    
+
     head = faces[0]
 
     if len(faces) == 1 and len(head.verts) == 3:

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -75,7 +75,7 @@ class ND_OT_snap_align(bpy.types.Operator):
         elif pressed(event, {'R'}):
             self.capture_points = []
             self.guide_line = ()
-                
+
             self.dirty = True
 
         elif self.key_confirm:
@@ -92,7 +92,7 @@ class ND_OT_snap_align(bpy.types.Operator):
 
         if self.dirty:
             self.operate(context)
-            
+
         update_overlay(self, context, event)
 
         return {'RUNNING_MODAL'}
@@ -102,7 +102,7 @@ class ND_OT_snap_align(bpy.types.Operator):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         self.dirty = False
         self.hit_location = None
         self.capture_points = []
@@ -127,7 +127,7 @@ class ND_OT_snap_align(bpy.types.Operator):
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
-        
+
         world_matrix = context.active_object.matrix_world
 
         vert_points = []
@@ -174,7 +174,7 @@ class ND_OT_snap_align(bpy.types.Operator):
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 2 and context.active_object.type == 'MESH'
 
-    
+
     def operate(self, context):
         self.tertiary_points = [cap[0] for cap in self.capture_points]
 
@@ -194,7 +194,7 @@ class ND_OT_snap_align(bpy.types.Operator):
                 self.reference_obj.rotation_euler = rotation_matrix.to_euler()
             else:
                 self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
-                
+
         elif self.hit_location:
             self.reference_obj.location = self.hit_location
 
@@ -239,7 +239,7 @@ class ND_OT_snap_align(bpy.types.Operator):
                     snap_points.append((vect, rotation_matrix))
                 elif v3_distance(vect, location) <= (0.8 * self.snap_distance_factor):
                     self.secondary_points.append(vect)
-            
+
             snap_points.sort(key=lambda p: v3_distance(p[0], location))
             self.snap_point = snap_points[0] if snap_points else None
             self.primary_points = [self.snap_point[0]] if self.snap_point else []
@@ -247,7 +247,7 @@ class ND_OT_snap_align(bpy.types.Operator):
             self.hit_location = None
             self.primary_points = []
             self.secondary_points = []
-        
+
         self.reference_obj.hide_set(False)
 
         self.dirty = True

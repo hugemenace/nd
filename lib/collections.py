@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -42,7 +42,7 @@ def move_to_utils_collection(obj):
     collection = bpy.data.collections.get(get_preferences().utils_collection_name)
     if collection is None:
         collection = create_utils_collection()
-    
+
     remove_obj_from_all_collections(obj)
     collection.objects.link(obj)
 
@@ -63,10 +63,10 @@ def get_utils_layer():
 
 def get_all_util_objects():
     data = get_utils_layer()
-    
+
     if data is None:
         return []
-    
+
     layer, collection = data
     return collection.all_objects
 
@@ -90,7 +90,7 @@ def isolate_in_utils_collection(target_objs):
     data = get_utils_layer()
     if data is not None:
         layer, collection = data
-        
+
         layer.hide_viewport = False
         collection.hide_viewport = False
 

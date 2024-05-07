@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -106,18 +106,18 @@ CTRL — Remove existing modifiers"""
                     self.angle = min(360, self.angle + angle_factor)
                 elif no_stream(self.factor_input_stream):
                     self.factor += factor_factor
-                
+
                 self.dirty = True
-            
+
         elif self.key_step_down:
             if self.key_no_modifiers:
                 if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle - angle_factor)
                 elif no_stream(self.factor_input_stream):
                     self.factor -= factor_factor
-                
+
                 self.dirty = True
-        
+
         elif self.key_confirm:
             self.finish(context)
 
@@ -132,7 +132,7 @@ CTRL — Remove existing modifiers"""
                     self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
                 elif no_stream(self.factor_input_stream):
                     self.factor += self.mouse_value
-            
+
                 self.dirty = True
 
         if self.dirty:
@@ -147,7 +147,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND SD')
             return {'FINISHED'}
@@ -191,7 +191,7 @@ CTRL — Remove existing modifiers"""
         if context.mode == 'OBJECT' and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type in ['MESH', 'CURVE']
 
-    
+
     def prepare_new_operator(self, context):
         self.summoned = False
 
@@ -254,7 +254,7 @@ CTRL — Remove existing modifiers"""
                 self.deform.angle = radians(self.angle_prev)
             else:
                 self.deform.factor = self.factor_prev
-        
+
         unregister_draw_handler()
         unregister_axis_handler()
 

@@ -1,10 +1,10 @@
-# ███╗   ██╗██████╗ 
+# ███╗   ██╗██████╗
 # ████╗  ██║██╔══██╗
 # ██╔██╗ ██║██║  ██║
 # ██║╚██╗██║██║  ██║
 # ██║ ╚████║██████╔╝
-# ╚═╝  ╚═══╝╚═════╝ 
-# 
+# ╚═╝  ╚═══╝╚═════╝
+#
 # ND (Non-Destructive) Blender Add-on
 # Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
 #
@@ -20,7 +20,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-# 
+#
 # ---
 # Contributors: Tristo (HM)
 # ---
@@ -98,12 +98,12 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][IDX_OFFSET] = self.axes[self.axis][IDX_OFFSET] * -1
                 else:
                     self.axes[self.axis][IDX_COUNT] = new_count
-                
+
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][IDX_OFFSET] += relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
                 self.dirty = True
-            
+
         if self.key_step_down:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
                 new_count = self.axes[self.axis][IDX_COUNT] - (1 if self.axes[self.axis][IDX_OFFSET] >= 0 else -1)
@@ -113,12 +113,12 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][IDX_OFFSET] = self.axes[self.axis][IDX_OFFSET] * -1
                 else:
                     self.axes[self.axis][IDX_COUNT] = new_count
-                
+
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][IDX_OFFSET] -= relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
                 self.dirty = True
-        
+
         if self.key_confirm:
             self.finish(context)
 
@@ -139,7 +139,7 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][IDX_OFFSET] = self.axes[self.axis][IDX_OFFSET] * -1
                 else:
                     self.axes[self.axis][IDX_COUNT] = new_count
-                
+
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][IDX_OFFSET] += self.mouse_value
@@ -150,7 +150,7 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
-        
+
         if event.ctrl:
             remove_modifiers_starting_with(context.selected_objects, 'Array³')
             return {'FINISHED'}
@@ -255,7 +255,7 @@ CTRL — Remove existing modifiers"""
                 array.relative_offset_displace = [offset if i == axis else 0 for i in range(3)]
                 array.use_relative_offset = relative
                 array.use_constant_offset = not relative
-        
+
         unregister_draw_handler()
         unregister_axis_handler()
 
@@ -264,7 +264,7 @@ def draw_text_callback(self):
     draw_header(self)
 
     draw_property(
-        self, 
+        self,
         "Count: {0}".format(self.axes[self.axis][IDX_COUNT]),
         self.generate_step_hint(1),
         active=self.key_no_modifiers,

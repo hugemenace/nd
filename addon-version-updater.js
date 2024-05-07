@@ -34,7 +34,7 @@ module.exports.readVersion = function (contents) {
 
 module.exports.writeVersion = function (contents, version) {
     const objRegex = /"version": \([0-9]+, [0-9]+, [0-9]+\),/gm;
-    const varRegex = /version = \([0-9]+, [0-9]+, [0-9]+\),/gm;
+    const varRegex = /version = \([0-9]+, [0-9]+, [0-9]+\)/gm;
     const v = version.split('.');
 
     return contents

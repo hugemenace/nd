@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.41.1](https://github.com/hugemenace/nd/compare/v1.41.0...v1.41.1) (2024-05-07)
+
+
+### Bug Fixes
+
+* fix Blender 4.2 extension compatibility issues ([08004b7](https://github.com/hugemenace/nd/commit/08004b732cb8733ccc52fdf2efc7fb4c6a135172))
+
 ## [1.41.0](https://github.com/hugemenace/nd/compare/v1.40.0...v1.41.0) (2024-04-15)
 
 

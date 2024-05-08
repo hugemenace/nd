@@ -139,12 +139,13 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             row.scale_y = 1.2
             web_link("https://docs.nd.hugemenace.co/#/getting-started/changelog", "View Changelog", "DOCUMENTS", row)
 
-        box = create_box("Useful Links", layout, props, "display_links", icons, [])
-        if props.display_links:
-            for url, label, icon in links:
-                row = box.row(align=True)
-                row.scale_y = 1.2
-                web_link(url, label, icon, row)
+        if not lib.addons.is_extension():
+          box = create_box("Useful Links", layout, props, "display_links", icons, [])
+          if props.display_links:
+              for url, label, icon in links:
+                  row = box.row(align=True)
+                  row.scale_y = 1.2
+                  web_link(url, label, icon, row)
 
         for label, collection, prop, shortcuts in op_sections:
             box = create_box(label, layout, props, prop, icons, shortcuts)

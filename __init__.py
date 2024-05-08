@@ -28,7 +28,7 @@
 bl_info = {
     "name": "HugeMenace — ND",
     "author": "HugeMenace",
-    "version": (1, 41, 1),
+    "version": (1, 41, 2),
     "blender": (4, 0, 0),
     "location": "N Panel, Shift + 2",
     "description": "Non-destructive operations, tools, and generators.",
@@ -559,7 +559,7 @@ class NDPreferences(AddonPreferences):
             row = column.row()
             row.prop(self, pref)
 
-        version = (1, 41, 1)
+        version = (1, 41, 2)
 
         name = "ND v%s" % ('.'.join([str(v) for v in version]))
         wm = bpy.context.window_manager
@@ -616,7 +616,7 @@ def register():
         registerable.reload()
         registerable.register()
 
-    version = (1, 41, 1)
+    version = (1, 41, 2)
     version_str = '.'.join([str(v) for v in version])
 
     prefs = lib.preferences.get_preferences()

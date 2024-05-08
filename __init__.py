@@ -627,17 +627,6 @@ def register():
         prefs.update_available = False
 
 
-    print("""
-███╗   ██╗██████╗
-████╗  ██║██╔══██╗
-██╔██╗ ██║██║  ██║
-██║╚██╗██║██║  ██║
-██║ ╚████║██████╔╝
-╚═╝  ╚═══╝╚═════╝
-HugeMenace — ND Addon v%s
-    """ % (version_str));
-
-
 def unregister():
     for registerable in registerables:
         registerable.unregister()

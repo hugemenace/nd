@@ -126,7 +126,7 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         row.operator("nd.toggle_sections")
         row.separator()
 
-        if lib.preferences.get_preferences().update_available:
+        if not lib.addons.is_extension() and lib.preferences.get_preferences().update_available:
             box = layout.box()
             column = box.column()
 

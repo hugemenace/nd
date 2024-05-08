@@ -477,13 +477,16 @@ class NDPreferences(AddonPreferences):
             row.prop(self, pref)
 
         general_boxed_prefs = [
-            ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True],
-            ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False],
-            ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False],
-            ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False],
-            ["Enable experimental features. Use at your own risk!", "enable_experimental_features", False]]
+            ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True, True],
+            ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False, True],
+            ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False, not lib.addons.is_extension()],
+            ["Enable deprecated features for short term backwards compatibility", "enable_deprecated_features", False, True],
+            ["Enable experimental features. Use at your own risk!", "enable_experimental_features", False, True]]
 
-        for label, prop, expanded in general_boxed_prefs:
+        for label, prop, expanded, visible in general_boxed_prefs:
+            if not visible:
+                continue
+
             pref_box = box.box()
             column = pref_box.column(align=True)
             row = column.row()
@@ -603,6 +606,7 @@ class NDPreferences(AddonPreferences):
             row = column.row()
             row.prop(self, pref)
 
+
 def register():
     lib.reload()
 
@@ -617,20 +621,11 @@ def register():
 
     prefs = lib.preferences.get_preferences()
 
-    if prefs.enable_update_check:
-
+    if not lib.addons.is_extension() and prefs.enable_update_check:
         prefs.update_available = lib.updates.update_available(version_str)
     else:
         prefs.update_available = False
 
-    if prefs.local_user_prefs_version != version_str:
-        if version_str.startswith("1.28"):
-            prefs.overlay_pin_key = "P"
-            prefs.overlay_pause_key = "BACK_SLASH"
-            prefs.overlay_reset_key = "X"
-            prefs.lock_overlay_pinning = True
-            prefs.enable_mouse_values = True
-        prefs.local_user_prefs_version = version_str
 
     print("""
 ███╗   ██╗██████╗

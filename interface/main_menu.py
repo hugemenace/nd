@@ -43,7 +43,7 @@ class ND_MT_main_menu(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
-        if lib.preferences.get_preferences().update_available:
+        if not lib.addons.is_extension() and lib.preferences.get_preferences().update_available:
             layout.operator("wm.url_open", text="Update Available!", icon='PACKAGE').url = "https://hugemenace.gumroad.com/l/nd-blender-addon"
             layout.separator()
 

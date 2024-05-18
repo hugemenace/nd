@@ -33,7 +33,8 @@ class ND_OT_apply_modifiers(bpy.types.Operator):
     bl_idname = "nd.apply_modifiers"
     bl_label = "Apply Modifiers"
     bl_description = """Prepare the selected object(s) for destructive operations by applying applicable modifiers
-SHIFT — Hard apply (apply all modifiers)"""
+SHIFT — Hard apply (apply all modifiers)
+ALT — Hard apply (duplicate mesh)"""
     bl_options = {'UNDO'}
 
 
@@ -44,6 +45,9 @@ SHIFT — Hard apply (apply all modifiers)"""
 
 
     def execute(self, context):
+        if self.duplicate:
+            bpy.ops.object.duplicate()
+
         bpy.ops.object.make_single_user(object=True, obdata=True, material=False, animation=False, obdata_animation=False)
 
         for obj in context.selected_objects:
@@ -56,6 +60,7 @@ SHIFT — Hard apply (apply all modifiers)"""
 
     def invoke(self, context, event):
         self.hard_apply = event.shift
+        self.duplicate = event.alt
 
         return self.execute(context)
 

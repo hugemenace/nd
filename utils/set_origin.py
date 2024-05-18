@@ -98,11 +98,11 @@ SHIFT — Undo faux origin translation"""
         mods = [mod for mod in context.active_object.modifiers if mod.type == 'DISPLACE' and mod.name.endswith('— ND FO')]
         for mod in mods:
             if mod.direction == 'X':
-                location.x = mod.strength
+                location.x += mod.strength
             elif mod.direction == 'Y':
-                location.y = mod.strength
+                location.y += mod.strength
             elif mod.direction == 'Z':
-                location.z = mod.strength
+                location.z += mod.strength
 
             context.active_object.modifiers.remove(mod)
 

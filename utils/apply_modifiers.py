@@ -34,7 +34,7 @@ class ND_OT_apply_modifiers(bpy.types.Operator):
     bl_label = "Apply Modifiers"
     bl_description = """Prepare the selected object(s) for destructive operations by applying applicable modifiers
 SHIFT — Hard apply (apply all modifiers)
-ALT — Hard apply (duplicate mesh)"""
+ALT — Duplicate mesh before applying modifiers"""
     bl_options = {'UNDO'}
 
 

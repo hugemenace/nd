@@ -243,6 +243,9 @@ CTRL — Remove existing modifiers"""
 
 
     def add_smooth_shading(self, context):
+        if not get_preferences().enable_auto_smooth:
+            return
+
         if bpy.app.version >= (4, 1, 0):
             bpy.ops.object.mode_set(mode='OBJECT')
             add_smooth_by_angle(self.target_object)

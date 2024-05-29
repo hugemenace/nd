@@ -331,6 +331,11 @@ class NDPreferences(AddonPreferences):
         default="GENERAL",
     )
 
+    enable_auto_smooth: BoolProperty(
+        name="Enable Auto Smoothing",
+        default=True,
+    )
+
     default_smoothing_angle: EnumProperty(
         name="Default Smooting Angle",
         items=[
@@ -469,7 +474,8 @@ class NDPreferences(AddonPreferences):
             "use_fast_booleans",
             "recon_poly_solidify",
             "recon_poly_inscribed",
-            "enable_right_click_select"]
+            "enable_right_click_select",
+            "enable_auto_smooth"]
 
         for pref in general_prefs:
             column = box.column(align=True)

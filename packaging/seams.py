@@ -121,7 +121,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
         self.base_angle_factor = 15
         self.angle = int(get_preferences().default_smoothing_angle)
-        self.commit_auto_smooth = True
+        self.commit_auto_smooth = get_preferences().enable_auto_smooth
 
         self.angle_input_stream = new_stream()
 

@@ -623,12 +623,10 @@ def register():
         registerable.register()
 
     version = (1, 42, 0)
-    version_str = '.'.join([str(v) for v in version])
-
     prefs = lib.preferences.get_preferences()
 
     if not lib.addons.is_extension() and prefs.enable_update_check:
-        prefs.update_available = lib.updates.update_available(version_str)
+        prefs.update_available = lib.updates.update_available(version)
     else:
         prefs.update_available = False
 

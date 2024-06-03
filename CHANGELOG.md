@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.43.0](https://github.com/hugemenace/nd/compare/v1.42.0...v1.43.0) (2024-06-03)
+
+
+### Features
+
+* add an option in general preferences to toggle auto smoothing across all operators ([2d80d10](https://github.com/hugemenace/nd/commit/2d80d10aba1f385594c11add4a838b80e37a7e42))
+
+
+### Bug Fixes
+
+* fix version number check when check for updates is enabled ([83027b8](https://github.com/hugemenace/nd/commit/83027b84531194ace3f017d9c3276a7e8e355d6c))
+
 ## [1.42.0](https://github.com/hugemenace/nd/compare/v1.41.2...v1.42.0) (2024-05-25)
 
 

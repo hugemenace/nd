@@ -99,6 +99,9 @@ def add_smooth_by_angle(object):
         bpy.ops.object.shade_smooth()
         bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
 
+        # Ensure the object has the modifier on the stack.
+        object.data.update()
+
         mod = object.modifiers[-1]
         mod.name = "Smooth — ND SBA"
 

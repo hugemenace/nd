@@ -7,8 +7,6 @@ tagline = "Non-Destructive Modeling Toolkit"
 maintainer = "HugeMenace <hello@hugemenace.co>"
 type = "add-on"
 
-permissions = ["files"]
-
 website = "https://docs.nd.hugemenace.co/"
 
 tags = ["3D View", "Lighting", "Material", "Modeling", "Mesh", "Object", "Scene", "UV"]
@@ -23,3 +21,6 @@ copyright = [
   "2024 Tristan S. & Ian J.",
   "2024 HugeMenace",
 ]
+
+[permissions]
+files = "Import built-in and custom assets"

@@ -112,7 +112,10 @@ SHIFT — Create a stacked bevel modifier"""
             self.summon_old_operator(context)
 
         if self.key_step_up:
-            if no_stream(self.segments_input_stream) and self.key_alt:
+            if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
+                self.segments = 2 if self.segments == 1 else self.segments + segment_factor
+                self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
@@ -126,7 +129,10 @@ SHIFT — Create a stacked bevel modifier"""
                 self.dirty = True
 
         if self.key_step_down:
-            if no_stream(self.segments_input_stream) and self.key_alt:
+            if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
+                self.segments = max(1, self.segments - segment_factor)
+                self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
@@ -189,6 +195,8 @@ SHIFT — Create a stacked bevel modifier"""
 
         self.stacked = event.shift
         self.dirty = False
+
+        self.extend_mouse_values = get_preferences().enable_mouse_values and get_preferences().extend_mouse_values
 
         self.segments = 1
         self.width = 0
@@ -342,7 +350,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Segments: {}".format(self.segments),
-        self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
+        self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,

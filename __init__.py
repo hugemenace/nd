@@ -127,6 +127,11 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    extend_mouse_values: BoolProperty(
+        name="Extend Mouse Values (scroll wheel override for certain operations such as bevels)",
+        default=True,
+    )
+
     use_fast_booleans: BoolProperty(
         name="Use Fast Booleans",
         default=True,
@@ -506,6 +511,7 @@ class NDPreferences(AddonPreferences):
         ui_prefs = [
             ["overlay_dpi"],
             ["enable_mouse_values"],
+            ["extend_mouse_values"],
             ["mouse_value_scalar"],
             ["mouse_value_steps"],
             ["unit_increment_size"],

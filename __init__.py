@@ -161,6 +161,11 @@ class NDPreferences(AddonPreferences):
         default="RESET",
     )
 
+    lock_overlay_parameters_on_recall: BoolProperty(
+        name="Lock Overlay Parameters on Recall",
+        default=True,
+    )
+
     overlay_pinned: BoolProperty(
         name="Overlay Pinned",
         default=False,
@@ -526,6 +531,7 @@ class NDPreferences(AddonPreferences):
             ["unit_increment_size"],
             ["enable_quick_favourites"],
             ["lock_overlay_pinning"],
+            ["lock_overlay_parameters_on_recall"],
             ["enable_sidebar"],
             ["enable_axis_helper"],
             ["axis_base_thickness", "axis_active_thickness", "axis_inactive_opacity"]]

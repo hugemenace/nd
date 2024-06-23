@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
@@ -195,6 +195,10 @@ CTRL — Remove existing modifiers"""
         self.weighting = self.calculate_existing_weighting()
         self.weighting_offset_strength_prev = self.weighting_offset.strength
         self.offset_prev = self.offset = self.displace.strength
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.extrusion_length_input_stream = set_stream(self.extrusion_length)
+            self.offset_input_stream = set_stream(self.offset)
 
 
     def calculate_weighting_offset_strength(self):

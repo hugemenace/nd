@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
@@ -239,6 +239,11 @@ CTRL — Remove existing modifiers"""
         self.width_prev = self.width = self.bevel.width
         self.segments_prev = self.segments = self.bevel.segments
         self.profile_prev = self.profile = self.bevel.profile
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.segments_input_stream = set_stream(self.segments)
+            self.width_input_stream = set_stream(self.width)
+            self.profile_input_stream = set_stream(self.profile)
 
 
     def prepare_new_operator(self, context):

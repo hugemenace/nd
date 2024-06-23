@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, set_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
 
 
@@ -263,6 +263,12 @@ SHIFT — Create a stacked bevel modifier"""
         self.loop_slide_prev = self.loop_slide = self.bevel.loop_slide
         self.clamp_overlap_prev = self.clamp_overlap = self.bevel.use_clamp_overlap
         self.angle_prev = self.angle = degrees(self.bevel.angle_limit)
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.segments_input_stream = set_stream(self.segments)
+            self.width_input_stream = set_stream(self.width)
+            self.profile_input_stream = set_stream(self.profile)
+            self.angle_input_stream = set_stream(self.angle)
 
 
     def add_smooth_shading(self, context):

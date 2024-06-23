@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
@@ -79,6 +79,10 @@ CTRL — Remove existing modifiers"""
 
         elif pressed(event, {'M'}):
             self.current_method = (self.current_method + 1) % len(self.methods)
+            self.angle_input_stream = new_stream()
+            self.factor_input_stream = new_stream()
+            self.factor = 0
+            self.angle = 0
             self.dirty = True
 
         elif pressed(event, {'A'}):
@@ -191,6 +195,10 @@ CTRL — Remove existing modifiers"""
         self.method_prev = self.current_method = self.methods.index(self.deform.deform_method)
         self.angle_prev = self.angle = degrees(self.deform.angle)
         self.factor_prev = self.factor = self.deform.factor
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.angle_input_stream = set_stream(self.angle)
+            self.factor_input_stream = set_stream(self.factor)
 
 
     def add_simple_deform_modifier(self, context):

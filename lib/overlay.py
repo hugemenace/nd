@@ -241,7 +241,8 @@ def draw_property(cls, property_content, metadata_content, active=False, alt_mod
     blf.position(0, cls.overlay_x + (25 * cls.dpi_scalar), cls.overlay_y - ((40 * cls.dpi_scalar) + (cls.line_spacer * cls.line_step)), 0)
 
     if is_value is not None:
-        blf.draw(0, "Manual Override — [{}] to reset.".format(get_preferences().overlay_reset_key))
+        reset_behaviour = get_preferences().overlay_reset_key_behaviour
+        blf.draw(0, "Manual Override — [{}] to {}.".format(get_preferences().overlay_reset_key, "reset" if reset_behaviour == "RESET" else "unlock"))
     else:
         blf.draw(0, metadata_content)
 

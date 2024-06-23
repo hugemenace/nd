@@ -62,6 +62,7 @@ class BaseOperator(bpy.types.Operator):
         self.unit_step_hint = self.generate_step_hint(f"{(self.unit_scale * unit_increment_size):.2f}{self.unit_suffix}", f"{(self.unit_scale * 0.1 * unit_increment_size):.2f}{self.unit_suffix}")
 
         self.extend_mouse_values = get_preferences().enable_mouse_values and get_preferences().extend_mouse_values
+        self.hard_stream_reset = get_preferences().overlay_reset_key_behaviour == 'RESET'
 
         return self.do_invoke(context, event)
 

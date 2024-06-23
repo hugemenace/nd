@@ -33,7 +33,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
@@ -53,7 +53,7 @@ CTRL — Remove existing modifiers"""
         if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.lattice_points_u_input_stream = update_stream(self.lattice_points_u_input_stream, event.type)
-                self.lattice_points_u = get_stream_value(self.lattice_points_u_input_stream, min_value=2)
+                self.lattice_points_u = int(get_stream_value(self.lattice_points_u_input_stream, min_value=2))
 
                 if self.uniform:
                     self.lattice_points_v_input_stream = self.lattice_points_u_input_stream
@@ -65,33 +65,37 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
             elif self.key_alt:
                 self.lattice_points_v_input_stream = update_stream(self.lattice_points_v_input_stream, event.type)
-                self.lattice_points_v = get_stream_value(self.lattice_points_v_input_stream, min_value=2)
+                self.lattice_points_v = int(get_stream_value(self.lattice_points_v_input_stream, min_value=2))
                 self.dirty = True
             elif self.key_ctrl:
                 self.lattice_points_w_input_stream = update_stream(self.lattice_points_w_input_stream, event.type)
-                self.lattice_points_w = get_stream_value(self.lattice_points_w_input_stream, min_value=2)
+                self.lattice_points_w = int(get_stream_value(self.lattice_points_w_input_stream, min_value=2))
                 self.dirty = True
 
         elif self.key_reset:
             if self.key_no_modifiers:
-                self.lattice_points_u_input_stream = new_stream()
-                self.lattice_points_u = 2
+                if has_stream(self.lattice_points_u_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_u_input_stream):
+                    self.lattice_points_u = 2
 
                 if self.uniform:
+                    if has_stream(self.lattice_points_u_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_u_input_stream):
+                        self.lattice_points_v = 2
+                        self.lattice_points_w = 2
                     self.lattice_points_v_input_stream = new_stream()
                     self.lattice_points_w_input_stream = new_stream()
-                    self.lattice_points_v = 2
-                    self.lattice_points_w = 2
 
+                self.lattice_points_u_input_stream = new_stream()
                 self.dirty = True
             elif self.key_alt:
+                if has_stream(self.lattice_points_v_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_v_input_stream):
+                    self.lattice_points_v = 2
+                    self.dirty = True
                 self.lattice_points_v_input_stream = new_stream()
-                self.lattice_points_v = 2
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.lattice_points_w_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_w_input_stream):
+                    self.lattice_points_w = 2
+                    self.dirty = True
                 self.lattice_points_w_input_stream = new_stream()
-                self.lattice_points_w = 2
-                self.dirty = True
 
         elif pressed(event, {'U'}):
             self.uniform = not self.uniform

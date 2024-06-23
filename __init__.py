@@ -152,6 +152,15 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    overlay_reset_key_behaviour: EnumProperty(
+        name="Overlay Reset Key Behaviour",
+        items=[
+            ("RESET", "Reset", ""),
+            ("UNLOCK", "Unlock", ""),
+        ],
+        default="RESET",
+    )
+
     overlay_pinned: BoolProperty(
         name="Overlay Pinned",
         default=False,
@@ -560,7 +569,8 @@ class NDPreferences(AddonPreferences):
         overlay_prefs = [
             "overlay_pin_key",
             "overlay_pause_key",
-            "overlay_reset_key"]
+            "overlay_reset_key",
+            "overlay_reset_key_behaviour"]
 
         column = box.column(align=True)
         row = column.row()

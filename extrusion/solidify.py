@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
@@ -61,13 +61,15 @@ CTRL — Remove existing modifiers"""
 
         if self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.thickness_input_stream) and self.hard_stream_reset or no_stream(self.thickness_input_stream):
+                    self.thickness = 0
+                    self.dirty = True
                 self.thickness_input_stream = new_stream()
-                self.thickness = 0
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.offset_input_stream) and self.hard_stream_reset or no_stream(self.offset_input_stream):
+                    self.offset = 0
+                    self.dirty = True
                 self.offset_input_stream = new_stream()
-                self.offset = 0
-                self.dirty = True
 
         if pressed(event, {'W'}):
             self.weighting = self.weighting + 1 if self.weighting < 1 else -1

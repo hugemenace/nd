@@ -27,37 +27,20 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 
 
-class ND_OT_swap_solver(bpy.types.Operator):
+class ND_OT_swap_solver(BaseOperator):
     bl_idname = "nd.swap_solver"
     bl_label = "Swap Solver"
     bl_description = "Swap the solver mode of the boolean modifiers referencing the selected utility objects"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif pressed(event, {'S'}):
+    def do_modal(self, context, event):
+        if pressed(event, {'S'}):
             if self.solve_mode is None:
                 self.solve_mode = 'FAST'
             elif self.solve_mode == 'FAST':
@@ -75,15 +58,8 @@ class ND_OT_swap_solver(bpy.types.Operator):
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

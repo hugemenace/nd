@@ -27,6 +27,7 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.viewport import set_3d_cursor
@@ -35,7 +36,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.objects import create_duplicate_liftable_geometry
 
 
-class ND_OT_view_align(bpy.types.Operator):
+class ND_OT_view_align(BaseOperator):
     bl_idname = "nd.view_align"
     bl_label = "View Align"
     bl_description = """Orientate the view to the selected geometry
@@ -43,21 +44,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
+    def do_modal(self, context, event):
+        if self.key_cancel:
             self.clean_up(context, True)
 
             return {'CANCELLED'}
@@ -103,15 +91,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

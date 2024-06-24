@@ -28,44 +28,27 @@
 import bpy
 from math import radians, degrees, copysign
 from random import random, uniform, randrange
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
 
 
-class ND_OT_flare(bpy.types.Operator):
+class ND_OT_flare(BaseOperator):
     bl_idname = "nd.flare"
     bl_label = "Flare"
     bl_description = "Adds a new lighting rig targeting selected objects position"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
+    def do_modal(self, context, event):
         rotation_factor = 1 if self.key_shift else 15
         height_factor = 0.1 if self.key_shift else 1
         scale_factor = 0.01 if self.key_shift else 0.1
         energy_factor = 1000 if self.key_shift else 10000
 
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.rotation_input_stream = update_stream(self.rotation_input_stream, event.type)
                 self.rotation = get_stream_value(self.rotation_input_stream)
@@ -154,13 +137,6 @@ class ND_OT_flare(bpy.types.Operator):
 
             self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
-
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
 
     def reset_values(self, context):
         self.rotation_input_stream = new_stream()
@@ -174,7 +150,7 @@ class ND_OT_flare(bpy.types.Operator):
         self.energy_offset = 0
 
 
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
@@ -344,7 +320,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Rotation: {0:.2f}".format(self.rotation),
-        "(±15)  |  Shift (±1)",
+        self.generate_step_hint(15, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
@@ -353,7 +329,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Height Offset: {0:.2f}".format(self.height_offset),
-        "Alt (±1)  |  Shift + Alt (±0.1)",
+        self.generate_key_hint("Alt", self.generate_step_hint(1, 0.1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,
@@ -362,7 +338,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Scale: {0:.2f}".format(self.scale),
-        "Ctrl (±0.1)  |  Shift + Ctrl (±0.01)",
+        self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,
@@ -371,7 +347,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Energy Offset: {0:.1e}".format(self.energy_offset),
-        "Ctrl + Alt (±10k)  |  Shift + Ctrl + Alt (±1k)",
+        self.generate_key_hint("Ctrl + Alt", self.generate_step_hint("10k", "1k")),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
         mouse_value=True,

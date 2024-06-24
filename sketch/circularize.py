@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from math import radians
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -40,35 +41,17 @@ mod_weld = "Weld — ND CIRC"
 mod_summon_list = [mod_bevel, mod_weld]
 
 
-class ND_OT_circularize(bpy.types.Operator):
+class ND_OT_circularize(BaseOperator):
     bl_idname = "nd.circularize"
     bl_label = "Circularize"
     bl_description = "Adds a vertex bevel operator to the selected plane to convert it into a circular shape"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
+    def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
 
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
                 self.segments = int(get_stream_value(self.segments_input_stream, min_value=2))
@@ -103,15 +86,8 @@ class ND_OT_circularize(bpy.types.Operator):
                 self.segments = max(2, self.segments + self.mouse_step)
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
@@ -235,7 +211,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Segments: {}".format(self.segments),
-        "Alt (±2)  |  Shift (±1)",
+        self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         mouse_value=True,
         input_stream=self.segments_input_stream)

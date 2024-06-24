@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from math import radians
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -35,35 +36,17 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import add_smooth_by_angle, set_smoothing_angle
 
 
-class ND_OT_smooth(bpy.types.Operator):
+class ND_OT_smooth(BaseOperator):
     bl_idname = "nd.smooth"
     bl_label = "Smooth Shading"
     bl_description = "Set and configure object smoothing properties"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
+    def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else self.base_angle_factor
 
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
                 self.angle = get_stream_value(self.angle_input_stream)
@@ -102,15 +85,8 @@ class ND_OT_smooth(bpy.types.Operator):
                 self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         self.dirty = False
         self.base_angle_factor = 15
         self.angle = float(get_preferences().default_smoothing_angle)
@@ -186,7 +162,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Angle: {0:.2f}°".format(self.angle),
-        "(±{0:.0f})  |  Shift + (±1)".format(self.base_angle_factor),
+        self.generate_step_hint(self.base_angle_factor, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,

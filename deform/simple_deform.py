@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from math import radians, degrees
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -40,7 +41,7 @@ mod_deform = "Deform — ND SD"
 mod_summon_list = [mod_deform]
 
 
-class ND_OT_simple_deform(bpy.types.Operator):
+class ND_OT_simple_deform(BaseOperator):
     bl_idname = "nd.simple_deform"
     bl_label = "Simple Deform"
     bl_description = """Twist, bend, taper, or stretch the selected object
@@ -48,29 +49,11 @@ CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
+    def do_modal(self, context, event):
         factor_factor = 0.01 if self.key_shift else 0.1
         angle_factor = 1 if self.key_shift else 10
 
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 if self.is_angular[self.methods[self.current_method]]:
                     self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
@@ -135,15 +118,8 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}
@@ -266,7 +242,7 @@ def draw_text_callback(self):
         draw_property(
             self,
             "Angle: {0:.2f}°".format(self.angle),
-            "(±10)  |  Shift (±1)",
+            self.generate_step_hint(10, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,
@@ -275,7 +251,7 @@ def draw_text_callback(self):
         draw_property(
             self,
             "Factor: {0:.2f}".format(self.factor),
-            "(±0.1)  |  Shift (±0.01)",
+            self.generate_step_hint(0.1, 0.01),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,

@@ -29,39 +29,22 @@ import bpy
 import bmesh
 from numpy.linalg import norm
 from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
 from .. lib.math import v3_average, v3_distance, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face
 
 
-class ND_OT_snap_align(bpy.types.Operator):
+class ND_OT_snap_align(BaseOperator):
     bl_idname = "nd.snap_align"
     bl_label = "Snap Align"
     bl_description = "Align and snap one object to another"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif pressed(event, {'C'}):
+    def do_modal(self, context, event):
+        if pressed(event, {'C'}):
             if self.snap_point and len(self.capture_points) < 2:
                 self.capture_points.append(self.snap_point)
 
@@ -90,15 +73,8 @@ class ND_OT_snap_align(bpy.types.Operator):
             coords = (event.mouse_region_x, event.mouse_region_y)
             self.recalculate_points(context, coords)
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

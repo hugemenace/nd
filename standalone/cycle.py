@@ -27,13 +27,14 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import hide_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 
 
-class ND_OT_cycle(bpy.types.Operator):
+class ND_OT_cycle(BaseOperator):
     bl_idname = "nd.cycle"
     bl_label = "Cycle"
     bl_description = """Scroll through the active object's utilties, or modifier stack
@@ -41,26 +42,8 @@ SHIFT — Cycle through the modifier stack"""
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif pressed(event, {'M'}):
+    def do_modal(self, context, event):
+        if pressed(event, {'M'}):
             self.mod_cycle = not self.mod_cycle
             self.prepare_mode(context)
 
@@ -117,15 +100,8 @@ SHIFT — Cycle through the modifier stack"""
                 self.util_current_index = (self.util_current_index + self.mouse_step) % self.util_count
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

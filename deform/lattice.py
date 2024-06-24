@@ -27,6 +27,7 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
@@ -40,7 +41,7 @@ mod_lattice = "Lattice — ND L"
 mod_summon_list = [mod_lattice]
 
 
-class ND_OT_lattice(bpy.types.Operator):
+class ND_OT_lattice(BaseOperator):
     bl_idname = "nd.lattice"
     bl_label = "Lattice"
     bl_description = """Adds a lattice modifier to the selected object
@@ -48,26 +49,8 @@ CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_numeric_input:
+    def do_modal(self, context, event):
+        if self.key_numeric_input:
             if self.key_no_modifiers:
                 self.lattice_points_u_input_stream = update_stream(self.lattice_points_u_input_stream, event.type)
                 self.lattice_points_u = get_stream_value(self.lattice_points_u_input_stream, min_value=2)
@@ -188,15 +171,8 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_w = max(2, self.lattice_points_w + self.mouse_step)
                     self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

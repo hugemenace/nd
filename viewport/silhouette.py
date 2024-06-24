@@ -27,37 +27,20 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 
 
-class ND_OT_silhouette(bpy.types.Operator):
+class ND_OT_silhouette(BaseOperator):
     bl_idname = "nd.silhouette"
     bl_label = "Silhouette"
     bl_description = "Apply flat black shading all objects in the viewport to help assess thier silhouette"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif self.key_confirm:
+    def do_modal(self, context, event):
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
@@ -72,15 +55,8 @@ class ND_OT_silhouette(bpy.types.Operator):
         elif event.type in {'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
             return {'PASS_THROUGH'}
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         self.inverted = False
 
         self.prev_light = context.space_data.shading.light

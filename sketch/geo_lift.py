@@ -27,6 +27,7 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_hint, draw_property, draw_hint
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
@@ -34,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.objects import create_duplicate_liftable_geometry
 
 
-class ND_OT_geo_lift(bpy.types.Operator):
+class ND_OT_geo_lift(BaseOperator):
     bl_idname = "nd.geo_lift"
     bl_label = "Geo Lift"
     bl_description = """Lift geometry out of a non-destructive object
@@ -42,21 +43,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_select:
+    def do_modal(self, context, event):
+        if self.key_select:
             return {'PASS_THROUGH'}
 
         elif get_preferences().enable_experimental_features and self.key_undo:
@@ -102,15 +90,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         elif self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

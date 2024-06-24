@@ -27,38 +27,21 @@
 
 import bpy
 import bmesh
+from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 
 
-class ND_OT_hydrate(bpy.types.Operator):
+class ND_OT_hydrate(BaseOperator):
     bl_idname = "nd.hydrate"
     bl_label = "Hydrate"
     bl_description = "Convert a boolean reference object into solidified geometry"
     bl_options = {'UNDO'}
 
 
-    def modal(self, context, event):
-        capture_modifier_keys(self, event)
-
-        if self.key_toggle_operator_passthrough:
-            toggle_operator_passthrough(self)
-
-        elif self.key_toggle_pin_overlay:
-            toggle_pin_overlay(self, event)
-
-        elif self.operator_passthrough:
-            update_overlay(self, context, event)
-
-            return {'PASS_THROUGH'}
-
-        elif self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
-        elif pressed(event, {'C'}):
+    def do_modal(self, context, event):
+        if pressed(event, {'C'}):
             self.clear_parent = not self.clear_parent
             self.dirty = True
 
@@ -85,15 +68,8 @@ class ND_OT_hydrate(bpy.types.Operator):
                 self.active_collection = (self.active_collection + self.mouse_step) % (len(self.all_collections) + 1)
                 self.dirty = True
 
-        if self.dirty:
-            self.operate(context)
 
-        update_overlay(self, context, event)
-
-        return {'RUNNING_MODAL'}
-
-
-    def invoke(self, context, event):
+    def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
             return {'CANCELLED'}

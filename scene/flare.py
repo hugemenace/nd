@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 
 
 class ND_OT_flare(BaseOperator):
@@ -68,21 +68,25 @@ class ND_OT_flare(BaseOperator):
 
         elif self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.rotation_input_stream) and self.hard_stream_reset or no_stream(self.rotation_input_stream):
+                    self.rotation = 0
+                    self.dirty = True
                 self.rotation_input_stream = new_stream()
-                self.rotation = 0
-                self.dirty = True
             elif self.key_alt:
+                if has_stream(self.height_offset_input_stream) and self.hard_stream_reset or no_stream(self.height_offset_input_stream):
+                    self.height_offset = 0
+                    self.dirty = True
                 self.height_offset_input_stream = new_stream()
-                self.height_offset = 0
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.scale_input_stream) and self.hard_stream_reset or no_stream(self.scale_input_stream):
+                    self.scale = 1
+                    self.dirty = True
                 self.scale_input_stream = new_stream()
-                self.scale = 1
-                self.dirty = True
             elif self.key_ctrl_alt:
+                if has_stream(self.enery_offset_input_stream) and self.hard_stream_reset or no_stream(self.enery_offset_input_stream):
+                    self.enery_offset = 0
+                    self.dirty = True
                 self.enery_offset_input_stream = new_stream()
-                self.enery_offset = 0
-                self.dirty = True
 
         elif pressed(event, {'R'}):
             self.generate_rig(context)

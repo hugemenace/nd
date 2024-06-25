@@ -34,7 +34,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.objects import create_duplicate_liftable_geometry
 
 
@@ -68,9 +68,10 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if self.key_reset:
             if self.stage == 1:
                 if self.key_no_modifiers:
+                    if has_stream(self.inset_input_stream) and self.hard_stream_reset or no_stream(self.inset_input_stream):
+                        self.inset = 0
+                        self.dirty = True
                     self.inset_input_stream = new_stream()
-                    self.inset = 0
-                    self.dirty = True
 
         if pressed(event, {'F'}):
             if self.stage == 1:

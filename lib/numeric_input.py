@@ -82,6 +82,12 @@ def no_stream(input_stream):
     return value is None
 
 
+def has_stream(input_stream):
+    ok, value, raw = input_stream
+
+    return value is not None
+
+
 def get_stream_value(input_stream, factor=1, default=0, min_value=-inf, max_value=inf):
     ok, value, raw = input_stream
 

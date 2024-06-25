@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
@@ -74,21 +74,25 @@ CTRL — Remove existing modifiers"""
 
         if self.key_reset:
             if self.key_ctrl_alt:
+                if has_stream(self.weight_input_stream) and self.hard_stream_reset or no_stream(self.weight_input_stream):
+                    self.weight = 0
+                    self.dirty = True
                 self.weight_input_stream = new_stream()
-                self.weight = 0
-                self.dirty = True
             elif self.key_alt:
+                if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
+                    self.segments = 1
+                    self.dirty = True
                 self.segments_input_stream = new_stream()
-                self.segments = 1
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.profile_input_stream) and self.hard_stream_reset or no_stream(self.profile_input_stream):
+                    self.profile = 0.5
+                    self.dirty = True
                 self.profile_input_stream = new_stream()
-                self.profile = 0.5
-                self.dirty = True
             elif self.key_no_modifiers:
+                if has_stream(self.width_input_stream) and self.hard_stream_reset or no_stream(self.width_input_stream):
+                    self.width = 0.05 * self.unit_factor
+                    self.dirty = True
                 self.width_input_stream = new_stream()
-                self.width = 0.05 * self.unit_factor
-                self.dirty = True
 
         if pressed(event, {'H'}):
             self.harden_normals = not self.harden_normals

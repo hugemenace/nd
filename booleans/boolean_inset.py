@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
 
 
@@ -52,9 +52,10 @@ class ND_OT_bool_inset(BaseOperator):
 
         if self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.thickness_input_stream) and self.hard_stream_reset or no_stream(self.thickness_input_stream):
+                    self.thickness = 0
+                    self.dirty = True
                 self.thickness_input_stream = new_stream()
-                self.thickness = 0
-                self.dirty = True
 
         if pressed(event, {'M'}):
             self.outset = not self.outset

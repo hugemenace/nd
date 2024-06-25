@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
 
 
@@ -70,17 +70,20 @@ CTRL — Remove existing modifiers"""
 
         if self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
+                    self.segments = 3
+                    self.dirty = True
                 self.segments_input_stream = new_stream()
-                self.segments = 3
-                self.dirty = True
             elif self.key_alt:
+                if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
+                    self.angle = 360
+                    self.dirty = True
                 self.angle_input_stream = new_stream()
-                self.angle = 360
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.offset_input_stream) and self.hard_stream_reset or no_stream(self.offset_input_stream):
+                    self.offset = 0
+                    self.dirty = True
                 self.offset_input_stream = new_stream()
-                self.offset = 0
-                self.dirty = True
 
         if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3

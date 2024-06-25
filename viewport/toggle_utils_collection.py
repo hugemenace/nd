@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection
+from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection, has_visible_utils
 
 
 class ND_OT_toggle_utils_collection(bpy.types.Operator):
@@ -39,8 +39,7 @@ SHIFT — Display all utils for the selected objects"""
     def execute(self, context):
         data = get_utils_layer()
         if data is not None:
-            layer, collection = data
-            hide_utils_collection(not layer.hide_viewport)
+            hide_utils_collection(has_visible_utils())
 
         return {'FINISHED'}
 
@@ -51,11 +50,7 @@ SHIFT — Display all utils for the selected objects"""
             if data is None:
                 return {'FINISHED'}
 
-            layer, collection = data
-            visible = not layer.hide_viewport
-
-            if not visible:
-                hide_utils_collection(visible)
+            hide_utils_collection(True)
 
             all_util_objects = set(())
             for obj in context.selected_objects:

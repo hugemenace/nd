@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 
 
@@ -180,6 +180,10 @@ CTRL — Remove existing modifiers"""
         self.weighting_prev = self.weighting = self.solidify.offset
         self.complex_mode_prev = self.complex_mode = (self.solidify.solidify_mode == 'NON_MANIFOLD')
         self.offset_prev = self.offset = self.displace.strength
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.thickness_input_stream = set_stream(self.thickness)
+            self.offset_input_stream = set_stream(self.offset)
 
 
     def add_smooth_shading(self, context):

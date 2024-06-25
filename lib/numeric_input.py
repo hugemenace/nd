@@ -76,6 +76,10 @@ def update_stream(input_stream, type):
     return ok, value, raw
 
 
+def set_stream(value):
+    return True, value, str(value)
+
+
 def no_stream(input_stream):
     ok, value, raw = input_stream
 

@@ -36,7 +36,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
@@ -268,6 +268,11 @@ CTRL — Remove existing modifiers"""
         self.displace_axis = self.displace_axis_prev = ['X', 'Y', 'Z'].index(self.displace.direction)
         self.count = self.count_prev = self.array.count
         self.offset = self.offset_prev = self.displace.strength
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.count_input_stream = set_stream(self.count)
+            self.angle_input_stream = set_stream(self.angle)
+            self.offset_input_stream = set_stream(self.offset)
 
 
     def add_array_modifier(self):

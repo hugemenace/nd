@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier
 
 
@@ -244,6 +244,11 @@ class ND_OT_recon_poly(BaseOperator):
             self.obj.rotation_euler.rotate_axis('Z', radians((360 / self.segments) / 2) * -1)
             self.rotation_snapshot = self.obj.rotation_euler.copy()
             self.obj.rotation_euler = self.rotation_prev
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.segments_input_stream = set_stream(self.segments)
+            self.inner_radius_input_stream = set_stream(self.inner_radius)
+            self.width_input_stream = set_stream(self.width)
 
 
     @classmethod

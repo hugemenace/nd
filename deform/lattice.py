@@ -33,7 +33,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
@@ -258,6 +258,11 @@ CTRL — Remove existing modifiers"""
             self.lattice_points_v = self.lattice_points_v_prev = self.lattice_obj.data.points_v
             self.lattice_points_w = self.lattice_points_w_prev = self.lattice_obj.data.points_w
             self.interpolation_mode = self.interpolation_mode_prev = self.interpolation_modes.index(self.lattice_obj.data.interpolation_type_u)
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.lattice_points_u_input_stream = set_stream(self.lattice_points_u)
+            self.lattice_points_v_input_stream = set_stream(self.lattice_points_v)
+            self.lattice_points_w_input_stream = set_stream(self.lattice_points_w)
 
 
     def add_lattice_object(self, context):

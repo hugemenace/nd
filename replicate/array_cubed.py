@@ -32,7 +32,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 
 
@@ -219,6 +219,10 @@ CTRL — Remove existing modifiers"""
                     break
             self.axes_prev[axis] = [array, array.count, offset, array.use_relative_offset]
             self.axes[axis] = [array, array.count, offset, array.use_relative_offset]
+
+        if get_preferences().lock_overlay_parameters_on_recall:
+            self.count_streams = [set_stream(self.axes[0][IDX_COUNT]), set_stream(self.axes[1][IDX_COUNT]), set_stream(self.axes[2][IDX_COUNT])]
+            self.offset_streams = [set_stream(self.axes[0][IDX_OFFSET]), set_stream(self.axes[1][IDX_OFFSET]), set_stream(self.axes[2][IDX_OFFSET])]
 
 
     def add_array_modifier(self, context, name, axis):

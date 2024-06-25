@@ -123,7 +123,12 @@ class NDPreferences(AddonPreferences):
     )
 
     enable_mouse_values: BoolProperty(
-        name="Enable Mouse Values",
+        name="Enable Mouse Values (move mouse to change values)",
+        default=True,
+    )
+
+    extend_mouse_values: BoolProperty(
+        name="Extend Mouse Values (scroll wheel override)",
         default=True,
     )
 
@@ -506,6 +511,7 @@ class NDPreferences(AddonPreferences):
         ui_prefs = [
             ["overlay_dpi"],
             ["enable_mouse_values"],
+            ["extend_mouse_values"],
             ["mouse_value_scalar"],
             ["mouse_value_steps"],
             ["unit_increment_size"],

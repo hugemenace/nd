@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier
 
 
@@ -69,17 +69,20 @@ class ND_OT_recon_poly(BaseOperator):
 
         if self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.width_input_stream) and self.hard_stream_reset or no_stream(self.width_input_stream):
+                    self.width = 0.05
+                    self.dirty = True
                 self.width_input_stream = new_stream()
-                self.width = 0.05
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.inner_radius_input_stream) and self.hard_stream_reset or no_stream(self.inner_radius_input_stream):
+                    self.inner_radius = 0
+                    self.dirty = True
                 self.inner_radius_input_stream = new_stream()
-                self.inner_radius = 0
-                self.dirty = True
             elif self.key_alt:
+                if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
+                    self.segments = 3
+                    self.dirty = True
                 self.segments_input_stream = new_stream()
-                self.segments = 3
-                self.dirty = True
 
         if pressed(event, {'R'}):
             self.natural_rotation = not self.natural_rotation

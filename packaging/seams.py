@@ -32,7 +32,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import add_smooth_by_angle, set_smoothing_angle
 
 
@@ -55,9 +55,10 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
         elif self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
+                    self.angle = degrees(context.active_object.data.auto_smooth_angle)
+                    self.dirty = True
                 self.angle_input_stream = new_stream()
-                self.angle = degrees(context.active_object.data.auto_smooth_angle)
-                self.dirty = True
 
         elif pressed(event, {'A'}):
             self.commit_auto_smooth = not self.commit_auto_smooth

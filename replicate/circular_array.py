@@ -36,7 +36,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 
 
@@ -73,17 +73,20 @@ CTRL — Remove existing modifiers"""
 
         if self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.count_input_stream) and self.hard_stream_reset or no_stream(self.count_input_stream):
+                    self.count = 2
+                    self.dirty = True
                 self.count_input_stream = new_stream()
-                self.count = 2
-                self.dirty = True
             elif self.key_alt:
+                if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
+                    self.angle = 360
+                    self.dirty = True
                 self.angle_input_stream = new_stream()
-                self.angle = 360
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.offset_input_stream) and self.hard_stream_reset or no_stream(self.offset_input_stream):
+                    self.offset = self.reference_obj.dimensions[self.axis] if self.single_obj_mode else 0
+                    self.dirty = True
                 self.offset_input_stream = new_stream()
-                self.offset = self.reference_obj.dimensions[self.axis] if self.single_obj_mode else 0
-                self.dirty = True
 
         if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3

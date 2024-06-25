@@ -32,7 +32,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
-from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream
+from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 
 
@@ -71,14 +71,16 @@ CTRL — Remove existing modifiers"""
 
         if self.key_reset:
             if self.key_no_modifiers:
+                if has_stream(self.offset_streams[self.axis]) and self.hard_stream_reset or no_stream(self.offset_streams[self.axis]):
+                    self.axes[self.axis][IDX_COUNT] = 1
+                    self.axes[self.axis][IDX_OFFSET] = abs(self.axes[self.axis][IDX_OFFSET])
+                    self.dirty = True
                 self.count_streams[self.axis] = new_stream()
-                self.axes[self.axis][IDX_COUNT] = 1
-                self.axes[self.axis][IDX_OFFSET] = abs(self.axes[self.axis][IDX_OFFSET])
-                self.dirty = True
             elif self.key_ctrl:
+                if has_stream(self.offset_streams[self.axis]) and self.hard_stream_reset or no_stream(self.offset_streams[self.axis]):
+                    self.axes[self.axis][IDX_OFFSET] = 0
+                    self.dirty = True
                 self.offset_streams[self.axis] = new_stream()
-                self.axes[self.axis][IDX_OFFSET] = 0
-                self.dirty = True
 
         if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3

@@ -123,12 +123,12 @@ class NDPreferences(AddonPreferences):
     )
 
     enable_mouse_values: BoolProperty(
-        name="Enable Mouse Values",
+        name="Enable Mouse Values (move mouse to change values)",
         default=True,
     )
 
     extend_mouse_values: BoolProperty(
-        name="Extend Mouse Values (scroll wheel override for certain operations such as bevels)",
+        name="Extend Mouse Values (scroll wheel override)",
         default=True,
     )
 

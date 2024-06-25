@@ -196,8 +196,6 @@ SHIFT — Create a stacked bevel modifier"""
         self.stacked = event.shift
         self.dirty = False
 
-        self.extend_mouse_values = get_preferences().enable_mouse_values and get_preferences().extend_mouse_values
-
         self.segments = 1
         self.width = 0
         self.profile = 0.5

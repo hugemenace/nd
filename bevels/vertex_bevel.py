@@ -160,8 +160,6 @@ CTRL — Remove existing modifiers"""
         self.late_apply = event.shift
         self.edge_mode = event.alt
 
-        self.extend_mouse_values = get_preferences().enable_mouse_values and get_preferences().extend_mouse_values
-
         self.dirty = False
 
         self.segments = 1

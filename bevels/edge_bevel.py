@@ -191,8 +191,6 @@ CTRL — Remove existing modifiers"""
         self.dirty = False
         self.early_apply = event.shift
 
-        self.extend_mouse_values = get_preferences().enable_mouse_values and get_preferences().extend_mouse_values
-
         self.segments = 1
         self.weight = 1
         self.width = 0.05 * self.unit_factor

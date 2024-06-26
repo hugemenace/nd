@@ -339,6 +339,22 @@ class NDPreferences(AddonPreferences):
         size=3,
     )
 
+    utils_collection_color: EnumProperty(
+        name="Utils collection color",
+        items=[
+            ("NONE", "None", ""),
+            ("COLOR_01", "Red", ""),
+            ("COLOR_02", "Orange", ""),
+            ("COLOR_03", "Yellow", ""),
+            ("COLOR_04", "Green", ""),
+            ("COLOR_05", "Blue", ""),
+            ("COLOR_06", "Purple", ""),
+            ("COLOR_07", "Pink", ""),
+            ("COLOR_08", "Brown", ""),
+        ],
+        default="COLOR_02",
+    )
+
     tabs: EnumProperty(
         name="Tabs",
         items=[
@@ -490,6 +506,7 @@ class NDPreferences(AddonPreferences):
     def draw_general(self, box):
         general_prefs = [
             "utils_collection_name",
+            "utils_collection_color",
             "use_fast_booleans",
             "recon_poly_solidify",
             "recon_poly_inscribed",

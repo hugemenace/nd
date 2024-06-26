@@ -40,8 +40,8 @@ ALT — Duplicate mesh before applying modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) > 0:
-            return all([obj.type == 'MESH' for obj in context.selected_objects])
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def execute(self, context):
@@ -51,6 +51,9 @@ ALT — Duplicate mesh before applying modifiers"""
         bpy.ops.object.make_single_user(object=True, obdata=True, material=False, animation=False, obdata_animation=False)
 
         for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
             self.collapse_modifiers(obj)
             self.remove_vertex_groups(obj)
             self.remove_edge_weights(obj)

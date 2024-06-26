@@ -39,18 +39,19 @@ class ND_OT_bulk_create_id_materials(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
-            return len(context.selected_objects) > 0 and \
-            len(context.selected_objects) <= len(ND_MATERIALS) and \
-            all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0 and len(mesh_objects) <= len(ND_MATERIALS)
 
 
     def execute(self, context):
         material_names = sample(list(ND_MATERIALS.keys()), k=len(context.selected_objects))
         existing_material_names = bpy.data.materials.keys()
 
-        for i, object in enumerate(context.selected_objects):
-            object.data.materials.clear()
+        for i, obj in enumerate(context.selected_objects):
+            if obj.type != 'MESH':
+                continue
+
+            obj.data.materials.clear()
 
             material_name = material_names[i]
             material = None
@@ -59,7 +60,7 @@ class ND_OT_bulk_create_id_materials(bpy.types.Operator):
             else:
                 material = create_id_material(material_name)
 
-            object.active_material = material
+            obj.active_material = material
 
         return {'FINISHED'}
 

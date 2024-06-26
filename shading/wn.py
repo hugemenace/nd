@@ -40,18 +40,22 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) > 0:
-            return all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def invoke(self, context, event):
         if event.ctrl:
-            remove_modifiers_ending_with(context.selected_objects, ' — ND WN')
+            mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+            remove_modifiers_ending_with(mesh_objects, ' — ND WN')
             return {'FINISHED'}
 
         self.keep_sharp = not event.shift
 
         for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
             if any(' — ND WN' in mod.name for mod in obj.modifiers):
                 continue
 

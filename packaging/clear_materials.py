@@ -37,13 +37,16 @@ class ND_OT_clear_materials(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
-            return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def execute(self, context):
-        for object in context.selected_objects:
-            object.data.materials.clear()
+        for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
+            obj.data.materials.clear()
 
         return {'FINISHED'}
 

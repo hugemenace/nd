@@ -96,8 +96,8 @@ class ND_OT_hydrate(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
-            return len(context.selected_objects) > 0 and all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def operate(self, context):
@@ -107,6 +107,9 @@ class ND_OT_hydrate(BaseOperator):
     def finish(self, context):
         new_objects = []
         for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
             new_obj = obj.copy()
             new_obj.data = obj.data.copy()
             new_obj.animation_data_clear()

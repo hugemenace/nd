@@ -54,6 +54,12 @@ SHIFT — Display all utils for the selected objects"""
 
             all_util_objects = set(())
             for obj in context.selected_objects:
+                if obj.type != 'MESH':
+                    continue
+
+                if obj.type != 'CURVE':
+                    continue
+
                 local_util_objects = [mod.object for mod in obj.modifiers if mod.type == 'BOOLEAN' and mod.object]
                 all_util_objects.update(local_util_objects)
 

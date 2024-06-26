@@ -32,7 +32,7 @@ from . preferences import get_preferences
 def create_utils_collection():
     collection = bpy.data.collections.new(get_preferences().utils_collection_name)
     bpy.context.scene.collection.children.link(collection)
-    collection.color_tag = 'COLOR_02'
+    collection.color_tag = get_preferences().utils_collection_color
     collection.hide_render = True
 
     return collection

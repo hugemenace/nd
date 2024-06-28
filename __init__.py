@@ -158,7 +158,7 @@ class NDPreferences(AddonPreferences):
             ("RESET", "Reset", ""),
             ("UNLOCK", "Unlock", ""),
         ],
-        default="RESET",
+        default="UNLOCK",
     )
 
     lock_overlay_parameters_on_recall: BoolProperty(

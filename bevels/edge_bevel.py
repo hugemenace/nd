@@ -120,7 +120,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, self.profile + profile_factor)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width + self.step_size)
                 self.dirty = True
             elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:
@@ -137,7 +137,7 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, self.profile - profile_factor)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width - self.step_size)
                 self.dirty = True
             elif no_stream(self.weight_input_stream) and self.key_ctrl_alt:

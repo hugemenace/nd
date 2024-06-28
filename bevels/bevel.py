@@ -128,7 +128,7 @@ SHIFT — Create a stacked bevel modifier"""
             elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
                 self.angle = min(360, self.angle + angle_factor)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width += self.step_size
                 self.dirty = True
 
@@ -145,7 +145,7 @@ SHIFT — Create a stacked bevel modifier"""
             elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width - self.step_size)
                 self.dirty = True
 

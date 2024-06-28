@@ -40,8 +40,8 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) > 0:
-            return all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def invoke(self, context, event):
@@ -49,6 +49,9 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
         self.only_ngons = event.shift
 
         for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
             triangulate.keep_custom_normals = self.preserve_normals
             triangulate.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'

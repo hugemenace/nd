@@ -87,8 +87,8 @@ class ND_OT_create_id_material(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode in ['OBJECT', 'EDIT_MESH']:
-            return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def execute(self, context):
@@ -101,24 +101,30 @@ class ND_OT_create_id_material(bpy.types.Operator):
             material = create_id_material(self.material_name)
 
         if context.mode == 'OBJECT':
-            for object in context.selected_objects:
-                object.data.materials.clear()
-                object.active_material = material
+            for obj in context.selected_objects:
+                if obj.type != 'MESH':
+                    continue
+
+                obj.data.materials.clear()
+                obj.active_material = material
 
         if context.mode == 'EDIT_MESH':
-            for object in context.selected_objects:
-                previous_material_names = [m.name for m in object.material_slots]
+            for obj in context.selected_objects:
+                if obj.type != 'MESH':
+                    continue
+
+                previous_material_names = [m.name for m in obj.material_slots]
                 if self.material_name not in previous_material_names:
-                    object.data.materials.append(material)
+                    obj.data.materials.append(material)
 
-                active_materials = [slot.name for slot in object.material_slots]
+                active_materials = [slot.name for slot in obj.material_slots]
 
-                bm = bmesh.from_edit_mesh(object.data)
+                bm = bmesh.from_edit_mesh(obj.data)
                 for face in bm.faces:
                     if face.select:
                         face.material_index = active_materials.index(self.material_name)
 
-                bmesh.update_edit_mesh(object.data)
+                bmesh.update_edit_mesh(obj.data)
 
         return {'FINISHED'}
 

@@ -40,16 +40,20 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) > 0:
-            return all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def invoke(self, context, event):
         if event.ctrl:
-            remove_modifiers_ending_with(context.selected_objects, ' — ND SD')
+            mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+            remove_modifiers_ending_with(mesh_objects, ' — ND SD')
             return {'FINISHED'}
 
         for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
             decimate = new_modifier(obj, 'Decimate — ND SD', 'DECIMATE', rectify=True)
             decimate.decimate_type = 'DISSOLVE'
             decimate.angle_limit = radians(1)

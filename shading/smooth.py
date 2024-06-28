@@ -112,39 +112,48 @@ class ND_OT_smooth(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
-            return len(context.selected_objects) >= 1 and all(obj.type == 'MESH' for obj in context.selected_objects)
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return context.mode == 'OBJECT' and len(mesh_objects) > 0
 
 
     def add_smooth_shading(self, context):
         if bpy.app.version >= (4, 1, 0):
-            for object in context.selected_objects:
-                smooth_mod = add_smooth_by_angle(object)
+            for obj in context.selected_objects:
+                if obj.type != 'MESH':
+                    continue
+
+                smooth_mod = add_smooth_by_angle(obj)
 
                 # If the object has a WN modifier, place the smoothig mod before it.
-                object_mods = list(object.modifiers)
+                object_mods = list(obj.modifiers)
                 for index, mod in enumerate(object_mods):
                     if mod.name == "Weighted Normal — ND WN":
-                        with bpy.context.temp_override(object=object):
+                        with bpy.context.temp_override(object=obj):
                             bpy.ops.object.modifier_move_to_index(modifier=smooth_mod.name, index=index-1)
                         break
 
-                self.mods.append((object, smooth_mod))
+                self.mods.append((obj, smooth_mod))
             return
 
         bpy.ops.object.shade_smooth()
 
-        for object in context.selected_objects:
-            object.data.use_auto_smooth = True
+        for obj in context.selected_objects:
+            if obj.type != 'MESH':
+                continue
+
+            obj.data.use_auto_smooth = True
 
 
     def operate(self, context):
         if bpy.app.version >= (4, 1, 0):
-            for object, mod in self.mods:
-                set_smoothing_angle(object, mod, radians(self.angle), self.ignore_sharpness)
+            for obj, mod in self.mods:
+                set_smoothing_angle(obj, mod, radians(self.angle), self.ignore_sharpness)
         else:
-            for object in context.selected_objects:
-                object.data.auto_smooth_angle = radians(self.angle)
+            for obj in context.selected_objects:
+                if obj.type != 'MESH':
+                    continue
+
+                obj.data.auto_smooth_angle = radians(self.angle)
 
         self.dirty = False
 

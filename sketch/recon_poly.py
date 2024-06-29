@@ -93,25 +93,31 @@ class ND_OT_recon_poly(BaseOperator):
             self.dirty = True
 
         if self.key_step_up:
-            if no_stream(self.segments_input_stream) and self.key_alt:
+            if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
+                self.segments = 4 if self.segments == 3 else self.segments + segment_factor
+                self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.inner_radius_input_stream) and self.key_ctrl:
                 self.inner_radius += self.step_size
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width += self.step_size
                 self.dirty = True
 
         if self.key_step_down:
-            if no_stream(self.segments_input_stream) and self.key_alt:
+            if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
+                self.segments = max(3, self.segments - segment_factor)
+                self.dirty = True
+            elif no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(3, self.segments - segment_factor)
                 self.dirty = True
             elif no_stream(self.inner_radius_input_stream) and self.key_ctrl:
                 self.inner_radius = max(0, self.inner_radius - self.step_size)
                 self.width = max(self.computed_inner_radius() * -1, self.width)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(self.computed_inner_radius() * -1, self.width - self.step_size)
                 self.dirty = True
 
@@ -403,7 +409,7 @@ def draw_text_callback(self):
     draw_property(
         self,
         "Segments: {}".format(self.segments),
-        self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
+        self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
         mouse_value=True,

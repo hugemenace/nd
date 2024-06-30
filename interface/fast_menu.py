@@ -158,8 +158,24 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
                 made_prediction = True
 
+            mod_names = [mod.name for mod in context.active_object.modifiers]
+
+            has_mod_profile_extrude = False
+            has_mod_screw = False
+
+            for name in mod_names:
+                has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
+                has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
+
             if has_verts and not has_faces:
                 layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
+                layout.separator()
+                layout.operator("nd.mirror", icon=icons['nd.mirror'])
+
+                if not has_mod_screw and not has_mod_profile_extrude:
+                    layout.operator("nd.screw", icon=icons['nd.screw'])
+                    layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
+
                 made_prediction = True
 
             self.draw_make_edge_face_ops(context)

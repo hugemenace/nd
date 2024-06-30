@@ -131,6 +131,7 @@ CTRL — Remove existing modifiers"""
 
         self.extrusion_length_input_stream = new_stream()
         self.offset_input_stream = new_stream()
+        self.edit_mode = context.mode == 'EDIT_MESH'
 
         self.target_object = context.active_object
 
@@ -160,7 +161,7 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.object is not None:
+        if context.mode in {'OBJECT', 'EDIT_MESH'} and context.object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
 
 
@@ -222,13 +223,23 @@ CTRL — Remove existing modifiers"""
         if not get_preferences().enable_auto_smooth:
             return
 
+        return_to_edit = False
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            return_to_edit = True
+
         if bpy.app.version >= (4, 1, 0):
             self.smoothing = add_smooth_by_angle(self.target_object)
+            if return_to_edit:
+                bpy.ops.object.mode_set(mode='EDIT')
             return
 
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
         self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+
+        if return_to_edit:
+            bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_weighting_modifier(self, context):

@@ -151,6 +151,7 @@ CTRL — Remove existing modifiers"""
         self.dirty = False
         self.target_object = context.active_object
         self.object_type = self.target_object.type
+        self.edit_mode = context.mode == 'EDIT_MESH'
 
         self.axis = 2 # X (0), Y (1), Z (2)
         self.offset_axis = 1 # X (0), Y (1), Z (2)
@@ -194,7 +195,7 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
+        if context.mode in {'OBJECT', 'EDIT_MESH'} and context.active_object is not None:
             return len(context.selected_objects) == 1 and context.active_object.type in ['MESH', 'CURVE']
 
 
@@ -238,13 +239,23 @@ CTRL — Remove existing modifiers"""
         if not get_preferences().enable_auto_smooth:
             return
 
+        return_to_edit = False
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            return_to_edit = True
+
         if bpy.app.version >= (4, 1, 0):
             add_smooth_by_angle(self.target_object)
+            if return_to_edit:
+                bpy.ops.object.mode_set(mode='EDIT')
             return
 
         bpy.ops.object.shade_smooth()
         self.target_object.data.use_auto_smooth = True
         self.target_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
+
+        if return_to_edit:
+            bpy.ops.object.mode_set(mode='EDIT')
 
 
     def add_displace_modifier(self, context):

@@ -104,6 +104,7 @@ CTRL — Remove existing modifiers"""
             remove_modifiers_starting_with(context.selected_objects, 'Mirror —')
             return {'FINISHED'}
 
+        self.edit_mode = context.mode == 'EDIT_MESH'
         self.geometry_mode = event.alt
         self.early_apply = event.shift
         self.geometry_ready = False
@@ -117,6 +118,10 @@ CTRL — Remove existing modifiers"""
 
         if context.active_object.type == 'CURVE' and self.geometry_mode:
             self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used on curves")
+            return {'CANCELLED'}
+
+        if self.edit_mode and self.geometry_mode:
+            self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used in edit mode")
             return {'CANCELLED'}
 
         if len(context.selected_objects) >= 2:
@@ -152,6 +157,9 @@ CTRL — Remove existing modifiers"""
 
             if len(context.selected_objects) >= 2 and context.active_object is not None:
                 return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != context.active_object.name)
+
+        if context.mode == 'EDIT_MESH':
+            return len(context.selected_objects) == 1 and context.active_object is not None and context.active_object.type in ['MESH', 'CURVE']
 
 
     def set_selection_mode(self, context):
@@ -344,6 +352,9 @@ CTRL — Remove existing modifiers"""
 
 
     def select_reference_objs(self, context):
+        if self.edit_mode:
+            return
+
         bpy.ops.object.select_all(action='DESELECT')
         for obj in self.reference_objs:
             obj.select_set(True)

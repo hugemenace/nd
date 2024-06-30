@@ -57,6 +57,10 @@ CTRL — Remove existing modifiers"""
             self.flip = not self.flip
             self.dirty = True
 
+        elif pressed(event, {'S'}):
+            self.symmetrize = not self.symmetrize
+            self.dirty = True
+
         elif self.key_one:
             if self.geometry_mode and not self.geometry_ready:
                 self.geometry_selection_type = 0
@@ -113,6 +117,7 @@ CTRL — Remove existing modifiers"""
         self.dirty = False
         self.axis = 2 if self.geometry_mode else 0
         self.flip = self.geometry_mode
+        self.symmetrize = False
         self.reference_objs = [context.active_object]
         self.mirror_obj = None
 
@@ -364,6 +369,16 @@ CTRL — Remove existing modifiers"""
     def finish(self, context):
         self.select_reference_objs(context)
 
+        if self.edit_mode and self.symmetrize:
+            bpy.ops.object.mode_set(mode='OBJECT')
+            for mirror in self.mirrors:
+                bpy.ops.object.modifier_apply(modifier=mirror.name)
+            bpy.ops.object.mode_set(mode='EDIT')
+
+        if not self.edit_mode and self.symmetrize:
+            for mirror in self.mirrors:
+                bpy.ops.object.modifier_apply(modifier=mirror.name)
+
         unregister_draw_handler()
         unregister_axis_handler()
 
@@ -406,6 +421,11 @@ def draw_text_callback(self):
             self,
             "Flipped [F]: {}".format('Yes' if self.flip else 'No'),
             "Flip the mirror direction")
+
+        draw_hint(
+            self,
+            "Symmetrize [S]: {}".format('Yes' if self.symmetrize else 'No'),
+            "Immediately apply the mirror modifier")
 
 
 def register():

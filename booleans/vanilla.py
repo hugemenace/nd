@@ -111,15 +111,15 @@ def register():
     for mapping in [('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
 
-        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_MINUS', 'PRESS', ctrl = True)
+        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_MINUS', 'PRESS', ctrl=True)
         entry.properties.mode = "DIFFERENCE"
         keys.append((keymap, entry))
 
-        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_PLUS', 'PRESS', ctrl = True)
+        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_PLUS', 'PRESS', ctrl=True)
         entry.properties.mode = "UNION"
         keys.append((keymap, entry))
 
-        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_ASTERIX', 'PRESS', ctrl = True)
+        entry = keymap.keymap_items.new("nd.bool_vanilla", 'NUMPAD_ASTERIX', 'PRESS', ctrl=True)
         entry.properties.mode = "INTERSECT"
         keys.append((keymap, entry))
 

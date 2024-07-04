@@ -50,7 +50,10 @@ SHIFT — Cycle through the modifier stack"""
             self.dirty = True
 
         elif pressed(event, {'F'}):
-            if not self.mod_cycle:
+            if self.mod_cycle:
+                self.freeze_mod_cycle_state = not self.freeze_mod_cycle_state
+                self.dirty = True
+            else:
                 self.toggle_frozen_util()
                 self.dirty = True
 
@@ -111,6 +114,7 @@ SHIFT — Cycle through the modifier stack"""
         self.mod_cycle = event.shift
         self.show_wireframe = False
         self.target_obj = context.active_object
+        self.freeze_mod_cycle_state = False
 
         self.show_wireframe_prev = self.target_obj.show_wire
 
@@ -178,8 +182,6 @@ SHIFT — Cycle through the modifier stack"""
     def operate(self, context):
         if self.mod_cycle:
             for counter, mod in enumerate(self.target_obj.modifiers):
-                if not self.mod_snapshot[counter]:
-                    continue
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
             util_obj = self.util_mods[self.util_current_index].object
@@ -228,7 +230,7 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def finish(self, context):
-        if self.mod_cycle:
+        if self.mod_cycle and not self.freeze_mod_cycle_state:
             self.revert_mods(context)
 
         if self.util_count > 0:
@@ -275,6 +277,11 @@ def draw_text_callback(self):
                 active=True,
                 mouse_value=True,
                 alt_mode=False)
+
+            draw_hint(
+                self,
+                "Freeze State [F]: {0}".format("Yes" if self.freeze_mod_cycle_state else "No"),
+                "Retain the current modifier state(s) on exit")
         else:
             draw_hint(self, "Whoops", "Looks like there are no modifiers to view.")
     else:

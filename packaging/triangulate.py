@@ -34,7 +34,7 @@ class ND_OT_triangulate(bpy.types.Operator):
     bl_label = "Triangulate"
     bl_description = """Add a triangulate modifier to the selected objects
 CTRL — Remove existing modifiers
-ALT — Do not preserve custom normals
+ALT — Do not preserve custom normals (Blender <4.2)
 SHIFT — Only triangulate ngons (5+ vertices)"""
     bl_options = {'UNDO'}
 
@@ -58,7 +58,10 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
 
         for obj in mesh_objects:
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
-            triangulate.keep_custom_normals = self.preserve_normals
+
+            if bpy.app.version < (4, 1, 0):
+                triangulate.keep_custom_normals = self.preserve_normals
+
             triangulate.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'
             triangulate.min_vertices = 5 if self.only_ngons else 4
 

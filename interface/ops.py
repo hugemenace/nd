@@ -113,7 +113,8 @@ util_ops = [
     ("nd.set_origin", 'TRANSFORM_ORIGINS', None, None, False),
     ("nd.snap_align", 'SNAP_ON', None, None, False),
     None, # Separator
-    ("nd.smart_duplicate", 'DUPLICATE', None, None, False),
+    ("nd.smart_duplicate", 'DUPLICATE', "Smart Duplicate", "DUPLICATE", False),
+    ("nd.smart_duplicate", 'LINKED', "Linked Duplicate", "LINKED", False),
     None, # Separator
     ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
 ]

@@ -39,6 +39,12 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
     bl_description = """Duplicate the selected objects with their utils"""
 
 
+    mode: bpy.props.EnumProperty(items=[
+        ('DUPLICATE', 'Duplicate', 'Perform a duplicate operation'),
+        ('LINKED', 'Linked', 'Perform a linked duplicate operation'),
+    ], name="Mode", default='DUPLICATE')
+
+
     def invoke(self, context, event):
         data = get_utils_layer()
         if data is None:
@@ -51,7 +57,10 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
         for obj in util_objects:
             obj.select_set(True)
 
-        bpy.ops.object.duplicate_move('INVOKE_DEFAULT')
+        if self.mode == 'LINKED':
+            bpy.ops.object.duplicate_move_linked('INVOKE_DEFAULT')
+        else:
+            bpy.ops.object.duplicate_move('INVOKE_DEFAULT')
 
         hide_utils_collection(True)
 
@@ -65,6 +74,11 @@ def register():
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
 
         entry = keymap.keymap_items.new("nd.smart_duplicate", 'D', 'PRESS', shift=True, alt=True)
+        entry.properties.mode = "DUPLICATE"
+        keys.append((keymap, entry))
+
+        entry = keymap.keymap_items.new("nd.smart_duplicate", 'S', 'PRESS', shift=True, alt=True)
+        entry.properties.mode = "LINKED"
         keys.append((keymap, entry))
 
 

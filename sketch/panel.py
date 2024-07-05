@@ -46,18 +46,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def do_modal(self, context, event):
-        if get_preferences().enable_experimental_features and self.key_undo:
-            return {'PASS_THROUGH'}
-
-        if get_preferences().enable_experimental_features and self.key_redo:
-            return {'PASS_THROUGH'}
-
-        if get_preferences().enable_experimental_features and pressed(event, {'W'}):
-            return {'PASS_THROUGH'}
-
-        if get_preferences().enable_experimental_features and pressed(event, {'C'}):
-            return {'PASS_THROUGH'}
-
         if self.key_numeric_input:
             if self.stage == 1:
                 if self.key_no_modifiers:

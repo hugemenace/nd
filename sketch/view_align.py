@@ -50,18 +50,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
             return {'CANCELLED'}
 
-        elif get_preferences().enable_experimental_features and self.key_undo:
-            return {'PASS_THROUGH'}
-
-        elif get_preferences().enable_experimental_features and self.key_redo:
-            return {'PASS_THROUGH'}
-
-        elif get_preferences().enable_experimental_features and pressed(event, {'W'}):
-            return {'PASS_THROUGH'}
-
-        elif get_preferences().enable_experimental_features and pressed(event, {'C'}):
-            return {'PASS_THROUGH'}
-
         elif pressed(event, {'S'}):
             self.selection_type = (self.selection_type + 1) % 3
             self.set_selection_mode(context)

@@ -158,13 +158,18 @@ def is_planar(bm, tolerance=0.0001):
 
 
 def get_all_util_objects(objs):
-    all_util_objects = set(())
+    utils = set(())
+
     for obj in objs:
         if not obj.type in {'MESH', 'CURVE'}:
             continue
 
-        all_util_objects.update([mod.object for mod in obj.modifiers if mod.type == 'BOOLEAN' and mod.object])
-        all_util_objects.update([mod.offset_object for mod in obj.modifiers if mod.type == 'ARRAY' and mod.use_object_offset and mod.offset_object])
-        all_util_objects.update([mod.mirror_object for mod in obj.modifiers if mod.type == 'MIRROR' and mod.mirror_object])
+        utils.update([mod.object for mod in obj.modifiers if mod.type == 'BOOLEAN' and mod.object])
+        utils.update([mod.offset_object for mod in obj.modifiers if mod.type == 'ARRAY' and mod.use_object_offset and mod.offset_object])
+        utils.update([mod.mirror_object for mod in obj.modifiers if mod.type == 'MIRROR' and mod.mirror_object])
 
-    return all_util_objects
+    if len(utils) > 0:
+        # Recursively get all composited utils.
+        utils.update(get_all_util_objects(list(utils)))
+
+    return utils

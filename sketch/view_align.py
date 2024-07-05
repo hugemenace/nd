@@ -45,12 +45,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def do_modal(self, context, event):
-        if self.key_cancel:
-            self.clean_up(context, True)
-
-            return {'CANCELLED'}
-
-        elif pressed(event, {'S'}):
+        if pressed(event, {'S'}):
             self.selection_type = (self.selection_type + 1) % 3
             self.set_selection_mode(context)
 
@@ -241,6 +236,10 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             self.active_object.select_set(True)
 
         unregister_draw_handler()
+
+
+    def revert(self, context):
+        self.clean_up(context, True)
 
 
 def draw_text_callback(self):

@@ -96,11 +96,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if self.stage == 0 and self.key_select:
             return {'PASS_THROUGH'}
 
-        if self.key_cancel:
-            self.revert(context)
-
-            return {'CANCELLED'}
-
         if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 

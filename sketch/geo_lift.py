@@ -50,11 +50,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         elif self.key_confirm_alternative:
             return self.finish(context)
 
-        elif self.key_cancel:
-            self.clean_up(context)
-
-            return {'CANCELLED'}
-
         elif pressed(event, {'S'}):
             self.selection_type = (self.selection_type + 1) % 3
             self.set_selection_mode(context)
@@ -150,18 +145,18 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     def finish(self, context):
         if self.has_invalid_selection(context):
-            self.clean_up(context)
+            self.revert(context)
             self.report({'ERROR_INVALID_INPUT'}, "Ensure at least a single peice of geometry is selected.")
 
             return {'CANCELLED'}
 
         self.isolate_geometry(context)
-        self.clean_up(context, remove_lifted_geometry=False)
+        self.revert(context, remove_lifted_geometry=False)
 
         return {'FINISHED'}
 
 
-    def clean_up(self, context, remove_lifted_geometry=True):
+    def revert(self, context, remove_lifted_geometry=True):
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='MEDIAN')
 

@@ -50,12 +50,12 @@ class ND_OT_swap_solver(BaseOperator):
 
             self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
 

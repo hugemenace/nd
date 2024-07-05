@@ -49,29 +49,29 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             self.selection_type = (self.selection_type + 1) % 3
             self.set_selection_mode(context)
 
-        elif pressed(event, {'E'}):
+        if pressed(event, {'E'}):
             self.xray_mode = not self.xray_mode
             self.dirty = True
 
-        elif self.key_one:
+        if self.key_one:
             self.selection_type = 0
             self.set_selection_mode(context)
 
-        elif self.key_two:
+        if self.key_two:
             self.selection_type = 1
             self.set_selection_mode(context)
 
-        elif self.key_three:
+        if self.key_three:
             self.selection_type = 2
             self.set_selection_mode(context)
 
-        elif self.key_confirm_alternative:
+        if self.key_confirm_alternative:
             return self.finish(context)
 
-        elif self.key_select:
+        if self.key_select:
             return {'PASS_THROUGH'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
 

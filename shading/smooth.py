@@ -52,33 +52,33 @@ class ND_OT_smooth(BaseOperator):
                 self.angle = get_stream_value(self.angle_input_stream)
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
                     self.angle = float(get_preferences().default_smoothing_angle)
                     self.dirty = True
                 self.angle_input_stream = new_stream()
 
-        elif self.key_step_up:
+        if self.key_step_up:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = min(180, self.angle + angle_factor)
                 self.dirty = True
 
-        elif self.key_step_down:
+        if self.key_step_down:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
 
-        elif bpy.app.version >= (4, 1, 0) and pressed(event, {'S'}):
+        if bpy.app.version >= (4, 1, 0) and pressed(event, {'S'}):
             self.ignore_sharpness = not self.ignore_sharpness
             self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:

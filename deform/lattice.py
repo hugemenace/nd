@@ -72,7 +72,7 @@ CTRL — Remove existing modifiers"""
                 self.lattice_points_w = int(get_stream_value(self.lattice_points_w_input_stream, min_value=2))
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.lattice_points_u_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_u_input_stream):
                     self.lattice_points_u = 2
@@ -97,7 +97,7 @@ CTRL — Remove existing modifiers"""
                     self.dirty = True
                 self.lattice_points_w_input_stream = new_stream()
 
-        elif pressed(event, {'U'}):
+        if pressed(event, {'U'}):
             self.uniform = not self.uniform
 
             if self.uniform:
@@ -112,11 +112,11 @@ CTRL — Remove existing modifiers"""
 
             self.dirty = True
 
-        elif pressed(event, {'M'}):
+        if pressed(event, {'M'}):
             self.interpolation_mode = (self.interpolation_mode + 1) % len(self.interpolation_modes)
             self.dirty = True
 
-        elif self.key_step_up:
+        if self.key_step_up:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u += 1
                 self.lattice_points_v = self.lattice_points_u
@@ -133,7 +133,7 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_w += 1
                     self.dirty = True
 
-        elif self.key_step_down:
+        if self.key_step_down:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u = max(2, self.lattice_points_u - 1)
                 self.lattice_points_v = self.lattice_points_u
@@ -150,12 +150,12 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_w = max(2, self.lattice_points_w - 1)
                     self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:

@@ -53,41 +53,41 @@ CTRL — Remove existing modifiers"""
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
-        elif pressed(event, {'F'}):
+        if pressed(event, {'F'}):
             self.flip = not self.flip
             self.dirty = True
 
-        elif pressed(event, {'S'}):
+        if pressed(event, {'S'}):
             self.symmetrize = not self.symmetrize
             self.dirty = True
 
-        elif self.key_one:
+        if self.key_one:
             if self.geometry_mode and not self.geometry_ready:
                 self.geometry_selection_type = 0
                 self.set_selection_mode(context)
 
-        elif self.key_two:
+        if self.key_two:
             if self.geometry_mode and not self.geometry_ready:
                 self.geometry_selection_type = 1
                 self.set_selection_mode(context)
 
-        elif self.key_three:
+        if self.key_three:
             if self.geometry_mode and not self.geometry_ready:
                 self.geometry_selection_type = 2
                 self.set_selection_mode(context)
 
-        elif pressed(event, {'S'}):
+        if pressed(event, {'S'}):
             self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
             self.set_selection_mode(context)
 
-        elif self.key_confirm_alternative:
+        if self.key_confirm_alternative:
             if self.geometry_mode and not self.geometry_ready:
                 return self.complete_geometry_mode(context)
 
-        elif self.key_select and self.geometry_mode and not self.geometry_ready:
+        if self.key_select and self.geometry_mode and not self.geometry_ready:
             return {'PASS_THROUGH'}
 
-        elif self.key_confirm:
+        if self.key_confirm:
             if self.geometry_mode and not self.geometry_ready:
                 return {'PASS_THROUGH'}
             elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
@@ -95,7 +95,7 @@ CTRL — Remove existing modifiers"""
 
                 return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
 

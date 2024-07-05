@@ -55,21 +55,21 @@ class ND_OT_snap_align(BaseOperator):
 
                 self.dirty = True
 
-        elif pressed(event, {'R'}):
+        if pressed(event, {'R'}):
             self.capture_points = []
             self.guide_line = ()
 
             self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        elif event.type == 'MOUSEMOVE':
+        if event.type == 'MOUSEMOVE':
             coords = (event.mouse_region_x, event.mouse_region_y)
             self.recalculate_points(context, coords)
 

@@ -64,7 +64,7 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
 
-        elif self.key_reset:
+        if self.key_reset:
             if self.key_no_modifiers:
                 if self.is_angular[self.methods[self.current_method]]:
                     if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
@@ -77,7 +77,7 @@ CTRL — Remove existing modifiers"""
                         self.dirty = True
                     self.factor_input_stream = new_stream()
 
-        elif pressed(event, {'M'}):
+        if pressed(event, {'M'}):
             self.current_method = (self.current_method + 1) % len(self.methods)
             self.angle_input_stream = new_stream()
             self.factor_input_stream = new_stream()
@@ -85,11 +85,11 @@ CTRL — Remove existing modifiers"""
             self.angle = 0
             self.dirty = True
 
-        elif pressed(event, {'A'}):
+        if pressed(event, {'A'}):
             self.axis = (self.axis + 1) % 3
             self.dirty = True
 
-        elif self.key_step_up:
+        if self.key_step_up:
             if self.key_no_modifiers:
                 if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle + angle_factor)
@@ -98,7 +98,7 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
 
-        elif self.key_step_down:
+        if self.key_step_down:
             if self.key_no_modifiers:
                 if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle - angle_factor)
@@ -107,12 +107,12 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:

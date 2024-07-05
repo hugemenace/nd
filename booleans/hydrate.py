@@ -45,22 +45,22 @@ class ND_OT_hydrate(BaseOperator):
             self.clear_parent = not self.clear_parent
             self.dirty = True
 
-        elif self.key_step_up:
+        if self.key_step_up:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection + 1) % (len(self.all_collections) + 1)
                 self.dirty = True
 
-        elif self.key_step_down:
+        if self.key_step_down:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection - 1) % (len(self.all_collections) + 1)
                 self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:

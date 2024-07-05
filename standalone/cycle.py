@@ -49,7 +49,7 @@ SHIFT — Cycle through the modifier stack"""
 
             self.dirty = True
 
-        elif pressed(event, {'F'}):
+        if pressed(event, {'F'}):
             if self.mod_cycle:
                 self.freeze_mod_cycle_state = not self.freeze_mod_cycle_state
                 self.dirty = True
@@ -57,21 +57,21 @@ SHIFT — Cycle through the modifier stack"""
                 self.toggle_frozen_util()
                 self.dirty = True
 
-        elif pressed(event, {'A'}):
+        if pressed(event, {'A'}):
             if not self.mod_cycle:
                 self.toggle_applied_util()
                 self.dirty = True
 
-        elif pressed(event, {'D'}):
+        if pressed(event, {'D'}):
             if not self.mod_cycle:
                 self.toggle_mod()
                 self.dirty = True
 
-        elif pressed(event, {'W'}):
+        if pressed(event, {'W'}):
             self.show_wireframe = not self.show_wireframe
             self.dirty = True
 
-        elif self.key_step_up:
+        if self.key_step_up:
             if self.mod_cycle:
                 self.mod_current_index = min(self.mod_current_index + 1, self.mod_count - 1)
                 self.dirty = True
@@ -79,7 +79,7 @@ SHIFT — Cycle through the modifier stack"""
                 self.util_current_index = (self.util_current_index + 1) % self.util_count
                 self.dirty = True
 
-        elif self.key_step_down:
+        if self.key_step_down:
             if self.mod_cycle:
                 self.mod_current_index = max(self.mod_current_index - 1, -1)
                 self.dirty = True
@@ -87,12 +87,12 @@ SHIFT — Cycle through the modifier stack"""
                 self.util_current_index = (self.util_current_index - 1) % self.util_count
                 self.dirty = True
 
-        elif self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:

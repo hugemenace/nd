@@ -45,14 +45,14 @@ class ND_OT_silhouette(BaseOperator):
 
             return {'FINISHED'}
 
-        elif pressed(event, {'D'}):
+        if pressed(event, {'D'}):
             self.inverted = not self.inverted
             self.dirty = True
 
-        elif self.key_movement_passthrough:
+        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
-        elif event.type in {'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
+        if event.type in {'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
             return {'PASS_THROUGH'}
 
 

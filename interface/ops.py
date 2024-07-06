@@ -25,7 +25,7 @@
 # Contributors: Tristo (HM)
 # ---
 
-# (ID!, ICON!, CUSTOM_LABEL, MODE, DEPRECATED?)
+# (ID!, ICON!, CUSTOM_LABEL, MODE, EXPERIMENTAL?)
 
 standalone_ops = [
     ("nd.cycle", 'LONGDISPLAY', None, None, False),
@@ -115,6 +115,8 @@ util_ops = [
     None, # Separator
     ("nd.smart_duplicate", 'DUPLICATE', "Smart Duplicate", "DUPLICATE", False),
     ("nd.smart_duplicate", 'LINKED', "Linked Duplicate", "LINKED", False),
+    None, # Separator
+    ("nd.sync_modifiers", 'SYSTEM', None, None, True),
     None, # Separator
     ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
 ]

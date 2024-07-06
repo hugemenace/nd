@@ -25,7 +25,7 @@
 # Contributors: Tristo (HM)
 # ---
 
-from .. import lib
+from .. lib.preferences import get_preferences
 
 
 def create_box(text, layout, props, prop_name, icons, shortcuts):
@@ -59,7 +59,10 @@ def render_ops(ops, layout, new_row=True, use_separator=False):
                 layout.separator()
             continue
 
-        op, icon, label, mode, deprecated = op
+        op, icon, label, mode, experimental = op
+
+        if experimental and not get_preferences().enable_experimental_features:
+            continue
 
         if new_row:
             row = layout.row(align=True)

@@ -38,25 +38,45 @@ ALT — Duplicate mesh before applying modifiers"""
     bl_options = {'UNDO'}
 
 
+    def get_valid_objects(self, context):
+        return [obj for obj in context.selected_objects if obj.type in {'MESH', 'CURVE'}]
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        valid_objects = cls.get_valid_objects(cls, context)
+        return context.mode == 'OBJECT' and len(valid_objects) > 0
 
 
     def execute(self, context):
+        selected_objects = context.selected_objects
+        valid_objects = self.get_valid_objects(context)
+
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in valid_objects:
+            obj.select_set(True)
+
         if self.duplicate:
             bpy.ops.object.duplicate()
 
         bpy.ops.object.make_single_user(object=True, obdata=True, material=False, animation=False, obdata_animation=False)
 
-        for obj in context.selected_objects:
-            if obj.type != 'MESH':
-                continue
-
+        mesh_objects = [obj for obj in valid_objects if obj.type == 'MESH']
+        for obj in mesh_objects:
             self.collapse_modifiers(obj)
             self.remove_vertex_groups(obj)
             self.remove_edge_weights(obj)
+
+        curve_objects = [obj for obj in valid_objects if obj.type == 'CURVE']
+        if len(curve_objects) > 0:
+            bpy.ops.object.select_all(action='DESELECT')
+            for obj in curve_objects:
+                obj.select_set(True)
+            bpy.ops.object.convert(target='MESH')
+
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in selected_objects:
+            obj.select_set(True)
 
         return {'FINISHED'}
 

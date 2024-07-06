@@ -134,9 +134,12 @@ class ND_OT_sync_modifiers(bpy.types.Operator):
         # Clone the master object's modifiers to the copy objects
         for master_modifier in self.master_object.modifiers:
             for obj in self.copy_objects:
-                # Find the modifier by name
                 mod = obj.modifiers.get(master_modifier.name)
+
                 if mod is None:
+                    continue
+
+                if mod.type != master_modifier.type:
                     continue
 
                 if mod.type == 'NODES':
@@ -147,18 +150,19 @@ class ND_OT_sync_modifiers(bpy.types.Operator):
                 mod_props = [prop for prop in mod_props if not prop[0] in property_ignore_list]
 
                 for prop in mod_props:
-                    try:
-                        driver = mod.driver_add(prop[0])
-                        var = driver.driver.variables.new()
-                        var.name = prop[0]
-                        var.targets[0].data_path = f'modifiers["{master_modifier.name}"].{prop[0]}'
-                        var.targets[0].id_type='OBJECT'
-                        var.targets[0].id = self.master_object
-                        driver.driver.expression = f"{prop[0]}"
-                    except:
-                        pass
+                    self.create_driver(master_modifier, mod, prop[0])
 
         return {'FINISHED'}
+
+
+    def create_driver(self, master_mod, copy_mod, prop):
+        driver = copy_mod.driver_add(prop)
+        var = driver.driver.variables.new()
+        var.name = prop
+        var.targets[0].data_path = f'modifiers["{master_mod.name}"].{prop}'
+        var.targets[0].id_type = 'OBJECT'
+        var.targets[0].id = self.master_object
+        driver.driver.expression = prop
 
 
 def register():

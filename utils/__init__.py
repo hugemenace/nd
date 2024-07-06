@@ -30,6 +30,7 @@ from . import apply_modifiers
 from . import set_origin
 from . import snap_align
 from . import smart_duplicate
+from . import sync_modifiers
 
 
 registerables = (
@@ -37,6 +38,7 @@ registerables = (
     set_origin,
     snap_align,
     smart_duplicate,
+    sync_modifiers,
 )
 
 

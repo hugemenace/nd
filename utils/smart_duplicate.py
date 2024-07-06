@@ -45,9 +45,22 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
     ], name="Mode", default='DUPLICATE')
 
 
+    @classmethod
+    def poll(cls, context):
+        return context.mode == 'OBJECT' and len(context.selected_objects) > 0
+
+
+    def perform_duplicate(self, context):
+        if self.mode == 'LINKED':
+            bpy.ops.object.duplicate_move_linked('INVOKE_DEFAULT')
+        else:
+            bpy.ops.object.duplicate_move('INVOKE_DEFAULT')
+
+
     def invoke(self, context, event):
         data = get_utils_layer()
         if data is None:
+            self.perform_duplicate(context)
             return {'FINISHED'}
 
         hide_utils_collection(True)
@@ -57,10 +70,7 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
         for obj in util_objects:
             obj.select_set(True)
 
-        if self.mode == 'LINKED':
-            bpy.ops.object.duplicate_move_linked('INVOKE_DEFAULT')
-        else:
-            bpy.ops.object.duplicate_move('INVOKE_DEFAULT')
+        self.perform_duplicate(context)
 
         hide_utils_collection(True)
 

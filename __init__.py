@@ -166,6 +166,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    enable_experimental_features: BoolProperty(
+        name="Enable Experimental Features",
+        default=False,
+    )
+
     overlay_pin_x: IntProperty(
         name="Overlay Pin X Coordinate",
         default=0,
@@ -511,7 +516,8 @@ class NDPreferences(AddonPreferences):
         general_boxed_prefs = [
             ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True, True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False, True],
-            ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False, not lib.addons.is_extension()]]
+            ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False, not lib.addons.is_extension()],
+            ["Enable experimental features (requires Blender restart)", "enable_experimental_features", False, True]]
 
         for label, prop, expanded, visible in general_boxed_prefs:
             if not visible:

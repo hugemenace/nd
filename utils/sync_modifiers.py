@@ -104,7 +104,8 @@ property_ignore_list = {
 class ND_OT_sync_modifiers(bpy.types.Operator):
     bl_idname = "nd.sync_modifiers"
     bl_label = "Sync Modifiers"
-    bl_description = """Sync modifier settings from the active object to the selected objects"""
+    bl_description = """Sync modifier settings from the active object to the selected objects
+SHIFT — Clone the active object's modifiers"""
 
 
     def get_valid_objects(self, context, target_object_type):
@@ -116,9 +117,13 @@ class ND_OT_sync_modifiers(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
+        if context.active_object is None:
+            return False
+
         target_object_type = context.active_object.type
         valid_objects = cls.get_valid_objects(cls, context, target_object_type)
-        return context.mode == 'OBJECT' and len(valid_objects) > 1 and context.active_object is not None
+
+        return context.mode == 'OBJECT' and len(valid_objects) > 1
 
 
     def invoke(self, context, event):
@@ -131,19 +136,28 @@ class ND_OT_sync_modifiers(bpy.types.Operator):
         self.master_object = context.active_object
         self.copy_objects = [obj for obj in valid_objects if obj != self.master_object]
 
-        # Clone the master object's modifiers to the copy objects
+        self.clone = event.shift
+
+        if self.clone:
+            for obj in self.copy_objects:
+                obj.modifiers.clear()
+
         for master_modifier in self.master_object.modifiers:
             for obj in self.copy_objects:
-                mod = obj.modifiers.get(master_modifier.name)
+                if master_modifier.type == 'NODES':
+                    continue
+
+                mod = None
+
+                if self.clone:
+                    mod = obj.modifiers.new(master_modifier.name, master_modifier.type)
+                else:
+                    mod = obj.modifiers.get(master_modifier.name)
 
                 if mod is None:
                     continue
 
                 if mod.type != master_modifier.type:
-                    continue
-
-                if mod.type == 'NODES':
-                    mod.node_group = master_modifier.node_group
                     continue
 
                 mod_props = inspect.getmembers(master_modifier, lambda a: not(inspect.isroutine(a)))

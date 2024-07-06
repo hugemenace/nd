@@ -38,22 +38,24 @@ CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
+    def get_valid_objects(self, context):
+        return [obj for obj in context.selected_objects if obj.type == 'MESH']
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        valid_objects = cls.get_valid_objects(cls, context)
+        return context.mode == 'OBJECT' and len(valid_objects) > 0
 
 
     def invoke(self, context, event):
+        valid_objects = self.get_valid_objects(context)
+
         if event.ctrl:
-            mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-            remove_modifiers_ending_with(mesh_objects, ' — ND SD')
+            remove_modifiers_ending_with(valid_objects, ' — ND SD')
             return {'FINISHED'}
 
-        for obj in context.selected_objects:
-            if obj.type != 'MESH':
-                continue
-
+        for obj in valid_objects:
             decimate = new_modifier(obj, 'Decimate — ND SD', 'DECIMATE', rectify=True)
             decimate.decimate_type = 'DISSOLVE'
             decimate.angle_limit = radians(1)

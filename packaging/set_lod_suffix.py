@@ -44,15 +44,11 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        return context.mode == 'OBJECT' and len(context.selected_objects) > 0
 
 
     def execute(self, context):
         for obj in context.selected_objects:
-            if obj.type != 'MESH':
-                continue
-
             # Remove Blender's .001, .002, etc naming convention
             old_name = re.sub(r"(.+?)(?:\.[0-9]+)+$", r"\1", obj.name)
 
@@ -69,7 +65,9 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
             new_name = "_".join(name_segments)
 
             obj.name = new_name
-            obj.data.name = new_name
+
+            if obj.data:
+                obj.data.name = new_name
 
         return {'FINISHED'}
 

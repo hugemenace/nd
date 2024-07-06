@@ -37,20 +37,23 @@ class ND_OT_bulk_create_id_materials(bpy.types.Operator):
     bl_options = {'UNDO'}
 
 
+    def get_valid_objects(self, context):
+        return [obj for obj in context.selected_objects if obj.type in {'MESH', 'CURVE'}]
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0 and len(mesh_objects) <= len(ND_MATERIALS)
+        valid_objects = cls.get_valid_objects(cls, context)
+        return context.mode == 'OBJECT' and len(valid_objects) > 0 and len(valid_objects) <= len(ND_MATERIALS)
 
 
     def execute(self, context):
-        material_names = sample(list(ND_MATERIALS.keys()), k=len(context.selected_objects))
+        valid_objects = self.get_valid_objects(context)
+
+        material_names = sample(list(ND_MATERIALS.keys()), k=len(valid_objects))
         existing_material_names = bpy.data.materials.keys()
 
-        for i, obj in enumerate(context.selected_objects):
-            if obj.type != 'MESH':
-                continue
-
+        for i, obj in enumerate(valid_objects):
             obj.data.materials.clear()
 
             material_name = material_names[i]

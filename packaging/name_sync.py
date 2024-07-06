@@ -35,17 +35,20 @@ class ND_OT_name_sync(bpy.types.Operator):
     bl_options = {'UNDO'}
 
 
+    def get_valid_objects(self, context):
+        return [obj for obj in context.selected_objects if obj.data]
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        valid_objects = cls.get_valid_objects(cls, context)
+        return context.mode == 'OBJECT' and len(valid_objects) > 0
 
 
     def execute(self, context):
-        for obj in context.selected_objects:
-            if obj.type != 'MESH':
-                continue
+        valid_objects = self.get_valid_objects(context)
 
+        for obj in valid_objects:
             obj.data.name = obj.name
 
         return {'FINISHED'}

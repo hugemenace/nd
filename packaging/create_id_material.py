@@ -85,10 +85,18 @@ class ND_OT_create_id_material(bpy.types.Operator):
     material_name: bpy.props.StringProperty(name="Material Name")
 
 
+    def get_valid_objects(self, context, edit_mode):
+        if edit_mode:
+            return [obj for obj in context.selected_objects if obj.type == 'MESH']
+
+        return [obj for obj in context.selected_objects if obj.type in {'MESH', 'CURVE'}]
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        edit_mode = context.mode == 'EDIT_MESH'
+        valid_objects = cls.get_valid_objects(cls, context, edit_mode=edit_mode)
+        return context.mode in {'OBJECT', 'EDIT_MESH'} and len(valid_objects) > 0
 
 
     def execute(self, context):
@@ -101,18 +109,16 @@ class ND_OT_create_id_material(bpy.types.Operator):
             material = create_id_material(self.material_name)
 
         if context.mode == 'OBJECT':
-            for obj in context.selected_objects:
-                if obj.type != 'MESH':
-                    continue
+            valid_objects = self.get_valid_objects(context, edit_mode=False)
 
+            for obj in valid_objects:
                 obj.data.materials.clear()
                 obj.active_material = material
 
         if context.mode == 'EDIT_MESH':
-            for obj in context.selected_objects:
-                if obj.type != 'MESH':
-                    continue
+            valid_objects = self.get_valid_objects(context, edit_mode=True)
 
+            for obj in valid_objects:
                 previous_material_names = [m.name for m in obj.material_slots]
                 if self.material_name not in previous_material_names:
                     obj.data.materials.append(material)

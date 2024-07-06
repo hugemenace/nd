@@ -39,10 +39,14 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
     bl_options = {'UNDO'}
 
 
+    def get_valid_objects(self, context):
+        return [obj for obj in context.selected_objects if obj.type in {'MESH', 'CURVE'}]
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        valid_objects = cls.get_valid_objects(cls, context)
+        return context.mode == 'OBJECT' and len(valid_objects) > 0
 
 
     def invoke(self, context, event):
@@ -50,13 +54,13 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
         self.only_ngons = event.shift
         self.remove_mods = event.ctrl
 
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        valid_objects = self.get_valid_objects(context)
 
         if self.remove_mods:
-            remove_modifiers_ending_with(mesh_objects, 'Triangulate — ND', False)
+            remove_modifiers_ending_with(valid_objects, 'Triangulate — ND', False)
             return {'FINISHED'}
 
-        for obj in mesh_objects:
+        for obj in valid_objects:
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
 
             if bpy.app.version < (4, 1, 0):

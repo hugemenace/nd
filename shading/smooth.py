@@ -110,18 +110,21 @@ class ND_OT_smooth(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
+    def get_valid_objects(self, context):
+        return [obj for obj in context.selected_objects if obj.type == 'MESH']
+
+
     @classmethod
     def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        valid_objects = cls.get_valid_objects(cls, context)
+        return context.mode == 'OBJECT' and len(valid_objects) > 0
 
 
     def add_smooth_shading(self, context):
-        if bpy.app.version >= (4, 1, 0):
-            for obj in context.selected_objects:
-                if obj.type != 'MESH':
-                    continue
+        valid_objects = self.get_valid_objects(context)
 
+        if bpy.app.version >= (4, 1, 0):
+            for obj in valid_objects:
                 smooth_mod = add_smooth_by_angle(obj)
 
                 # If the object has a WN modifier, place the smoothig mod before it.
@@ -137,10 +140,7 @@ class ND_OT_smooth(BaseOperator):
 
         bpy.ops.object.shade_smooth()
 
-        for obj in context.selected_objects:
-            if obj.type != 'MESH':
-                continue
-
+        for obj in valid_objects:
             obj.data.use_auto_smooth = True
 
 

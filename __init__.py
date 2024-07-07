@@ -153,7 +153,7 @@ class NDPreferences(AddonPreferences):
 
     lock_overlay_parameters_on_recall: BoolProperty(
         name="Lock Overlay Parameters on Recall",
-        default=True,
+        default=False,
     )
 
     overlay_pinned: BoolProperty(

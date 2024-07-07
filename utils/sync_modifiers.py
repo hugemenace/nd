@@ -58,7 +58,7 @@ property_ignore_list = {
     'is_bound',
     'is_cached',
     'is_external',
-    'is_override_data'
+    'is_override_data',
     'map_curve',
     'mask_tex_map_bone',
     'mask_tex_map_object',
@@ -80,6 +80,11 @@ property_ignore_list = {
     'rim_vertex_group',
     'rna_type',
     'shell_vertex_group',
+    'show_expanded',
+    'show_in_editmode',
+    'show_on_cage',
+    'show_render',
+    'show_viewport',
     'start_cap',
     'start_position_object',
     'subtarget',
@@ -161,22 +166,26 @@ SHIFT — Clone the active object's modifiers"""
                     continue
 
                 mod_props = inspect.getmembers(master_modifier, lambda a: not(inspect.isroutine(a)))
-                mod_props = [prop for prop in mod_props if not prop[0] in property_ignore_list]
+                mod_props = [prop for prop in mod_props if not(prop[0] in property_ignore_list)]
 
                 for prop in mod_props:
+                    print(prop)
                     self.create_driver(master_modifier, mod, prop[0])
 
         return {'FINISHED'}
 
 
     def create_driver(self, master_mod, copy_mod, prop):
-        driver = copy_mod.driver_add(prop)
-        var = driver.driver.variables.new()
-        var.name = prop
-        var.targets[0].data_path = f'modifiers["{master_mod.name}"].{prop}'
-        var.targets[0].id_type = 'OBJECT'
-        var.targets[0].id = self.master_object
-        driver.driver.expression = prop
+        try:
+            driver = copy_mod.driver_add(prop)
+            var = driver.driver.variables.new()
+            var.name = prop
+            var.targets[0].data_path = f'modifiers["{master_mod.name}"].{prop}'
+            var.targets[0].id_type = 'OBJECT'
+            var.targets[0].id = self.master_object
+            driver.driver.expression = prop
+        except:
+            pass
 
 
 def register():

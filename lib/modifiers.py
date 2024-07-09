@@ -123,8 +123,9 @@ def add_smooth_by_angle(object):
             sba_mod = object.modifiers.new("Smooth — ND SBA", 'NODES')
             sba_mod.node_group = sba_node_group
             if bpy.app.version > (4, 1, 0):
-                sba_mod.show_group_selector = False
                 sba_mod.use_pin_to_last = True
+            if bpy.app.version >= (4, 1, 0):
+                sba_mod.show_group_selector = False
 
         # It isn't pretty, but it's the only way to get the modifier as modifier_add_node_group/shade_auto_smooth
         # runs asynchronously which doesn't guarantee the modifier is ready before the next chunk of code.

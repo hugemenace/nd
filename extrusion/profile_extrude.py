@@ -229,7 +229,7 @@ CTRL — Remove existing modifiers"""
             return_to_edit = True
 
         if bpy.app.version >= (4, 1, 0):
-            self.smoothing = add_smooth_by_angle(self.target_object)
+            add_smooth_by_angle(self.target_object)
             if return_to_edit:
                 bpy.ops.object.mode_set(mode='EDIT')
             return

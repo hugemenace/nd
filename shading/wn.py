@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 
 
 class ND_OT_weighted_normal(bpy.types.Operator):
@@ -65,6 +65,11 @@ CTRL — Remove existing modifiers"""
             mod.keep_sharp = self.keep_sharp
             mod.weight = 100
             mod.use_face_influence = True
+
+            if bpy.app.version > (4, 1, 0):
+                mod.use_pin_to_last = True
+
+            rectify_smooth_by_angle(obj, force=True)
 
         return {'FINISHED'}
 

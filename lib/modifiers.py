@@ -87,50 +87,101 @@ def rectify_mod_order(object, mod_name):
             bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=matching_mod_index)
 
 
+def get_sba_mod(object):
+    for mod in object.modifiers:
+        if mod.type == 'NODES' and (mod.name.startswith("Smooth — ND SBA") or mod.name.startswith("Smooth by Angle")):
+            return mod
+
+    return None
+
+
+def has_sba_mod(object):
+    return get_sba_mod(object) != None
+
+
 def add_smooth_by_angle(object):
     if bpy.app.version < (4, 1, 0):
         return
 
-    for mod in object.modifiers:
-        if mod.name == "Smooth — ND SBA":
-            return mod
+    if has_sba_mod(object):
+        return
 
     with bpy.context.temp_override(object=object):
-        bpy.ops.object.shade_smooth()
-        bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
+        sba_node_group = bpy.data.node_groups.get("Smooth by Angle")
 
-        # Ensure the object has the modifier on the stack.
-        object.data.update()
+        if sba_node_group == None and bpy.app.version == (4, 1, 0):
+            bpy.ops.object.shade_smooth()
+            bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="",
+                    relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
 
-        mod = object.modifiers[-1]
-        mod.name = "Smooth — ND SBA"
+        if sba_node_group == None and bpy.app.version > (4, 1, 0):
+            bpy.ops.object.shade_auto_smooth()
 
-        set_smoothing_angle(object, mod, radians(float(get_preferences().default_smoothing_angle)), True)
+        sba_mod = None
 
-        return mod
+        if sba_node_group != None:
+            sba_mod = object.modifiers.new("Smooth — ND SBA", 'NODES')
+            sba_mod.node_group = sba_node_group
+            if bpy.app.version > (4, 1, 0):
+                sba_mod.show_group_selector = False
+                sba_mod.use_pin_to_last = True
+
+        # It isn't pretty, but it's the only way to get the modifier as modifier_add_node_group/shade_auto_smooth
+        # runs asynchronously which doesn't guarantee the modifier is ready before the next chunk of code.
+        # This is a temporary solution until Blender provides a way to check if the modifier is ready.
+        count = 0
+        while sba_mod is None and count < 25:
+            sba_mod = get_sba_mod(object)
+            if sba_mod != None:
+                break
+            object.data.update()
+            count += 1
+
+        # If the modifier is still None, give up.
+        if sba_mod == None:
+            return
+
+        sba_mod.name = "Smooth — ND SBA"
+
+        set_smoothing_angle(object, radians(float(get_preferences().default_smoothing_angle)), True)
+
+        # If the object has a WN modifier, place the smoothig mod before it.
+        for index, mod in enumerate(object.modifiers):
+            if mod.name == "Weighted Normal — ND WN":
+                bpy.ops.object.modifier_move_to_index(modifier=sba_mod.name, index=index-1)
+                break
 
 
-def set_smoothing_angle(object, mod, angle, ignore_sharpness=False):
+def set_smoothing_angle(object, angle, ignore_sharpness=False):
+    mod = get_sba_mod(object)
+
+    if mod is None:
+        return
+
     mod["Input_1"] = angle
     mod["Socket_1"] = ignore_sharpness
 
     object.data.update()
 
 
-def rectify_smooth_by_angle(object):
-    if bpy.app.version < (4, 1, 0):
+def rectify_smooth_by_angle(object, force=False):
+    # For Blender 4.1.0 and above, the smoothing and weighted normal
+    # modifiers are pinned at the end of the stack by ND.
+    if force == False and bpy.app.version > (4, 1, 0):
         return
 
-    mods = list(object.modifiers)
-    smoothing_mods = ['Smooth — ND SBA', 'Weighted Normal — ND WN']
-    smoothing_mods = [mod for mod in mods if mod.name in smoothing_mods]
+    mod_order = ['Smooth by Angle', 'Smooth — ND SBA', 'Weighted Normal — ND WN']
+    object_mods = [mod.name for mod in list(object.modifiers)]
 
-    for index, mod in enumerate(smoothing_mods):
+    for mod_name in mod_order:
+        if not(mod_name in object_mods):
+            continue
+
         if bpy.app.version < (4, 0, 0):
-            bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod.name, index=len(mods) - 1)
+            bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=len(object_mods) - 1)
         else:
             with bpy.context.temp_override(object=object):
-                bpy.ops.object.modifier_move_to_index(modifier=mod.name, index=len(mods) - 1)
+                bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=len(object_mods) - 1)
 
 
 def remove_problematic_boolean_mods(object):

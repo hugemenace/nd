@@ -94,7 +94,7 @@ class ND_OT_smooth(BaseOperator):
         self.angle_input_stream = new_stream()
         self.ignore_sharpness = True
 
-        self.mods = []
+        self.valid_objects = self.get_valid_objects(context)
 
         self.add_smooth_shading(context)
 
@@ -121,33 +121,21 @@ class ND_OT_smooth(BaseOperator):
 
 
     def add_smooth_shading(self, context):
-        valid_objects = self.get_valid_objects(context)
-
         if bpy.app.version >= (4, 1, 0):
-            for obj in valid_objects:
-                smooth_mod = add_smooth_by_angle(obj)
-
-                # If the object has a WN modifier, place the smoothig mod before it.
-                object_mods = list(obj.modifiers)
-                for index, mod in enumerate(object_mods):
-                    if mod.name == "Weighted Normal — ND WN":
-                        with bpy.context.temp_override(object=obj):
-                            bpy.ops.object.modifier_move_to_index(modifier=smooth_mod.name, index=index-1)
-                        break
-
-                self.mods.append((obj, smooth_mod))
+            for obj in self.valid_objects:
+                add_smooth_by_angle(obj)
             return
 
         bpy.ops.object.shade_smooth()
 
-        for obj in valid_objects:
+        for obj in self.valid_objects:
             obj.data.use_auto_smooth = True
 
 
     def operate(self, context):
         if bpy.app.version >= (4, 1, 0):
-            for obj, mod in self.mods:
-                set_smoothing_angle(obj, mod, radians(self.angle), self.ignore_sharpness)
+            for obj in self.valid_objects:
+                set_smoothing_angle(obj, radians(self.angle), self.ignore_sharpness)
         else:
             for obj in context.selected_objects:
                 if obj.type != 'MESH':

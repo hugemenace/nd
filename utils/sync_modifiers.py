@@ -169,7 +169,6 @@ SHIFT — Clone the active object's modifiers"""
                 mod_props = [prop for prop in mod_props if not(prop[0] in property_ignore_list)]
 
                 for prop in mod_props:
-                    print(prop)
                     self.create_driver(master_modifier, mod, prop[0])
 
         return {'FINISHED'}

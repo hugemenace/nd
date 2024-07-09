@@ -66,6 +66,9 @@ CTRL — Remove existing modifiers"""
             mod.weight = 100
             mod.use_face_influence = True
 
+            if bpy.app.version > (4, 1, 0):
+                mod.use_pin_to_last = True
+
         return {'FINISHED'}
 
 

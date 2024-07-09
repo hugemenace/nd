@@ -87,30 +87,46 @@ def rectify_mod_order(object, mod_name):
             bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=matching_mod_index)
 
 
+def get_sba_mod(object):
+    for mod in object.modifiers:
+        if mod.type == 'NODES' and mod.name in {"Smooth — ND SBA", "Smooth by Angle"}:
+            return mod
+
+    return None
+
+
 def add_smooth_by_angle(object):
     if bpy.app.version < (4, 1, 0):
-        return
+        return None
 
     for mod in object.modifiers:
         if mod.name == "Smooth — ND SBA":
-            return mod
+            return None
 
     with bpy.context.temp_override(object=object):
-        bpy.ops.object.shade_smooth()
-        bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="", relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
+        bpy.ops.object.shade_auto_smooth()
 
-        # Ensure the object has the modifier on the stack.
-        object.data.update()
+        sba_mod = get_sba_mod(object)
+        if not(sba_mod is None):
+            return sba_mod
 
-        mod = object.modifiers[-1]
-        mod.name = "Smooth — ND SBA"
+        set_smoothing_angle(object, radians(float(get_preferences().default_smoothing_angle)), True)
 
-        set_smoothing_angle(object, mod, radians(float(get_preferences().default_smoothing_angle)), True)
+        # If the object has a WN modifier, place the smoothig mod before it.
+        for index, mod in enumerate(object.modifiers):
+            if mod.name == "Weighted Normal — ND WN":
+                bpy.ops.object.modifier_move_to_index(modifier=sba_mod.name, index=index-1)
+                break
 
-        return mod
+    return sba_mod
 
 
-def set_smoothing_angle(object, mod, angle, ignore_sharpness=False):
+def set_smoothing_angle(object, angle, ignore_sharpness=False):
+    mod = get_sba_mod(object)
+
+    if mod is None:
+        return
+
     mod["Input_1"] = angle
     mod["Socket_1"] = ignore_sharpness
 

@@ -126,8 +126,9 @@ def add_smooth_by_angle(object):
                 sba_mod.show_group_selector = False
                 sba_mod.use_pin_to_last = True
 
-        # It isn't pretty, but it's the only way to get the modifier in modifier_add_node_group/shade_auto_smooth
+        # It isn't pretty, but it's the only way to get the modifier as modifier_add_node_group/shade_auto_smooth
         # runs asynchronously which doesn't guarantee the modifier is ready before the next chunk of code.
+        # This is a temporary solution until Blender provides a way to check if the modifier is ready.
         count = 0
         while sba_mod is None and count < 25:
             sba_mod = get_sba_mod(object)

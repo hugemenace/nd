@@ -103,6 +103,7 @@ class ND_OT_toggle_sections(bpy.types.Operator):
         props.simplify = toggle
         props.shading = toggle
         props.scene = toggle
+        props.packaging = toggle
         props.export = toggle
         props.utils = toggle
         props.viewport = toggle

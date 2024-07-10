@@ -29,7 +29,7 @@ import bpy
 import bmesh
 import numpy
 from random import choice
-from .. lib.polling import ctx_multi_mode, list_gt
+from .. lib.polling import ctx_edit_mode, ctx_multi_mode, list_gt
 
 
 # Distinct color names and RGB values from:

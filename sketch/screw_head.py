@@ -38,6 +38,7 @@ from .. lib.objects import align_object_to_3d_cursor, get_real_active_object
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier
+from .. lib.polling import is_object_mode
 
 
 mod_displace = "Offset — ND SH"
@@ -162,7 +163,7 @@ class ND_OT_screw_head(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        return context.mode == 'OBJECT'
+        return is_object_mode(context)
 
 
     def update_head_type(self, context):

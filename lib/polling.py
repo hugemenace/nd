@@ -90,17 +90,17 @@ def is_edit_mode(context):
 
 def has_verts_selected(obj):
     mesh = bmesh.from_edit_mesh(obj.data)
-    return len([vert for vert in mesh.verts if vert.select]) >= 1
+    return len([vert for vert in mesh.verts if vert.select]) > 0
 
 
 def has_edges_selected(obj):
     mesh = bmesh.from_edit_mesh(obj.data)
-    return len([edge for edge in mesh.edges if edge.select]) >= 1
+    return len([edge for edge in mesh.edges if edge.select]) > 0
 
 
 def has_faces_selected(obj):
     mesh = bmesh.from_edit_mesh(obj.data)
-    return len([face for face in mesh.faces if face.select]) >= 1
+    return len([face for face in mesh.faces if face.select]) > 0
 
 
 def not_empty(objs):

@@ -231,7 +231,7 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_edit_mode(context) and is_edit_mode, (target_object) and has_verts_selected(target_object)
+        return is_edit_mode(context) and object_is_mesh(target_object) and has_verts_selected(target_object)
 
 
     def summon_old_operator(self, context):

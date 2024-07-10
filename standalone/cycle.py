@@ -33,6 +33,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import hide_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import get_real_active_object
+from .. lib.polling import is_object_mode, object_is_mesh, has_objects_selected
 
 
 class ND_OT_cycle(BaseOperator):
@@ -150,8 +151,7 @@ SHIFT — Cycle through the modifier stack"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        if context.mode == 'OBJECT' and target_object is not None:
-            return len(context.selected_objects) == 1 and target_object.type == 'MESH'
+        return is_object_mode(context) and object_is_mesh(target_object) and has_objects_selected(context, 1)
 
 
     def set_mod_visible(self, mod, visible):

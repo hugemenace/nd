@@ -27,6 +27,7 @@
 
 import bpy
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
+from .. lib.polling import is_object_mode, not_empty
 
 
 class ND_OT_weld(bpy.types.Operator):
@@ -44,7 +45,7 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return context.mode == 'OBJECT' and len(valid_objects) > 0
+        return is_object_mode(context) and not_empty(valid_objects)
 
 
     def invoke(self, context, event):

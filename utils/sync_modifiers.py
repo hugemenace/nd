@@ -28,6 +28,7 @@
 import bpy
 import inspect
 from .. lib.objects import get_real_active_object
+from .. lib.polling import is_object_mode, object_exists, list_gt
 
 
 property_ignore_list = {

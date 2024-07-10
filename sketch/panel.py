@@ -36,6 +36,7 @@ from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
+from .. lib.polling import is_object_mode, object_is_mesh, has_objects_selected
 
 
 class ND_OT_panel(BaseOperator):
@@ -137,8 +138,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        if context.mode == 'OBJECT' and target_object is not None:
-            return len(context.selected_objects) == 1 and target_object.type == 'MESH'
+        return is_object_mode(context) and object_is_mesh(target_object) and has_objects_selected(context, 1)
 
 
     def isolate_geometry(self, context):

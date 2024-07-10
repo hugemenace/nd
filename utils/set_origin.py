@@ -29,7 +29,7 @@ import bpy
 from mathutils import Vector
 from .. lib.objects import set_origin, get_real_active_object
 from .. lib.modifiers import new_modifier
-from .. lib.polling import is_object_mode, object_exists, object_is_mesh, has_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_exists, obj_is_mesh, ctx_objects_selected
 
 
 class ND_OT_set_origin(bpy.types.Operator):
@@ -45,13 +45,13 @@ SHIFT — Undo faux origin translation"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
 
-        if is_object_mode(context) and has_objects_selected(context, 2) and object_exists(target_object):
+        if ctx_obj_mode(context) and ctx_objects_selected(context, 2) and obj_exists(target_object):
             a, b = context.selected_objects
             reference_obj = a if a.name != target_object.name else b
-            return object_is_mesh(reference_obj)
-        elif is_object_mode(context) and has_objects_selected(context, 1) and object_is_mesh(target_object):
+            return obj_is_mesh(reference_obj)
+        elif ctx_obj_mode(context) and ctx_objects_selected(context, 1) and obj_is_mesh(target_object):
             return True
-        elif is_edit_mode(context) and has_objects_selected(context, 1):
+        elif ctx_edit_mode(context) and ctx_objects_selected(context, 1):
             return True
 
 

@@ -27,7 +27,7 @@
 
 import bpy
 import re
-from .. lib.polling import is_object_mode, has_min_objects_selected
+from .. lib.polling import ctx_obj_mode, ctx_min_objects_selected
 
 
 class ND_OT_set_lod_suffix(bpy.types.Operator):
@@ -45,7 +45,7 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return is_object_mode(context) and has_min_objects_selected(context, 1)
+        return ctx_obj_mode(context) and ctx_min_objects_selected(context, 1)
 
 
     def execute(self, context):

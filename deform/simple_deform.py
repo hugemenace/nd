@@ -36,7 +36,7 @@ from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handle
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import object_exists, object_supports_mods, is_object_mode, has_objects_selected
+from .. lib.polling import obj_exists, obj_moddable, ctx_obj_mode, ctx_objects_selected
 
 
 mod_deform = "Deform — ND SD"
@@ -173,7 +173,7 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_object_mode(context) and object_exists(target_object) and object_supports_mods(target_object) and has_objects_selected(context, 1)
+        return ctx_obj_mode(context) and obj_exists(target_object) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
 
 
     def prepare_new_operator(self, context):

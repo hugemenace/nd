@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import is_edit_mode, object_is_mesh, has_verts_selected
+from .. lib.polling import ctx_edit_mode, obj_is_mesh, obj_verts_selected
 
 
 mod_bevel = "Bevel — ND VB"
@@ -231,7 +231,7 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_edit_mode(context) and object_is_mesh(target_object) and has_verts_selected(target_object)
+        return ctx_edit_mode(context) and obj_is_mesh(target_object) and obj_verts_selected(target_object)
 
 
     def summon_old_operator(self, context):

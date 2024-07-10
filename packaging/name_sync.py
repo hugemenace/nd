@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.polling import is_object_mode, list_gt
+from .. lib.polling import ctx_obj_mode, list_gt
 
 
 class ND_OT_name_sync(bpy.types.Operator):
@@ -43,7 +43,7 @@ class ND_OT_name_sync(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return is_object_mode(context) and list_gt(valid_objects, 0)
+        return ctx_obj_mode(context) and list_gt(valid_objects, 0)
 
 
     def execute(self, context):

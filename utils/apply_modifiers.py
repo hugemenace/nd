@@ -27,7 +27,7 @@
 
 import bpy
 import bmesh
-from .. lib.polling import is_object_mode, not_empty
+from .. lib.polling import ctx_obj_mode, list_populated
 
 
 class ND_OT_apply_modifiers(bpy.types.Operator):
@@ -46,7 +46,7 @@ ALT — Duplicate mesh before applying modifiers"""
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return is_object_mode(context) and not_empty(valid_objects)
+        return ctx_obj_mode(context) and list_populated(valid_objects)
 
 
     def execute(self, context):

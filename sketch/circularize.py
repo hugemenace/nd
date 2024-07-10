@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import is_object_edit_mode, object_is_mesh, has_objects_selected
+from .. lib.polling import ctx_multi_mode, obj_is_mesh, ctx_objects_selected
 
 
 mod_bevel = "Bevel — ND CIRC"
@@ -133,7 +133,7 @@ class ND_OT_circularize(BaseOperator):
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_object_edit_mode(context) and object_is_mesh(target_object) and has_objects_selected(context, 1)
+        return ctx_multi_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def summon_old_operator(self, context, mods):

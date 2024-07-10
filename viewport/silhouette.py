@@ -30,7 +30,7 @@ import bmesh
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.polling import is_object_mode
+from .. lib.polling import ctx_obj_mode
 
 
 class ND_OT_silhouette(BaseOperator):
@@ -85,7 +85,7 @@ class ND_OT_silhouette(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        return is_object_mode(context)
+        return ctx_obj_mode(context)
 
 
     def operate(self, context):

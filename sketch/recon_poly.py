@@ -35,7 +35,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier
-from .. lib.polling import is_object_mode
+from .. lib.polling import ctx_obj_mode
 
 
 mod_displace = "Radius — ND RCP"
@@ -260,7 +260,7 @@ class ND_OT_recon_poly(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        return is_object_mode(context)
+        return ctx_obj_mode(context)
 
 
     def add_displace_modifier(self):

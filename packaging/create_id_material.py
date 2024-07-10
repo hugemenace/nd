@@ -29,7 +29,7 @@ import bpy
 import bmesh
 import numpy
 from random import choice
-from .. lib.polling import is_object_edit_mode, list_gt
+from .. lib.polling import ctx_multi_mode, list_gt
 
 
 # Distinct color names and RGB values from:
@@ -95,8 +95,8 @@ class ND_OT_create_id_material(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        valid_objects = cls.get_valid_objects(cls, context, edit_mode=is_edit_mode(context))
-        return is_object_edit_mode(context) and list_gt(valid_objects, 0)
+        valid_objects = cls.get_valid_objects(cls, context, edit_mode=ctx_edit_mode(context))
+        return ctx_multi_mode(context) and list_gt(valid_objects, 0)
 
 
     def execute(self, context):

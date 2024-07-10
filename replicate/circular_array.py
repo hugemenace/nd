@@ -39,7 +39,7 @@ from .. lib.objects import set_origin
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 from .. lib.objects import get_real_active_object
-from .. lib.polling import object_exists, object_is_mesh, is_object_mode, has_objects_selected
+from .. lib.polling import obj_exists, obj_is_mesh, ctx_obj_mode, ctx_objects_selected
 
 
 mod_displace = 'Displace — ND CA'
@@ -193,12 +193,12 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        if is_object_mode(context) and object_exists(target_object) and has_objects_selected(context, 2):
+        if ctx_obj_mode(context) and obj_exists(target_object) and ctx_objects_selected(context, 2):
             a, b = context.selected_objects
             reference_obj = a if a.name != target_object.name else b
 
             return reference_obj.type == 'MESH'
-        elif is_object_mode(context) and object_is_mesh(target_object) and has_objects_selected(context, 1):
+        elif ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1):
             return True
         else:
             return False

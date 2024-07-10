@@ -30,7 +30,7 @@ from .. lib.collections import move_to_utils_collection, isolate_in_utils_collec
 from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import object_exists, all_objects_are_mesh, has_objects_selected, is_object_mode
+from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode
 
 
 keys = []
@@ -47,7 +47,7 @@ ALT — Do not clean the reference object's mesh"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_object_mode(context) and object_exists(target_object) and all_objects_are_mesh(context.selected_objects) and has_objects_selected(context, 2)
+        return ctx_obj_mode(context) and obj_exists(target_object) and objs_are_mesh(context.selected_objects) and ctx_objects_selected(context, 2)
 
 
     def execute(self, context):

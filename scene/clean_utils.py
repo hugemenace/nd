@@ -27,7 +27,7 @@
 
 import bpy
 from .. lib.collections import get_all_util_objects
-from .. lib.polling import is_object_mode
+from .. lib.polling import ctx_obj_mode
 
 
 class ND_OT_clean_utils(bpy.types.Operator):
@@ -38,7 +38,7 @@ class ND_OT_clean_utils(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return is_object_mode(context)
+        return ctx_obj_mode(context)
 
 
     def invoke(self, context, event):

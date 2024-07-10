@@ -31,7 +31,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.polling import is_object_mode, not_empty
+from .. lib.polling import ctx_obj_mode, list_populated
 
 
 class ND_OT_hydrate(BaseOperator):
@@ -96,7 +96,7 @@ class ND_OT_hydrate(BaseOperator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return is_object_mode(context) and not_empty(valid_objects)
+        return ctx_obj_mode(context) and list_populated(valid_objects)
 
 
     def operate(self, context):

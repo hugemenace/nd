@@ -27,7 +27,7 @@
 
 import bpy
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
-from .. lib.polling import is_object_mode, list_gt
+from .. lib.polling import ctx_obj_mode, list_gt
 
 
 class ND_OT_triangulate(bpy.types.Operator):
@@ -47,7 +47,7 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return is_object_mode(context) and list_gt(valid_objects, 0)
+        return ctx_obj_mode(context) and list_gt(valid_objects, 0)
 
 
     def invoke(self, context, event):

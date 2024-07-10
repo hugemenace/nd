@@ -35,7 +35,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
 from .. lib.math import v3_average, v3_distance, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face
 from .. lib.objects import get_real_active_object
-from .. lib.polling import is_object_mode, object_is_mesh, has_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
 
 
 class ND_OT_snap_align(BaseOperator):
@@ -150,7 +150,7 @@ class ND_OT_snap_align(BaseOperator):
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_object_mode(context) and object_is_mesh(target_object) and has_objects_selected(context, 2)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 2)
 
 
     def operate(self, context):

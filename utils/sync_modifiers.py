@@ -28,7 +28,7 @@
 import bpy
 import inspect
 from .. lib.objects import get_real_active_object
-from .. lib.polling import is_object_mode, object_exists, list_gt
+from .. lib.polling import ctx_obj_mode, obj_exists, list_gt
 
 
 property_ignore_list = {
@@ -125,13 +125,13 @@ SHIFT — Clone the active object's modifiers"""
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        if not object_exists(target_object):
+        if not obj_exists(target_object):
             return False
 
         target_object_type = target_object.type
         valid_objects = cls.get_valid_objects(cls, context, target_object_type)
 
-        return is_object_mode(context) and list_gt(valid_objects, 1)
+        return ctx_obj_mode(context) and list_gt(valid_objects, 1)
 
 
     def invoke(self, context, event):

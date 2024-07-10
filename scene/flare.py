@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.objects import get_real_active_object
-from .. lib.polling import is_object_mode, object_is, has_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_is, ctx_objects_selected
 
 
 class ND_OT_flare(BaseOperator):
@@ -210,7 +210,7 @@ class ND_OT_flare(BaseOperator):
     @classmethod
     def poll(cls, context):
         target_object = get_real_active_object(context)
-        return is_object_mode(context) and object_is(target_object, {'MESH', 'EMPTY'}) and has_objects_selected(context, 1)
+        return ctx_obj_mode(context) and obj_is(target_object, {'MESH', 'EMPTY'}) and ctx_objects_selected(context, 1)
 
 
     def create_empty(self, context):

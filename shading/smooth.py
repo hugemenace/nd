@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import add_smooth_by_angle, set_smoothing_angle
-from .. lib.polling import is_object_mode, not_empty
+from .. lib.polling import ctx_obj_mode, list_populated
 
 
 class ND_OT_smooth(BaseOperator):
@@ -118,7 +118,7 @@ class ND_OT_smooth(BaseOperator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return is_object_mode(context) and not_empty(valid_objects)
+        return ctx_obj_mode(context) and list_populated(valid_objects)
 
 
     def add_smooth_shading(self, context):

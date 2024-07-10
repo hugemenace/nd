@@ -29,7 +29,7 @@ import bpy
 from mathutils import Vector
 from .. lib.objects import set_origin, get_real_active_object
 from .. lib.modifiers import new_modifier
-from .. lib.polling import ctx_obj_mode, obj_exists, obj_is_mesh, ctx_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_exists, obj_is_mesh, ctx_edit_mode, ctx_objects_selected
 
 
 class ND_OT_set_origin(bpy.types.Operator):

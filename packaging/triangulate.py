@@ -27,7 +27,7 @@
 
 import bpy
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
-from .. lib.polling import ctx_obj_mode, list_gt
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 class ND_OT_triangulate(bpy.types.Operator):

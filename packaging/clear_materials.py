@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.polling import ctx_obj_mode, list_gt
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 class ND_OT_clear_materials(bpy.types.Operator):

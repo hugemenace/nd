@@ -30,7 +30,7 @@ import bmesh
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.polling import ctx_obj_mode, list_populated
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 class ND_OT_swap_solver(BaseOperator):
@@ -101,7 +101,7 @@ class ND_OT_swap_solver(BaseOperator):
     @classmethod
     def poll(cls, context):
         mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return ctx_obj_mode(context) and list_populated(mesh_objects)
+        return ctx_obj_mode(context) and list_ok(mesh_objects)
 
 
     def operate(self, context):

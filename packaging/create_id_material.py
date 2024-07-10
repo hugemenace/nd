@@ -96,7 +96,7 @@ class ND_OT_create_id_material(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context, edit_mode=ctx_edit_mode(context))
-        return ctx_multi_mode(context) and list_gt(valid_objects, 0)
+        return ctx_multi_mode(context) and list_ok(valid_objects)
 
 
     def execute(self, context):

@@ -47,7 +47,7 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return ctx_obj_mode(context) and list_gt(valid_objects, 0)
+        return ctx_obj_mode(context) and list_ok(valid_objects)
 
 
     def invoke(self, context, event):

@@ -45,7 +45,7 @@ class ND_OT_bulk_create_id_materials(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return ctx_obj_mode(context) and list_gt(valid_objects, 0) and list_lte(valid_objects, len(ND_MATERIALS))
+        return ctx_obj_mode(context) and list_ok(valid_objects) and list_lte(valid_objects, len(ND_MATERIALS))
 
 
     def execute(self, context):

@@ -28,7 +28,7 @@
 import bpy
 from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection
 from .. lib.objects import get_all_util_objects
-from .. lib.polling import ctx_obj_mode, list_populated
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 keys = []
@@ -48,7 +48,7 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return ctx_obj_mode(context) and list_populated(context.selected_objects)
+        return ctx_obj_mode(context) and list_ok(context.selected_objects)
 
 
     def perform_duplicate(self, context):

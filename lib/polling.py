@@ -94,7 +94,7 @@ def obj_edges_selected(obj):
     return len([edge for edge in mesh.edges if edge.select]) > 0
 
 
-def list_populated(objs):
+def list_ok(objs):
     return len(objs) > 0
 
 

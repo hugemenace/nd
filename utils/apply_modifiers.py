@@ -27,6 +27,7 @@
 
 import bpy
 import bmesh
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 class ND_OT_apply_modifiers(bpy.types.Operator):
@@ -45,7 +46,7 @@ ALT — Duplicate mesh before applying modifiers"""
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return context.mode == 'OBJECT' and len(valid_objects) > 0
+        return ctx_obj_mode(context) and list_ok(valid_objects)
 
 
     def execute(self, context):

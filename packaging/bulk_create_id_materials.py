@@ -28,6 +28,7 @@
 import bpy
 from .create_id_material import ND_MATERIALS, create_id_material
 from random import sample
+from .. lib.polling import ctx_obj_mode, list_ok, list_lte
 
 
 class ND_OT_bulk_create_id_materials(bpy.types.Operator):
@@ -44,7 +45,7 @@ class ND_OT_bulk_create_id_materials(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return context.mode == 'OBJECT' and len(valid_objects) > 0 and len(valid_objects) <= len(ND_MATERIALS)
+        return ctx_obj_mode(context) and list_ok(valid_objects) and list_lte(valid_objects, len(ND_MATERIALS))
 
 
     def execute(self, context):

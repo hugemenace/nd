@@ -173,3 +173,16 @@ def get_all_util_objects(objs):
         utils.update(get_all_util_objects(list(utils)))
 
     return utils
+
+
+def get_real_active_object(context):
+    active = context.active_object
+    selected_objects = context.selected_objects
+
+    if len(selected_objects) == 0:
+        return None
+
+    if not(active in selected_objects):
+        return None
+
+    return active

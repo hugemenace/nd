@@ -28,7 +28,7 @@
 import bpy
 import bmesh
 from .. __init__ import bl_info
-from .. lib.objects import is_planar
+from .. lib.objects import is_planar, get_real_active_object
 from . ops import build_icon_lookup_table
 from .. lib.addons import is_addon_enabled
 
@@ -47,7 +47,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
     def draw(self, context):
         objs = context.selected_objects
-        has_target = context.active_object is not None
+        target_object = get_real_active_object(context)
+        has_target = target_object is not None
 
         total_sections = 0
 
@@ -137,8 +138,12 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
+        target_object = get_real_active_object(context)
+        if target_object is None:
+            return NO_SECTION_COUNT
+
         if context.mode == 'EDIT_MESH':
-            mesh = bmesh.from_edit_mesh(context.active_object.data)
+            mesh = bmesh.from_edit_mesh(target_object.data)
 
             verts_selected = len([vert for vert in mesh.verts if vert.select]) >= 1
             edges_selected = len([edge for edge in mesh.edges if edge.select]) >= 1
@@ -158,7 +163,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
                 layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
                 made_prediction = True
 
-            mod_names = [mod.name for mod in context.active_object.modifiers]
+            mod_names = [mod.name for mod in target_object.modifiers]
 
             has_mod_profile_extrude = False
             has_mod_screw = False
@@ -183,9 +188,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
             return SECTION_COUNT
 
         if context.mode == 'OBJECT':
-            if context.active_object.type == 'MESH':
+            if target_object.type == 'MESH':
                 return self.draw_single_object_mesh_predictions(context, layout)
-            elif context.active_object.type == 'CURVE':
+            elif target_object.type == 'CURVE':
                 return self.draw_single_object_curve_predictions(context, layout)
 
         return NO_SECTION_COUNT
@@ -201,8 +206,12 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
 
     def draw_single_object_mesh_predictions(self, context, layout):
+        target_object = get_real_active_object(context)
+        if target_object is None:
+            return NO_SECTION_COUNT
+
         depsgraph = context.evaluated_depsgraph_get()
-        object_eval = context.active_object.evaluated_get(depsgraph)
+        object_eval = target_object.evaluated_get(depsgraph)
 
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
@@ -218,7 +227,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         bm.free()
 
-        mod_names = [mod.name for mod in context.active_object.modifiers]
+        mod_names = [mod.name for mod in target_object.modifiers]
 
         has_mod_profile_extrude = False
         has_mod_solidify = False
@@ -278,7 +287,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.circularize", icon=icons['nd.circularize'])
             replay_prediction_count += 1
 
-        if context.active_object.display_type == 'WIRE' and "Bool —" in context.active_object.name:
+        if target_object.display_type == 'WIRE' and "Bool —" in target_object.name:
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.separator()
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])

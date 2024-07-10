@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-import bmesh
+from .. lib.polling import ctx_edit_mode
 
 
 class ND_OT_make_manifold(bpy.types.Operator):
@@ -47,7 +47,7 @@ class ND_OT_make_manifold(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.mode == 'EDIT_MESH'
+        return ctx_edit_mode(context)
 
 
 def register():

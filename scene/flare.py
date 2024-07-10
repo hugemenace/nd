@@ -33,6 +33,8 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
+from .. lib.objects import get_real_active_object
+from .. lib.polling import ctx_obj_mode, obj_is, ctx_objects_selected
 
 
 class ND_OT_flare(BaseOperator):
@@ -207,8 +209,8 @@ class ND_OT_flare(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
-            return len(context.selected_objects) == 1 and context.active_object.type in {'MESH', 'EMPTY'}
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is(target_object, {'MESH', 'EMPTY'}) and ctx_objects_selected(context, 1)
 
 
     def create_empty(self, context):

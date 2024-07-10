@@ -34,6 +34,8 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
+from .. lib.objects import get_real_active_object
+from .. lib.polling import ctx_edit_mode, obj_edges_selected, obj_is_mesh
 
 
 mod_bevel = "Bevel — ND EB"
@@ -239,9 +241,8 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'EDIT_MESH' and context.active_object is not None:
-            mesh = bmesh.from_edit_mesh(context.active_object.data)
-            return len([edge for edge in mesh.edges if edge.select]) >= 1
+        target_object = get_real_active_object(context)
+        return ctx_edit_mode(context) and obj_is_mesh(target_object) and obj_edges_selected(target_object)
 
 
     def prepare_new_operator(self, context):

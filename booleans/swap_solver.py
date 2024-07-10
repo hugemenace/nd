@@ -30,6 +30,7 @@ import bmesh
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 class ND_OT_swap_solver(BaseOperator):
@@ -60,24 +61,20 @@ class ND_OT_swap_solver(BaseOperator):
 
 
     def do_invoke(self, context, event):
-        if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
-            return {'CANCELLED'}
-
         self.dirty = False
 
         self.solve_mode = None
         self.boolean_mods = []
 
         all_scene_objects = [obj for obj in bpy.data.objects if obj.type == 'MESH']
-        selected_object_names = [obj.name for obj in context.selected_objects]
+        mesh_object_names = [obj.name for obj in context.selected_objects if obj.type == 'MESH']
         fast_solver_count = 0
         exact_solver_count = 0
 
         for obj in all_scene_objects:
             mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
             for mod in mods:
-                if mod.object and mod.object.name in selected_object_names:
+                if mod.object and mod.object.name in mesh_object_names:
                     self.boolean_mods.append(mod)
 
         for mod in self.boolean_mods:
@@ -104,7 +101,7 @@ class ND_OT_swap_solver(BaseOperator):
     @classmethod
     def poll(cls, context):
         mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return context.mode == 'OBJECT' and len(mesh_objects) > 0
+        return ctx_obj_mode(context) and list_ok(mesh_objects)
 
 
     def operate(self, context):

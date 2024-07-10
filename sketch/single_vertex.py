@@ -27,6 +27,7 @@
 
 import bpy
 from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
+from .. lib.polling import ctx_obj_mode
 
 
 class ND_OT_single_vertex(bpy.types.Operator):
@@ -51,7 +52,7 @@ class ND_OT_single_vertex(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return context.mode == 'OBJECT'
+        return ctx_obj_mode(context)
 
 
     def start_sketch_editing(self, context):

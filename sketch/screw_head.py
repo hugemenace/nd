@@ -34,10 +34,11 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property
 from .. lib.events import capture_modifier_keys
 from .. lib.assets import get_asset_path
-from .. lib.objects import align_object_to_3d_cursor
+from .. lib.objects import align_object_to_3d_cursor, get_real_active_object
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier
+from .. lib.polling import ctx_obj_mode
 
 
 mod_displace = "Offset — ND SH"
@@ -129,7 +130,7 @@ class ND_OT_screw_head(BaseOperator):
         self.offset_input_stream = new_stream()
         self.scale_input_stream = new_stream()
 
-        self.target_object = context.active_object if context.active_object is not None else None
+        self.target_object = get_real_active_object(context)
 
         custom_objects = []
         custom_file = get_preferences().custom_screw_heads_path
@@ -162,7 +163,7 @@ class ND_OT_screw_head(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        return context.mode == 'OBJECT'
+        return ctx_obj_mode(context)
 
 
     def update_head_type(self, context):

@@ -31,6 +31,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
+from .. lib.polling import ctx_obj_mode, list_ok
 
 
 class ND_OT_hydrate(BaseOperator):
@@ -70,13 +71,7 @@ class ND_OT_hydrate(BaseOperator):
 
 
     def do_invoke(self, context, event):
-        if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
-            return {'CANCELLED'}
-
         self.dirty = False
-
-        self.active_object = context.active_object
 
         self.clear_parent = False
         self.all_collections = [c.name for c in bpy.data.collections]
@@ -101,7 +96,7 @@ class ND_OT_hydrate(BaseOperator):
     @classmethod
     def poll(cls, context):
         valid_objects = cls.get_valid_objects(cls, context)
-        return context.mode == 'OBJECT' and len(valid_objects) > 0
+        return ctx_obj_mode(context) and list_ok(valid_objects)
 
 
     def operate(self, context):
@@ -144,8 +139,6 @@ class ND_OT_hydrate(BaseOperator):
         bpy.ops.object.select_all(action='DESELECT')
         for new_obj, orig_obj in new_objects:
             new_obj.select_set(True)
-            if orig_obj == self.active_object:
-                bpy.context.view_layer.objects.active = new_obj
 
         unregister_draw_handler()
 

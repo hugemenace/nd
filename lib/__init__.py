@@ -42,6 +42,7 @@ from . import modifiers
 from . import numeric_input
 from . import overlay_keys
 from . import base_operator
+from . import polling
 
 
 registerables = (
@@ -61,6 +62,7 @@ registerables = (
     numeric_input,
     overlay_keys,
     base_operator,
+    polling,
 )
 
 

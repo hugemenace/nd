@@ -34,6 +34,8 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, set_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
+from .. lib.objects import get_real_active_object
+from .. lib.polling import is_object_mode, object_exists, object_is_mesh
 
 
 mod_bevel = "Bevel — ND B"
@@ -237,8 +239,8 @@ SHIFT — Create a stacked bevel modifier"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+        target_object = get_real_active_object(context)
+        return is_object_mode(context) and object_exists(target_object) and object_is_mesh(target_object)
 
 
     def prepare_new_operator(self, context):

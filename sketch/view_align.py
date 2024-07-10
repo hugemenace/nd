@@ -33,7 +33,7 @@ from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_r
 from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.objects import create_duplicate_liftable_geometry
+from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
 
 
 class ND_OT_view_align(BaseOperator):
@@ -100,8 +100,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+        target_object = get_real_active_object(context)
+        if context.mode == 'OBJECT' and target_object is not None:
+            return len(context.selected_objects) == 1 and target_object.type == 'MESH'
 
 
     def set_selection_mode(self, context):

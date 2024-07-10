@@ -32,7 +32,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.objects import create_duplicate_liftable_geometry
+from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
 
 
 class ND_OT_geo_lift(BaseOperator):
@@ -100,8 +100,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+        target_obj = get_real_active_object(context)
+        if context.mode == 'OBJECT' and target_obj is not None:
+            return len(context.selected_objects) == 1 and target_obj.type == 'MESH'
 
 
     def register_mode(self):

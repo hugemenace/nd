@@ -35,6 +35,8 @@ from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
+from .. lib.objects import get_real_active_object
+from .. lib.polling import is_object_edit_mode, object_is_mesh, has_objects_selected
 
 
 mod_screw = "Extrusion — ND PE"
@@ -161,8 +163,8 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode in {'OBJECT', 'EDIT_MESH'} and context.object is not None:
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+        target_object = get_real_active_object(context)
+        return is_object_edit_mode(context) and object_is_mesh(target_object) and has_objects_selected(context, 1)
 
 
     def prepare_new_operator(self, context):

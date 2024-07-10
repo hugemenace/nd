@@ -27,7 +27,7 @@
 
 import bpy
 from mathutils import Vector
-from .. lib.objects import set_origin
+from .. lib.objects import set_origin, get_real_active_object
 from .. lib.modifiers import new_modifier
 
 
@@ -42,12 +42,13 @@ SHIFT — Undo faux origin translation"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and len(context.selected_objects) == 2 and context.active_object is not None:
+        target_object = get_real_active_object(context)
+        if context.mode == 'OBJECT' and len(context.selected_objects) == 2 and target_object is not None:
             a, b = context.selected_objects
-            reference_obj = a if a.name != context.active_object.name else b
+            reference_obj = a if a.name != target_object.name else b
 
             return reference_obj.type == 'MESH'
-        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and context.active_object is not None and context.active_object.type == 'MESH':
+        elif context.mode == 'OBJECT' and len(context.selected_objects) == 1 and target_object is not None and target_object.type == 'MESH':
             return True
         elif context.mode == 'EDIT_MESH' and len(context.selected_objects) == 1:
             return True

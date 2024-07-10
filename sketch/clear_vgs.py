@@ -27,6 +27,7 @@
 
 import bpy
 import bmesh
+from .. lib.objects import get_real_active_object
 
 
 class ND_OT_clear_vgs(bpy.types.Operator):
@@ -38,8 +39,9 @@ class ND_OT_clear_vgs(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'EDIT_MESH' and context.active_object is not None:
-            mesh = bmesh.from_edit_mesh(context.active_object.data)
+        target_object = get_real_active_object(context)
+        if context.mode == 'EDIT_MESH' and target_object is not None:
+            mesh = bmesh.from_edit_mesh(target_object.data)
             return len([vert for vert in mesh.verts if vert.select]) >= 1
 
 

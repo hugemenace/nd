@@ -36,6 +36,8 @@ from .. lib.viewport import set_3d_cursor
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
+from .. lib.objects import get_real_active_object
+from .. lib.polling import object_supports_mods, object_is_curve, object_exists, is_edit_mode, is_object_mode, has_objects_selected, has_min_objects_selected
 
 
 class ND_OT_mirror(BaseOperator):
@@ -108,7 +110,7 @@ CTRL — Remove existing modifiers"""
             remove_modifiers_starting_with(context.selected_objects, 'Mirror —')
             return {'FINISHED'}
 
-        self.edit_mode = context.mode == 'EDIT_MESH'
+        self.edit_mode = is_edit_mode(context)
         self.geometry_mode = event.alt
         self.early_apply = event.shift
         self.geometry_ready = False
@@ -121,7 +123,7 @@ CTRL — Remove existing modifiers"""
         self.reference_objs = [context.active_object]
         self.mirror_obj = None
 
-        if context.active_object.type == 'CURVE' and self.geometry_mode:
+        if object_is_curve(context.active_object) and self.geometry_mode:
             self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used on curves")
             return {'CANCELLED'}
 
@@ -129,7 +131,7 @@ CTRL — Remove existing modifiers"""
             self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used in edit mode")
             return {'CANCELLED'}
 
-        if len(context.selected_objects) >= 2:
+        if has_min_objects_selected(context, 2):
             self.reference_objs = [obj for obj in context.selected_objects if obj != context.active_object]
             self.mirror_obj = context.active_object
 
@@ -156,15 +158,16 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT':
-            if len(context.selected_objects) == 1 and context.active_object is not None and context.active_object.type in ['MESH', 'CURVE']:
+        target_object = get_real_active_object(context)
+        if is_object_mode(context):
+            if has_objects_selected(context, 1) and object_supports_mods(target_object):
                 return True
 
-            if len(context.selected_objects) >= 2 and context.active_object is not None:
-                return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != context.active_object.name)
+            if has_min_objects_selected(context, 2) and object_exists(target_object):
+                return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != target_object.name)
 
-        if context.mode == 'EDIT_MESH':
-            return len(context.selected_objects) == 1 and context.active_object is not None and context.active_object.type in ['MESH', 'CURVE']
+        if is_edit_mode(context):
+            return has_objects_selected(context, 1) and object_supports_mods(target_object)
 
 
     def set_selection_mode(self, context):

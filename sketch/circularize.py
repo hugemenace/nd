@@ -34,6 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
+from .. lib.objects import get_real_active_object
 
 
 mod_bevel = "Bevel — ND CIRC"
@@ -130,8 +131,9 @@ class ND_OT_circularize(BaseOperator):
 
     @classmethod
     def poll(cls, context):
-        if context.mode in {'OBJECT', 'EDIT_MESH'} and context.active_object is not None:
-            return len(context.selected_objects) == 1 and context.active_object.type == 'MESH'
+        target_object = get_real_active_object(context)
+        if context.mode in {'OBJECT', 'EDIT_MESH'} and target_object is not None:
+            return len(context.selected_objects) == 1 and target_object.type == 'MESH'
 
 
     def summon_old_operator(self, context, mods):

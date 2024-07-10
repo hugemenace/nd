@@ -29,6 +29,8 @@ import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
+from .. lib.objects import get_real_active_object
+from .. lib.polling import object_exists, all_objects_are_mesh, has_objects_selected, is_object_mode
 
 
 keys = []
@@ -52,8 +54,8 @@ ALT — Do not clean the reference object's mesh"""
 
     @classmethod
     def poll(cls, context):
-        if context.mode == 'OBJECT' and context.active_object is not None:
-            return len(context.selected_objects) == 2 and all(obj.type == 'MESH' for obj in context.selected_objects)
+        target_object = get_real_active_object(context)
+        return is_object_mode(context) and object_exists(target_object) and all_objects_are_mesh(context.selected_objects) and has_objects_selected(context, 2)
 
 
     def execute(self, context):

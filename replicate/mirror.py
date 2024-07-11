@@ -59,9 +59,13 @@ CTRL — Remove existing modifiers"""
             self.flip = not self.flip
             self.dirty = True
 
-        if not self.geometry_mode and pressed(event, {'S'}):
-            self.symmetrize = not self.symmetrize
-            self.dirty = True
+        if pressed(event, {'S'}):
+            if self.geometry_mode and not self.geometry_ready:
+                self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
+                self.set_selection_mode(context)
+            else:
+                self.symmetrize = not self.symmetrize
+                self.dirty = True
 
         if self.key_one:
             if self.geometry_mode and not self.geometry_ready:
@@ -77,10 +81,6 @@ CTRL — Remove existing modifiers"""
             if self.geometry_mode and not self.geometry_ready:
                 self.geometry_selection_type = 2
                 self.set_selection_mode(context)
-
-        if self.geometry_mode and pressed(event, {'S'}):
-            self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
-            self.set_selection_mode(context)
 
         if self.key_confirm_alternative:
             if self.geometry_mode and not self.geometry_ready:

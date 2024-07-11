@@ -30,6 +30,9 @@ from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_i
 from .. lib.objects import get_all_util_objects
 
 
+keys = []
+
+
 class ND_OT_toggle_utils_collection(bpy.types.Operator):
     bl_idname = "nd.toggle_utils_collection"
     bl_label = "Utils Visibility"
@@ -63,6 +66,17 @@ SHIFT — Display all utils for the selected objects"""
 def register():
     bpy.utils.register_class(ND_OT_toggle_utils_collection)
 
+    for mapping in [('Object Mode', 'EMPTY')]:
+        keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
+
+        entry = keymap.keymap_items.new("nd.toggle_utils_collection", 'T', 'PRESS', shift=True)
+        keys.append((keymap, entry))
+
 
 def unregister():
+    for keymap, entry in keys:
+        keymap.keymap_items.remove(entry)
+
+    keys.clear()
+
     bpy.utils.unregister_class(ND_OT_toggle_utils_collection)

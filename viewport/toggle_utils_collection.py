@@ -40,6 +40,12 @@ class ND_OT_toggle_utils_collection(bpy.types.Operator):
 SHIFT — Display all utils for the selected objects"""
 
 
+    mode: bpy.props.EnumProperty(items=[
+        ('DYNAMIC', 'Dynamic', 'Run the operator with alt modes enabled'),
+        ('RESTRICTED', 'Restricted', 'Run the operator with alt modes disabled'),
+    ], name="Mode", default='DYNAMIC')
+
+
     def execute(self, context):
         data = get_utils_layer()
         if data is not None:
@@ -49,13 +55,19 @@ SHIFT — Display all utils for the selected objects"""
 
 
     def invoke(self, context, event):
-        if event.shift and len(context.selected_objects) > 0:
+        isolated_object_mode = event.shift and not self.mode == 'RESTRICTED'
+
+        if isolated_object_mode and len(context.selected_objects) > 0:
             data = get_utils_layer()
             if data is None:
                 return {'FINISHED'}
 
+            selected_objects = context.selected_objects.copy()
+
+            util_objects = get_all_util_objects(selected_objects)
+            util_objects.extend(selected_objects)
+
             hide_utils_collection(True)
-            util_objects = get_all_util_objects(context.selected_objects)
             isolate_in_utils_collection(util_objects)
 
             return {'FINISHED'}
@@ -70,6 +82,7 @@ def register():
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
 
         entry = keymap.keymap_items.new("nd.toggle_utils_collection", 'T', 'PRESS', shift=True)
+        entry.properties.mode = 'RESTRICTED'
         keys.append((keymap, entry))
 
 

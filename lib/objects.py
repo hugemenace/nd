@@ -172,7 +172,7 @@ def get_all_util_objects(objs):
         # Recursively get all composited utils.
         utils.update(get_all_util_objects(list(utils)))
 
-    return utils
+    return list(utils)
 
 
 def get_real_active_object(context):

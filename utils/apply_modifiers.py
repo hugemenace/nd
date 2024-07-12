@@ -50,7 +50,6 @@ ALT — Duplicate mesh before applying modifiers"""
 
 
     def execute(self, context):
-        selected_objects = context.selected_objects
         valid_objects = self.get_valid_objects(context)
 
         bpy.ops.object.select_all(action='DESELECT')
@@ -59,6 +58,7 @@ ALT — Duplicate mesh before applying modifiers"""
 
         if self.duplicate:
             bpy.ops.object.duplicate()
+            valid_objects = context.selected_objects.copy()
 
         bpy.ops.object.make_single_user(object=True, obdata=True, material=False, animation=False, obdata_animation=False)
 
@@ -76,7 +76,7 @@ ALT — Duplicate mesh before applying modifiers"""
             bpy.ops.object.convert(target='MESH')
 
         bpy.ops.object.select_all(action='DESELECT')
-        for obj in selected_objects:
+        for obj in valid_objects:
             obj.select_set(True)
 
         return {'FINISHED'}

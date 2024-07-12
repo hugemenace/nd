@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.44.0](https://github.com/hugemenace/nd/compare/v1.43.1...v1.44.0) (2024-07-12)
+
+
+### Features
+
+* add a linked version of smart duplicate (equivalent to Blender's ALT + D) ([1acd138](https://github.com/hugemenace/nd/commit/1acd138e20320ff1ec77ba977d1577daec740cd9))
+* add extended mouse behaviour support (scroll on bevels to change segment count) ([2422215](https://github.com/hugemenace/nd/commit/242221567bc7c6336cbbe08e686e912dbb7464ee))
+* add extended mouse value support to recon poly (scroll to adjust segments) ([90d4959](https://github.com/hugemenace/nd/commit/90d49597326c9dee47b397c42018f9a18fac3e90))
+* add freeze state option to modifier mode in the cycle operator (retain mod visibility states on exit) ([a22cee1](https://github.com/hugemenace/nd/commit/a22cee1cabe3fc0a491aa8441ab2672fa12f7b14))
+* add mirror, profile extrude, and screw operators to the edit mode fast menu ([a30ba55](https://github.com/hugemenace/nd/commit/a30ba5539f0ea0745842932cc221f09e35855f7f))
+* add option to change overlay reset key behaviour to unlock instead of hard-reset ([fe6efb5](https://github.com/hugemenace/nd/commit/fe6efb56f13bf2ecc4253ca4c7e9912b64a5e70f))
+* add option to customise the Utils collection icon color ([c7e4b61](https://github.com/hugemenace/nd/commit/c7e4b61e679244a3482d67463c24e91ee0ae3ffa))
+* add option to lock overlay parameters on recall ([3c719cc](https://github.com/hugemenace/nd/commit/3c719cc7f1b81efee705281c1927a7b618592c44))
+* add option to remove triangulate modifiers via the CTRL alt-mode convention ([e6aa830](https://github.com/hugemenace/nd/commit/e6aa830a24eb19cd06ab4240282c4a82a7486aa3))
+* add SHIFT+T shortcut for toggle utils ([ccb530e](https://github.com/hugemenace/nd/commit/ccb530ec143d2194bad3fe1f9d1b2c8327b4b265))
+* add smart duplicate operator (copy selected object/s with all associated utilities) ([3373146](https://github.com/hugemenace/nd/commit/33731466398fa3dce5df23fde0fc75fe775c6b62))
+* add symmetrize option to mirror operator for immediate application ([6f6c303](https://github.com/hugemenace/nd/commit/6f6c3034d77ed64cb404fdc0a161dc2186663ad5))
+* add sync modifiers operator (experimental feature) ([4bd8de1](https://github.com/hugemenace/nd/commit/4bd8de1063c3c59f8501fb6b1dabc35c8526a86d))
+* allow apply modifiers to be run on curve objects in selection set (will convert them to mesh) ([14985ee](https://github.com/hugemenace/nd/commit/14985eedc43d71018e18bfcd0612dbc2255c7c2b))
+* allow bulk operators to be executed as long as mesh objects are in the selected group (e.g., ignore empties) ([045eeaf](https://github.com/hugemenace/nd/commit/045eeaf8e815ed38b9ab44f6421c1eba2908215a))
+* allow profile extrude, screw, mirror, and circularize operators to be run from edit mode ([0ece46c](https://github.com/hugemenace/nd/commit/0ece46cb4c2a8d9c66e06e92da89fa856145579b))
+* allow the isolated object util toggle operator to be run on composite utils ([c725174](https://github.com/hugemenace/nd/commit/c72517416ee4e0ba2dc0b038a4c8962ffded79c3))
+
+
+### Bug Fixes
+
+* ensure that all util objects are toggled (including empties) when using the isolated object mode in toggle utils ([b79562b](https://github.com/hugemenace/nd/commit/b79562b2c2a04677fd287a55a601d7896feb7a60))
+* ensure that all utils and composited utils are recursively selected when toggling or duplicating ([6b8278a](https://github.com/hugemenace/nd/commit/6b8278aa99aef4b4eb0d6e681b13ee1fc6e51b50))
+* fix Blender 4.2 SBA crash and improve SBA/WN across various versions ([43dcad9](https://github.com/hugemenace/nd/commit/43dcad9a7c02f9f29b2d748c800f7bc2cb4d6831))
+* only attempt to preserve custom normals when running triangulate in Blender <4.2 ([4143813](https://github.com/hugemenace/nd/commit/4143813a25d21cf7c3edaf50050f12ecfcd6d10b))
+
 ### [1.43.1](https://github.com/hugemenace/nd/compare/v1.43.0...v1.43.1) (2024-06-12)
 
 ## [1.43.0](https://github.com/hugemenace/nd/compare/v1.42.0...v1.43.0) (2024-06-03)

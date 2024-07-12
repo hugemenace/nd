@@ -30,6 +30,7 @@ import bmesh
 from math import radians
 from mathutils.geometry import distance_point_to_plane, normal
 from . preferences import get_preferences
+from . polling import app_minor_version
 
 
 def add_single_vertex_object(cls, context, name):
@@ -47,7 +48,7 @@ def add_single_vertex_object(cls, context, name):
 
     context.view_layer.objects.active = obj
 
-    if bpy.app.version < (4, 1, 0):
+    if app_minor_version() < (4, 1):
         bpy.ops.object.shade_smooth()
         obj.data.use_auto_smooth = True
         obj.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
@@ -111,7 +112,7 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
 
     bevel_weight_layer = None
 
-    if bpy.app.version < (4, 0, 0):
+    if app_minor_version() < (4, 0):
         bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
     else:
         bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)

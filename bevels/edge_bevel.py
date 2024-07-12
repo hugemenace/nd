@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_edit_mode, obj_edges_selected, obj_is_mesh
+from .. lib.polling import ctx_edit_mode, obj_edges_selected, obj_is_mesh, app_minor_version
 
 
 mod_bevel = "Bevel — ND EB"
@@ -181,7 +181,7 @@ CTRL — Remove existing modifiers"""
 
                 bevel_weight_layer = None
 
-                if bpy.app.version < (4, 0, 0):
+                if app_minor_version() < (4, 0):
                     bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
                 else:
                     bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
@@ -212,7 +212,7 @@ CTRL — Remove existing modifiers"""
 
         self.target_object = context.active_object
 
-        if bpy.app.version < (3, 4, 0):
+        if app_minor_version() < (3, 4):
             if not self.target_object.data.use_customdata_edge_bevel:
                 self.target_object.data.use_customdata_edge_bevel = True
 
@@ -278,7 +278,7 @@ CTRL — Remove existing modifiers"""
         if not get_preferences().enable_auto_smooth:
             return
 
-        if bpy.app.version >= (4, 1, 0):
+        if app_minor_version() >= (4, 1):
             bpy.ops.object.mode_set(mode='OBJECT')
             add_smooth_by_angle(self.target_object)
             bpy.ops.object.mode_set(mode='EDIT')
@@ -331,7 +331,7 @@ CTRL — Remove existing modifiers"""
 
         bevel_weight_layer = None
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
         else:
             bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
@@ -358,7 +358,7 @@ CTRL — Remove existing modifiers"""
 
         bevel_weight_layer = None
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
         else:
             bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)
@@ -403,7 +403,7 @@ CTRL — Remove existing modifiers"""
 
         bevel_weight_layer = None
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
         else:
             bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)

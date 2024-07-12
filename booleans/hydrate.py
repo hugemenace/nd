@@ -31,7 +31,7 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.polling import ctx_obj_mode, list_ok
+from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
 class ND_OT_hydrate(BaseOperator):
@@ -130,7 +130,7 @@ class ND_OT_hydrate(BaseOperator):
                 new_obj.select_set(True)
                 bpy.context.view_layer.objects.active = new_obj
 
-                if bpy.app.version < (4, 0, 0):
+                if app_minor_version() < (4, 0):
                     bpy.ops.object.parent_clear({'object': new_obj}, type='CLEAR_KEEP_TRANSFORM')
                 else:
                     with bpy.context.temp_override(object=new_obj):

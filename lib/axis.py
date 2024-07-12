@@ -30,6 +30,7 @@ import gpu
 from mathutils import Vector, Matrix
 from gpu_extras.batch import batch_for_shader
 from . preferences import get_preferences
+from . polling import app_minor_version
 
 
 def register_axis_handler(cls):
@@ -98,7 +99,7 @@ def update_axis(cls):
 
         shader = None
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
         else:
             shader = gpu.shader.from_builtin('UNIFORM_COLOR')

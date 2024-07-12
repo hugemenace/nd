@@ -37,7 +37,7 @@ from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_r
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 from .. lib.objects import get_real_active_object
-from .. lib.polling import obj_moddable, obj_is_curve, obj_exists, ctx_edit_mode, ctx_obj_mode, ctx_objects_selected, ctx_min_objects_selected
+from .. lib.polling import obj_moddable, obj_is_curve, obj_exists, ctx_edit_mode, ctx_obj_mode, ctx_objects_selected, ctx_min_objects_selected, app_minor_version
 
 
 class ND_OT_mirror(BaseOperator):
@@ -337,7 +337,7 @@ CTRL — Remove existing modifiers"""
 
             if self.early_apply:
                 while obj.modifiers[0].name != mirror.name:
-                    if bpy.app.version < (4, 0, 0):
+                    if app_minor_version() < (4, 0):
                         bpy.ops.object.modifier_move_up({'object': obj}, modifier=mirror.name)
                     else:
                         with bpy.context.temp_override(object=obj):

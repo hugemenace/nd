@@ -25,6 +25,7 @@
 # Contributors: Tristo (HM)
 # ---
 
+import bpy
 import bmesh
 
 
@@ -104,3 +105,7 @@ def list_gt(objs, count):
 
 def list_lte(objs, count):
     return len(objs) <= count
+
+
+def app_minor_version():
+    return (bpy.app.version[0], bpy.app.version[1])

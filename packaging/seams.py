@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import add_smooth_by_angle, set_smoothing_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 
 
 class ND_OT_seams(BaseOperator):
@@ -158,7 +158,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         bpy.ops.object.mode_set(mode='OBJECT')
 
         if self.commit_auto_smooth:
-            if bpy.app.version >= (4, 1, 0):
+            if app_minor_version() >= (4, 1):
                 add_smooth_by_angle(self.target_object)
                 set_smoothing_angle(self.target_object, radians(180), False)
             else:

@@ -28,7 +28,8 @@
 import bpy
 import re
 from math import radians
-from .. lib.preferences import get_preferences
+from . preferences import get_preferences
+from . polling import app_minor_version
 
 
 def new_modifier(object, mod_name, mod_type, rectify=True):
@@ -80,7 +81,7 @@ def rectify_mod_order(object, mod_name):
     if matching_mod_index is None:
         return
 
-    if bpy.app.version < (4, 0, 0):
+    if app_minor_version() < (4, 0):
         bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=matching_mod_index)
     else:
         with bpy.context.temp_override(object=object):
@@ -100,7 +101,7 @@ def has_sba_mod(object):
 
 
 def add_smooth_by_angle(object):
-    if bpy.app.version < (4, 1, 0):
+    if app_minor_version() < (4, 1):
         return
 
     if has_sba_mod(object):
@@ -109,12 +110,12 @@ def add_smooth_by_angle(object):
     with bpy.context.temp_override(object=object):
         sba_node_group = bpy.data.node_groups.get("Smooth by Angle")
 
-        if sba_node_group == None and bpy.app.version == (4, 1, 0):
+        if sba_node_group == None and app_minor_version() == (4, 1):
             bpy.ops.object.shade_smooth()
             bpy.ops.object.modifier_add_node_group(asset_library_type='ESSENTIALS', asset_library_identifier="",
                     relative_asset_identifier="geometry_nodes\\smooth_by_angle.blend\\NodeTree\\Smooth by Angle")
 
-        if sba_node_group == None and bpy.app.version > (4, 1, 0):
+        if sba_node_group == None and app_minor_version() > (4, 1):
             bpy.ops.object.shade_auto_smooth()
 
         sba_mod = None
@@ -122,9 +123,9 @@ def add_smooth_by_angle(object):
         if sba_node_group != None:
             sba_mod = object.modifiers.new("Smooth — ND SBA", 'NODES')
             sba_mod.node_group = sba_node_group
-            if bpy.app.version > (4, 1, 0):
+            if app_minor_version() > (4, 1):
                 sba_mod.use_pin_to_last = True
-            if bpy.app.version >= (4, 1, 0):
+            if app_minor_version() >= (4, 1):
                 sba_mod.show_group_selector = False
 
         # It isn't pretty, but it's the only way to get the modifier as modifier_add_node_group/shade_auto_smooth
@@ -168,7 +169,7 @@ def set_smoothing_angle(object, angle, ignore_sharpness=False):
 def rectify_smooth_by_angle(object, force=False):
     # For Blender 4.1.0 and above, the smoothing and weighted normal
     # modifiers are pinned at the end of the stack by ND.
-    if force == False and bpy.app.version > (4, 1, 0):
+    if force == False and app_minor_version() > (4, 1):
         return
 
     mod_order = ['Smooth by Angle', 'Smooth — ND SBA', 'Weighted Normal — ND WN']
@@ -178,7 +179,7 @@ def rectify_smooth_by_angle(object, force=False):
         if not(mod_name in object_mods):
             continue
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=len(object_mods) - 1)
         else:
             with bpy.context.temp_override(object=object):
@@ -210,7 +211,7 @@ def remove_modifiers_ending_with(objects, suffix, strict=False):
         for mod_name in mod_names:
             base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name) if not strict else mod_name
             if base_name.endswith(suffix):
-                if bpy.app.version < (4, 0, 0):
+                if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
                 else:
                     with bpy.context.temp_override(object=object):
@@ -224,7 +225,7 @@ def remove_modifiers_starting_with(objects, suffix):
         for mod_name in mod_names:
             base_name = re.sub(r"(.+?)(\.[0-9]{3})$", r"\1", mod_name)
             if base_name.startswith(suffix):
-                if bpy.app.version < (4, 0, 0):
+                if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': object}, modifier=mod_name)
                 else:
                     with bpy.context.temp_override(object=object):

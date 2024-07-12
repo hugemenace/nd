@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import add_smooth_by_angle, set_smoothing_angle
-from .. lib.polling import ctx_obj_mode, list_ok
+from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
 class ND_OT_smooth(BaseOperator):
@@ -70,7 +70,7 @@ class ND_OT_smooth(BaseOperator):
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
 
-        if bpy.app.version >= (4, 1, 0) and pressed(event, {'S'}):
+        if app_minor_version() >= (4, 1) and pressed(event, {'S'}):
             self.ignore_sharpness = not self.ignore_sharpness
             self.dirty = True
 
@@ -122,7 +122,7 @@ class ND_OT_smooth(BaseOperator):
 
 
     def add_smooth_shading(self, context):
-        if bpy.app.version >= (4, 1, 0):
+        if app_minor_version() >= (4, 1):
             for obj in self.valid_objects:
                 add_smooth_by_angle(obj)
             return
@@ -134,7 +134,7 @@ class ND_OT_smooth(BaseOperator):
 
 
     def operate(self, context):
-        if bpy.app.version >= (4, 1, 0):
+        if app_minor_version() >= (4, 1):
             for obj in self.valid_objects:
                 set_smoothing_angle(obj, radians(self.angle), self.ignore_sharpness)
         else:
@@ -167,7 +167,7 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.angle_input_stream)
 
-    if bpy.app.version >= (4, 1, 0):
+    if app_minor_version() >= (4, 1):
         draw_hint(
             self,
             "Ignore Sharpness [S]: {}".format("Yes" if self.ignore_sharpness else "No"),

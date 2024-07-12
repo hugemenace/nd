@@ -36,7 +36,7 @@ from .. lib.math import generate_bounding_box, v3_average
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 
 
 mod_lattice = "Lattice — ND L"
@@ -293,7 +293,7 @@ CTRL — Remove existing modifiers"""
         context.active_object.data.name = "ND — Lattice"
         context.active_object.data.use_outside = True
 
-        if bpy.app.version >= (4, 1, 0):
+        if app_minor_version() >= (4, 1):
             context.active_object.scale = eval_obj.dimensions * 1.001
         else:
             context.active_object.dimensions = eval_obj.dimensions * 1.001

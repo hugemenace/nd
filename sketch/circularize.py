@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_multi_mode, obj_is_mesh, ctx_objects_selected
+from .. lib.polling import ctx_multi_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 
 
 mod_bevel = "Bevel — ND CIRC"
@@ -167,7 +167,7 @@ class ND_OT_circularize(BaseOperator):
             bpy.ops.object.mode_set(mode='OBJECT')
             return_to_edit = True
 
-        if bpy.app.version >= (4, 1, 0):
+        if app_minor_version() >= (4, 1):
             add_smooth_by_angle(self.target_object)
             if return_to_edit:
                 bpy.ops.object.mode_set(mode='EDIT')

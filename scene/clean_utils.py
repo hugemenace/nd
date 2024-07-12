@@ -27,7 +27,7 @@
 
 import bpy
 from .. lib.collections import get_all_util_objects
-from .. lib.polling import ctx_obj_mode
+from .. lib.polling import ctx_obj_mode, app_minor_version
 
 
 class ND_OT_clean_utils(bpy.types.Operator):
@@ -95,7 +95,7 @@ class ND_OT_clean_utils(bpy.types.Operator):
                 deleted_objects.append(obj)
                 removal_count += 1
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             bpy.ops.object.delete({'active_object': None, 'object': None, 'selected_objects': deleted_objects}, use_global=False)
         else:
             with bpy.context.temp_override(active_object=None, object=None, selected_objects=deleted_objects):

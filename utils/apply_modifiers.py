@@ -27,7 +27,7 @@
 
 import bpy
 import bmesh
-from .. lib.polling import ctx_obj_mode, list_ok
+from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
 class ND_OT_apply_modifiers(bpy.types.Operator):
@@ -123,21 +123,21 @@ ALT — Duplicate mesh before applying modifiers"""
 
         for mod_name in mods_to_apply:
             try:
-                if bpy.app.version < (4, 0, 0):
+                if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_apply({'object': obj}, modifier=mod_name)
                 else:
                     with bpy.context.temp_override(object=obj):
                         bpy.ops.object.modifier_apply(modifier=mod_name)
             except:
                 # If the modifier is disabled, just remove it.
-                if bpy.app.version < (4, 0, 0):
+                if app_minor_version() < (4, 0):
                     bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
                 else:
                     with bpy.context.temp_override(object=obj):
                         bpy.ops.object.modifier_remove(modifier=mod_name)
 
         for mod_name in mods_to_remove:
-            if bpy.app.version < (4, 0, 0):
+            if app_minor_version() < (4, 0):
                 bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
             else:
                 with bpy.context.temp_override(object=obj):
@@ -156,7 +156,7 @@ ALT — Duplicate mesh before applying modifiers"""
 
         bevel_weight_layer = None
 
-        if bpy.app.version < (4, 0, 0):
+        if app_minor_version() < (4, 0):
             bevel_weight_layer = bm.edges.layers.bevel_weight.verify()
         else:
             bevel_weight_layer = bm.edges.layers.float.get("bevel_weight_edge", None)

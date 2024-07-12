@@ -33,7 +33,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.collections import hide_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
+from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 
 
 class ND_OT_cycle(BaseOperator):
@@ -245,7 +245,7 @@ SHIFT — Cycle through the modifier stack"""
             for apply_obj in self.applied_utils:
                 for mod in self.target_obj.modifiers:
                     if mod.type == 'BOOLEAN' and mod.object == apply_obj:
-                        if bpy.app.version < (4, 0, 0):
+                        if app_minor_version() < (4, 0):
                             bpy.ops.object.modifier_apply({'object': self.target_obj}, modifier=mod.name)
                         else:
                             with bpy.context.temp_override(object=self.target_obj):

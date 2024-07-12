@@ -27,7 +27,7 @@
 
 import bpy
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
-from .. lib.polling import ctx_obj_mode, list_ok
+from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
 class ND_OT_triangulate(bpy.types.Operator):
@@ -64,7 +64,7 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
         for obj in valid_objects:
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
 
-            if bpy.app.version < (4, 1, 0):
+            if app_minor_version() < (4, 1):
                 triangulate.keep_custom_normals = self.preserve_normals
 
             triangulate.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'

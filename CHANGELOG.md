@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.44.1](https://github.com/hugemenace/nd/compare/v1.44.0...v1.44.1) (2024-07-12)
+
+
+### Bug Fixes
+
+* fix Blender version polling ([2768161](https://github.com/hugemenace/nd/commit/2768161bc0d210e84a569b0e46d5658395424d36))
+
 ## [1.44.0](https://github.com/hugemenace/nd/compare/v1.43.1...v1.44.0) (2024-07-12)
 
 

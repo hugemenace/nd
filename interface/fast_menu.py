@@ -143,14 +143,19 @@ class ND_MT_fast_menu(bpy.types.Menu):
             return NO_SECTION_COUNT
 
         if context.mode == 'EDIT_MESH':
-            mesh = bmesh.from_edit_mesh(target_object.data)
+            bm = bmesh.from_edit_mesh(target_object.data)
+            bm.verts.ensure_lookup_table()
+            bm.edges.ensure_lookup_table()
+            bm.faces.ensure_lookup_table()
 
-            verts_selected = len([vert for vert in mesh.verts if vert.select]) >= 1
-            edges_selected = len([edge for edge in mesh.edges if edge.select]) >= 1
+            verts_selected = len([vert for vert in bm.verts if vert.select]) >= 1
+            edges_selected = len([edge for edge in bm.edges if edge.select]) >= 1
 
-            has_verts = len(mesh.verts) >= 1
-            has_edges = len(mesh.edges) >= 1
-            has_faces = len(mesh.faces) >= 1
+            has_verts = len(bm.verts) >= 1
+            has_edges = len(bm.edges) >= 1
+            has_faces = len(bm.faces) >= 1
+
+            bm.free()
 
             made_prediction = False
 

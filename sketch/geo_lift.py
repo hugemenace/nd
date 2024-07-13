@@ -123,11 +123,16 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def has_invalid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
+        bm.edges.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
 
-        selected_vertices = len([v for v in mesh.verts if v.select])
-        selected_edges = len([e for e in mesh.edges if e.select])
-        selected_faces = len([f for f in mesh.faces if f.select])
+        selected_vertices = len([v for v in bm.verts if v.select])
+        selected_edges = len([e for e in bm.edges if e.select])
+        selected_faces = len([f for f in bm.faces if f.select])
+
+        bm.free()
 
         if self.selection_type == 0:
             return selected_vertices < 1

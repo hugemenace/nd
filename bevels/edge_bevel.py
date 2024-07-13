@@ -191,6 +191,7 @@ CTRL — Remove existing modifiers"""
                         edge[bevel_weight_layer] = 0
 
                 bmesh.update_edit_mesh(object.data)
+                bm.free()
 
             return {'FINISHED'}
 
@@ -328,6 +329,7 @@ CTRL — Remove existing modifiers"""
 
         data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
+        bm.edges.ensure_lookup_table()
 
         bevel_weight_layer = None
 
@@ -344,6 +346,8 @@ CTRL — Remove existing modifiers"""
 
             self.edge_weight_average /= len(selected_edges)
 
+        bm.free()
+
 
     def operate(self, context):
         self.bevel.width = self.width
@@ -355,6 +359,7 @@ CTRL — Remove existing modifiers"""
 
         data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
+        bm.edges.ensure_lookup_table()
 
         bevel_weight_layer = None
 
@@ -370,6 +375,7 @@ CTRL — Remove existing modifiers"""
             edge[bevel_weight_layer] = self.weight
 
         bmesh.update_edit_mesh(data)
+        bm.free()
 
         self.dirty = False
 
@@ -400,6 +406,7 @@ CTRL — Remove existing modifiers"""
 
         data = self.target_object.data
         bm = bmesh.from_edit_mesh(data)
+        bm.edges.ensure_lookup_table()
 
         bevel_weight_layer = None
 
@@ -415,6 +422,7 @@ CTRL — Remove existing modifiers"""
                     edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
 
         bmesh.update_edit_mesh(data)
+        bm.free()
 
         unregister_draw_handler()
 

@@ -233,30 +233,45 @@ CTRL — Remove existing modifiers"""
 
 
     def get_geometry_transform(self, context):
-        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
+        bm.edges.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
+
         world_matrix = context.active_object.matrix_world
 
         if self.geometry_selection_type == 0:
-            selected_vertices = len([v for v in mesh.verts if v.select])
+            selected_vertices = len([v for v in bm.verts if v.select])
             if selected_vertices == 3:
-                bpy.ops.mesh.edge_face_add()
+                bpy.ops.bm.edge_face_add()
                 context.tool_settings.mesh_select_mode = (False, False, True)
                 self.geometry_selection_type = 2
 
         if self.geometry_selection_type == 0:
-            return self.get_vertex_transform(mesh, world_matrix)
+            transform = self.get_vertex_transform(bm, world_matrix)
+            bm.free()
+            return transform
         elif self.geometry_selection_type == 1:
-            return self.get_edge_transform(mesh, world_matrix)
+            transform = self.get_edge_transform(bm, world_matrix)
+            bm.free()
+            return transform
         elif self.geometry_selection_type == 2:
-            return self.get_face_transform(mesh, world_matrix)
+            transform = self.get_face_transform(bm, world_matrix)
+            bm.free()
+            return transform
 
 
     def has_invalid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
+        bm.edges.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
 
-        selected_vertices = len([v for v in mesh.verts if v.select])
-        selected_edges = len([e for e in mesh.edges if e.select])
-        selected_faces = len([f for f in mesh.faces if f.select])
+        selected_vertices = len([v for v in bm.verts if v.select])
+        selected_edges = len([e for e in bm.edges if e.select])
+        selected_faces = len([f for f in bm.faces if f.select])
+
+        bm.free()
 
         if self.geometry_selection_type == 0:
             return selected_vertices != 1 and selected_vertices != 3

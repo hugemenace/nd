@@ -142,13 +142,14 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def prepare_view_align(self, context):
-        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
         world_matrix = context.active_object.matrix_world
 
         if self.selection_type == 0:
-            selected_vertices = len([v for v in mesh.verts if v.select])
+            selected_vertices = len([v for v in bm.verts if v.select])
             if selected_vertices == 3:
-                bpy.ops.mesh.edge_face_add()
+                bpy.ops.bm.edge_face_add()
                 context.tool_settings.mesh_select_mode = (False, False, True)
                 self.selection_type = 2
 
@@ -158,22 +159,29 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         self.set_custom_transform_orientation()
 
         if self.selection_type == 0:
-            (location, rotation) = self.get_vertex_transform(mesh, world_matrix)
+            (location, rotation) = self.get_vertex_transform(bm, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
         elif self.selection_type == 1:
-            (location, rotation) = self.get_edge_transform(mesh, world_matrix)
+            (location, rotation) = self.get_edge_transform(bm, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
         elif self.selection_type == 2:
-            (location, rotation) = self.get_face_transform(mesh, world_matrix)
+            (location, rotation) = self.get_face_transform(bm, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
+
+        bm.free()
 
 
     def has_invalid_selection(self, context):
-        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
+        bm.edges.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
 
-        selected_vertices = len([v for v in mesh.verts if v.select])
-        selected_edges = len([e for e in mesh.edges if e.select])
-        selected_faces = len([f for f in mesh.faces if f.select])
+        selected_vertices = len([v for v in bm.verts if v.select])
+        selected_edges = len([e for e in bm.edges if e.select])
+        selected_faces = len([f for f in bm.faces if f.select])
+
+        bm.free()
 
         if self.selection_type == 0:
             return selected_vertices != 1 and selected_vertices != 3
@@ -188,11 +196,16 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     def determine_selection_type(self, context):
         self.selection_type = 0
 
-        mesh = bmesh.from_edit_mesh(context.active_object.data)
+        bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
+        bm.edges.ensure_lookup_table()
+        bm.faces.ensure_lookup_table()
 
-        selected_vertices = len([v for v in mesh.verts if v.select])
-        selected_edges = len([e for e in mesh.edges if e.select])
-        selected_faces = len([f for f in mesh.faces if f.select])
+        selected_vertices = len([v for v in bm.verts if v.select])
+        selected_edges = len([e for e in bm.edges if e.select])
+        selected_faces = len([f for f in bm.faces if f.select])
+
+        bm.free()
 
         if selected_vertices >= 1 and selected_faces == 0 and selected_edges == 0:
             return

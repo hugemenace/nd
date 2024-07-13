@@ -126,11 +126,13 @@ class ND_OT_create_id_material(bpy.types.Operator):
                 active_materials = [slot.name for slot in obj.material_slots]
 
                 bm = bmesh.from_edit_mesh(obj.data)
+                bm.faces.ensure_lookup_table()
                 for face in bm.faces:
                     if face.select:
                         face.material_index = active_materials.index(self.material_name)
 
                 bmesh.update_edit_mesh(obj.data)
+                bm.free()
 
         return {'FINISHED'}
 

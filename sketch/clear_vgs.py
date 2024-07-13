@@ -50,6 +50,7 @@ class ND_OT_clear_vgs(bpy.types.Operator):
             return {'CANCELLED'}
 
         bm = bmesh.from_edit_mesh(context.active_object.data)
+        bm.verts.ensure_lookup_table()
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
         bm.free()
 

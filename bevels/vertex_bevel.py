@@ -180,7 +180,9 @@ CTRL — Remove existing modifiers"""
         previous_op = False
 
         bm = bmesh.from_edit_mesh(self.target_object.data)
+        bm.verts.ensure_lookup_table()
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
+        bm.free()
 
         self.vgroup_match = None
         for group in self.target_object.vertex_groups:

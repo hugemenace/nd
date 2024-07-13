@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.44.2](https://github.com/hugemenace/nd/compare/v1.44.1...v1.44.2) (2024-07-13)
+
+
+### Bug Fixes
+
+* ensure all bmesh instances are freed after use to prevent memory leaks ([ac0a3be](https://github.com/hugemenace/nd/commit/ac0a3be4286a783160ad1950d38d5419097e1618))
+* fix ND N-panel toggle-utils shortcut icon registration error ([28479a3](https://github.com/hugemenace/nd/commit/28479a331ae5ad21f3ca09689b2d512044425669))
+
 ### [1.44.1](https://github.com/hugemenace/nd/compare/v1.44.0...v1.44.1) (2024-07-12)
 
 

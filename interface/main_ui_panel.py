@@ -56,7 +56,7 @@ op_sections = [
     ("Scene", ops.scene_ops, "scene", [("nd.flare", None), ("nd.clean_utils", None)]),
     ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)]),
     ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None), ("nd.apply_modifiers", None)]),
-    ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils_collection", None), ("nd.toggle_clear_view", None)]),
+    ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils_collection", 'DYNAMIC'), ("nd.toggle_clear_view", None)]),
 ]
 
 

@@ -93,8 +93,11 @@ class ND_MT_fast_menu(bpy.types.Menu):
         text = "F » Make Edge/Face"
         icon = 'MOD_SIMPLIFY'
 
-        if is_addon_enabled("mesh_f2"):
-            layout.operator("mesh.f2", text=text, icon=icon)
+        if is_addon_enabled("bl_ext.blender_org.f2") or is_addon_enabled("mesh_f2"):
+            try:
+                layout.operator("mesh.f2", text=text, icon=icon)
+            except:
+                layout.operator("mesh.edge_face_add", text=text, icon=icon)
         else:
             layout.operator("mesh.edge_face_add", text=text, icon=icon)
 

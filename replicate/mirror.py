@@ -158,8 +158,9 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        target_object = get_real_active_object(context)
         if ctx_obj_mode(context):
+            target_object = get_real_active_object(context)
+
             if ctx_objects_selected(context, 1) and obj_moddable(target_object):
                 return True
 
@@ -167,7 +168,7 @@ CTRL — Remove existing modifiers"""
                 return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != target_object.name)
 
         if ctx_edit_mode(context):
-            return ctx_objects_selected(context, 1) and obj_moddable(target_object)
+            return obj_moddable(context.active_object)
 
 
     def set_selection_mode(self, context):

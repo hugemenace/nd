@@ -27,7 +27,6 @@
 
 import bpy
 import bmesh
-from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_edit_mode, obj_exists, obj_verts_selected
 
 
@@ -40,7 +39,7 @@ class ND_OT_clear_vgs(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        target_object = get_real_active_object(context)
+        target_object = context.active_object
         return ctx_edit_mode(context) and obj_exists(target_object) and obj_verts_selected(target_object)
 
 

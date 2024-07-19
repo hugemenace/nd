@@ -89,7 +89,12 @@ def obj_verts_selected(obj):
     mesh = bmesh.from_edit_mesh(obj.data)
     mesh.verts.ensure_lookup_table()
     has_verts = len([vert for vert in mesh.verts if vert.select]) > 0
-    mesh.free()
+
+    # Blender versions prior to 4.0 can only create a BMesh instance ONCE in edit mode.
+    # So if we're in a version that's 4.0 or higher, we can free the BMesh instance.
+    if app_minor_version() >= (4, 0):
+        mesh.free()
+
     return has_verts
 
 
@@ -97,7 +102,12 @@ def obj_edges_selected(obj):
     mesh = bmesh.from_edit_mesh(obj.data)
     mesh.edges.ensure_lookup_table()
     has_edges = len([edge for edge in mesh.edges if edge.select]) > 0
-    mesh.free()
+
+    # Blender versions prior to 4.0 can only create a BMesh instance ONCE in edit mode.
+    # So if we're in a version that's 4.0 or higher, we can free the BMesh instance.
+    if app_minor_version() >= (4, 0):
+        mesh.free()
+
     return has_edges
 
 

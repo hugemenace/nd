@@ -36,7 +36,7 @@ from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handle
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_multi_mode, obj_moddable, ctx_objects_selected, app_minor_version
+from .. lib.polling import ctx_obj_mode, ctx_edit_mode, obj_moddable, ctx_objects_selected, app_minor_version
 
 
 mod_displace = "Offset — ND SCR"
@@ -197,8 +197,12 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_multi_mode(context) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
+        if ctx_obj_mode(context):
+            target_object = get_real_active_object(context)
+            return obj_moddable(target_object) and ctx_objects_selected(context, 1)
+
+        if ctx_edit_mode(context):
+            return obj_moddable(context.active_object)
 
 
     def prepare_new_operator(self, context):

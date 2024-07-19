@@ -31,6 +31,7 @@ from .. __init__ import bl_info
 from .. lib.objects import is_planar, get_real_active_object
 from . ops import build_icon_lookup_table
 from .. lib.addons import is_addon_enabled
+from .. lib.polling import ctx_edit_mode
 
 
 SECTION_COUNT = 1
@@ -49,11 +50,15 @@ class ND_MT_fast_menu(bpy.types.Menu):
         objs = context.selected_objects
         target_object = get_real_active_object(context)
         has_target = target_object is not None
+        has_soft_target = context.active_object is not None
+        edit_mode = ctx_edit_mode(context)
 
         total_sections = 0
 
-        if len(objs) == 0:
+        if not edit_mode and len(objs) == 0:
             total_sections += self.draw_no_object_predictions(context)
+        elif edit_mode and has_soft_target:
+            total_sections += self.draw_single_object_predictions(context)
         elif not has_target and len(objs) > 0:
             total_sections += self.draw_no_active_target(context)
         elif has_target and len(objs) == 1:
@@ -138,55 +143,17 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        target_object = get_real_active_object(context)
-        if target_object is None:
-            return NO_SECTION_COUNT
+        target_object = context.active_object
 
         if context.mode == 'EDIT_MESH':
-            bm = bmesh.from_edit_mesh(target_object.data)
-            bm.verts.ensure_lookup_table()
-            bm.edges.ensure_lookup_table()
-            bm.faces.ensure_lookup_table()
-
-            verts_selected = len([vert for vert in bm.verts if vert.select]) >= 1
-            edges_selected = len([edge for edge in bm.edges if edge.select]) >= 1
-
-            has_verts = len(bm.verts) >= 1
-            has_edges = len(bm.edges) >= 1
-            has_faces = len(bm.faces) >= 1
-
-            bm.free()
-
-            made_prediction = False
-
-            if verts_selected:
-                layout.operator("nd.vertex_bevel", icon=icons['nd.vertex_bevel'])
-                layout.operator("nd.clear_vgs", icon=icons['nd.clear_vgs'])
-                made_prediction = True
-
-            if edges_selected:
-                layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
-                made_prediction = True
-
-            mod_names = [mod.name for mod in target_object.modifiers]
-
-            has_mod_profile_extrude = False
-            has_mod_screw = False
-
-            for name in mod_names:
-                has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
-                has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
-
-            if has_verts and not has_faces:
-                layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
-                layout.separator()
-                layout.operator("nd.mirror", icon=icons['nd.mirror'])
-
-                if not has_mod_screw and not has_mod_profile_extrude:
-                    layout.operator("nd.screw", icon=icons['nd.screw'])
-                    layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
-
-                made_prediction = True
+            layout.operator("nd.vertex_bevel", icon=icons['nd.vertex_bevel'])
+            layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
+            layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
+            layout.operator("nd.clear_vgs", icon=icons['nd.clear_vgs'])
+            layout.separator()
+            layout.operator("nd.mirror", icon=icons['nd.mirror'])
+            layout.operator("nd.screw", icon=icons['nd.screw'])
+            layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
 
             self.draw_make_edge_face_ops(context)
 

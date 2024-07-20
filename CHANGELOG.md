@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.44.3](https://github.com/hugemenace/nd/compare/v1.44.2...v1.44.3) (2024-07-20)
+
+
+### Bug Fixes
+
+* ensure that only one triangulate modifier is applied to an object when running the operator multiple times ([51f4a8d](https://github.com/hugemenace/nd/commit/51f4a8df4f3c4823bd05ced300fa32e12f6edffe))
+* ensure the triangulate modifier is placed/pinned at the end of the mod stack ([0c4afd4](https://github.com/hugemenace/nd/commit/0c4afd4f038471a6b932e970a6e890006559b871))
+* ensure the triangulate modifier is removed from boolean utility objects ([380f808](https://github.com/hugemenace/nd/commit/380f808b5040772b397fed19d450fde8f53f06c8))
+* improve F2 add-on/extension detection and subsequent Fast menu "Make Edge/Face" prediction ([2a4c2b8](https://github.com/hugemenace/nd/commit/2a4c2b8c813010891961f564fbe34b1c77392ba9))
+* improve operator polling and the edit mode predictions in the Fast menu ([3680363](https://github.com/hugemenace/nd/commit/3680363aa3be7c37a569ae4324721f8ed6528644))
+
 ### [1.44.2](https://github.com/hugemenace/nd/compare/v1.44.1...v1.44.2) (2024-07-13)
 
 

@@ -190,6 +190,10 @@ def remove_problematic_boolean_mods(object):
             remove_mods.append(mod)
             continue
 
+        if mod.name == "Triangulate — ND":
+            remove_mods.append(mod)
+            continue
+
         if mod.type == 'BEVEL' and mod.affect == 'EDGES' and mod.limit_method == 'ANGLE':
             if mod.segments > 1 or (mod.segments == 1 and mod.harden_normals):
                 remove_mods.append(mod)

@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
@@ -73,6 +73,11 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
 
             triangulate.quad_method = 'FIXED' if self.preserve_normals else 'BEAUTY'
             triangulate.min_vertices = 5 if self.only_ngons else 4
+
+            if app_minor_version() > (4, 1):
+                triangulate.use_pin_to_last = True
+
+            ensure_tail_mod_consistency(obj, force=True)
 
         return {'FINISHED'}
 

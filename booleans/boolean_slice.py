@@ -28,7 +28,7 @@
 import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
-from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode
 
@@ -98,8 +98,8 @@ ALT — Do not clean the reference object's mesh"""
         reference_obj.select_set(True)
         bpy.context.view_layer.objects.active = reference_obj
 
-        rectify_smooth_by_angle(target_obj)
-        rectify_smooth_by_angle(intersecting_obj)
+        ensure_tail_mod_consistency(target_obj)
+        ensure_tail_mod_consistency(intersecting_obj)
 
         return {'FINISHED'}
 

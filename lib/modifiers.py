@@ -144,14 +144,9 @@ def add_smooth_by_angle(object):
             return
 
         sba_mod.name = "Smooth — ND SBA"
-
         set_smoothing_angle(object, radians(float(get_preferences().default_smoothing_angle)), True)
 
-        # If the object has a WN modifier, place the smoothig mod before it.
-        for index, mod in enumerate(object.modifiers):
-            if mod.name == "Weighted Normal — ND WN":
-                bpy.ops.object.modifier_move_to_index(modifier=sba_mod.name, index=index-1)
-                break
+        ensure_tail_mod_consistency(object, force=True)
 
 
 def set_smoothing_angle(object, angle, ignore_sharpness=False):
@@ -166,13 +161,13 @@ def set_smoothing_angle(object, angle, ignore_sharpness=False):
     object.data.update()
 
 
-def rectify_smooth_by_angle(object, force=False):
+def ensure_tail_mod_consistency(object, force=False):
     # For Blender 4.1.0 and above, the smoothing and weighted normal
     # modifiers are pinned at the end of the stack by ND.
     if force == False and app_minor_version() > (4, 1):
         return
 
-    mod_order = ['Smooth by Angle', 'Smooth — ND SBA', 'Weighted Normal — ND WN']
+    mod_order = ['Smooth by Angle', 'Smooth — ND SBA', 'Weighted Normal — ND WN', 'Triangulate — ND']
     object_mods = [mod.name for mod in list(object.modifiers)]
 
     for mod_name in mod_order:

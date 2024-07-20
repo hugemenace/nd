@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_exists, obj_moddable, ctx_obj_mode, ctx_objects_selected
 
@@ -185,7 +185,7 @@ CTRL — Remove existing modifiers"""
 
         self.add_simple_deform_modifier(context)
 
-        rectify_smooth_by_angle(self.target_object)
+        ensure_tail_mod_consistency(self.target_object)
 
 
     def summon_old_operator(self, context, mods):

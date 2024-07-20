@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, set_stream, has_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_exists, obj_is_mesh, app_minor_version
 
@@ -249,7 +249,7 @@ SHIFT — Create a stacked bevel modifier"""
         self.add_smooth_shading(context)
         self.add_bevel_modifier(context)
 
-        rectify_smooth_by_angle(self.target_object)
+        ensure_tail_mod_consistency(self.target_object)
 
 
     def summon_old_operator(self, context):
@@ -321,7 +321,7 @@ SHIFT — Create a stacked bevel modifier"""
 
         if not self.summoned:
             self.add_weld_modifier(context)
-            rectify_smooth_by_angle(self.target_object)
+            ensure_tail_mod_consistency(self.target_object)
 
         unregister_draw_handler()
 

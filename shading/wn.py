@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
@@ -70,7 +70,7 @@ CTRL — Remove existing modifiers"""
             if app_minor_version() > (4, 1):
                 mod.use_pin_to_last = True
 
-            rectify_smooth_by_angle(obj, force=True)
+            ensure_tail_mod_consistency(obj, force=True)
 
         return {'FINISHED'}
 

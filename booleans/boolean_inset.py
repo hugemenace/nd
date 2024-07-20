@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
-from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode
 
@@ -154,7 +154,7 @@ class ND_OT_bool_inset(BaseOperator):
 
         bpy.ops.object.select_all(action='DESELECT')
 
-        rectify_smooth_by_angle(self.target_obj)
+        ensure_tail_mod_consistency(self.target_obj)
 
         self.operate(context)
 

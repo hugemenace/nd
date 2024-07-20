@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.polling import ctx_obj_mode, list_ok
 
 
@@ -59,7 +59,7 @@ CTRL — Remove existing modifiers"""
             weld = new_modifier(obj, 'Weld — ND SW', 'WELD', rectify=True)
             weld.merge_threshold = 0.001
 
-            rectify_smooth_by_angle(obj)
+            ensure_tail_mod_consistency(obj)
 
         return {'FINISHED'}
 

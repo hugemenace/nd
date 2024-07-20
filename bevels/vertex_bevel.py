@@ -33,7 +33,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, obj_verts_selected, app_minor_version
 
 
@@ -255,7 +255,7 @@ CTRL — Remove existing modifiers"""
         self.add_vertex_group(context)
         self.add_bevel_modifier(context)
 
-        rectify_smooth_by_angle(self.target_object)
+        ensure_tail_mod_consistency(self.target_object)
 
 
     def add_smooth_shading(self, context):
@@ -326,7 +326,7 @@ CTRL — Remove existing modifiers"""
         self.target_object.show_in_front = False
         self.add_weld_modifier(context)
 
-        rectify_smooth_by_angle(self.target_object)
+        ensure_tail_mod_consistency(self.target_object)
 
         # TODO: Find a better solution. This is a workaround for the fact that
         # the vertex group <> modifier combo's are not being detected by the recall

@@ -33,7 +33,7 @@ from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, rectify_smooth_by_angle, add_smooth_by_angle
+from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 
@@ -169,7 +169,7 @@ CTRL — Remove existing modifiers"""
         self.add_displace_modifier(context)
         self.add_solidify_modifier(context)
 
-        rectify_smooth_by_angle(self.target_object)
+        ensure_tail_mod_consistency(self.target_object)
 
 
     def summon_old_operator(self, context, mods):

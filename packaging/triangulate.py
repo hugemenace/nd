@@ -62,6 +62,9 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
             return {'FINISHED'}
 
         for obj in valid_objects:
+            if any('Triangulate — ND' in mod.name for mod in obj.modifiers):
+                continue
+
             triangulate = new_modifier(obj, 'Triangulate — ND', 'TRIANGULATE', rectify=False)
 
             if app_minor_version() < (4, 1):

@@ -51,7 +51,8 @@ SHIFT — Only triangulate ngons (5+ vertices)"""
 
 
     def invoke(self, context, event):
-        self.preserve_normals = not event.alt
+        # Ignore the event.alt key and set preserve_normals to True if the Blender version is 4.1 or higher
+        self.preserve_normals = app_minor_version() >= (4, 1) or not event.alt
         self.only_ngons = event.shift
         self.remove_mods = event.ctrl
 

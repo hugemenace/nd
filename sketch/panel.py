@@ -121,7 +121,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         self.target_obj = context.active_object
 
         create_duplicate_liftable_geometry(context, {'FACE'}, 'ND — Panel', not event.shift)
+
         self.panel_obj = context.active_object
+        self.panel_bm = None
 
         self.inset_input_stream = new_stream()
 
@@ -239,7 +241,8 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def revert(self, context):
-        self.panel_bm.free()
+        if self.panel_bm is not None:
+            self.panel_bm.free()
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.data.objects.remove(self.panel_obj, do_unlink=True)

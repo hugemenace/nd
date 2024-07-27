@@ -36,7 +36,8 @@ from .. lib.modifiers import move_mod_to_index
 class ND_OT_duplicate_utility(bpy.types.Operator):
     bl_idname = "nd.duplicate_utility"
     bl_label = "Duplicate Utility"
-    bl_description = """Duplicate the selected utility object and auto-create the associated modifier"""
+    bl_description = """Duplicate the selected utility object and the associated modifier(s)
+SHIFT — Do not duplicate intersect target objects"""
 
 
     @classmethod
@@ -46,43 +47,56 @@ class ND_OT_duplicate_utility(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        utility_object = context.active_object
+        self.ignore_intersects = event.shift
+
+        old_utility_object = context.active_object
+        bpy.ops.object.duplicate()
+        new_utility_object = context.active_object
+
+        targets = []
         all_scene_objects = [obj for obj in bpy.context.view_layer.objects if obj.type == 'MESH']
 
-        target_object = None
-        target_object_mod = None
-        target_object_mod_index = 0
-
-        for ref_obj in all_scene_objects:
-            if ref_obj == utility_object:
+        # Get all objects with boolean modifiers that reference the utility object
+        for obj in all_scene_objects:
+            if obj == old_utility_object:
                 continue
 
-            ref_mods = list(ref_obj.modifiers)
-            for index, ref_mod in enumerate(ref_mods):
-                if ref_mod.type == 'BOOLEAN' and ref_mod.object == utility_object:
-                    target_object = ref_obj
-                    target_object_mod = ref_mod
-                    target_object_mod_index = index
-                    break
+            obj_mods = list(obj.modifiers)
+            applicable_mods = []
+            for index, mod in enumerate(obj_mods):
+                if mod.type == 'BOOLEAN' and mod.object == old_utility_object:
+                    applicable_mods.append((mod, index))
 
-        if target_object_mod is None:
-            self.report({'ERROR'}, "This utility object has no associated boolean modifier")
-            return {'CANCELLED'}
+            if len(applicable_mods) > 0:
+                targets.append((obj, applicable_mods))
 
-        new_mod = target_object.modifiers.new(target_object_mod.name, 'BOOLEAN')
-        target_object_mod_props = inspect.getmembers(target_object_mod, lambda a: not(inspect.isroutine(a)))
-        for prop in target_object_mod_props:
-            try:
-                setattr(new_mod, prop[0], prop[1])
-            except:
-                pass
+        for obj, applicable_mods in targets:
+            for old_mod, old_mod_index in applicable_mods:
+                if not self.ignore_intersects and old_mod.operation == 'INTERSECT':
+                    bpy.ops.object.select_all(action='DESELECT')
+                    obj.select_set(True)
+                    context.view_layer.objects.active = obj
+                    bpy.ops.object.duplicate()
+                    obj = context.active_object
 
-        move_mod_to_index(target_object, new_mod.name, target_object_mod_index+1)
+                new_mod = obj.modifiers.new(old_mod.name, 'BOOLEAN')
+                old_mod_props = inspect.getmembers(old_mod, lambda a: not(inspect.isroutine(a)))
+                for prop in old_mod_props:
+                    try:
+                        setattr(new_mod, prop[0], prop[1])
+                    except:
+                        pass
 
-        bpy.ops.object.duplicate_move('INVOKE_DEFAULT')
-        utility_object = context.active_object
+                new_mod.object = new_utility_object
+                move_mod_to_index(obj, new_mod.name, old_mod_index+1)
 
-        target_object.modifiers[new_mod.name].object = utility_object
+                if not self.ignore_intersects and old_mod.operation == 'INTERSECT':
+                    bpy.ops.object.modifier_remove(modifier=old_mod.name)
+
+        bpy.ops.object.select_all(action='DESELECT')
+        new_utility_object.select_set(True)
+        context.view_layer.objects.active = new_utility_object
+        bpy.ops.transform.translate('INVOKE_DEFAULT')
 
         return {'FINISHED'}
 

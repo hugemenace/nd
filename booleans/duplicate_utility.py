@@ -72,6 +72,8 @@ SHIFT — Do not duplicate intersect target objects"""
 
         for obj, applicable_mods in targets:
             for old_mod, old_mod_index in applicable_mods:
+                # If the intersect target is not being ignored, duplicate the intersect target object
+                # and set it as the new object for the boolean modifier.
                 if not self.ignore_intersects and old_mod.operation == 'INTERSECT':
                     bpy.ops.object.select_all(action='DESELECT')
                     obj.select_set(True)
@@ -79,6 +81,7 @@ SHIFT — Do not duplicate intersect target objects"""
                     bpy.ops.object.duplicate()
                     obj = context.active_object
 
+                # Create a new boolean modifier with the same properties as the old one.
                 new_mod = obj.modifiers.new(old_mod.name, 'BOOLEAN')
                 old_mod_props = inspect.getmembers(old_mod, lambda a: not(inspect.isroutine(a)))
                 for prop in old_mod_props:

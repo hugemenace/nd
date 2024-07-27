@@ -69,6 +69,7 @@ extrusion_ops = [
     ("nd.solidify", 'MOD_SOLIDIFY', None, None, False),
     ("nd.screw", 'MOD_SCREW', None, None, False),
     ("nd.profile_extrude", 'EMPTY_SINGLE_ARROW', None, None, False),
+    ("nd.pipe_extrude", 'ANIM', None, None, False),
 ]
 
 replicate_ops = [

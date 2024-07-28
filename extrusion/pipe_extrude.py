@@ -131,7 +131,7 @@ class ND_OT_pipe_extrude(BaseOperator):
 
         self.extrusion_diameter_input_stream = new_stream()
         self.segments_input_stream = new_stream()
-        self.edit_mode = context.mode == 'EDIT_MESH'
+        self.edit_mode = ctx_edit_mode(context)
 
         self.target_object = context.active_object
 
@@ -143,6 +143,9 @@ class ND_OT_pipe_extrude(BaseOperator):
             self.summon_old_operator(context, mods)
         else:
             self.prepare_new_operator(context)
+
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='OBJECT')
 
         self.operate(context)
 
@@ -269,10 +272,16 @@ class ND_OT_pipe_extrude(BaseOperator):
 
 
     def finish(self, context):
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='EDIT')
+
         unregister_draw_handler()
 
 
     def revert(self, context):
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='EDIT')
+
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
             bpy.ops.object.modifier_remove(modifier=self.skin.name)

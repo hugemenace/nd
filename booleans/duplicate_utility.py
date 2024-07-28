@@ -37,7 +37,8 @@ class ND_OT_duplicate_utility(bpy.types.Operator):
     bl_idname = "nd.duplicate_utility"
     bl_label = "Duplicate Utility"
     bl_description = """Duplicate the selected utility object and the associated modifier(s)
-SHIFT — Do not duplicate intersect target objects"""
+SHIFT — Do not duplicate intersect target objects
+ALT — Create a linked duplicate"""
 
 
     @classmethod
@@ -48,9 +49,15 @@ SHIFT — Do not duplicate intersect target objects"""
 
     def invoke(self, context, event):
         self.ignore_intersects = event.shift
+        self.linked_duplicate = event.alt
 
         old_utility_object = context.active_object
-        bpy.ops.object.duplicate()
+
+        if self.linked_duplicate:
+            bpy.ops.object.duplicate_move_linked()
+        else:
+            bpy.ops.object.duplicate()
+
         new_utility_object = context.active_object
 
         targets = []

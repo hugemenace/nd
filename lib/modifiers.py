@@ -49,6 +49,14 @@ def new_modifier(object, mod_name, mod_type, rectify=True):
     return mod
 
 
+def move_mod_to_index(object, mod_name, index):
+    if app_minor_version() < (4, 0):
+        bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=index)
+    else:
+        with bpy.context.temp_override(object=object):
+            bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=index)
+
+
 def rectify_mod_order(object, mod_name):
     mods = list(object.modifiers)
 
@@ -81,11 +89,7 @@ def rectify_mod_order(object, mod_name):
     if matching_mod_index is None:
         return
 
-    if app_minor_version() < (4, 0):
-        bpy.ops.object.modifier_move_to_index({'object': object}, modifier=mod_name, index=matching_mod_index)
-    else:
-        with bpy.context.temp_override(object=object):
-            bpy.ops.object.modifier_move_to_index(modifier=mod_name, index=matching_mod_index)
+    move_mod_to_index(object, mod_name, matching_mod_index)
 
 
 def get_sba_mod(object):

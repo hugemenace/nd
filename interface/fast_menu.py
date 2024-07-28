@@ -275,6 +275,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.separator()
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
             layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
+            layout.operator("nd.duplicate_utility", icon=icons['nd.duplicate_utility'])
 
             return SECTION_COUNT
 

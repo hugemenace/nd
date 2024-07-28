@@ -31,6 +31,7 @@ from . import boolean_slice
 from . import hydrate
 from . import swap_solver
 from . import boolean_inset
+from . import duplicate_utility
 
 
 registerables = (
@@ -39,6 +40,7 @@ registerables = (
     hydrate,
     swap_solver,
     boolean_inset,
+    duplicate_utility,
 )
 
 

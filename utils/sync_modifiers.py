@@ -112,7 +112,8 @@ class ND_OT_sync_modifiers(bpy.types.Operator):
     bl_idname = "nd.sync_modifiers"
     bl_label = "Sync Modifiers"
     bl_description = """Sync modifier settings from the active object to the selected objects
-SHIFT — Clone the active object's modifiers"""
+SHIFT — Clone the active object's modifiers
+CTRL — Remove all drivers (retaining values)"""
 
 
     def get_valid_objects(self, context, target_object_type):
@@ -131,7 +132,7 @@ SHIFT — Clone the active object's modifiers"""
         target_object_type = target_object.type
         valid_objects = cls.get_valid_objects(cls, context, target_object_type)
 
-        return ctx_obj_mode(context) and list_gt(valid_objects, 1)
+        return ctx_obj_mode(context) and list_gt(valid_objects, 0)
 
 
     def invoke(self, context, event):
@@ -145,6 +146,24 @@ SHIFT — Clone the active object's modifiers"""
         self.copy_objects = [obj for obj in valid_objects if obj != self.master_object]
 
         self.clone = event.shift
+        self.clear_drivers = event.ctrl
+
+        if not self.clear_drivers and len(valid_objects) == 1:
+            self.report({'ERROR_INVALID_INPUT'}, "At least two objects need to be selected in order to sync modifiers.")
+            return {'CANCELLED'}
+
+        if self.clear_drivers:
+            for obj in valid_objects:
+                for mod in obj.modifiers:
+                    mod_props = inspect.getmembers(mod, lambda a: not(inspect.isroutine(a)))
+                    mod_props = [prop for prop in mod_props if not(prop[0] in property_ignore_list)]
+
+                    for prop in mod_props:
+                        mod.driver_remove(prop[0])
+
+                obj.data.update()
+
+            return {'FINISHED'}
 
         if self.clone:
             for obj in self.copy_objects:

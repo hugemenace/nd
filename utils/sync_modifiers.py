@@ -165,6 +165,14 @@ CTRL — Remove all drivers (retaining values)"""
                         except:
                             pass
 
+                    if mod.type == 'NODES':
+                        key_table = self.build_gn_key_table(mod)
+                        for key in key_table:
+                            try:
+                                mod.driver_remove(f'["{key}"]')
+                            except:
+                                pass
+
                 obj.data.update()
 
             return {'FINISHED'}
@@ -205,22 +213,28 @@ CTRL — Remove all drivers (retaining values)"""
         return {'FINISHED'}
 
 
-    def sync_node_group(self, master_modifier, mod):
-        mod.node_group = master_modifier.node_group
-        mod.show_group_selector = master_modifier.show_group_selector
-
+    def build_gn_key_table(self, mod):
         # Build a dictionary of all the properties and their optional attributes to more
         # effectively sync them as drivers cannot be added to properties with use_attribute set.
-        keys = list(master_modifier.keys())
+        keys = list(mod.keys())
         key_table = dict()
         for key in keys:
             if not key.endswith("_use_attribute") and not key.endswith("_attribute_name"):
                 key_table[key] = {}
-                key_table[key]["value"] = master_modifier[key]
+                key_table[key]["value"] = mod[key]
             if key.endswith("_use_attribute"):
-                key_table[key[:-14]]["_use_attribute"] = master_modifier[key]
+                key_table[key[:-14]]["_use_attribute"] = mod[key]
             if key.endswith("_attribute_name"):
-                key_table[key[:-15]]["_attribute_name"] = master_modifier[key]
+                key_table[key[:-15]]["_attribute_name"] = mod[key]
+
+        return key_table
+
+
+    def sync_node_group(self, master_modifier, mod):
+        mod.node_group = master_modifier.node_group
+        mod.show_group_selector = master_modifier.show_group_selector
+
+        key_table = self.build_gn_key_table(master_modifier)
 
         for key in key_table:
             mod[key] = key_table[key]["value"]

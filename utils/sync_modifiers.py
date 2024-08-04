@@ -55,6 +55,11 @@ hard_ignore_list = {
     'type',
 }
 
+object_ignore_list = {
+    'object',
+    'offset_object',
+}
+
 property_ignore_list = {
     'armature',
     'auxiliary_target',
@@ -84,8 +89,6 @@ property_ignore_list = {
     'object_from',
     'object_path',
     'object_to',
-    'object',
-    'offset_object',
     'origin',
     'projectors',
     'read_velocity',
@@ -116,7 +119,8 @@ class ND_OT_sync_modifiers(bpy.types.Operator):
     bl_label = "Sync Modifiers"
     bl_description = """Sync modifier settings from the active object to the selected objects
 SHIFT — Clone the active object's modifiers
-CTRL — Remove all drivers (retaining values)"""
+CTRL — Remove all drivers (retaining values)
+ALT — Override util references on all sync'd objects"""
 
 
     def get_valid_objects(self, context, target_object_type):
@@ -150,6 +154,7 @@ CTRL — Remove all drivers (retaining values)"""
 
         self.clone = event.shift
         self.clear_drivers = event.ctrl
+        self.override_utils = event.alt
 
         if not self.clear_drivers and len(valid_objects) == 1:
             self.report({'ERROR_INVALID_INPUT'}, "At least two objects need to be selected in order to sync modifiers.")
@@ -255,7 +260,9 @@ CTRL — Remove all drivers (retaining values)"""
 
         for prop in mod_props:
             try:
-                setattr(mod, prop[0], prop[1])
+                obj_key = prop[0] in object_ignore_list
+                if not obj_key or (obj_key and self.override_utils):
+                    setattr(mod, prop[0], prop[1])
             except:
                 pass
 

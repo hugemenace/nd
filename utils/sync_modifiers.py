@@ -28,39 +28,50 @@
 import bpy
 import inspect
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_obj_mode, obj_exists, list_gt
+from .. lib.polling import ctx_obj_mode, obj_exists, list_gt, app_minor_version
 
 
-property_ignore_list = {
+hard_ignore_list = {
     '__doc__',
     '__module__',
     '__slotnames__',
     '__slots__',
-    'armature',
-    'auxiliary_target',
     'bl_rna',
-    'bone_from',
-    'bone_to',
-    'cache_file',
-    'collection',
-    'curve',
     'custom_profile',
-    'debug_options',
-    'delimit',
-    'driver',
-    'end_cap',
     'execution_time',
-    'face_count',
-    'falloff_curve',
-    'filepath',
-    'grid_name',
-    'has_velocity',
     'is_active',
     'is_bind',
     'is_bound',
     'is_cached',
     'is_external',
     'is_override_data',
+    'persistent_uid',
+    'rna_type',
+    'show_expanded',
+    'show_in_editmode',
+    'show_on_cage',
+    'show_render',
+    'show_viewport',
+    'type',
+}
+
+property_ignore_list = {
+    'armature',
+    'auxiliary_target',
+    'bone_from',
+    'bone_to',
+    'cache_file',
+    'collection',
+    'curve',
+    'debug_options',
+    'delimit',
+    'driver',
+    'end_cap',
+    'face_count',
+    'falloff_curve',
+    'filepath',
+    'grid_name',
+    'has_velocity',
     'map_curve',
     'mask_tex_map_bone',
     'mask_tex_map_object',
@@ -76,17 +87,10 @@ property_ignore_list = {
     'object',
     'offset_object',
     'origin',
-    'persistent_uid',
     'projectors',
     'read_velocity',
     'rim_vertex_group',
-    'rna_type',
     'shell_vertex_group',
-    'show_expanded',
-    'show_in_editmode',
-    'show_on_cage',
-    'show_render',
-    'show_viewport',
     'start_cap',
     'start_position_object',
     'subtarget',
@@ -95,7 +99,6 @@ property_ignore_list = {
     'texture_coords_object',
     'texture',
     'total_levels',
-    'type',
     'use_bone_envelopes',
     'use_vertex_groups',
     'uv_layer',
@@ -156,10 +159,11 @@ CTRL — Remove all drivers (retaining values)"""
             for obj in valid_objects:
                 for mod in obj.modifiers:
                     mod_props = inspect.getmembers(mod, lambda a: not(inspect.isroutine(a)))
-                    mod_props = [prop for prop in mod_props if not(prop[0] in property_ignore_list)]
-
                     for prop in mod_props:
-                        mod.driver_remove(prop[0])
+                        try:
+                            mod.driver_remove(prop[0])
+                        except:
+                            pass
 
                 obj.data.update()
 
@@ -169,15 +173,15 @@ CTRL — Remove all drivers (retaining values)"""
             for obj in self.copy_objects:
                 obj.modifiers.clear()
 
+        pinned_mods = []
         for master_modifier in self.master_object.modifiers:
             for obj in self.copy_objects:
-                if master_modifier.type == 'NODES':
-                    continue
-
                 mod = None
+                new_mod = False
 
                 if self.clone:
                     mod = obj.modifiers.new(master_modifier.name, master_modifier.type)
+                    new_mod = True
                 else:
                     mod = obj.modifiers.get(master_modifier.name)
 
@@ -187,21 +191,83 @@ CTRL — Remove all drivers (retaining values)"""
                 if mod.type != master_modifier.type:
                     continue
 
-                mod_props = inspect.getmembers(master_modifier, lambda a: not(inspect.isroutine(a)))
-                mod_props = [prop for prop in mod_props if not(prop[0] in property_ignore_list)]
+                if master_modifier.type == 'NODES':
+                    self.sync_node_group(master_modifier, mod)
+                else:
+                    self.sync_vanilla_mod(master_modifier, mod)
 
-                for prop in mod_props:
-                    self.create_driver(master_modifier, mod, prop[0])
+                if new_mod and app_minor_version() >= (4, 2) and master_modifier.use_pin_to_last:
+                    pinned_mods.append(mod)
+
+        for mod in pinned_mods:
+            mod.use_pin_to_last = True
 
         return {'FINISHED'}
 
 
-    def create_driver(self, master_mod, copy_mod, prop):
+    def sync_node_group(self, master_modifier, mod):
+        mod.node_group = master_modifier.node_group
+        mod.show_group_selector = master_modifier.show_group_selector
+
+        # Build a dictionary of all the properties and their optional attributes to more
+        # effectively sync them as drivers cannot be added to properties with use_attribute set.
+        keys = list(master_modifier.keys())
+        key_table = dict()
+        for key in keys:
+            if not key.endswith("_use_attribute") and not key.endswith("_attribute_name"):
+                key_table[key] = {}
+                key_table[key]["value"] = master_modifier[key]
+            if key.endswith("_use_attribute"):
+                key_table[key[:-14]]["_use_attribute"] = master_modifier[key]
+            if key.endswith("_attribute_name"):
+                key_table[key[:-15]]["_attribute_name"] = master_modifier[key]
+
+        for key in key_table:
+            mod[key] = key_table[key]["value"]
+
+            if "_use_attribute" in key_table[key]:
+                use_attribute = key_table[key]["_use_attribute"]
+                mod[key + "_use_attribute"] = use_attribute
+                if not use_attribute:
+                    self.create_gnmod_driver(master_modifier, mod, key)
+
+            if "_attribute_name" in key_table[key]:
+                mod[key + "_attribute_name"] = key_table[key]["_attribute_name"]
+
+
+    def sync_vanilla_mod(self, master_modifier, mod):
+        mod_props = inspect.getmembers(master_modifier, lambda a: not(inspect.isroutine(a)))
+        mod_props = [prop for prop in mod_props if not(prop[0] in hard_ignore_list)]
+
+        for prop in mod_props:
+            try:
+                setattr(mod, prop[0], prop[1])
+            except:
+                pass
+
+            if not prop[0] in property_ignore_list:
+                self.create_vmod_driver(master_modifier, mod, prop[0])
+
+
+    def create_vmod_driver(self, master_mod, copy_mod, prop):
         try:
             driver = copy_mod.driver_add(prop)
             var = driver.driver.variables.new()
             var.name = prop
             var.targets[0].data_path = f'modifiers["{master_mod.name}"].{prop}'
+            var.targets[0].id_type = 'OBJECT'
+            var.targets[0].id = self.master_object
+            driver.driver.expression = prop
+        except:
+            pass
+
+
+    def create_gnmod_driver(self, master_mod, copy_mod, prop):
+        try:
+            driver = copy_mod.driver_add(f'["{prop}"]')
+            var = driver.driver.variables.new()
+            var.name = prop
+            var.targets[0].data_path = f'modifiers["{master_mod.name}"]["{prop}"]'
             var.targets[0].id_type = 'OBJECT'
             var.targets[0].id = self.master_object
             driver.driver.expression = prop

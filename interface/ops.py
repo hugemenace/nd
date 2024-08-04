@@ -56,7 +56,7 @@ boolean_ops = [
     None, # Separator
     ("nd.hydrate", 'SHADING_RENDERED', None, None, False),
     ("nd.swap_solver", 'CON_OBJECTSOLVER', None, None, False),
-    ("nd.duplicate_utility", 'CON_SIZELIKE', None, None, True),
+    ("nd.duplicate_utility", 'CON_SIZELIKE', None, None, False),
 ]
 
 bevel_ops = [

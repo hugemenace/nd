@@ -47,7 +47,8 @@ mod_summon_list = [mod_skin, mod_bevel, mod_weld]
 class ND_OT_pipe_extrude(BaseOperator):
     bl_idname = "nd.pipe_extrude"
     bl_label = "Pipe Extrude"
-    bl_description = """Extrudes a pipe along the selected edge."""
+    bl_description = """Extrudes a pipe along the selected edge.
+CTRL — Remove existing modifiers"""
 
 
     def do_modal(self, context, event):

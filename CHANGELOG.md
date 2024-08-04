@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.45.0](https://github.com/hugemenace/nd/compare/v1.44.3...v1.45.0) (2024-08-04)
+
+
+### Features
+
+* add duplicate utility operator and corresponding fast menu integration ([61db54a](https://github.com/hugemenace/nd/commit/61db54a7b1fd858fc30cbff35bb174e709a72d6b))
+* add pipe extrude operator and corresponding fast menu integration ([89fec66](https://github.com/hugemenace/nd/commit/89fec66eeb6b695c7c5f8b8baf2547e490fdcebf))
+* add the option to clear/remove drivers (and retain existing values) to the sync modifiers operator ([1b72557](https://github.com/hugemenace/nd/commit/1b725574f34d0d2028c0e61434eadb59843ff977))
+* improve sync modifiers attribute detection and add support for geometry nodes ([13a635b](https://github.com/hugemenace/nd/commit/13a635bf2122bed9014ed57132670375a700f52f))
+* mark sync modifiers as a standard feature (previously experimental) ([7ee5924](https://github.com/hugemenace/nd/commit/7ee59244733f1e079cdffb34b84663f5b030d054))
+* retain original object and offset_object utils when syncing modifiers and add an option to override (ALT) if required ([789428a](https://github.com/hugemenace/nd/commit/789428aa39f90430472caa27a0913846ae6bb42c))
+
+
+### Bug Fixes
+
+* fix maximum recursion depth exceeded error when smart duplicating an object with cylic utils ([190c79a](https://github.com/hugemenace/nd/commit/190c79a7218158c0bc50705b87592434cd0f73e4))
+* fix the error that occurs when cancelling a panel operation on the first step (selecting geometry) ([0fe30a7](https://github.com/hugemenace/nd/commit/0fe30a71b80126214cc93372f58e12cc0b1c03f3))
+
 ### [1.44.3](https://github.com/hugemenace/nd/compare/v1.44.2...v1.44.3) (2024-07-20)
 
 

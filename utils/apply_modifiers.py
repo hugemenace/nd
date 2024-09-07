@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
+from .. lib.objects import safe_bm_free
 
 
 class ND_OT_apply_modifiers(bpy.types.Operator):
@@ -167,7 +168,7 @@ ALT — Duplicate mesh before applying modifiers"""
                 edge[bevel_weight_layer] = 0
 
         bm.to_mesh(obj.data)
-        bm.free()
+        safe_bm_free(bm)
 
 
 def register():

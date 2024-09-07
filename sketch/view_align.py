@@ -33,7 +33,7 @@ from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_r
 from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
+from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object, safe_bm_free
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
 
 
@@ -168,7 +168,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             (location, rotation) = self.get_face_transform(bm, world_matrix)
             set_3d_cursor(location, rotation.to_quaternion())
 
-        bm.free()
+        safe_bm_free(bm)
 
 
     def has_invalid_selection(self, context):
@@ -181,7 +181,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         selected_edges = len([e for e in bm.edges if e.select])
         selected_faces = len([f for f in bm.faces if f.select])
 
-        bm.free()
+        safe_bm_free(bm)
 
         if self.selection_type == 0:
             return selected_vertices != 1 and selected_vertices != 3
@@ -205,7 +205,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         selected_edges = len([e for e in bm.edges if e.select])
         selected_faces = len([f for f in bm.faces if f.select])
 
-        bm.free()
+        safe_bm_free(bm)
 
         if selected_vertices >= 1 and selected_faces == 0 and selected_edges == 0:
             return

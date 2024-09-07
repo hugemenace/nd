@@ -35,6 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.polling import ctx_edit_mode, obj_edges_selected, obj_is_mesh, app_minor_version
+from .. lib.objects import safe_bm_free
 
 
 mod_bevel = "Bevel — ND EB"
@@ -190,7 +191,7 @@ CTRL — Remove existing modifiers"""
                         edge[bevel_weight_layer] = 0
 
                 bmesh.update_edit_mesh(object.data)
-                bm.free()
+                safe_bm_free(bm)
 
             return {'FINISHED'}
 
@@ -345,7 +346,7 @@ CTRL — Remove existing modifiers"""
 
             self.edge_weight_average /= len(selected_edges)
 
-        bm.free()
+        safe_bm_free(bm)
 
 
     def operate(self, context):
@@ -374,7 +375,7 @@ CTRL — Remove existing modifiers"""
             edge[bevel_weight_layer] = self.weight
 
         bmesh.update_edit_mesh(data)
-        bm.free()
+        safe_bm_free(bm)
 
         self.dirty = False
 
@@ -421,7 +422,7 @@ CTRL — Remove existing modifiers"""
                     edge[bevel_weight_layer] = self.edges_snapshot[edge.index]
 
         bmesh.update_edit_mesh(data)
-        bm.free()
+        safe_bm_free(bm)
 
         unregister_draw_handler()
 

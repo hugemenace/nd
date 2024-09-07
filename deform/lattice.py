@@ -35,7 +35,7 @@ from .. lib.collections import move_to_utils_collection, isolate_in_utils_collec
 from .. lib.math import generate_bounding_box, v3_average
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
-from .. lib.objects import get_real_active_object
+from .. lib.objects import get_real_active_object, safe_bm_free
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 
 
@@ -277,7 +277,7 @@ CTRL — Remove existing modifiers"""
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
         bm.to_mesh(context.active_object.data)
-        bm.free()
+        safe_bm_free(bm)
 
         eval_obj = context.active_object
 

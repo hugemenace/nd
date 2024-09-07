@@ -30,6 +30,7 @@ import bmesh
 import numpy
 from random import choice
 from .. lib.polling import ctx_edit_mode, ctx_multi_mode, list_ok
+from .. lib.objects import safe_bm_free
 
 
 # Distinct color names and RGB values from:
@@ -132,7 +133,7 @@ class ND_OT_create_id_material(bpy.types.Operator):
                         face.material_index = active_materials.index(self.material_name)
 
                 bmesh.update_edit_mesh(obj.data)
-                bm.free()
+                safe_bm_free(bm)
 
         return {'FINISHED'}
 

@@ -35,6 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, obj_verts_selected, app_minor_version
+from .. lib.objects import safe_bm_free
 
 
 mod_bevel = "Bevel — ND VB"
@@ -181,7 +182,7 @@ CTRL — Remove existing modifiers"""
         bm = bmesh.from_edit_mesh(self.target_object.data)
         bm.verts.ensure_lookup_table()
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
-        bm.free()
+        safe_bm_free(bm)
 
         self.vgroup_match = None
         for group in self.target_object.vertex_groups:

@@ -28,7 +28,7 @@
 import bpy
 import bmesh
 from .. __init__ import bl_info
-from .. lib.objects import is_planar, get_real_active_object
+from .. lib.objects import is_planar, get_real_active_object, safe_bm_free
 from . ops import build_icon_lookup_table
 from .. lib.addons import is_addon_enabled
 from .. lib.polling import ctx_edit_mode
@@ -201,7 +201,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         self.manifold = all([len(edge.link_faces) == 2 for edge in self.edges])
         self.has_loose_edges = any([len(edge.link_faces) == 0 for edge in self.edges])
 
-        bm.free()
+        safe_bm_free(bm)
 
         mod_names = [mod.name for mod in target_object.modifiers]
 

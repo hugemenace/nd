@@ -36,7 +36,7 @@ from .. lib.viewport import set_3d_cursor
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
-from .. lib.objects import get_real_active_object
+from .. lib.objects import get_real_active_object, safe_bm_free
 from .. lib.polling import obj_moddable, obj_is_curve, obj_exists, ctx_edit_mode, ctx_obj_mode, ctx_objects_selected, ctx_min_objects_selected, app_minor_version
 
 
@@ -196,7 +196,7 @@ CTRL — Remove existing modifiers"""
         bm = bmesh.new()
         bm.from_mesh(object_eval.data)
         bm.to_mesh(self.evaluated_geometry.data)
-        bm.free()
+        safe_bm_free(bm)
 
         mode = ['VERT', 'EDGE', 'FACE'][self.geometry_selection_type]
         bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode={mode})
@@ -250,15 +250,15 @@ CTRL — Remove existing modifiers"""
 
         if self.geometry_selection_type == 0:
             transform = self.get_vertex_transform(bm, world_matrix)
-            bm.free()
+            safe_bm_free(bm)
             return transform
         elif self.geometry_selection_type == 1:
             transform = self.get_edge_transform(bm, world_matrix)
-            bm.free()
+            safe_bm_free(bm)
             return transform
         elif self.geometry_selection_type == 2:
             transform = self.get_face_transform(bm, world_matrix)
-            bm.free()
+            safe_bm_free(bm)
             return transform
 
 
@@ -272,7 +272,7 @@ CTRL — Remove existing modifiers"""
         selected_edges = len([e for e in bm.edges if e.select])
         selected_faces = len([f for f in bm.faces if f.select])
 
-        bm.free()
+        safe_bm_free(bm)
 
         if self.geometry_selection_type == 0:
             return selected_vertices != 1 and selected_vertices != 3

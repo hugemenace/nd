@@ -33,6 +33,16 @@ from . preferences import get_preferences
 from . polling import app_minor_version
 
 
+def safe_bm_free(bm):
+    if bm is None:
+        return
+
+    try:
+        bm.free()
+    except:
+        pass
+
+
 def add_single_vertex_object(cls, context, name):
     mesh = bpy.data.meshes.new("ND — " + name)
     obj = bpy.data.objects.new("ND — " + name, mesh)
@@ -42,7 +52,7 @@ def add_single_vertex_object(cls, context, name):
     bm = bmesh.new()
     bm.verts.new()
     bm.to_mesh(mesh)
-    bm.free()
+    safe_bm_free(bm)
 
     obj.select_set(True)
 
@@ -123,7 +133,7 @@ def create_duplicate_liftable_geometry(context, mode, object_name, ignore_comple
             edge[bevel_weight_layer] = 0
 
     bm.to_mesh(context.active_object.data)
-    bm.free()
+    safe_bm_free(bm)
 
     bpy.ops.object.mode_set_with_submode(mode='EDIT', mesh_select_mode=mode)
     bpy.ops.mesh.select_all(action='DESELECT')

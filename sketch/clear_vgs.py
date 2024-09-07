@@ -28,6 +28,7 @@
 import bpy
 import bmesh
 from .. lib.polling import ctx_edit_mode, obj_exists, obj_verts_selected
+from .. lib.objects import safe_bm_free
 
 
 class ND_OT_clear_vgs(bpy.types.Operator):
@@ -51,7 +52,7 @@ class ND_OT_clear_vgs(bpy.types.Operator):
         bm = bmesh.from_edit_mesh(context.active_object.data)
         bm.verts.ensure_lookup_table()
         selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
-        bm.free()
+        safe_bm_free(bm)
 
         bpy.ops.object.mode_set(mode='OBJECT')
 

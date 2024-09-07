@@ -35,7 +35,7 @@ from .. lib.viewport import set_3d_cursor
 from .. lib.preferences import get_preferences
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
-from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
+from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object, safe_bm_free
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
 
 
@@ -222,13 +222,11 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
         selected_faces = len([f for f in bm.faces if f.select])
 
-        bm.free()
-
         return selected_faces > 0
 
 
     def finish(self, context):
-        self.panel_bm.free()
+        safe_bm_free(self.panel_bm)
 
         bpy.ops.object.mode_set(mode='OBJECT')
         self.panel_obj.show_in_front = False
@@ -241,8 +239,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def revert(self, context):
-        if self.panel_bm is not None:
-            self.panel_bm.free()
+        safe_bm_free(self.panel_bm)
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.data.objects.remove(self.panel_obj, do_unlink=True)

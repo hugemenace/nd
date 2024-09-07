@@ -32,7 +32,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.viewport import set_3d_cursor
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
+from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object, safe_bm_free
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
 
 
@@ -132,7 +132,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         selected_edges = len([e for e in bm.edges if e.select])
         selected_faces = len([f for f in bm.faces if f.select])
 
-        bm.free()
+        safe_bm_free(bm)
 
         if self.selection_type == 0:
             return selected_vertices < 1

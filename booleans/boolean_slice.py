@@ -71,11 +71,13 @@ ALT — Do not clean the reference object's mesh"""
         boolean_diff.operation = 'DIFFERENCE'
         boolean_diff.object = reference_obj
         boolean_diff.solver = solver
+        boolean_diff.material_mode = 'TRANSFER'
 
         boolean_isect = new_modifier(intersecting_obj, "Intersection — ND Bool", 'BOOLEAN', rectify=True)
         boolean_isect.operation = 'INTERSECT'
         boolean_isect.object = reference_obj
         boolean_isect.solver = solver
+        boolean_isect.material_mode = 'TRANSFER'
 
         set_object_util_visibility(reference_obj, hidden=True)
         reference_obj.name = " — ".join(['Bool', reference_obj.name])

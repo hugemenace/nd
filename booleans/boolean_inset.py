@@ -116,6 +116,7 @@ class ND_OT_bool_inset(BaseOperator):
         self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
         self.boolean_diff.object = self.intersecting_obj
         self.boolean_diff.solver = solver
+        self.boolean_diff.material_mode = 'TRANSFER'
 
         self.solidify = new_modifier(self.intersecting_obj, "Thickness — ND Bool", 'SOLIDIFY', rectify=False)
         self.solidify.use_even_offset = True
@@ -125,6 +126,7 @@ class ND_OT_bool_inset(BaseOperator):
         self.boolean_isect.operation = 'INTERSECT'
         self.boolean_isect.object = self.reference_obj
         self.boolean_isect.solver = solver
+        self.boolean_isect.material_mode = 'TRANSFER'
         self.boolean_isect.show_expanded = False
 
         self.reference_obj_name_prev = self.reference_obj.name

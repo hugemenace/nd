@@ -27,7 +27,6 @@
 
 import bpy
 import bmesh
-from . objects import safe_bm_free
 
 
 def obj_exists(obj):
@@ -94,7 +93,7 @@ def obj_verts_selected(obj):
     # Blender versions prior to 4.0 can only create a BMesh instance ONCE in edit mode.
     # So if we're in a version that's 4.0 or higher, we can free the BMesh instance.
     if app_minor_version() >= (4, 0):
-        safe_bm_free(mesh)
+        mesh.free()
 
     return has_verts
 
@@ -107,7 +106,7 @@ def obj_edges_selected(obj):
     # Blender versions prior to 4.0 can only create a BMesh instance ONCE in edit mode.
     # So if we're in a version that's 4.0 or higher, we can free the BMesh instance.
     if app_minor_version() >= (4, 0):
-        safe_bm_free(mesh)
+        mesh.free()
 
     return has_edges
 

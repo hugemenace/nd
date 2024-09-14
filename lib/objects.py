@@ -192,3 +192,14 @@ def get_real_active_object(context):
         return None
 
     return active
+
+
+def set_object_util_visibility(obj, hidden=True):
+    obj.display_type = 'WIRE' if hidden else 'SOLID'
+    obj.hide_render = hidden
+    obj.visible_camera = not hidden
+    obj.visible_diffuse = not hidden
+    obj.visible_glossy = not hidden
+    obj.visible_shadow = not hidden
+    obj.visible_transmission = not hidden
+    obj.visible_volume_scatter = not hidden

@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
-from .. lib.objects import get_real_active_object
+from .. lib.objects import get_real_active_object, set_object_util_visibility
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode
 
 
@@ -127,20 +127,16 @@ class ND_OT_bool_inset(BaseOperator):
         self.boolean_isect.solver = solver
         self.boolean_isect.show_expanded = False
 
-        self.reference_obj_display_type_prev = self.reference_obj.display_type
-        self.reference_obj_hide_render_prev = self.reference_obj.hide_render
         self.reference_obj_name_prev = self.reference_obj.name
 
-        self.reference_obj.display_type = 'WIRE'
-        self.reference_obj.hide_render = True
+        set_object_util_visibility(self.reference_obj, hidden=True)
         self.reference_obj.name = " — ".join(['Bool', self.reference_obj.name])
         self.reference_obj.data.name = self.reference_obj.name
         self.reference_obj.hide_set(True)
 
         remove_problematic_boolean_mods(self.reference_obj)
 
-        self.intersecting_obj.display_type = 'WIRE'
-        self.intersecting_obj.hide_render = True
+        set_object_util_visibility(self.intersecting_obj, hidden=True)
         self.intersecting_obj.name = " — ".join(['Bool', self.intersecting_obj.name])
         self.intersecting_obj.data.name = self.intersecting_obj.name
 
@@ -201,8 +197,7 @@ class ND_OT_bool_inset(BaseOperator):
         bpy.ops.object.modifier_remove(modifier=self.boolean_diff.name)
         bpy.data.meshes.remove(self.intersecting_obj.data, do_unlink=True)
 
-        self.reference_obj.display_type = self.reference_obj_display_type_prev
-        self.reference_obj.hide_render = self.reference_obj_hide_render_prev
+        set_object_util_visibility(self.reference_obj, hidden=False)
         self.reference_obj.name = self.reference_obj_name_prev
         self.reference_obj.data.name = self.reference_obj_name_prev
         self.reference_obj.parent = None

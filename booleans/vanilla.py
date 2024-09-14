@@ -29,7 +29,7 @@ import bpy
 from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
-from .. lib.objects import get_real_active_object
+from .. lib.objects import get_real_active_object, set_object_util_visibility
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode
 
 
@@ -76,8 +76,7 @@ ALT — Do not clean the reference object's mesh"""
         boolean.solver = solver
 
         if not self.protect_reference_obj:
-            reference_obj.display_type = 'WIRE'
-            reference_obj.hide_render = True
+            set_object_util_visibility(reference_obj, hidden=True)
             reference_obj.name = " — ".join(['Bool', reference_obj.name])
             reference_obj.data.name = reference_obj.name
 

@@ -350,6 +350,11 @@ class NDPreferences(AddonPreferences):
         default="COLOR_02",
     )
 
+    disable_utils_in_viewport: BoolProperty(
+        name="Disable utils in viewport when toggling",
+        default=False,
+    )
+
     tabs: EnumProperty(
         name="Tabs",
         items=[
@@ -502,6 +507,7 @@ class NDPreferences(AddonPreferences):
         general_prefs = [
             "utils_collection_name",
             "utils_collection_color",
+            "disable_utils_in_viewport",
             "use_fast_booleans",
             "recon_poly_solidify",
             "recon_poly_inscribed",

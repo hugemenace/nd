@@ -79,11 +79,13 @@ def hide_utils_collection(hide):
         layer.hide_viewport = False
         collection.hide_viewport = False
 
+        should_hide_viewport = get_preferences().disable_utils_in_viewport
+
         obj_names = [obj.name for obj in collection.all_objects]
         for obj_name in obj_names:
             obj = bpy.data.objects[obj_name]
             obj.hide_set(hide)
-            obj.hide_viewport = False
+            obj.hide_viewport = should_hide_viewport and hide
 
 
 def has_visible_utils():
@@ -94,7 +96,7 @@ def has_visible_utils():
         obj_names = [obj.name for obj in collection.all_objects]
         for obj_name in obj_names:
             obj = bpy.data.objects[obj_name]
-            if not obj.hide_get():
+            if not obj.hide_get() and not obj.hide_viewport:
                 return True
 
     return False
@@ -108,10 +110,12 @@ def isolate_in_utils_collection(target_objs):
         layer.hide_viewport = False
         collection.hide_viewport = False
 
+        should_hide_viewport = get_preferences().disable_utils_in_viewport
+
         obj_names = [obj.name for obj in collection.all_objects]
         target_obj_names = [obj.name for obj in target_objs]
 
         for obj_name in obj_names:
             obj = bpy.data.objects[obj_name]
             obj.hide_set(obj.name not in target_obj_names)
-            obj.hide_viewport = False
+            obj.hide_viewport = should_hide_viewport and hide

@@ -127,6 +127,11 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    create_custom_transform_orientation: BoolProperty(
+        name="Create Custom Transform Orientations with View Align",
+        default=True,
+    )
+
     enable_sidebar: BoolProperty(
         name="Enable the sidebar / N-panel (requires Blender restart)",
         default=True,
@@ -511,6 +516,7 @@ class NDPreferences(AddonPreferences):
             "use_fast_booleans",
             "recon_poly_solidify",
             "recon_poly_inscribed",
+            "create_custom_transform_orientation",
             "enable_right_click_select",
             "enable_auto_smooth"]
 

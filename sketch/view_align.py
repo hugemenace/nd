@@ -138,6 +138,9 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def set_custom_transform_orientation(self):
+        if not get_preferences().create_custom_transform_orientation:
+            return
+
         bpy.ops.transform.create_orientation(name="ND — Sketch Surface", use=True)
 
 

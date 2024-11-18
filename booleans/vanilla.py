@@ -78,7 +78,6 @@ ALT — Do not clean the reference object's mesh"""
 
         if not self.protect_reference_obj:
             set_object_util_visibility(reference_obj, hidden=True)
-            reference_obj.name = " — ".join(['Bool', reference_obj.name])
             reference_obj.data.name = reference_obj.name
 
             if not self.do_not_clean_mesh:

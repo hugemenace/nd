@@ -119,8 +119,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        obj_names = [obj.name for obj in context.selected_objects]
-        if all(["Bool —" in name for name in obj_names]):
+        if all([obj.display_type == 'WIRE' for obj in context.selected_objects]):
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
             layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 
@@ -270,7 +269,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.circularize", icon=icons['nd.circularize'])
             replay_prediction_count += 1
 
-        if target_object.display_type == 'WIRE' and "Bool —" in target_object.name:
+        if target_object.display_type == 'WIRE':
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.separator()
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
@@ -320,8 +319,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        obj_names = [obj.name for obj in context.selected_objects]
-        if all(["Bool —" in name for name in obj_names]):
+        if all([obj.display_type == 'WIRE' for obj in context.selected_objects]):
             layout.operator("nd.hydrate", icon=icons['nd.hydrate'])
             layout.operator("nd.swap_solver", text="Swap Solver (Booleans)", icon=icons['nd.swap_solver'])
 

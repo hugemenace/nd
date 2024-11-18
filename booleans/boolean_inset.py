@@ -132,14 +132,12 @@ class ND_OT_bool_inset(BaseOperator):
         self.reference_obj_name_prev = self.reference_obj.name
 
         set_object_util_visibility(self.reference_obj, hidden=True)
-        self.reference_obj.name = " — ".join(['Bool', self.reference_obj.name])
         self.reference_obj.data.name = self.reference_obj.name
         self.reference_obj.hide_set(True)
 
         remove_problematic_boolean_mods(self.reference_obj)
 
         set_object_util_visibility(self.intersecting_obj, hidden=True)
-        self.intersecting_obj.name = " — ".join(['Bool', self.intersecting_obj.name])
         self.intersecting_obj.data.name = self.intersecting_obj.name
 
         remove_problematic_boolean_mods(self.intersecting_obj)

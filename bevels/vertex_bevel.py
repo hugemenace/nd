@@ -142,6 +142,9 @@ CTRL — Remove existing modifiers"""
     def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+
+        if not obj_verts_selected(context.active_object):
+            self.report({'INFO'}, "No vertices selected.")
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -232,7 +235,7 @@ CTRL — Remove existing modifiers"""
     @classmethod
     def poll(cls, context):
         target_object = context.active_object
-        return ctx_edit_mode(context) and obj_is_mesh(target_object) and obj_verts_selected(target_object)
+        return ctx_edit_mode(context) and obj_is_mesh(target_object)
 
 
     def summon_old_operator(self, context):

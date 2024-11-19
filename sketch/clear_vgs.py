@@ -45,7 +45,8 @@ class ND_OT_clear_vgs(bpy.types.Operator):
 
     def execute(self, context):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
+            return {'CANCELLED'}
 
         if not obj_verts_selected(context.active_object):
             self.report({'INFO'}, "No vertices selected.")

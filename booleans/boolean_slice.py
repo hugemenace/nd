@@ -52,7 +52,7 @@ ALT — Do not clean the reference object's mesh"""
 
     def execute(self, context):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'

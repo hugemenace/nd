@@ -77,7 +77,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
         self.dirty = False
@@ -152,7 +152,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     def finish(self, context):
         if self.has_invalid_selection(context):
             self.revert(context)
-            self.report({'ERROR_INVALID_INPUT'}, "Ensure at least a single peice of geometry is selected.")
+            self.report({'INFO'}, "Ensure at least a single peice of geometry is selected.")
 
             return {'CANCELLED'}
 

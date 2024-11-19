@@ -103,7 +103,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
         if event.ctrl:
@@ -124,11 +124,11 @@ CTRL — Remove existing modifiers"""
         self.mirror_obj = None
 
         if obj_is_curve(context.active_object) and self.geometry_mode:
-            self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used on curves")
+            self.report({'INFO'}, "The mirror across selected geometry feature cannot be used on curves")
             return {'CANCELLED'}
 
         if self.edit_mode and self.geometry_mode:
-            self.report({'ERROR_INVALID_INPUT'}, "The mirror across selected geometry feature cannot be used in edit mode")
+            self.report({'INFO'}, "The mirror across selected geometry feature cannot be used in edit mode")
             return {'CANCELLED'}
 
         if ctx_min_objects_selected(context, 2):
@@ -296,9 +296,9 @@ CTRL — Remove existing modifiers"""
             unregister_axis_handler()
 
             if self.geometry_selection_type == 0:
-                self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
+                self.report({'INFO'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
             else:
-                self.report({'ERROR_INVALID_INPUT'}, "Ensure only a single edge or face is selected.")
+                self.report({'INFO'}, "Ensure only a single edge or face is selected.")
 
             return {'CANCELLED'}
 

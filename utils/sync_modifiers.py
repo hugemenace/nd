@@ -144,7 +144,7 @@ ALT — Override util references on all sync'd objects"""
 
     def invoke(self, context, event):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
         valid_objects = self.get_valid_objects(context, context.active_object.type)
@@ -157,7 +157,7 @@ ALT — Override util references on all sync'd objects"""
         self.override_utils = event.alt
 
         if not self.clear_drivers and len(valid_objects) == 1:
-            self.report({'ERROR_INVALID_INPUT'}, "At least two objects need to be selected in order to sync modifiers.")
+            self.report({'INFO'}, "At least two objects need to be selected in order to sync modifiers.")
             return {'CANCELLED'}
 
         if self.clear_drivers:

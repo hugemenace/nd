@@ -129,7 +129,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
         if event.ctrl:

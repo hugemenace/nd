@@ -152,7 +152,7 @@ class ND_OT_recon_poly(BaseOperator):
 
         if len(context.selected_objects) == 1:
             if context.active_object is None:
-                self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+                self.report({'INFO'}, "No active target object selected.")
                 return {'CANCELLED'}
 
             mods = context.active_object.modifiers

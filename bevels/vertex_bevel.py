@@ -141,7 +141,8 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         if context.active_object is None:
-            self.report({'ERROR_INVALID_INPUT'}, "No active target object selected.")
+            self.report({'INFO'}, "No active target object selected.")
+            return {'CANCELLED'}
 
         if not obj_verts_selected(context.active_object):
             self.report({'INFO'}, "No vertices selected.")
@@ -191,7 +192,7 @@ CTRL — Remove existing modifiers"""
             vgroup_vert_indices = [vert.index for vert in self.target_object.data.vertices if group.index in [i.group for i in vert.groups]]
             if len(set(vgroup_vert_indices) & set(selected_vert_indices)) > 0:
                 if self.vgroup_match:
-                    self.report({'ERROR_INVALID_INPUT'}, "Multiple vertex groups selected, unable to continue operation.")
+                    self.report({'INFO'}, "Multiple vertex groups selected, unable to continue operation.")
                     return {'CANCELLED'}
                 self.vgroup_match = (group, vgroup_vert_indices)
 

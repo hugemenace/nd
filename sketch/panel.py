@@ -144,10 +144,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def isolate_geometry(self, context):
-        self.panel_bm = bmesh.from_edit_mesh(self.panel_obj.data)
-        self.panel_bm.verts.ensure_lookup_table()
-        self.panel_bm.edges.ensure_lookup_table()
-        self.panel_bm.faces.ensure_lookup_table()
+
 
         self.delete_unselected_panel_geometry()
         self.update_panel_edit_mesh(True)
@@ -217,12 +214,13 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
 
     def has_valid_selection(self, context):
-        bm = bmesh.from_edit_mesh(context.active_object.data)
-        bm.faces.ensure_lookup_table()
+        if self.panel_bm is None:
+            self.panel_bm = bmesh.from_edit_mesh(self.panel_obj.data)
+            self.panel_bm.verts.ensure_lookup_table()
+            self.panel_bm.edges.ensure_lookup_table()
+            self.panel_bm.faces.ensure_lookup_table()
 
-        selected_faces = len([f for f in bm.faces if f.select])
-
-        bm.free()
+        selected_faces = len([f for f in self.panel_bm.faces if f.select])
 
         return selected_faces > 0
 

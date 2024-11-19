@@ -30,7 +30,7 @@ from .. lib.collections import move_to_utils_collection, isolate_in_utils_collec
 from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object, set_object_util_visibility
-from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode
+from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode, app_minor_version
 
 
 keys = []
@@ -71,13 +71,15 @@ ALT — Do not clean the reference object's mesh"""
         boolean_diff.operation = 'DIFFERENCE'
         boolean_diff.object = reference_obj
         boolean_diff.solver = solver
-        boolean_diff.material_mode = 'TRANSFER'
+        if app_minor_version() >= (4, 0):
+            boolean_diff.material_mode = 'TRANSFER'
 
         boolean_isect = new_modifier(intersecting_obj, "Intersection — ND Bool", 'BOOLEAN', rectify=True)
         boolean_isect.operation = 'INTERSECT'
         boolean_isect.object = reference_obj
         boolean_isect.solver = solver
-        boolean_isect.material_mode = 'TRANSFER'
+        if app_minor_version() >= (4, 0):
+            boolean_isect.material_mode = 'TRANSFER'
 
         set_object_util_visibility(reference_obj, hidden=True)
         reference_obj.data.name = reference_obj.name

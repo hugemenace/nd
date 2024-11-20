@@ -322,7 +322,8 @@ CTRL — Remove existing modifiers"""
         empty.name = "ND — Mirror Geometry"
 
         move_to_utils_collection(empty)
-        isolate_in_utils_collection([empty])
+        if get_preferences().hide_unrelated_utils_after_op:
+            isolate_in_utils_collection([empty])
 
         self.mirror_obj = empty
 

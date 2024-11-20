@@ -94,7 +94,8 @@ ALT — Do not clean the reference object's mesh"""
         intersecting_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 
         move_to_utils_collection(reference_obj)
-        isolate_in_utils_collection([reference_obj])
+        if get_preferences().hide_unrelated_utils_after_op:
+            isolate_in_utils_collection([reference_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

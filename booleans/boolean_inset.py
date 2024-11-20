@@ -185,7 +185,8 @@ class ND_OT_bool_inset(BaseOperator):
         move_to_utils_collection(self.reference_obj)
         move_to_utils_collection(self.intersecting_obj)
 
-        isolate_in_utils_collection([self.reference_obj, self.intersecting_obj])
+        if get_preferences().hide_unrelated_utils_after_op:
+            isolate_in_utils_collection([self.reference_obj, self.intersecting_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)

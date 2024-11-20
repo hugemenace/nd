@@ -119,3 +119,16 @@ def isolate_in_utils_collection(target_objs):
             obj = bpy.data.objects[obj_name]
             obj.hide_set(obj.name not in target_obj_names)
             obj.hide_viewport = should_hide_viewport and hide
+
+
+def show_utils(target_objs):
+    data = get_utils_layer()
+    if data is not None:
+        layer, collection = data
+
+        layer.hide_viewport = False
+        collection.hide_viewport = False
+
+        for obj in target_objs:
+            obj.hide_set(False)
+            obj.hide_viewport = False

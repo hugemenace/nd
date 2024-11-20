@@ -360,6 +360,11 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
+    hide_unrelated_utils_after_op: BoolProperty(
+        name="Hide unrelated utils after operation",
+        default=True,
+    )
+
     tabs: EnumProperty(
         name="Tabs",
         items=[
@@ -513,6 +518,7 @@ class NDPreferences(AddonPreferences):
             "utils_collection_name",
             "utils_collection_color",
             "disable_utils_in_viewport",
+            "hide_unrelated_utils_after_op",
             "use_fast_booleans",
             "recon_poly_solidify",
             "recon_poly_inscribed",

@@ -27,8 +27,7 @@
 
 import bpy
 import inspect
-from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection
-from .. lib.objects import get_all_util_objects, get_real_active_object
+from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, ctx_objects_selected
 from .. lib.modifiers import move_mod_to_index
 

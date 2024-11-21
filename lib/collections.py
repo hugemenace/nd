@@ -38,13 +38,28 @@ def create_utils_collection():
     return collection
 
 
+def get_all_collections(obj):
+    collections = []
+    for collection in bpy.data.collections:
+        if obj.name in [obj.name for obj in collection.all_objects]:
+            collections.append(collection)
+
+    return collections
+
+
 def move_to_utils_collection(obj):
-    collection = bpy.data.collections.get(get_preferences().utils_collection_name)
-    if collection is None:
-        collection = create_utils_collection()
+    utils_collection_name = get_preferences().utils_collection_name
+
+    utils_collection = bpy.data.collections.get(utils_collection_name)
+    if utils_collection is None:
+        utils_collection = create_utils_collection()
+
+    object_collections = get_all_collections(obj)
+    if utils_collection in object_collections:
+        return
 
     remove_obj_from_all_collections(obj)
-    collection.objects.link(obj)
+    utils_collection.objects.link(obj)
 
 
 def remove_obj_from_all_collections(obj):

@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.46.0](https://github.com/hugemenace/nd/compare/v1.45.0...v1.46.0) (2024-11-23)
+
+
+### Features
+
+* add an option to disable the creation of a custom transform orientation when using view align ([179ab7a](https://github.com/hugemenace/nd/commit/179ab7a75af220397dca87d8ce01c31be3458607))
+* add an option to disable util viewport visibility when toggling (in addition to hiding) ([ae494e6](https://github.com/hugemenace/nd/commit/ae494e6796415b15cce55dacecd3ee7ea2ba48c4))
+* add an option to stop ND from hiding all unrelated utils when an operation creates or recalls another util object ([d7bfd24](https://github.com/hugemenace/nd/commit/d7bfd24b9e05e796d2c135d6f7d71e2840149c07))
+* set the material mode on exact booleans to transfer ([3938e72](https://github.com/hugemenace/nd/commit/3938e725e619a4bcaee688d99651d5162c1ddbde))
+
+
+### Bug Fixes
+
+* ensure that util objects aren't rendered when in Cycles or EEVEE preview modes ([2f261c6](https://github.com/hugemenace/nd/commit/2f261c63bf9028aac60fc35f68e70e644092fdca))
+* ensure that utils aren't relocated to the root of the utils collection if they already exist in a sub-collection ([4020e1a](https://github.com/hugemenace/nd/commit/4020e1ae772998a1b43723928cc448fba81da914))
+* ensure the panel operator's BMesh instance is not prematurely freed during operation ([4637880](https://github.com/hugemenace/nd/commit/4637880abcab241f458baac43f3449341ee900d7))
+* ensure the utils collection is included in the current view layer when utils are created or recalled ([34f681f](https://github.com/hugemenace/nd/commit/34f681f49c373dd12046e6190614a60dc175cae7))
+* move the vertices/edges selected polling methods into the invoke method for the edge_bevel, vertex_bevel, and clear_vgs operators to avoid freeing any existing object's BMesh instance ([7ae5a2b](https://github.com/hugemenace/nd/commit/7ae5a2b3135b6f737a73113aac0ec8764237597f))
+
 ## [1.45.0](https://github.com/hugemenace/nd/compare/v1.44.3...v1.45.0) (2024-08-04)
 
 

@@ -255,8 +255,10 @@ class ND_OT_flare(BaseOperator):
         self.energy_offset_input_stream = new_stream()
         self.energy_offset = 0
 
-        for light, height, energy in self.lights:
+        for i in range(0, len(self.lights)):
+            light, height, energy = self.lights[i]
             light.data.energy = uniform(1000, 25000)
+            self.lights[i] = (light, height, light.data.energy)
 
 
     def add_light(self, context, energy=None, size=None, color=None, location=None):

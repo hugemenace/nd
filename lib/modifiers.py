@@ -104,7 +104,7 @@ def has_sba_mod(object):
     return get_sba_mod(object) != None
 
 
-def add_smooth_by_angle(object):
+def add_smooth_by_angle(context, object):
     if app_minor_version() < (4, 1):
         return
 
@@ -148,12 +148,12 @@ def add_smooth_by_angle(object):
             return
 
         sba_mod.name = "Smooth — ND SBA"
-        set_smoothing_angle(object, radians(float(get_preferences().default_smoothing_angle)), True)
+        set_smoothing_angle(context, object, radians(float(get_preferences().default_smoothing_angle)), True)
 
         ensure_tail_mod_consistency(object, force=True)
 
 
-def set_smoothing_angle(object, angle, ignore_sharpness=False):
+def set_smoothing_angle(context, object, angle, ignore_sharpness=False):
     mod = get_sba_mod(object)
 
     if mod is None:
@@ -162,6 +162,7 @@ def set_smoothing_angle(object, angle, ignore_sharpness=False):
     mod["Input_1"] = angle
     mod["Socket_1"] = ignore_sharpness
 
+    mod.node_group.interface_update(context)
     object.data.update()
 
 

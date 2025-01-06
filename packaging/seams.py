@@ -159,8 +159,8 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
         if self.commit_auto_smooth:
             if app_minor_version() >= (4, 1):
-                add_smooth_by_angle(self.target_object)
-                set_smoothing_angle(self.target_object, radians(180), False)
+                add_smooth_by_angle(context, self.target_object)
+                set_smoothing_angle(context, self.target_object, radians(180), False)
             else:
                 bpy.ops.object.shade_smooth()
                 self.target_object.data.use_auto_smooth = True

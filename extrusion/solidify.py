@@ -193,7 +193,7 @@ CTRL — Remove existing modifiers"""
             return
 
         if app_minor_version() >= (4, 1):
-            add_smooth_by_angle(self.target_object)
+            add_smooth_by_angle(context, self.target_object)
             return
 
         bpy.ops.object.shade_smooth()

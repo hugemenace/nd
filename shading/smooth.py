@@ -124,7 +124,7 @@ class ND_OT_smooth(BaseOperator):
     def add_smooth_shading(self, context):
         if app_minor_version() >= (4, 1):
             for obj in self.valid_objects:
-                add_smooth_by_angle(obj)
+                add_smooth_by_angle(context, obj)
             return
 
         bpy.ops.object.shade_smooth()
@@ -136,7 +136,7 @@ class ND_OT_smooth(BaseOperator):
     def operate(self, context):
         if app_minor_version() >= (4, 1):
             for obj in self.valid_objects:
-                set_smoothing_angle(obj, radians(self.angle), self.ignore_sharpness)
+                set_smoothing_angle(context, obj, radians(self.angle), self.ignore_sharpness)
         else:
             for obj in context.selected_objects:
                 if obj.type != 'MESH':

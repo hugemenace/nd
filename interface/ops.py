@@ -46,6 +46,10 @@ sketch_ops = [
     ("nd.screw_head", 'CANCEL', None, None, False),
 ]
 
+generator_ops = [
+    ("nd.hole_generator", 'PROP_CON', None, None, False),
+]
+
 boolean_ops = [
     ("nd.bool_vanilla", 'SELECT_SUBTRACT', "Difference", 'DIFFERENCE', False),
     ("nd.bool_vanilla", 'SELECT_EXTEND', "Union", 'UNION', False),
@@ -137,7 +141,7 @@ viewport_ops = [
 
 def build_icon_lookup_table():
     icon_lookup = {}
-    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + \
+    for op in standalone_ops + sketch_ops + generator_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + \
     deform_ops + simplify_ops + shading_ops + scene_ops + packaging_ops + util_ops + viewport_ops:
         if op is None:
             continue

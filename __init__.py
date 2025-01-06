@@ -42,6 +42,7 @@ import bpy
 import rna_keymap_ui
 from bpy.types import AddonPreferences
 from bpy.props import BoolProperty, IntProperty, StringProperty, EnumProperty, FloatProperty, FloatVectorProperty
+from bpy.app.handlers import persistent
 from . import lib
 from . import interface
 from . import booleans
@@ -58,6 +59,7 @@ from . import standalone
 from . import utils
 from . import viewport
 from . import icons
+from . import generate
 
 
 registerables = (
@@ -76,6 +78,7 @@ registerables = (
     utils,
     viewport,
     icons,
+    generate,
 )
 
 
@@ -662,6 +665,27 @@ class NDPreferences(AddonPreferences):
             column = box.column(align=True)
             row = column.row()
             row.prop(self, pref)
+
+
+@persistent
+def load_generators(_a, _b):
+    existing_node_groups = [node_group.name for node_group in bpy.data.node_groups]
+
+    filepath = lib.assets.get_asset_path('generators')
+    with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+        for node_group in data_from.node_groups:
+            if node_group in existing_node_groups:
+                continue
+
+            data_to.node_groups.append(node_group)
+
+    for node_group in bpy.data.node_groups:
+        if not node_group.name.startswith("ND."):
+            continue
+        node_group.use_fake_user = True
+
+
+bpy.app.handlers.load_post.append(load_generators)
 
 
 def register():

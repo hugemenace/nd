@@ -65,6 +65,10 @@ def ctx_objects_selected(context, count=1):
     return len(context.selected_objects) == count
 
 
+def ctx_objects_selected_range(context, min=1, max=1):
+    return min <= len(context.selected_objects) <= max
+
+
 def ctx_min_objects_selected(context, count=1):
     return len(context.selected_objects) >= count
 

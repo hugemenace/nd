@@ -56,7 +56,7 @@ class ND_OT_edge_length(BaseOperator):
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.distance_input_stream) and self.hard_stream_reset or no_stream(self.distance_input_stream):
-                    self.distance = self.start_distance
+                    self.distance = self.starting_distance
                     self.dirty = True
                 self.distance_input_stream = new_stream()
             
@@ -111,13 +111,16 @@ class ND_OT_edge_length(BaseOperator):
 
         bm = bmesh.from_edit_mesh(context.active_object.data)
         self.selected_vertices_indexes = [v.index for v in bm.verts if v.select]
+        self.starting_positions = [bm.verts[n].co.copy() for n in self.selected_vertices_indexes]
+        self.midpoint = (self.starting_positions[0] + self.starting_positions[1]) / 2
+        self.direction = (self.starting_positions[1] - self.starting_positions[0]).normalized()
 
         if len(self.selected_vertices_indexes) != 2:
             self.report({'WARNING'}, "Please select exactly two vertices for this operator to function.")
             return {'CANCELLED'}
 
 
-        self.start_distance = self.distance = (bm.verts[self.selected_vertices_indexes[0]].co - bm.verts[self.selected_vertices_indexes[1]].co).length
+        self.starting_distance = self.distance = (bm.verts[self.selected_vertices_indexes[0]].co - bm.verts[self.selected_vertices_indexes[1]].co).length
 
 
         capture_modifier_keys(self, None, event.mouse_x)
@@ -141,21 +144,23 @@ class ND_OT_edge_length(BaseOperator):
         bm = bmesh.from_edit_mesh(self.target_object.data)
         bm.verts.ensure_lookup_table()
 
-        v1 = bm.verts[self.selected_vertices_indexes[0]]
-        v2 = bm.verts[self.selected_vertices_indexes[1]]
+        vertex_0 = bm.verts[self.selected_vertices_indexes[0]]
+        vertex_1 = bm.verts[self.selected_vertices_indexes[1]]
 
-        midpoint = (v1.co + v2.co) / 2
+        
 
         if not self.anchored:
-            direction = (v2.co - v1.co).normalized()
-            v1.co = midpoint - direction * (self.distance / 2)
-            v2.co = midpoint + direction * (self.distance / 2)
+            vertex_0.co = self.midpoint - self.direction * (self.distance / 2)
+            vertex_1.co = self.midpoint + self.direction * (self.distance / 2)
+
         elif not self.flip:
-            direction = (v2.co - v1.co).normalized()
-            v2.co = v1.co + direction * self.distance
+            vertex_0.co = self.starting_positions[0]
+            vertex_1.co = vertex_0.co + self.direction * self.distance
+
         else:
-            direction = (v1.co - v2.co).normalized()
-            v1.co = v2.co + direction * self.distance
+            vertex_1.co = self.starting_positions[1]
+            vertex_0.co = vertex_1.co - self.direction * self.distance
+
 
         bmesh.update_edit_mesh(context.active_object.data)
 
@@ -167,7 +172,7 @@ class ND_OT_edge_length(BaseOperator):
 
 
     def revert(self, context):
-        self.distance = self.start_distance
+        self.distance = self.starting_distance
         self.operate(context)
 
         unregister_draw_handler()

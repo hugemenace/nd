@@ -35,6 +35,7 @@ sketch_ops = [
     ("nd.single_vertex", 'DOT', None, None, False),
     ("nd.make_manifold", 'OUTLINER_DATA_SURFACE', None, None, False),
     ("nd.clear_vgs", 'GROUP_VERTEX', None, None, False),
+    ("nd.edge_length", 'FIXED_SIZE', None, None, False),
     None, # Separator
     ("nd.view_align", 'ORIENTATION_VIEW', None, None, False),
     None, # Separator

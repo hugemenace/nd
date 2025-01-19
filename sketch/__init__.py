@@ -35,6 +35,7 @@ from . import circularize
 from . import screw_head
 from . import clear_vgs
 from . import make_manifold
+from . import edge_length
 
 
 registerables = (
@@ -47,6 +48,7 @@ registerables = (
     screw_head,
     clear_vgs,
     make_manifold,
+    edge_length,
 )
 
 

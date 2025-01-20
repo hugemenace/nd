@@ -33,9 +33,9 @@ from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
-from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
+from .. lib.math import v3_distance, v3_average
 
 
 
@@ -112,7 +112,7 @@ class ND_OT_edge_length(BaseOperator):
         bm = bmesh.from_edit_mesh(context.active_object.data)
         self.selected_vertices_indexes = [v.index for v in bm.verts if v.select]
         self.starting_positions = [bm.verts[n].co.copy() for n in self.selected_vertices_indexes]
-        self.midpoint = (self.starting_positions[0] + self.starting_positions[1]) / 2
+        self.midpoint = v3_average(self.starting_positions)
         self.direction = (self.starting_positions[1] - self.starting_positions[0]).normalized()
 
         if len(self.selected_vertices_indexes) != 2:
@@ -120,7 +120,7 @@ class ND_OT_edge_length(BaseOperator):
             return {'CANCELLED'}
 
 
-        self.starting_distance = self.distance = (bm.verts[self.selected_vertices_indexes[0]].co - bm.verts[self.selected_vertices_indexes[1]].co).length
+        self.starting_distance = self.distance = v3_distance(bm.verts[self.selected_vertices_indexes[0]].co - bm.verts[self.selected_vertices_indexes[1]].co)
 
 
         capture_modifier_keys(self, None, event.mouse_x)

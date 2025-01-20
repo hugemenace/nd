@@ -42,7 +42,7 @@ from .. lib.math import v3_distance, v3_average
 class ND_OT_edge_length(BaseOperator):
     bl_idname = "nd.edge_length"
     bl_label = "Set edge length"
-    bl_description = """Allows you to accuratly set the distance between two selected vertices"""
+    bl_description = """Allows you to accuratly set the distance between two selected vertices or n not connected selected edges"""
 
 
     def do_modal(self, context, event):
@@ -69,6 +69,11 @@ class ND_OT_edge_length(BaseOperator):
             self.flip = not self.flip
             self.dirty = True
 
+        if pressed(event, {'D'}):
+            self.offset_distance = not self.offset_distance
+            self.distance += sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else - sum(self.starting_distances) / len(self.starting_distances) 
+            self.dirty = True
+
         if self.key_step_up:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance += self.step_size
@@ -91,7 +96,7 @@ class ND_OT_edge_length(BaseOperator):
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
-                self.distance = max(0, self.distance + self.mouse_value)
+                self.distance = max(0, self.distance + self.mouse_value) if not self.offset_distance else self.distance + self.mouse_value
                 self.dirty = True
 
 
@@ -101,28 +106,51 @@ class ND_OT_edge_length(BaseOperator):
             return {'CANCELLED'}
         
         self.dirty = False
+        self.revert_distance = False
 
         self.anchored = False
         self.flip = False
+        
 
         self.target_object = context.active_object
 
         self.distance_input_stream = new_stream()
 
         bm = bmesh.from_edit_mesh(context.active_object.data)
-        self.selected_vertices_indexes = [v.index for v in bm.verts if v.select]
-        self.starting_positions = [bm.verts[n].co.copy() for n in self.selected_vertices_indexes]
-        self.midpoint = v3_average(self.starting_positions)
-        self.direction = (self.starting_positions[1] - self.starting_positions[0]).normalized()
+        selected_verts = [v for v in bm.verts if v.select]
+        selected_edges = [e for e in bm.edges if e.select]
+        self.one_pair = len(selected_verts) == 2
+        self.offset_distance = not self.one_pair
 
-        if len(self.selected_vertices_indexes) != 2:
-            self.report({'WARNING'}, "Please select exactly two vertices for this operator to function.")
+        if not self.one_pair and len([v.index for e in selected_edges for v in e.verts]) != len(selected_verts):
+            self.report({'INFO'}, "Select two vertices or n edges")
             return {'CANCELLED'}
+        
+        
+        self.selected_vertex_pairs = []
+        if not self.one_pair:
+            self.selected_vertex_pairs = [
+                (e.verts[0].index, e.verts[1].index) 
+                for e in selected_edges
+            ]
+        else:
+            self.selected_vertex_pairs = [
+                (selected_verts[0].index, selected_verts[1].index)
+            ]
 
+        self.starting_positions = [
+            (bm.verts[vertex_pair[0]].co.copy(), bm.verts[vertex_pair[1]].co.copy()) for vertex_pair in self.selected_vertex_pairs] 
+        self.midpoints = [
+            v3_average(position_pair) for position_pair in self.starting_positions]
+        self.directions = [
+            (position_pair[1] - position_pair[0]).normalized() for position_pair in self.starting_positions]
+        self.starting_distances = [
+            v3_distance(position_pair[0], position_pair[1]) for position_pair in self.starting_positions]
+        self.distance = sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else 0
 
-        self.starting_distance = self.distance = v3_distance(bm.verts[self.selected_vertices_indexes[0]].co - bm.verts[self.selected_vertices_indexes[1]].co)
+        bm.free()
 
-
+        
         capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
@@ -141,38 +169,58 @@ class ND_OT_edge_length(BaseOperator):
 
 
     def operate(self, context):
+        for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+            self.move_verts(context, vertex_pair, index)
+
+        self.dirty = False
+
+    def move_verts(self, context, vertex_pair, index):
         bm = bmesh.from_edit_mesh(self.target_object.data)
         bm.verts.ensure_lookup_table()
 
-        vertex_0 = bm.verts[self.selected_vertices_indexes[0]]
-        vertex_1 = bm.verts[self.selected_vertices_indexes[1]]
-
+        vertex_0 = bm.verts[vertex_pair[0]]
+        vertex_1 = bm.verts[vertex_pair[1]]
         
+        if not self.offset_distance or self.revert_distance:
+            if not self.anchored:
+                vertex_0.co = self.midpoints[index] - self.directions[index] * (self.get_distance(index) / 2)
+                vertex_1.co = self.midpoints[index] + self.directions[index] * (self.get_distance(index) / 2)
 
-        if not self.anchored:
-            vertex_0.co = self.midpoint - self.direction * (self.distance / 2)
-            vertex_1.co = self.midpoint + self.direction * (self.distance / 2)
+            elif not self.flip:
+                vertex_0.co = self.starting_positions[index][0]
+                vertex_1.co = vertex_0.co + self.directions[index] * self.get_distance(index)
 
-        elif not self.flip:
-            vertex_0.co = self.starting_positions[0]
-            vertex_1.co = vertex_0.co + self.direction * self.distance
-
+            else:
+                vertex_1.co = self.starting_positions[index][1]
+                vertex_0.co = vertex_1.co - self.directions[index] * self.get_distance(index)
         else:
-            vertex_1.co = self.starting_positions[1]
-            vertex_0.co = vertex_1.co - self.direction * self.distance
+            if not self.anchored:
+                vertex_0.co = self.starting_positions[index][0] - self.directions[index] * (self.get_distance(index) / 2)
+                vertex_1.co = self.starting_positions[index][1] + self.directions[index] * (self.get_distance(index) / 2)
+
+            elif not self.flip:
+                vertex_0.co = self.starting_positions[index][0]
+                vertex_1.co = self.starting_positions[index][0] + self.directions[index] * self.get_distance(index)
+
+            else:
+                vertex_1.co = self.starting_positions[index][1]
+                vertex_0.co = self.starting_positions[index][1] - self.directions[index] * self.get_distance(index)
 
 
         bmesh.update_edit_mesh(context.active_object.data)
 
-        self.dirty = False
 
+    def get_distance(self, index):
+        return self.distance if not self.revert_distance else self.starting_distances[index]
+    
 
     def finish(self, context):
         unregister_draw_handler()
 
 
     def revert(self, context):
-        self.distance = self.starting_distance
+        self.revert_distance = True
+        self.distances = self.starting_distances
         self.operate(context)
 
         unregister_draw_handler()
@@ -200,6 +248,7 @@ def draw_text_callback(self):
         self,
         "Flip [F]: {}".format('Yes' if self.flip else 'No'),
         "Create an Inset or Outset")
+    
 
 
 def register():

@@ -242,12 +242,18 @@ def draw_text_callback(self):
     draw_hint(
         self,
         "Anchored [A]: {}".format('Yes' if self.anchored else 'No'),
-        "Create an Inset or Outset")
+        "Limit the movement to one vertex")
 
     draw_hint(
         self,
         "Flip [F]: {}".format('Yes' if self.flip else 'No'),
-        "Create an Inset or Outset")
+        "Flip the anchored Vertex")
+    
+    if not self.one_pair:
+        draw_hint(
+            self,
+            "Offset [D]: {}".format('Yes' if self.offset_distance else 'No'),
+            "Move the vertices based on their original position")
     
 
 

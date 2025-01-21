@@ -36,6 +36,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 from .. lib.math import v3_distance, v3_average
+from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
 
@@ -64,12 +65,14 @@ class ND_OT_edge_length(BaseOperator):
         if pressed(event, {'A'}):
             self.current_affect_mode = (self.current_affect_mode + 1) % len(self.affect_modes)
             self.dirty = True
+            self.assign_points()
 
 
         if pressed(event, {'D'}):
             self.offset_distance = not self.offset_distance
             self.distance += sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else - sum(self.starting_distances) / len(self.starting_distances) 
             self.dirty = True
+            self.assign_points()
 
 
         if self.key_step_up:
@@ -104,7 +107,10 @@ class ND_OT_edge_length(BaseOperator):
             return {'CANCELLED'}
         
         self.dirty = False
-        self.revert_distance = False
+
+        self.primary_points = []
+        self.secondary_points = []
+        
 
         self.affect_modes = ["Both", "Start", "End"]
         self.current_affect_mode = 0
@@ -135,10 +141,12 @@ class ND_OT_edge_length(BaseOperator):
                 (selected_verts[0].index, selected_verts[1].index)
             ]
 
+        self.current_positions = [
+            (bm.verts[vertex_pair[0]].co, bm.verts[vertex_pair[1]].co) for vertex_pair in self.selected_vertex_pairs] 
         self.starting_positions = [
-            (bm.verts[vertex_pair[0]].co.copy(), bm.verts[vertex_pair[1]].co.copy()) for vertex_pair in self.selected_vertex_pairs] 
+            (bm.verts[vertex_pair[0]].co.copy(), bm.verts[vertex_pair[1]].co.copy()) for vertex_pair in self.selected_vertex_pairs]
         self.midpoints = [
-            v3_average(position_pair) for position_pair in self.starting_positions]
+            v3_average(position_pair) for position_pair in self.current_positions]
         self.directions = [
             (position_pair[1] - position_pair[0]).normalized() for position_pair in self.starting_positions]
         self.starting_distances = [
@@ -147,13 +155,16 @@ class ND_OT_edge_length(BaseOperator):
 
         bm.free()
 
-        
         capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
+        init_points(self)
+        register_points_handler(self)
+
         context.window_manager.modal_handler_add(self)
+        self.assign_points()
 
         return {'RUNNING_MODAL'}
 
@@ -180,14 +191,14 @@ class ND_OT_edge_length(BaseOperator):
         
         match self.current_affect_mode:
             case 0:
-                vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
-                vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
+                vertex_0.co = self.get_reference_position( index, 1) - self.directions[index] * self.get_distance()
+                vertex_1.co = self.get_reference_position( index, 0) + self.directions[index] * self.get_distance()
             case 1:
                 vertex_0.co = self.starting_positions[index][0]
-                vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
+                vertex_1.co = self.get_reference_position( index, 0) + self.directions[index] * self.get_distance()
             case 2:
                 vertex_1.co = self.starting_positions[index][1]
-                vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
+                vertex_0.co = self.get_reference_position( index, 1) - self.directions[index] * self.get_distance()
 
 
         bmesh.update_edit_mesh(context.active_object.data)
@@ -197,21 +208,34 @@ class ND_OT_edge_length(BaseOperator):
         return self.distance if not self.current_affect_mode == 0 else self.distance / 2
  
     
-    def get_reference_position(self, bm, vertex_pair, index, index_of_vert):
-        if self.revert_distance:
-            return bm.verts[vertex_pair[index_of_vert]].co
-        elif not self.offset_distance:
+    def get_reference_position(self, index, index_of_vert):
+        if not self.offset_distance:
             if self.current_affect_mode == 0:
                 return self.midpoints[index]
             else:
                 return self.starting_positions[index][index_of_vert]
         else:
             return self.starting_positions[index][not index_of_vert]
+        
+    def assign_points(self):
+        self.primary_points.clear()
+        self.secondary_points.clear()
 
+
+        match self.current_affect_mode:
+            case 0:
+                self.primary_points = [pos for pos_pair in self.current_positions for pos in pos_pair]
+            case 1:
+                self.primary_points = [pos_pair[1] for pos_pair in self.current_positions]
+                self.secondary_points = [pos_pair[0] for pos_pair in self.current_positions]
+            case 2:
+                self.primary_points = [pos_pair[0] for pos_pair in self.current_positions]
+                self.secondary_points = [pos_pair[1] for pos_pair in self.current_positions]
     
 
     def finish(self, context):
         unregister_draw_handler()
+        unregister_points_handler()
 
 
     def revert(self, context):
@@ -220,6 +244,7 @@ class ND_OT_edge_length(BaseOperator):
         self.operate(context)
 
         unregister_draw_handler()
+        unregister_points_handler()
 
 
 def draw_text_callback(self):

@@ -62,17 +62,15 @@ class ND_OT_edge_length(BaseOperator):
             
 
         if pressed(event, {'A'}):
-            self.anchored = not self.anchored
+            self.current_affect_mode = (self.current_affect_mode + 1) % len(self.affect_modes)
             self.dirty = True
 
-        if pressed(event, {'F'}):
-            self.flip = not self.flip
-            self.dirty = True
 
         if pressed(event, {'D'}):
             self.offset_distance = not self.offset_distance
             self.distance += sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else - sum(self.starting_distances) / len(self.starting_distances) 
             self.dirty = True
+
 
         if self.key_step_up:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
@@ -108,9 +106,8 @@ class ND_OT_edge_length(BaseOperator):
         self.dirty = False
         self.revert_distance = False
 
-        self.anchored = False
-        self.flip = False
-        
+        self.affect_modes = ["Both", "Start", "End"]
+        self.current_affect_mode = 0
 
         self.target_object = context.active_object
 
@@ -181,37 +178,36 @@ class ND_OT_edge_length(BaseOperator):
         vertex_0 = bm.verts[vertex_pair[0]]
         vertex_1 = bm.verts[vertex_pair[1]]
         
-        if not self.offset_distance or self.revert_distance:
-            if not self.anchored:
-                vertex_0.co = self.midpoints[index] - self.directions[index] * (self.get_distance(index) / 2)
-                vertex_1.co = self.midpoints[index] + self.directions[index] * (self.get_distance(index) / 2)
-
-            elif not self.flip:
+        match self.current_affect_mode:
+            case 0:
+                vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
+                vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
+            case 1:
                 vertex_0.co = self.starting_positions[index][0]
-                vertex_1.co = vertex_0.co + self.directions[index] * self.get_distance(index)
-
-            else:
+                vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
+            case 2:
                 vertex_1.co = self.starting_positions[index][1]
-                vertex_0.co = vertex_1.co - self.directions[index] * self.get_distance(index)
-        else:
-            if not self.anchored:
-                vertex_0.co = self.starting_positions[index][0] - self.directions[index] * (self.get_distance(index) / 2)
-                vertex_1.co = self.starting_positions[index][1] + self.directions[index] * (self.get_distance(index) / 2)
-
-            elif not self.flip:
-                vertex_0.co = self.starting_positions[index][0]
-                vertex_1.co = self.starting_positions[index][0] + self.directions[index] * self.get_distance(index)
-
-            else:
-                vertex_1.co = self.starting_positions[index][1]
-                vertex_0.co = self.starting_positions[index][1] - self.directions[index] * self.get_distance(index)
+                vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
 
 
         bmesh.update_edit_mesh(context.active_object.data)
 
 
-    def get_distance(self, index):
-        return self.distance if not self.revert_distance else self.starting_distances[index]
+    def get_distance(self ):
+        return self.distance if not self.current_affect_mode == 0 else self.distance / 2
+ 
+    
+    def get_reference_position(self, bm, vertex_pair, index, index_of_vert):
+        if self.revert_distance:
+            return bm.verts[vertex_pair[index_of_vert]].co
+        elif not self.offset_distance:
+            if self.current_affect_mode == 0:
+                return self.midpoints[index]
+            else:
+                return self.starting_positions[index][index_of_vert]
+        else:
+            return self.starting_positions[index][not index_of_vert]
+
     
 
     def finish(self, context):
@@ -219,8 +215,8 @@ class ND_OT_edge_length(BaseOperator):
 
 
     def revert(self, context):
-        self.revert_distance = True
-        self.distances = self.starting_distances
+        self.offset_distance = True
+        self.distance = 0
         self.operate(context)
 
         unregister_draw_handler()
@@ -231,7 +227,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        f"distance: {(self.distance * self.display_unit_scale):.2f}{self.unit_suffix}",
+        f"Distance: {(self.distance * self.display_unit_scale):.2f}{self.unit_suffix}",
         self.unit_step_hint,
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -241,19 +237,14 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Anchored [A]: {}".format('Yes' if self.anchored else 'No'),
-        "Limit the movement to one vertex")
+        "Affect [A]: {}".format(self.affect_modes[self.current_affect_mode].capitalize()),
+        "Affect ({})".format(", ".join([m.capitalize() for m in self.affect_modes])))
+    
 
     draw_hint(
         self,
-        "Flip [F]: {}".format('Yes' if self.flip else 'No'),
-        "Flip the anchored Vertex")
-    
-    if not self.one_pair:
-        draw_hint(
-            self,
-            "Offset [D]: {}".format('Yes' if self.offset_distance else 'No'),
-            "Move the vertices based on their original position")
+        "Distance [D]: {}".format('Offset' if self.offset_distance else 'Overwrite'),
+        "Overwrite, Offset")
     
 
 

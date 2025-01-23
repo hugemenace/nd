@@ -53,7 +53,6 @@ class ND_OT_edge_length(BaseOperator):
                 self.distance = get_stream_value(self.distance_input_stream, self.unit_scaled_factor)
                 self.dirty = True
 
-
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.distance_input_stream) and self.hard_stream_reset or no_stream(self.distance_input_stream):
@@ -61,12 +60,10 @@ class ND_OT_edge_length(BaseOperator):
                     self.dirty = True
                 self.distance_input_stream = new_stream()
             
-
         if pressed(event, {'A'}):
             self.current_affect_mode = (self.current_affect_mode + 1) % len(self.affect_modes)
             self.dirty = True
             self.assign_points()
-
 
         if pressed(event, {'D'}):
             self.offset_distance = not self.offset_distance
@@ -74,18 +71,15 @@ class ND_OT_edge_length(BaseOperator):
             self.dirty = True
             self.assign_points()
 
-
         if self.key_step_up:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance += self.step_size
                 self.dirty = True
 
-
         if self.key_step_down:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance = self.distance - self.step_size
                 self.dirty = True
-
 
         if self.key_confirm:
             self.finish(context)
@@ -133,18 +127,22 @@ class ND_OT_edge_length(BaseOperator):
         self.selected_vertex_pairs = []
         if not self.one_pair:
             self.selected_vertex_pairs = [
-                (e.verts[0].index, e.verts[1].index) 
+                [e.verts[0].index, e.verts[1].index]
+                if self.compare_distance_to_cursor(context, e.verts[0].co, e.verts[1].co) else
+                [e.verts[1].index, e.verts[0].index]
                 for e in selected_edges
             ]
         else:
             self.selected_vertex_pairs = [
-                (selected_verts[0].index, selected_verts[1].index)
+                [selected_verts[0].index, selected_verts[1].index]
+                if self.compare_distance_to_cursor(context, selected_verts[0].co, selected_verts[0].co) else
+                [selected_verts[1].index, selected_verts[0].index] 
             ]
 
         self.current_positions = [
-            (bm.verts[vertex_pair[0]].co, bm.verts[vertex_pair[1]].co) for vertex_pair in self.selected_vertex_pairs] 
+            [bm.verts[vertex_pair[0]].co, bm.verts[vertex_pair[1]].co] for vertex_pair in self.selected_vertex_pairs] 
         self.starting_positions = [
-            (bm.verts[vertex_pair[0]].co.copy(), bm.verts[vertex_pair[1]].co.copy()) for vertex_pair in self.selected_vertex_pairs]
+            [bm.verts[vertex_pair[0]].co.copy(), bm.verts[vertex_pair[1]].co.copy()] for vertex_pair in self.selected_vertex_pairs]
         self.midpoints = [
             v3_average(position_pair) for position_pair in self.current_positions]
         self.directions = [
@@ -175,12 +173,12 @@ class ND_OT_edge_length(BaseOperator):
         return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
-
     def operate(self, context):
         for index, vertex_pair in enumerate(self.selected_vertex_pairs):
             self.move_verts(context, vertex_pair, index)
 
         self.dirty = False
+
 
     def move_verts(self, context, vertex_pair, index):
         bm = bmesh.from_edit_mesh(self.target_object.data)
@@ -216,7 +214,8 @@ class ND_OT_edge_length(BaseOperator):
                 return self.starting_positions[index][index_of_vert]
         else:
             return self.starting_positions[index][not index_of_vert]
-        
+
+
     def assign_points(self):
         self.primary_points.clear()
         self.secondary_points.clear()
@@ -232,6 +231,11 @@ class ND_OT_edge_length(BaseOperator):
                 self.primary_points = [pos_pair[0] for pos_pair in self.current_positions]
                 self.secondary_points = [pos_pair[1] for pos_pair in self.current_positions]
     
+
+    def compare_distance_to_cursor(self, context, coords_0, coords_1):
+        cursor_pos = context.scene.cursor.location
+        return v3_distance(cursor_pos, coords_0) < v3_distance(cursor_pos, coords_1)
+
 
     def finish(self, context):
         unregister_draw_handler()

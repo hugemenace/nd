@@ -38,11 +38,10 @@ from .. lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app
 from .. lib.math import v3_distance, v3_average
 
 
-
 class ND_OT_edge_length(BaseOperator):
     bl_idname = "nd.edge_length"
-    bl_label = "Set edge length"
-    bl_description = """Allows you to accuratly set the distance between two selected vertices or n not connected selected edges"""
+    bl_label = "Edge length"
+    bl_description = """Accurately define or offset the length of any selected disconnected edges"""
 
 
     def do_modal(self, context, event):
@@ -60,7 +59,7 @@ class ND_OT_edge_length(BaseOperator):
                 self.distance_input_stream = new_stream()
             
         if pressed(event, {'A'}):
-            self.current_affect_mode = (self.current_affect_mode + 1) % len(self.affect_modes)
+            self.current_anchor = (self.current_anchor + 1) % len(self.anchors)
             self.dirty = True
 
         if pressed(event, {'D'}):
@@ -100,8 +99,8 @@ class ND_OT_edge_length(BaseOperator):
         self.dirty = False
         self.revert_distance = False
 
-        self.affect_modes = ["Both", "Start", "End"]
-        self.current_affect_mode = 0
+        self.anchors = ["Center", "Start", "End"]
+        self.current_anchor = 0
 
         self.target_object = context.active_object
 
@@ -178,7 +177,7 @@ class ND_OT_edge_length(BaseOperator):
         vertex_0 = bm.verts[vertex_pair[0]]
         vertex_1 = bm.verts[vertex_pair[1]]
         
-        match self.current_affect_mode:
+        match self.current_anchor:
             case 0:
                 vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
                 vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
@@ -189,40 +188,23 @@ class ND_OT_edge_length(BaseOperator):
                 vertex_1.co = self.starting_positions[index][1]
                 vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
 
-
         bmesh.update_edit_mesh(context.active_object.data)
 
 
     def get_distance(self ):
-        return self.distance if not self.current_affect_mode == 0 else self.distance / 2
+        return self.distance if not self.current_anchor == 0 else self.distance / 2
  
     
     def get_reference_position(self, bm, vertex_pair, index, index_of_vert):
         if self.revert_distance:
             return bm.verts[vertex_pair[index_of_vert]].co
         elif not self.offset_distance:
-            if self.current_affect_mode == 0:
+            if self.current_anchor == 0:
                 return self.midpoints[index]
             else:
                 return self.starting_positions[index][index_of_vert]
         else:
             return self.starting_positions[index][not index_of_vert]
-
-
-    def assign_points(self):
-        self.primary_points.clear()
-        self.secondary_points.clear()
-
-
-        match self.current_affect_mode:
-            case 0:
-                self.primary_points = [pos for pos_pair in self.current_positions for pos in pos_pair]
-            case 1:
-                self.primary_points = [pos_pair[1] for pos_pair in self.current_positions]
-                self.secondary_points = [pos_pair[0] for pos_pair in self.current_positions]
-            case 2:
-                self.primary_points = [pos_pair[0] for pos_pair in self.current_positions]
-                self.secondary_points = [pos_pair[1] for pos_pair in self.current_positions]
     
 
     def compare_distance_to_cursor(self, context, coords_0, coords_1):
@@ -257,8 +239,8 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Affect [A]: {}".format(self.affect_modes[self.current_affect_mode].capitalize()),
-        "Affect ({})".format(", ".join([m.capitalize() for m in self.affect_modes])))
+        "Affect [A]: {}".format(self.anchors[self.current_anchor].capitalize()),
+        "Affect ({})".format(", ".join([m.capitalize() for m in self.anchors])))
     
 
     draw_hint(

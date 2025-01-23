@@ -263,8 +263,8 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Distance [D]: {}".format('Offset' if self.offset_distance else 'Overwrite'),
-        "Overwrite, Offset")
+        "Distance [D]: {}".format('Offset' if self.offset_distance else 'Absolute'),
+        "Absolute, Offset")
     
 
 

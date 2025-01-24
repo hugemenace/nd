@@ -64,7 +64,11 @@ class ND_OT_edge_length(BaseOperator):
 
         if pressed(event, {'D'}):
             self.offset_distance = not self.offset_distance
-            self.distance += sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else - sum(self.starting_distances) / len(self.starting_distances)
+
+            offset_distance = (sum(self.starting_distances) / len(self.starting_distances)) * -1.0
+            absolute_distance = sum(self.starting_distances) / len(self.starting_distances)
+
+            self.distance += absolute_distance if not self.offset_distance else offset_distance
             self.dirty = True
 
         if self.key_step_up:

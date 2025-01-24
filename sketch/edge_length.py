@@ -36,6 +36,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 from .. lib.math import v3_distance, v3_average, v3_direction
+from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
 class ND_OT_edge_length(BaseOperator):
@@ -108,6 +109,7 @@ class ND_OT_edge_length(BaseOperator):
         self.distance = 0
 
         self.target_object = context.active_object
+        self.world_matrix = context.active_object.matrix_world
 
         self.distance_input_stream = new_stream()
 
@@ -161,6 +163,9 @@ class ND_OT_edge_length(BaseOperator):
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
+        init_points(self)
+        register_points_handler(self)
+
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
@@ -175,6 +180,31 @@ class ND_OT_edge_length(BaseOperator):
     def operate(self, context):
         for index, vertex_pair in enumerate(self.selected_vertex_pairs):
             self.move_verts(context, vertex_pair, index)
+
+        if self.current_anchor == 0:
+            self.primary_points = [self.world_matrix @ point for point in self.midpoints]
+            self.secondary_points = []
+            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+                self.secondary_points.extend([
+                    self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
+                    self.world_matrix @ self.bm.verts[vertex_pair[1]].co
+                ])
+
+        if self.current_anchor == 1:
+            self.primary_points = [self.world_matrix @ point[0] for point in self.starting_positions]
+            self.secondary_points = []
+            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+                self.secondary_points.extend([
+                    self.world_matrix @ self.bm.verts[vertex_pair[1]].co,
+                ])
+
+        if self.current_anchor == 2:
+            self.primary_points = [self.world_matrix @ point[1] for point in self.starting_positions]
+            self.secondary_points = []
+            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+                self.secondary_points.extend([
+                    self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
+                ])
 
         self.dirty = False
 
@@ -221,6 +251,7 @@ class ND_OT_edge_length(BaseOperator):
 
     def finish(self, context):
         unregister_draw_handler()
+        unregister_points_handler()
 
 
     def revert(self, context):
@@ -229,6 +260,7 @@ class ND_OT_edge_length(BaseOperator):
         self.operate(context)
 
         unregister_draw_handler()
+        unregister_points_handler()
 
 
 def draw_text_callback(self):
@@ -261,3 +293,4 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_edge_length)
     unregister_draw_handler()
+    unregister_points_handler()

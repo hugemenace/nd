@@ -54,6 +54,10 @@ def v3_distance(a, b):
     return (a - b).length
 
 
+def v3_direction(a, b):
+    return (b - a).normalized()
+
+
 def get_edge_normal(edge):
     return v3_sum_normalized([face.normal for face in edge.link_faces])
 

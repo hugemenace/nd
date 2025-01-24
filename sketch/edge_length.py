@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
-from .. lib.math import v3_distance, v3_average
+from .. lib.math import v3_distance, v3_average, v3_direction
 
 
 class ND_OT_edge_length(BaseOperator):
@@ -57,14 +57,14 @@ class ND_OT_edge_length(BaseOperator):
                     self.distance = self.starting_distance
                     self.dirty = True
                 self.distance_input_stream = new_stream()
-            
+
         if pressed(event, {'A'}):
             self.current_anchor = (self.current_anchor + 1) % len(self.anchors)
             self.dirty = True
 
         if pressed(event, {'D'}):
             self.offset_distance = not self.offset_distance
-            self.distance += sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else - sum(self.starting_distances) / len(self.starting_distances) 
+            self.distance += sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else - sum(self.starting_distances) / len(self.starting_distances)
             self.dirty = True
 
         if self.key_step_up:
@@ -95,58 +95,63 @@ class ND_OT_edge_length(BaseOperator):
         if context.active_object is None:
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
-        
-        self.dirty = False
-        self.revert_distance = False
 
+        self.dirty = False
+
+        self.revert_distance = False
         self.anchors = ["Center", "Start", "End"]
         self.current_anchor = 0
+        self.distance = 0
 
         self.target_object = context.active_object
 
         self.distance_input_stream = new_stream()
 
-        bm = bmesh.from_edit_mesh(context.active_object.data)
-        selected_verts = [v for v in bm.verts if v.select]
-        selected_edges = [e for e in bm.edges if e.select]
-        self.one_pair = len(selected_verts) == 2
-        self.offset_distance = not self.one_pair
+        self.bm = bmesh.from_edit_mesh(context.active_object.data)
+        self.bm.verts.ensure_lookup_table()
 
-        if not self.one_pair and len([v.index for e in selected_edges for v in e.verts]) != len(selected_verts):
-            self.report({'INFO'}, "Select two vertices or n edges")
+        selected_verts = [v for v in self.bm.verts if v.select]
+        selected_edges = [e for e in self.bm.edges if e.select]
+
+        self.single_edge = len(selected_verts) == 2
+        self.offset_distance = not self.single_edge
+
+        if not self.single_edge and len([v.index for e in selected_edges for v in e.verts]) != len(selected_verts):
+            self.report({'INFO'}, "Selected edges must be disconnected.")
             return {'CANCELLED'}
-        
-        
+
         self.selected_vertex_pairs = []
-        if not self.one_pair:
+        if not self.single_edge:
             self.selected_vertex_pairs = [
-                [e.verts[0].index, e.verts[1].index]
-                if self.compare_distance_to_cursor(context, e.verts[0].co, e.verts[1].co) else
-                [e.verts[1].index, e.verts[0].index]
-                for e in selected_edges
+                [edge.verts[0].index, edge.verts[1].index]
+                if self.compare_distance_to_cursor(context, edge.verts[0].co, edge.verts[1].co) else
+                [edge.verts[1].index, edge.verts[0].index]
+                for edge in selected_edges
             ]
         else:
             self.selected_vertex_pairs = [
                 [selected_verts[0].index, selected_verts[1].index]
                 if self.compare_distance_to_cursor(context, selected_verts[0].co, selected_verts[0].co) else
-                [selected_verts[1].index, selected_verts[0].index] 
+                [selected_verts[1].index, selected_verts[0].index]
             ]
 
-        self.current_positions = [
-            [bm.verts[vertex_pair[0]].co, bm.verts[vertex_pair[1]].co] for vertex_pair in self.selected_vertex_pairs] 
-        self.starting_positions = [
-            [bm.verts[vertex_pair[0]].co.copy(), bm.verts[vertex_pair[1]].co.copy()] for vertex_pair in self.selected_vertex_pairs]
-        self.midpoints = [
-            v3_average(position_pair) for position_pair in self.starting_positions]
-        self.directions = [
-            (position_pair[1] - position_pair[0]).normalized() for position_pair in self.starting_positions]
-        self.starting_distances = [
-            v3_distance(position_pair[0], position_pair[1]) for position_pair in self.starting_positions]
-        self.distance = sum(self.starting_distances) / len(self.starting_distances) if not self.offset_distance else 0
+        self.current_positions = [[
+            self.bm.verts[vert_pair[0]].co,
+            self.bm.verts[vert_pair[1]].co
+        ] for vert_pair in self.selected_vertex_pairs]
 
-        bm.free()
+        self.starting_positions = [[
+            self.bm.verts[vert_pair[0]].co.copy(),
+            self.bm.verts[vert_pair[1]].co.copy()
+        ] for vert_pair in self.selected_vertex_pairs]
 
-        
+        self.midpoints = [v3_average(pos_pair) for pos_pair in self.starting_positions]
+        self.directions = [v3_direction(pos_pair[0], pos_pair[1]) for pos_pair in self.starting_positions]
+        self.starting_distances = [v3_distance(pos_pair[0], pos_pair[1]) for pos_pair in self.starting_positions]
+
+        if not self.offset_distance:
+            self.distance = sum(self.starting_distances) / len(self.starting_distances)
+
         capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
@@ -171,41 +176,39 @@ class ND_OT_edge_length(BaseOperator):
 
 
     def move_verts(self, context, vertex_pair, index):
-        bm = bmesh.from_edit_mesh(self.target_object.data)
-        bm.verts.ensure_lookup_table()
+        vertex_0 = self.bm.verts[vertex_pair[0]]
+        vertex_1 = self.bm.verts[vertex_pair[1]]
 
-        vertex_0 = bm.verts[vertex_pair[0]]
-        vertex_1 = bm.verts[vertex_pair[1]]
-        
         match self.current_anchor:
             case 0:
-                vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
-                vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
+                vertex_0.co = self.get_reference_position(vertex_pair, index, 1) - self.directions[index] * self.get_distance()
+                vertex_1.co = self.get_reference_position(vertex_pair, index, 0) + self.directions[index] * self.get_distance()
             case 1:
                 vertex_0.co = self.starting_positions[index][0]
-                vertex_1.co = self.get_reference_position(bm, vertex_pair, index, 0) + self.directions[index] * self.get_distance()
+                vertex_1.co = self.get_reference_position(vertex_pair, index, 0) + self.directions[index] * self.get_distance()
             case 2:
                 vertex_1.co = self.starting_positions[index][1]
-                vertex_0.co = self.get_reference_position(bm, vertex_pair, index, 1) - self.directions[index] * self.get_distance()
+                vertex_0.co = self.get_reference_position(vertex_pair, index, 1) - self.directions[index] * self.get_distance()
 
         bmesh.update_edit_mesh(context.active_object.data)
 
 
     def get_distance(self ):
         return self.distance if not self.current_anchor == 0 else self.distance / 2
- 
-    
-    def get_reference_position(self, bm, vertex_pair, index, index_of_vert):
+
+
+    def get_reference_position(self, vertex_pair, pos_index, vert_index):
         if self.revert_distance:
-            return bm.verts[vertex_pair[index_of_vert]].co
-        elif not self.offset_distance:
-            if self.current_anchor == 0:
-                return self.midpoints[index]
-            else:
-                return self.starting_positions[index][index_of_vert]
-        else:
-            return self.starting_positions[index][not index_of_vert]
-    
+            return self.bm.verts[vertex_pair[vert_index]].co
+
+        if self.offset_distance:
+            return self.starting_positions[pos_index][not vert_index]
+
+        if self.current_anchor == 0:
+            return self.midpoints[pos_index]
+
+        return self.starting_positions[pos_index][vert_index]
+
 
     def compare_distance_to_cursor(self, context, coords_0, coords_1):
         cursor_pos = context.scene.cursor.location
@@ -236,18 +239,15 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.distance_input_stream)
 
-
     draw_hint(
         self,
-        "Affect [A]: {}".format(self.anchors[self.current_anchor].capitalize()),
-        "Affect ({})".format(", ".join([m.capitalize() for m in self.anchors])))
-    
+        "Anchor [A]: {}".format(self.anchors[self.current_anchor].capitalize()),
+        ", ".join([m.capitalize() for m in self.anchors]))
 
     draw_hint(
         self,
         "Distance [D]: {}".format('Offset' if self.offset_distance else 'Absolute'),
         "Absolute, Offset")
-    
 
 
 def register():

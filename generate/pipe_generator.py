@@ -36,7 +36,7 @@ from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
-from .. lib.polling import ctx_obj_mode, ctx_objects_selected, app_minor_version
+from .. lib.polling import ctx_obj_mode, ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
@@ -247,6 +247,7 @@ CTRL — Remove existing modifiers"""
 
     def do_invoke(self, context, event):
         self.dirty = False
+        self.edit_mode = ctx_edit_mode(context)
 
         self.profile_segments_input_stream = new_stream()
         self.profile_radius_input_stream = new_stream()
@@ -272,14 +273,17 @@ CTRL — Remove existing modifiers"""
         self.vertex_radius_attr = None
         self.vertex_segments_attr = None
 
+        if len(self.bm.edges) < 1:
+            self.report({'INFO'}, "Selected object has no edges")
+            return {'CANCELLED'}
+
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='OBJECT')
+
         self.configure_attributes(context)
 
         self.vertex_radius_input_streams = [new_stream() for _ in self.vertex_radius_attr.data]
         self.vertex_segments_input_streams = [new_stream() for _ in self.vertex_segments_attr.data]
-
-        if len(self.bm.edges) < 1:
-            self.report({'INFO'}, "Selected object has no edges")
-            return {'CANCELLED'}
 
         previous_op = False
         for mod in context.active_object.modifiers:
@@ -325,7 +329,12 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
-        return ctx_obj_mode(context) and ctx_objects_selected(context, 1)
+        if ctx_obj_mode(context):
+            target_object = get_real_active_object(context)
+            return obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+        if ctx_edit_mode(context):
+            return obj_is_mesh(context.active_object)
 
 
     def prepare_new_operator(self, context):
@@ -423,6 +432,9 @@ CTRL — Remove existing modifiers"""
 
 
     def finish(self, context):
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='EDIT')
+
         unregister_draw_handler()
         unregister_points_handler()
 
@@ -447,6 +459,9 @@ CTRL — Remove existing modifiers"""
         if not self.summoned:
             remove_modifiers_ending_with([context.active_object], 'Pipe Generator — ND')
             remove_modifiers_ending_with([context.active_object], '— ND SBA')
+
+        if self.edit_mode:
+            bpy.ops.object.mode_set(mode='EDIT')
 
         unregister_draw_handler()
         unregister_points_handler()

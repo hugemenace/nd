@@ -49,6 +49,7 @@ sketch_ops = [
 
 generator_ops = [
     ("nd.hole_generator", 'PROP_CON', None, None, False),
+    ("nd.pipe_generator", 'GRAPH', None, None, False),
 ]
 
 boolean_ops = [

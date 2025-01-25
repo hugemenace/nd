@@ -66,6 +66,15 @@ class ND_OT_pipe_generator(BaseOperator):
         segment_factor = 1 if self.key_shift else 2
 
         if self.key_numeric_input:
+            if self.configure_corners:
+                if self.key_ctrl:
+                    self.vertex_radius_input_streams[self.selected_vertex_index] = update_stream(self.vertex_radius_input_streams[self.selected_vertex_index], event.type)
+                    self.vertex_radius_attr.data[self.selected_vertex_index].value = get_stream_value(self.vertex_radius_input_streams[self.selected_vertex_index], self.unit_scaled_factor)
+                    self.dirty = True
+                elif self.key_alt:
+                    self.vertex_segments_input_streams[self.selected_vertex_index] = update_stream(self.vertex_segments_input_streams[self.selected_vertex_index], event.type)
+                    self.vertex_segments_attr.data[self.selected_vertex_index].value = int(get_stream_value(self.vertex_segments_input_streams[self.selected_vertex_index], min_value=0))
+                    self.dirty = True
             if not self.configure_corners:
                 if self.key_no_modifiers:
                     self.profile_radius_input_stream = update_stream(self.profile_radius_input_stream, event.type)
@@ -85,6 +94,17 @@ class ND_OT_pipe_generator(BaseOperator):
                     self.dirty = True
 
         if self.key_reset:
+            if self.configure_corners:
+                if self.key_ctrl:
+                    if has_stream(self.vertex_radius_input_streams[self.selected_vertex_index]) and self.hard_stream_reset or no_stream(self.vertex_radius_input_streams[self.selected_vertex_index]):
+                        self.vertex_radius_attr.data[self.selected_vertex_index].value = 0.0
+                        self.dirty = True
+                    self.vertex_radius_input_streams[self.selected_vertex_index] = new_stream()
+                elif self.key_alt:
+                    if has_stream(self.vertex_segments_input_streams[self.selected_vertex_index]) and self.hard_stream_reset or no_stream(self.vertex_segments_input_streams[self.selected_vertex_index]):
+                        self.vertex_segments_attr.data[self.selected_vertex_index].value = 0
+                        self.dirty = True
+                    self.vertex_segments_input_streams[self.selected_vertex_index] = new_stream()
             if not self.configure_corners:
                 if self.key_no_modifiers:
                     if has_stream(self.profile_radius_input_stream) and self.hard_stream_reset or no_stream(self.profile_radius_input_stream):
@@ -131,12 +151,12 @@ class ND_OT_pipe_generator(BaseOperator):
                 if self.key_no_modifiers:
                     self.selected_vertex_index = (self.selected_vertex_index + 1) % len(self.vertex_cache)
                     self.dirty = True
-                elif self.key_ctrl:
+                elif no_stream(self.vertex_radius_input_streams[self.selected_vertex_index]) and self.key_ctrl:
                     vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
                     vertex_radius += self.step_size
                     self.vertex_radius_attr.data[self.selected_vertex_index].value = vertex_radius
                     self.dirty = True
-                elif self.key_alt:
+                elif no_stream(self.vertex_segments_input_streams[self.selected_vertex_index]) and self.key_alt:
                     vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
                     vertex_segments += 1
                     self.vertex_segments_attr.data[self.selected_vertex_index].value = vertex_segments
@@ -163,12 +183,12 @@ class ND_OT_pipe_generator(BaseOperator):
                 if self.key_no_modifiers:
                     self.selected_vertex_index = (self.selected_vertex_index - 1) % len(self.vertex_cache)
                     self.dirty = True
-                elif self.key_ctrl:
+                elif no_stream(self.vertex_radius_input_streams[self.selected_vertex_index]) and self.key_ctrl:
                     vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
                     vertex_radius = max(0, vertex_radius - self.step_size)
                     self.vertex_radius_attr.data[self.selected_vertex_index].value = vertex_radius
                     self.dirty = True
-                elif self.key_alt:
+                elif no_stream(self.vertex_segments_input_streams[self.selected_vertex_index]) and self.key_alt:
                     vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
                     vertex_segments = max(0, vertex_segments - 1)
                     self.vertex_segments_attr.data[self.selected_vertex_index].value = vertex_segments
@@ -251,6 +271,11 @@ class ND_OT_pipe_generator(BaseOperator):
         self.vertex_radius_attr = None
         self.vertex_segments_attr = None
 
+        self.configure_attributes(context)
+
+        self.vertex_radius_input_streams = [new_stream() for _ in self.vertex_radius_attr.data]
+        self.vertex_segments_input_streams = [new_stream() for _ in self.vertex_segments_attr.data]
+
         if len(self.bm.edges) < 1:
             self.report({'INFO'}, "Selected object has no edges")
             return {'CANCELLED'}
@@ -261,8 +286,6 @@ class ND_OT_pipe_generator(BaseOperator):
                 self.pipe_gen = mod
                 previous_op = True
                 break
-
-        self.configure_attributes(context)
 
         if previous_op:
             self.summon_old_operator(context)
@@ -318,6 +341,14 @@ class ND_OT_pipe_generator(BaseOperator):
             self.profile_segments_input_stream = set_stream(self.profile_segments)
             self.base_corner_radius_input_stream = set_stream(self.base_corner_radius)
             self.base_corner_segments_input_stream = set_stream(self.base_corner_segments)
+
+            for i, attr in enumerate(self.vertex_radius_attr.data):
+                if attr.value != 0.0:
+                    self.vertex_radius_input_streams[i] = set_stream(attr.value)
+
+            for i, attr in enumerate(self.vertex_segments_attr.data):
+                if attr.value != 0:
+                    self.vertex_segments_input_streams[i] = set_stream(attr.value)
 
         self.prev_vertex_radii = [attr.value for attr in self.vertex_radius_attr.data]
         self.prev_vertex_segments = [attr.value for attr in self.vertex_segments_attr.data]
@@ -427,7 +458,8 @@ def draw_text_callback(self):
             self.generate_key_hint("Ctrl", self.unit_step_hint),
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
-            mouse_value=True)
+            mouse_value=True,
+            input_stream=self.vertex_radius_input_streams[self.selected_vertex_index])
 
         vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
         draw_property(
@@ -436,7 +468,8 @@ def draw_text_callback(self):
             self.generate_key_hint("Alt", self.unit_step_hint),
             active=self.key_alt,
             alt_mode=self.key_shift_alt,
-            mouse_value=True)
+            mouse_value=True,
+            input_stream=self.vertex_segments_input_streams[self.selected_vertex_index])
 
         draw_hint(self, "Reset Corner [R]", "Reverts active corner parameters to default values")
 

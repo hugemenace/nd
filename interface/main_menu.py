@@ -55,7 +55,7 @@ class ND_MT_main_menu(bpy.types.Menu):
         layout.menu("ND_MT_sketch_menu", text="Sketch", icon='GROUP_UVS')
 
         if app_minor_version() >= (4, 3):
-            layout.menu("ND_MT_generators_menu", text="Generate", icon='GEOMETRY_SET')
+            layout.menu("ND_MT_generators_menu", text="Generators", icon='GEOMETRY_SET')
 
         layout.separator()
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')

@@ -28,10 +28,14 @@
 import bpy
 from . import ops
 from . common import render_ops
+from .. __init__ import bl_info
+
+
+keys = []
 
 
 class ND_MT_generators_menu(bpy.types.Menu):
-    bl_label = "Generate"
+    bl_label = "ND v%s — Generators" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_generators_menu"
 
 
@@ -44,6 +48,17 @@ class ND_MT_generators_menu(bpy.types.Menu):
 def register():
     bpy.utils.register_class(ND_MT_generators_menu)
 
+    for mapping in [('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
+        keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
+        entry = keymap.keymap_items.new("wm.call_menu", 'G', 'PRESS', shift=True, alt=True)
+        entry.properties.name = "ND_MT_generators_menu"
+        keys.append((keymap, entry))
+
 
 def unregister():
+    for keymap, entry in keys:
+        keymap.keymap_items.remove(entry)
+
+    keys.clear()
+
     bpy.utils.unregister_class(ND_MT_generators_menu)

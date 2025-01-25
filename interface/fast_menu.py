@@ -156,7 +156,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.operator("nd.screw", icon=icons['nd.screw'])
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
-            layout.operator("nd.pipe_extrude", icon=icons['nd.pipe_extrude'])
+            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
 
             self.draw_make_edge_face_ops(context)
 
@@ -205,7 +205,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         mod_names = [mod.name for mod in target_object.modifiers]
 
         has_mod_profile_extrude = False
-        has_mod_pipe_extrude = False
+        has_mod_pipe_generator = False
         has_mod_solidify = False
         has_mod_boolean = False
         has_mod_screw = False
@@ -216,7 +216,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         for name in mod_names:
             has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
-            has_mod_pipe_extrude = has_mod_pipe_extrude or bool("— ND PIPE" in name)
+            has_mod_pipe_generator = has_mod_pipe_generator or bool("Pipe Generator" in name)
             has_mod_solidify = has_mod_solidify or bool("— ND SOL" in name)
             has_mod_boolean = has_mod_boolean or bool("— ND Bool" in name)
             has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
@@ -244,9 +244,9 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_mod_profile_extrude = True
             replay_prediction_count += 1
 
-        if (not self.manifold and self.has_loose_edges) or has_mod_pipe_extrude:
-            layout.operator("nd.pipe_extrude", icon=icons['nd.pipe_extrude'])
-            has_mod_pipe_extrude = True
+        if self.profile or has_mod_pipe_generator:
+            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
+            has_mod_pipe_generator = True
             replay_prediction_count += 1
 
         if has_mod_screw:
@@ -289,7 +289,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if self.profile:
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
-            layout.operator("nd.pipe_extrude", icon=icons['nd.pipe_extrude']) if not has_mod_profile_extrude else None
+            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator']) if not has_mod_pipe_generator else None
             layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
 

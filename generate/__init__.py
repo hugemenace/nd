@@ -26,54 +26,15 @@
 # ---
 
 import importlib
-from . import main_ui_panel
-from . import main_menu
-from . import sketch_menu
-from . import generators_menu
-from . import utils_menu
-from . import fast_menu
-from . import boolean_menu
-from . import packaging_menu
-from . import id_material_menu
-from . import scene_menu
-from . import bevel_menu
-from . import simplify_menu
-from . import shading_menu
-from . import extrude_menu
-from . import replicate_menu
-from . import deform_menu
-from . import viewport_menu
-from . import reset_theme
-from . import ops
-from . import common
+from . import hole_generator
 
 
 registerables = (
-    main_ui_panel,
-    main_menu,
-    sketch_menu,
-    generators_menu,
-    utils_menu,
-    fast_menu,
-    boolean_menu,
-    packaging_menu,
-    id_material_menu,
-    scene_menu,
-    bevel_menu,
-    simplify_menu,
-    shading_menu,
-    extrude_menu,
-    replicate_menu,
-    deform_menu,
-    viewport_menu,
-    reset_theme,
+    hole_generator,
 )
 
 
 def reload():
-    importlib.reload(ops)
-    importlib.reload(common)
-
     for registerable in registerables:
         importlib.reload(registerable)
 

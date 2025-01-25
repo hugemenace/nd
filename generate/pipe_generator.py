@@ -37,6 +37,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, ctx_objects_selected, app_minor_version
+from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
 socket_map = {
@@ -114,7 +115,32 @@ class ND_OT_pipe_generator(BaseOperator):
             self.configure_corners = not self.configure_corners
             self.dirty = True
 
+        if self.configure_corners and pressed(event, {'R'}):
+            self.vertex_radius_attr.data[self.selected_vertex_index].value = 0.0
+            self.vertex_segments_attr.data[self.selected_vertex_index].value = 0
+
+        if self.configure_corners and pressed(event, {'A'}):
+            for i, attr in enumerate(self.vertex_radius_attr.data):
+                attr.value = 0.0
+
+            for i, attr in enumerate(self.vertex_segments_attr.data):
+                attr.value = 0
+
         if self.key_step_up:
+            if self.configure_corners:
+                if self.key_no_modifiers:
+                    self.selected_vertex_index = (self.selected_vertex_index + 1) % len(self.vertex_cache)
+                    self.dirty = True
+                elif self.key_ctrl:
+                    vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
+                    vertex_radius += self.step_size
+                    self.vertex_radius_attr.data[self.selected_vertex_index].value = vertex_radius
+                    self.dirty = True
+                elif self.key_alt:
+                    vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
+                    vertex_segments += 1
+                    self.vertex_segments_attr.data[self.selected_vertex_index].value = vertex_segments
+                    self.dirty = True
             if not self.configure_corners:
                 if self.extend_mouse_values and no_stream(self.profile_segments_input_stream) and self.key_no_modifiers:
                     self.profile_segments = 4 if self.profile_segments == 3 else self.profile_segments + segment_factor
@@ -133,6 +159,20 @@ class ND_OT_pipe_generator(BaseOperator):
                     self.dirty = True
 
         if self.key_step_down:
+            if self.configure_corners:
+                if self.key_no_modifiers:
+                    self.selected_vertex_index = (self.selected_vertex_index - 1) % len(self.vertex_cache)
+                    self.dirty = True
+                elif self.key_ctrl:
+                    vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
+                    vertex_radius = max(0, vertex_radius - self.step_size)
+                    self.vertex_radius_attr.data[self.selected_vertex_index].value = vertex_radius
+                    self.dirty = True
+                elif self.key_alt:
+                    vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
+                    vertex_segments = max(0, vertex_segments - 1)
+                    self.vertex_segments_attr.data[self.selected_vertex_index].value = vertex_segments
+                    self.dirty = True
             if not self.configure_corners:
                 if self.extend_mouse_values and no_stream(self.profile_segments_input_stream) and self.key_no_modifiers:
                     self.profile_segments = max(3, self.profile_segments - segment_factor)
@@ -150,7 +190,7 @@ class ND_OT_pipe_generator(BaseOperator):
                     self.base_corner_segments = max(1, self.base_corner_segments - segment_factor)
                     self.dirty = True
 
-        if not self.configure_corners and self.key_confirm:
+        if self.key_confirm:
             self.finish(context)
             return {'FINISHED'}
 
@@ -158,6 +198,17 @@ class ND_OT_pipe_generator(BaseOperator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
+            if self.configure_corners:
+                if self.key_ctrl:
+                    vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
+                    vertex_radius = max(0, vertex_radius + self.mouse_value)
+                    self.vertex_radius_attr.data[self.selected_vertex_index].value = vertex_radius
+                    self.dirty = True
+                elif self.key_alt:
+                    vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
+                    vertex_segments = max(0, vertex_segments + self.mouse_step)
+                    self.vertex_segments_attr.data[self.selected_vertex_index].value = vertex_segments
+                    self.dirty = True
             if not self.configure_corners:
                 if no_stream(self.profile_radius_input_stream) and self.key_no_modifiers:
                     self.profile_radius = max(0, self.profile_radius + self.mouse_value)
@@ -189,9 +240,20 @@ class ND_OT_pipe_generator(BaseOperator):
         self.base_corner_segments = default_base_corner_segments
         self.base_corner_radius = default_base_corner_radius
 
-        self.selected_vertex = None
-        self.custom_corner_radius = 0.0
-        self.custom_corner_segments = 0
+        self.selected_vertex_index = 0
+
+        self.bm = bmesh.new()
+        self.bm.from_mesh(context.active_object.data)
+        self.bm.verts.ensure_lookup_table()
+        self.bm.edges.ensure_lookup_table()
+
+        self.attributes = context.active_object.data.attributes
+        self.vertex_radius_attr = None
+        self.vertex_segments_attr = None
+
+        if len(self.bm.edges) < 1:
+            self.report({'INFO'}, "Selected object has no edges")
+            return {'CANCELLED'}
 
         previous_op = False
         for mod in context.active_object.modifiers:
@@ -200,10 +262,15 @@ class ND_OT_pipe_generator(BaseOperator):
                 previous_op = True
                 break
 
+        self.configure_attributes(context)
+
         if previous_op:
             self.summon_old_operator(context)
         else:
             self.prepare_new_operator(context)
+
+        self.world_matrix = context.active_object.matrix_world
+        self.vertex_cache = [(v, self.world_matrix @ v.co) for v in self.bm.verts]
 
         self.operate(context)
 
@@ -211,6 +278,9 @@ class ND_OT_pipe_generator(BaseOperator):
 
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
+
+        init_points(self)
+        register_points_handler(self)
 
         context.window_manager.modal_handler_add(self)
 
@@ -228,7 +298,6 @@ class ND_OT_pipe_generator(BaseOperator):
         self.pipe_gen_object = get_real_active_object(context)
 
         self.add_pipe_generator(context)
-        self.add_attributes(context)
         self.add_smooth_shading(context)
 
 
@@ -237,18 +306,21 @@ class ND_OT_pipe_generator(BaseOperator):
 
         self.pipe_gen_object = get_real_active_object(context)
 
-        self.segments_prev = self.segments = self.hole_gen[socket_map["segments"]]
-        self.hole_diameter_prev = self.hole_diameter = self.hole_gen[socket_map["hole_diameter"]]
-        self.hole_depth_prev = self.hole_depth = self.hole_gen[socket_map["hole_depth"]]
-        self.counter_diameter_prev = self.counter_diameter = self.hole_gen[socket_map["counter_diameter"]]
-        self.hole_type_prev = self.hole_type = self.hole_gen[socket_map["hole_type"]]
-        self.drill_point_prev = self.drill_point = self.hole_gen[socket_map["drill_point"]]
+        self.profile_radius_prev = self.profile_radius = self.pipe_gen[socket_map["profile_radius"]]
+        self.profile_segments_prev = self.profile_segments = self.pipe_gen[socket_map["profile_segments"]]
+        self.base_corner_radius_prev = self.base_corner_radius = self.pipe_gen[socket_map["base_corner_radius"]]
+        self.base_corner_segments_prev = self.base_corner_segments = self.pipe_gen[socket_map["base_corner_segments"]]
+        self.fill_caps_prev = self.fill_caps = self.pipe_gen[socket_map["fill_caps"]]
+        self.vertex_merge_distance_prev = self.vertex_merge_distance = self.pipe_gen[socket_map["vertex_merge_distance"]]
 
         if get_preferences().lock_overlay_parameters_on_recall:
-            self.hole_diameter_input_stream = set_stream(self.hole_diameter)
-            self.segments_input_stream = set_stream(self.segments)
-            self.hole_depth_input_stream = set_stream(self.hole_depth)
-            self.counter_diameter_input_stream = set_stream(self.counter_diameter)
+            self.profile_radius_input_stream = set_stream(self.profile_radius)
+            self.profile_segments_input_stream = set_stream(self.profile_segments)
+            self.base_corner_radius_input_stream = set_stream(self.base_corner_radius)
+            self.base_corner_segments_input_stream = set_stream(self.base_corner_segments)
+
+        self.prev_vertex_radii = [attr.value for attr in self.vertex_radius_attr.data]
+        self.prev_vertex_segments = [attr.value for attr in self.vertex_segments_attr.data]
 
 
     def add_pipe_generator(self, context):
@@ -258,9 +330,14 @@ class ND_OT_pipe_generator(BaseOperator):
         self.pipe_gen = pipe_gen
 
 
-    def add_attributes(self, context):
-        bpy.ops.geometry.attribute_add(name="ND.VertexRadius", domain='POINT', data_type='FLOAT')
-        bpy.ops.geometry.attribute_add(name="ND.VertexSegments", domain='POINT', data_type='INT')
+    def configure_attributes(self, context):
+        self.vertex_radius_attr = self.attributes.get("ND.VertexRadius")
+        if self.vertex_radius_attr == None:
+            self.vertex_radius_attr = self.attributes.new(name="ND.VertexRadius", type='FLOAT', domain='POINT')
+
+        self.vertex_segments_attr = self.attributes.get("ND.VertexSegments")
+        if self.vertex_segments_attr == None:
+            self.vertex_segments_attr = self.attributes.new(name="ND.VertexSegments", type='INT', domain='POINT')
 
 
     def add_smooth_shading(self, context):
@@ -277,51 +354,93 @@ class ND_OT_pipe_generator(BaseOperator):
 
 
     def operate(self, context):
-        self.pipe_gen[socket_map["profile_radius"]] = self.profile_radius
-        self.pipe_gen[socket_map["profile_segments"]] = int(self.profile_segments)
-        self.pipe_gen[socket_map["base_corner_radius"]] = self.base_corner_radius
-        self.pipe_gen[socket_map["base_corner_segments"]] = int(self.base_corner_segments)
-        self.pipe_gen[socket_map["fill_caps"]] = self.fill_caps
+        self.primary_points = []
+        self.secondary_points = []
 
-        if not self.summoned:
-            self.pipe_gen[socket_map["vertex_merge_distance"]] = min(self.profile_radius, self.base_corner_radius) * 0.1
+        if self.configure_corners:
+            selected_vertex = self.vertex_cache[self.selected_vertex_index]
 
-        self.pipe_gen.node_group.interface_update(context)
+            self.primary_points = [selected_vertex[1]]
+            self.secondary_points = [point for _v, point in self.vertex_cache if point != selected_vertex[1]]
+
+        if not self.configure_corners:
+            self.pipe_gen[socket_map["profile_radius"]] = self.profile_radius
+            self.pipe_gen[socket_map["profile_segments"]] = int(self.profile_segments)
+            self.pipe_gen[socket_map["base_corner_radius"]] = self.base_corner_radius
+            self.pipe_gen[socket_map["base_corner_segments"]] = int(self.base_corner_segments)
+            self.pipe_gen[socket_map["fill_caps"]] = self.fill_caps
+
+            if not self.summoned:
+                self.pipe_gen[socket_map["vertex_merge_distance"]] = min(self.profile_radius, self.base_corner_radius) * 0.1
+
+            self.pipe_gen.node_group.interface_update(context)
 
         self.dirty = False
 
 
     def finish(self, context):
         unregister_draw_handler()
+        unregister_points_handler()
 
 
     def revert(self, context):
-        # if self.summoned:
-        #     self.segments = self.segments_prev
-        #     self.hole_diameter = self.hole_diameter_prev
-        #     self.hole_depth = self.hole_depth_prev
-        #     self.counter_diameter = self.counter_diameter_prev
-        #     self.hole_type = self.hole_type_prev
-        #     self.drill_point = self.drill_point_prev
+        if self.summoned:
+            self.profile_radius = self.profile_radius_prev
+            self.profile_segments = self.profile_segments_prev
+            self.base_corner_radius = self.base_corner_radius_prev
+            self.base_corner_segments = self.base_corner_segments_prev
+            self.fill_caps = self.fill_caps_prev
+            self.vertex_merge_distance = self.vertex_merge_distance_prev
 
-        #     self.operate(context)
+            for i, attr in enumerate(self.vertex_radius_attr.data):
+                attr.value = self.prev_vertex_radii[i]
 
-        # if not self.summoned:
-        #     bpy.data.objects.remove(self.pipe_gen_object, do_unlink=True)
+            for i, attr in enumerate(self.vertex_segments_attr.data):
+                attr.value = self.prev_vertex_segments[i]
+
+            self.operate(context)
+
+        if not self.summoned:
+            remove_modifiers_ending_with(context.active_object, 'Pipe Generator — ND')
+            remove_modifiers_ending_with(context.active_object, 'Smooth')
 
         unregister_draw_handler()
+        unregister_points_handler()
 
 
 def draw_text_callback(self):
     draw_header(self)
 
     if self.configure_corners:
-        if not self.selected_vertex:
-            draw_hint(
-                self,
-                "Select a corner vertex to configure",
-                "Once selected, you can adjust the corner radius and segments"
-            )
+        draw_property(
+            self,
+            f"Vertex: {self.selected_vertex_index + 1}/{len(self.vertex_cache)}",
+            "Current active vertex",
+            active=self.key_no_modifiers,
+            alt_mode=self.key_shift_no_modifiers,
+            mouse_value=False)
+
+        vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
+        draw_property(
+            self,
+            f"Vertex Radius: {(vertex_radius * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.generate_key_hint("Ctrl", self.unit_step_hint),
+            active=self.key_ctrl,
+            alt_mode=self.key_shift_ctrl,
+            mouse_value=True)
+
+        vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
+        draw_property(
+            self,
+            f"Vertex Segments: {vertex_segments}",
+            self.generate_key_hint("Alt", self.unit_step_hint),
+            active=self.key_alt,
+            alt_mode=self.key_shift_alt,
+            mouse_value=True)
+
+        draw_hint(self, "Reset Corner [R]", "Reverts active corner parameters to default values")
+
+        draw_hint(self, "Reset All Corners [A]", "Reverts ALL corner parameters to default values")
 
 
     if not self.configure_corners:
@@ -343,33 +462,35 @@ def draw_text_callback(self):
             mouse_value=True,
             input_stream=self.profile_segments_input_stream)
 
-        draw_property(
-            self,
-            f"Base Corner Radius: {(self.base_corner_radius * self.display_unit_scale):.2f}{self.unit_suffix}",
-            self.generate_key_hint("Ctrl", self.unit_step_hint),
-            active=self.key_ctrl,
-            alt_mode=self.key_shift_ctrl,
-            mouse_value=True,
-            input_stream=self.base_corner_radius_input_stream)
+        if len(self.vertex_cache) > 0:
+            draw_property(
+                self,
+                f"Base Corner Radius: {(self.base_corner_radius * self.display_unit_scale):.2f}{self.unit_suffix}",
+                self.generate_key_hint("Ctrl", self.unit_step_hint),
+                active=self.key_ctrl,
+                alt_mode=self.key_shift_ctrl,
+                mouse_value=True,
+                input_stream=self.base_corner_radius_input_stream)
 
-        draw_property(
-            self,
-            f"Base Corner Segments: {self.base_corner_segments}",
-            self.generate_key_hint("Ctrl + Alt", self.generate_step_hint(2, 1)),
-            active=self.key_ctrl_alt,
-            alt_mode=self.key_shift_ctrl_alt,
-            mouse_value=True,
-            input_stream=self.base_corner_segments_input_stream)
+            draw_property(
+                self,
+                f"Base Corner Segments: {self.base_corner_segments}",
+                self.generate_key_hint("Ctrl + Alt", self.generate_step_hint(2, 1)),
+                active=self.key_ctrl_alt,
+                alt_mode=self.key_shift_ctrl_alt,
+                mouse_value=True,
+                input_stream=self.base_corner_segments_input_stream)
 
         draw_hint(
             self,
             "Fill Caps [F]: {}".format("Yes" if self.fill_caps else "No"),
             ", ".join(["Yes", "No"]))
 
-    draw_hint(
-        self,
-        "Configure Corners [C]: {}".format("Active" if self.configure_corners else "Inactive"),
-        ", ".join(["Active", "Inactive"]))
+    if len(self.vertex_cache) > 0:
+        if self.configure_corners:
+            draw_hint(self, "Configure Pipe [C]", "Switches to pipe configuration mode")
+        elif not self.configure_corners:
+            draw_hint(self, "Configure Corners [C]", "Switches to corner configuration mode")
 
 
 def register():

@@ -59,7 +59,8 @@ default_base_corner_segments = 8
 class ND_OT_pipe_generator(BaseOperator):
     bl_idname = "nd.pipe_generator"
     bl_label = "Pipe Generator"
-    bl_description = """Generates a pipe from an edge path with customisable corner parameters"""
+    bl_description = """Generates a pipe from an edge path with customisable corner parameters
+CTRL — Remove existing modifiers"""
 
 
     def do_modal(self, context, event):
@@ -204,7 +205,7 @@ class ND_OT_pipe_generator(BaseOperator):
                     self.profile_radius = max(0, self.profile_radius - self.step_size)
                     self.dirty = True
                 elif no_stream(self.base_corner_radius_input_stream) and self.key_ctrl:
-                    self.base_corner_radius -= self.step_size
+                    self.base_corner_radius = max(0, self.base_corner_radius - self.step_size)
                     self.dirty = True
                 elif no_stream(self.base_corner_segments_input_stream) and self.key_ctrl_alt:
                     self.base_corner_segments = max(1, self.base_corner_segments - segment_factor)
@@ -237,7 +238,7 @@ class ND_OT_pipe_generator(BaseOperator):
                     self.profile_segments = max(3, self.profile_segments + self.mouse_step)
                     self.dirty = True
                 elif no_stream(self.base_corner_radius_input_stream) and self.key_ctrl:
-                    self.base_corner_radius += self.mouse_value
+                    self.base_corner_radius = max(0, self.base_corner_radius + self.mouse_value)
                     self.dirty = True
                 elif no_stream(self.base_corner_segments_input_stream) and self.key_ctrl_alt:
                     self.base_corner_segments = max(1, self.base_corner_segments + self.mouse_step)
@@ -286,6 +287,18 @@ class ND_OT_pipe_generator(BaseOperator):
                 self.pipe_gen = mod
                 previous_op = True
                 break
+
+        if event.ctrl:
+            remove_modifiers_ending_with(context.selected_objects, 'Pipe Generator — ND')
+            remove_modifiers_ending_with(context.selected_objects, '— ND SBA')
+
+            for attr in self.vertex_radius_attr.data:
+                attr.value = 0.0
+
+            for attr in self.vertex_segments_attr.data:
+                attr.value = 0
+
+            return {'FINISHED'}
 
         if previous_op:
             self.summon_old_operator(context)
@@ -432,8 +445,8 @@ class ND_OT_pipe_generator(BaseOperator):
             self.operate(context)
 
         if not self.summoned:
-            remove_modifiers_ending_with(context.active_object, 'Pipe Generator — ND')
-            remove_modifiers_ending_with(context.active_object, 'Smooth')
+            remove_modifiers_ending_with([context.active_object], 'Pipe Generator — ND')
+            remove_modifiers_ending_with([context.active_object], '— ND SBA')
 
         unregister_draw_handler()
         unregister_points_handler()

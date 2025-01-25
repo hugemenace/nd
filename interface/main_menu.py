@@ -28,6 +28,7 @@
 import bpy
 from . import ops
 from . common import render_ops
+from .. lib.polling import app_minor_version
 from .. __init__ import bl_info
 from .. import lib
 
@@ -52,6 +53,10 @@ class ND_MT_main_menu(bpy.types.Menu):
         render_ops(ops.standalone_ops, layout, new_row=False, use_separator=True)
 
         layout.menu("ND_MT_sketch_menu", text="Sketch", icon='GROUP_UVS')
+
+        if app_minor_version() >= (4, 3):
+            layout.menu("ND_MT_generators_menu", text="Generate", icon='GEOMETRY_SET')
+
         layout.separator()
         layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
         layout.menu("ND_MT_bevel_menu", icon='MOD_BEVEL')

@@ -27,10 +27,12 @@
 
 import importlib
 from . import hole_generator
+from . import pipe_generator
 
 
 registerables = (
     hole_generator,
+    pipe_generator,
 )
 
 

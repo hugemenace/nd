@@ -67,10 +67,15 @@ drill_points = {
 
 drill_point_names = list(map(lambda x: x.capitalize(), drill_points.keys()))
 
+default_hole_diameter = 0.01
+default_segments = 32
+default_hole_depth = 0.01
+default_counter_diameter = 0.015
+
 
 class ND_OT_hole_generator(BaseOperator):
     bl_idname = "nd.hole_generator"
-    bl_label = "Hole"
+    bl_label = "Hole Generator"
     bl_description = """Generates a simple, counterbored, or countersunk hole with an optional drill point."""
 
 
@@ -98,22 +103,22 @@ class ND_OT_hole_generator(BaseOperator):
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.hole_diameter_input_stream) and self.hard_stream_reset or no_stream(self.hole_diameter_input_stream):
-                    self.hole_diameter = 0
+                    self.hole_diameter = default_hole_diameter
                     self.dirty = True
                 self.hole_diameter_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
-                    self.segments = 32
+                    self.segments = default_segments
                     self.dirty = True
                 self.segments_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.hole_depth_input_stream) and self.hard_stream_reset or no_stream(self.hole_depth_input_stream):
-                    self.hole_depth = 0
+                    self.hole_depth = default_hole_depth
                     self.dirty = True
                 self.hole_depth_input_stream = new_stream()
             elif self.key_ctrl_alt:
                 if has_stream(self.counter_diameter_input_stream) and self.hard_stream_reset or no_stream(self.counter_diameter_input_stream):
-                    self.counter_diameter = 0
+                    self.counter_diameter = default_counter_diameter
                     self.dirty = True
                 self.counter_diameter_input_stream = new_stream()
 
@@ -195,10 +200,10 @@ class ND_OT_hole_generator(BaseOperator):
         self.hole_type = hole_types["simple"]
         self.drill_point = drill_points["flat"]
 
-        self.segments = 32
-        self.hole_diameter = 0.01
-        self.hole_depth = 0.01
-        self.counter_diameter = 0.015
+        self.segments = default_segments
+        self.hole_diameter = default_hole_diameter
+        self.hole_depth = default_hole_depth
+        self.counter_diameter = default_counter_diameter
 
         previous_op = False
         for mod in context.active_object.modifiers:

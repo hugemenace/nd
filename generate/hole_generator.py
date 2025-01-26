@@ -31,7 +31,7 @@ from math import radians
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor
+from .. lib.objects import add_single_vertex_object, align_object_to_3d_cursor, get_real_active_object
 from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
@@ -205,12 +205,14 @@ class ND_OT_hole_generator(BaseOperator):
         self.hole_depth = default_hole_depth
         self.counter_diameter = default_counter_diameter
 
+        self.target_object = get_real_active_object(context)
         previous_op = False
-        for mod in context.active_object.modifiers:
-            if mod.type == 'NODES' and mod.node_group.name == 'ND.HoleGenerator':
-                self.hole_gen = mod
-                previous_op = True
-                break
+        if self.target_object != None:
+            for mod in context.active_object.modifiers:
+                if mod.type == 'NODES' and mod.node_group.name == 'ND.HoleGenerator':
+                    self.hole_gen = mod
+                    previous_op = True
+                    break
 
         if previous_op:
             self.summon_old_operator(context)
@@ -288,6 +290,9 @@ class ND_OT_hole_generator(BaseOperator):
 
 
     def add_boolean(self, context):
+        if self.target_object == None:
+            return
+
         if not len(self.selected_objects) == 1:
             return
 

@@ -667,11 +667,10 @@ class NDPreferences(AddonPreferences):
             row.prop(self, pref)
 
 
-@persistent
-def load_generators(_a, _b):
+def load_gn_data_from_file(file_name):
     existing_node_groups = [node_group.name for node_group in bpy.data.node_groups]
 
-    filepath = lib.assets.get_asset_path('generators')
+    filepath = lib.assets.get_asset_path(file_name)
     with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
         for node_group in data_from.node_groups:
             if node_group in existing_node_groups:
@@ -683,6 +682,12 @@ def load_generators(_a, _b):
         if not node_group.name.startswith("ND."):
             continue
         node_group.use_fake_user = True
+
+
+@persistent
+def load_generators(_a, _b):
+    load_gn_data_from_file('hole_generator')
+    load_gn_data_from_file('pipe_generator')
 
 
 bpy.app.handlers.load_post.append(load_generators)

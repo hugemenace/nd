@@ -684,10 +684,28 @@ def load_gn_data_from_file(file_name):
         node_group.use_fake_user = True
 
 
+def load_collection_data_from_file(file_name):
+    existing_collections = [collection.name for collection in bpy.data.collections]
+
+    filepath = lib.assets.get_asset_path(file_name)
+    with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
+        for collection in data_from.collections:
+            if collection in existing_collections:
+                continue
+
+            data_to.collections.append(collection)
+
+    for collection in bpy.data.collections:
+        if not collection.name.startswith("ND."):
+            continue
+        collection.use_fake_user = True
+
+
 @persistent
 def load_generators(_a, _b):
     load_gn_data_from_file('hole_generator')
     load_gn_data_from_file('pipe_generator')
+    load_collection_data_from_file('pipe_generator')
 
 
 bpy.app.handlers.load_post.append(load_generators)

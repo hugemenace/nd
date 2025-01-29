@@ -358,6 +358,12 @@ CTRL — Remove existing modifiers"""
 
 
     def do_invoke(self, context, event):
+        try:
+            bpy.data.node_groups['ND.PipeGenerator']
+        except:
+            self.report({'ERROR'}, "ND.PipeGenerator node group not found. Please restart Blender.")
+            return {'CANCELLED'}
+
         self.dirty = False
         self.edit_mode = ctx_edit_mode(context)
 

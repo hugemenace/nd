@@ -188,6 +188,12 @@ class ND_OT_hole_generator(BaseOperator):
 
 
     def do_invoke(self, context, event):
+        try:
+            bpy.data.node_groups['ND.HoleGenerator']
+        except:
+            self.report({'ERROR'}, "ND.HoleGenerator node group not found. Please restart Blender.")
+            return {'CANCELLED'}
+
         self.dirty = False
 
         self.selected_objects = context.selected_objects

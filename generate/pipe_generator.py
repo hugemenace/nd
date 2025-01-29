@@ -27,7 +27,7 @@
 
 import bpy
 import bmesh
-from math import radians
+from math import radians, degrees
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
@@ -75,6 +75,7 @@ CTRL — Remove existing modifiers"""
 
     def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
+        angle_factor = 1 if self.key_shift else 10
 
         if self.key_numeric_input:
             if self.mode == MODE_CORNERS:
@@ -102,6 +103,18 @@ CTRL — Remove existing modifiers"""
                 elif self.key_ctrl_alt:
                     self.base_corner_segments_input_stream = update_stream(self.base_corner_segments_input_stream, event.type)
                     self.base_corner_segments = int(get_stream_value(self.base_corner_segments_input_stream, min_value=3))
+                    self.dirty = True
+            if self.mode == MODE_ENDS:
+                if self.key_ctrl:
+                    self.start_connector_rotation_input_stream = update_stream(self.start_connector_rotation_input_stream, event.type)
+                    self.start_connector_rotation = get_stream_value(self.start_connector_rotation_input_stream)
+                    if self.sync_connectors:
+                        self.end_connector_rotation_input_stream = self.start_connector_rotation_input_stream
+                        self.end_connector_rotation = self.start_connector_rotation
+                    self.dirty = True
+                elif not self.sync_connectors and self.key_ctrl_alt:
+                    self.end_connector_rotation_input_stream = update_stream(self.end_connector_rotation_input_stream, event.type)
+                    self.end_connector_rotation = get_stream_value(self.end_connector_rotation_input_stream)
                     self.dirty = True
 
         if self.key_reset:
@@ -137,6 +150,21 @@ CTRL — Remove existing modifiers"""
                         self.base_corner_segments = default_base_corner_segments
                         self.dirty = True
                     self.base_corner_segments_input_stream = new_stream()
+            if self.mode == MODE_ENDS:
+                if self.key_ctrl:
+                    if has_stream(self.start_connector_rotation_input_stream) and self.hard_stream_reset or no_stream(self.start_connector_rotation_input_stream):
+                        self.start_connector_rotation = 0
+                        if self.sync_connectors:
+                            self.end_connector_rotation = 0
+                        self.dirty = True
+                    self.start_connector_rotation_input_stream = new_stream()
+                    if self.sync_connectors:
+                        self.end_connector_rotation_input_stream = new_stream()
+                elif not self.sync_connectors and self.key_ctrl_alt:
+                    if has_stream(self.end_connector_rotation_input_stream) and self.hard_stream_reset or no_stream(self.end_connector_rotation_input_stream):
+                        self.end_connector_rotation = 0
+                        self.dirty = True
+                    self.end_connector_rotation_input_stream = new_stream()
 
         if self.mode == MODE_PIPE and pressed(event, {'F'}):
             self.fill_caps = not self.fill_caps
@@ -151,12 +179,24 @@ CTRL — Remove existing modifiers"""
             self.vertex_radius_attr.data[vertex.index].value = 0.0
             self.vertex_segments_attr.data[vertex.index].value = 0
 
+        if self.mode == MODE_ENDS and pressed(event, {'R'}):
+            self.selected_start_connector_index = None
+            self.start_connector_rotation = 0
+            self.selected_end_connector_index = None
+            self.end_connector_rotation = 0
+            self.sync_connectors = True
+            self.dirty = True
+
         if self.mode == MODE_CORNERS and pressed(event, {'A'}):
             for i, attr in enumerate(self.vertex_radius_attr.data):
                 attr.value = 0.0
 
             for i, attr in enumerate(self.vertex_segments_attr.data):
                 attr.value = 0
+
+        if self.mode == MODE_ENDS and pressed(event, {'S'}):
+            self.sync_connectors = not self.sync_connectors
+            self.dirty = True
 
         if self.key_step_up:
             if self.mode == MODE_CORNERS:
@@ -200,13 +240,19 @@ CTRL — Remove existing modifiers"""
                     else:
                         self.selected_start_connector_index += 1
                     self.dirty = True
-                elif self.key_alt:
+                elif not self.sync_connectors and self.key_alt:
                     if self.selected_end_connector_index is None:
                         self.selected_end_connector_index = 0
                     elif self.selected_end_connector_index == len(self.connectors) - 1:
                         self.selected_end_connector_index = None
                     else:
                         self.selected_end_connector_index += 1
+                    self.dirty = True
+                elif no_stream(self.start_connector_rotation_input_stream) and self.key_ctrl:
+                    self.start_connector_rotation = min(360, self.start_connector_rotation + angle_factor)
+                    self.dirty = True
+                elif no_stream(self.end_connector_rotation_input_stream) and not self.sync_connectors and self.key_ctrl_alt:
+                    self.end_connector_rotation = min(360, self.end_connector_rotation + angle_factor)
                     self.dirty = True
 
         if self.key_step_down:
@@ -241,6 +287,29 @@ CTRL — Remove existing modifiers"""
                     self.dirty = True
                 elif no_stream(self.base_corner_segments_input_stream) and self.key_ctrl_alt:
                     self.base_corner_segments = max(1, self.base_corner_segments - segment_factor)
+                    self.dirty = True
+            if self.mode == MODE_ENDS:
+                if self.key_no_modifiers:
+                    if self.selected_start_connector_index is None:
+                        self.selected_start_connector_index = len(self.connectors) - 1
+                    elif self.selected_start_connector_index == 0:
+                        self.selected_start_connector_index = None
+                    else:
+                        self.selected_start_connector_index -= 1
+                    self.dirty = True
+                elif not self.sync_connectors and self.key_alt:
+                    if self.selected_end_connector_index is None:
+                        self.selected_end_connector_index = len(self.connectors) - 1
+                    elif self.selected_end_connector_index == 0:
+                        self.selected_end_connector_index = None
+                    else:
+                        self.selected_end_connector_index -= 1
+                    self.dirty = True
+                elif no_stream(self.start_connector_rotation_input_stream) and self.key_ctrl:
+                    self.start_connector_rotation = max(-360, self.start_connector_rotation - angle_factor)
+                    self.dirty = True
+                elif no_stream(self.end_connector_rotation_input_stream) and not self.sync_connectors and self.key_ctrl_alt:
+                    self.end_connector_rotation = max(-360, self.end_connector_rotation - angle_factor)
                     self.dirty = True
 
         if self.key_confirm:
@@ -277,6 +346,15 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.base_corner_segments_input_stream) and self.key_ctrl_alt:
                     self.base_corner_segments = max(1, self.base_corner_segments + self.mouse_step)
                     self.dirty = True
+            if self.mode == MODE_ENDS:
+                if no_stream(self.start_connector_rotation_input_stream) and self.key_ctrl:
+                    self.start_connector_rotation = min(360, max(-360, self.start_connector_rotation + self.mouse_value_mag))
+                    if self.sync_connectors:
+                        self.end_connector_rotation = self.start_connector_rotation
+                    self.dirty = True
+                elif not self.sync_connectors and no_stream(self.end_connector_rotation_input_stream) and self.key_ctrl_alt:
+                    self.end_connector_rotation = min(360, max(-360, self.end_connector_rotation + self.mouse_value_mag))
+                    self.dirty = True
 
 
     def do_invoke(self, context, event):
@@ -287,6 +365,8 @@ CTRL — Remove existing modifiers"""
         self.profile_radius_input_stream = new_stream()
         self.base_corner_segments_input_stream = new_stream()
         self.base_corner_radius_input_stream = new_stream()
+        self.start_connector_rotation_input_stream = new_stream()
+        self.end_connector_rotation_input_stream = new_stream()
 
         self.mode = MODE_PIPE
 
@@ -297,6 +377,7 @@ CTRL — Remove existing modifiers"""
         self.base_corner_radius = default_base_corner_radius
 
         self.selected_vertex_index = 0
+        self.sync_connectors = True
         self.selected_start_connector_index = None
         self.start_connector_rotation = 0
         self.selected_end_connector_index = None
@@ -406,12 +487,30 @@ CTRL — Remove existing modifiers"""
         self.base_corner_segments_prev = self.base_corner_segments = self.pipe_gen[socket_map["base_corner_segments"]]
         self.fill_caps_prev = self.fill_caps = self.pipe_gen[socket_map["fill_caps"]]
         self.vertex_merge_distance_prev = self.vertex_merge_distance = self.pipe_gen[socket_map["vertex_merge_distance"]]
+        self.start_connector_rotation_prev = self.start_connector_rotation = degrees(self.pipe_gen[socket_map["start_connector_rotation"]])
+        self.end_connector_rotation_prev = self.end_connector_rotation = degrees(self.pipe_gen[socket_map["end_connector_rotation"]])
+
+        self.selected_start_connector_index = None
+        self.selected_end_connector_index = None
+        self.sync_connectors = False
+
+        for i, connector in enumerate(self.connectors):
+            if connector[1] == self.pipe_gen[socket_map["start_connector"]]:
+                self.selected_start_connector_index = i
+            if connector[1] == self.pipe_gen[socket_map["end_connector"]]:
+                self.selected_end_connector_index = i
+
+        if self.selected_start_connector_index == self.selected_end_connector_index \
+                and self.start_connector_rotation == self.end_connector_rotation:
+            self.sync_connectors = True
 
         if get_preferences().lock_overlay_parameters_on_recall:
             self.profile_radius_input_stream = set_stream(self.profile_radius)
             self.profile_segments_input_stream = set_stream(self.profile_segments)
             self.base_corner_radius_input_stream = set_stream(self.base_corner_radius)
             self.base_corner_segments_input_stream = set_stream(self.base_corner_segments)
+            self.start_connector_rotation_input_stream = set_stream(self.start_connector_rotation)
+            self.end_connector_rotation_input_stream = set_stream(self.end_connector_rotation)
 
             for i, attr in enumerate(self.vertex_radius_attr.data):
                 if attr.value != 0.0:
@@ -486,23 +585,29 @@ CTRL — Remove existing modifiers"""
             if self.supports_connectors and self.selected_end_connector_index != None:
                 end_connector = self.connectors[self.selected_end_connector_index][1]
 
-            self.pipe_gen[socket_map["start_connector"]] = start_connector
-            self.pipe_gen[socket_map["start_connector_rotation"]] = self.start_connector_rotation
+            if self.sync_connectors:
+                end_connector = start_connector
+                self.end_connector_rotation = self.start_connector_rotation
+                self.selected_end_connector_index = self.selected_start_connector_index
 
+            self.pipe_gen[socket_map["start_connector"]] = start_connector
+            self.pipe_gen[socket_map["start_connector_rotation"]] = radians(self.start_connector_rotation)
             self.pipe_gen[socket_map["end_connector"]] = end_connector
-            self.pipe_gen[socket_map["end_connector_rotation"]] = self.end_connector_rotation
+            self.pipe_gen[socket_map["end_connector_rotation"]] = radians(self.end_connector_rotation)
 
             self.pipe_gen.node_group.interface_update(context)
 
-            sc = bpy.context.scene.collection.children
+            scene_children = bpy.context.scene.collection.children
 
-            if start_connector != None and sc.get(start_connector.name) == None:
-                sc.link(start_connector)
-                sc.unlink(start_connector)
+            if start_connector != None and scene_children.get(start_connector.name) == None:
+                # NOTE: This is a hack to ensure the start connector correctly updates in the viewport.
+                scene_children.link(start_connector)
+                scene_children.unlink(start_connector)
 
-            if end_connector != None and sc.get(end_connector.name) == None:
-                sc.link(end_connector)
-                sc.unlink(end_connector)
+            if end_connector != None and scene_children.get(end_connector.name) == None:
+                # NOTE: This is a hack to ensure the end connector correctly updates in the viewport.
+                scene_children.link(end_connector)
+                scene_children.unlink(end_connector)
 
         self.dirty = False
 
@@ -523,6 +628,8 @@ CTRL — Remove existing modifiers"""
             self.base_corner_segments = self.base_corner_segments_prev
             self.fill_caps = self.fill_caps_prev
             self.vertex_merge_distance = self.vertex_merge_distance_prev
+            self.start_connector_rotation = self.start_connector_rotation_prev
+            self.end_connector_rotation = self.end_connector_rotation_prev
 
             for i, attr in enumerate(self.vertex_radius_attr.data):
                 attr.value = self.prev_vertex_radii[i]
@@ -630,21 +737,65 @@ def draw_text_callback(self):
         if self.supports_connectors and self.selected_end_connector_index != None:
             end_connector = self.connectors[self.selected_end_connector_index][0]
 
-        draw_property(
-            self,
-            "Start Connector: {}".format(start_connector),
-            "Select from available connectors",
-            active=self.key_no_modifiers,
-            alt_mode=self.key_shift_no_modifiers,
-            mouse_value=True)
+        if self.sync_connectors:
+            draw_property(
+                self,
+                "Connectors: {}".format(start_connector),
+                "Select from available connectors",
+                active=self.key_no_modifiers,
+                alt_mode=self.key_shift_no_modifiers,
+                mouse_value=False)
 
-        draw_property(
+            draw_property(
+                self,
+                "Rotation: {0:.2f}°".format(self.start_connector_rotation),
+                self.generate_key_hint("Ctrl", self.generate_step_hint(10, 1)),
+                active=self.key_ctrl,
+                alt_mode=self.key_shift_ctrl,
+                mouse_value=True,
+                input_stream=self.start_connector_rotation_input_stream)
+
+        if not self.sync_connectors:
+            draw_property(
+                self,
+                "Start Connector: {}".format(start_connector),
+                "Select from available connectors",
+                active=self.key_no_modifiers,
+                alt_mode=self.key_shift_no_modifiers,
+                mouse_value=False)
+
+            draw_property(
+                self,
+                "Start Connector Rotation: {0:.2f}°".format(self.start_connector_rotation),
+                self.generate_key_hint("Ctrl", self.generate_step_hint(10, 1)),
+                active=self.key_ctrl,
+                alt_mode=self.key_shift_ctrl,
+                mouse_value=True,
+                input_stream=self.start_connector_rotation_input_stream)
+
+            draw_property(
+                self,
+                "End Connector: {}".format(end_connector),
+                "Select from available connectors",
+                active=self.key_alt,
+                alt_mode=self.key_shift_alt,
+                mouse_value=False)
+
+            draw_property(
+                self,
+                "End Connector Rotation: {0:.2f}°".format(self.end_connector_rotation),
+                self.generate_key_hint("Ctrl + Alt", self.generate_step_hint(10, 1)),
+                active=self.key_ctrl_alt,
+                alt_mode=self.key_shift_ctrl_alt,
+                mouse_value=True,
+                input_stream=self.end_connector_rotation_input_stream)
+
+        draw_hint(
             self,
-            "End Connector: {}".format(end_connector),
-            "Select from available connectors",
-            active=self.key_alt,
-            alt_mode=self.key_shift_alt,
-            mouse_value=True)
+            "Sync Connectors [S]: {}".format("Yes" if self.sync_connectors else "No"),
+            "Synchronizes the start and end connectors")
+
+        draw_hint(self, "Reset Connectors [R]", "Reverts connectors to default values")
 
     draw_hint(
         self,

@@ -182,27 +182,27 @@ class ND_OT_edge_length(BaseOperator):
             self.move_verts(context, vertex_pair, index)
 
         if self.current_anchor == 0:
-            self.primary_points = [self.world_matrix @ point for point in self.midpoints]
-            self.secondary_points = []
+            self.secondary_points = [self.world_matrix @ point for point in self.midpoints]
+            self.primary_points = []
             for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-                self.secondary_points.extend([
+                self.primary_points.extend([
                     self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
                     self.world_matrix @ self.bm.verts[vertex_pair[1]].co
                 ])
 
         if self.current_anchor == 1:
-            self.primary_points = [self.world_matrix @ point[0] for point in self.starting_positions]
-            self.secondary_points = []
+            self.secondary_points = [self.world_matrix @ point[0] for point in self.starting_positions]
+            self.primary_points = []
             for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-                self.secondary_points.extend([
+                self.primary_points.extend([
                     self.world_matrix @ self.bm.verts[vertex_pair[1]].co,
                 ])
 
         if self.current_anchor == 2:
-            self.primary_points = [self.world_matrix @ point[1] for point in self.starting_positions]
-            self.secondary_points = []
+            self.secondary_points = [self.world_matrix @ point[1] for point in self.starting_positions]
+            self.primary_points = []
             for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-                self.secondary_points.extend([
+                self.primary_points.extend([
                     self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
                 ])
 

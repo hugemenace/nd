@@ -563,11 +563,13 @@ CTRL — Remove existing modifiers"""
     def operate(self, context):
         self.primary_points = []
         self.secondary_points = []
+        self.disc_points = []
 
         if self.mode == MODE_CORNERS:
             selected_vertex = self.vertex_cache[self.selected_vertex_index]
 
             self.primary_points = [selected_vertex[1]]
+            self.disc_points = [selected_vertex[1]]
             self.secondary_points = [point for _v, point in self.vertex_cache if point != selected_vertex[1]]
 
         if self.mode == MODE_PIPE:

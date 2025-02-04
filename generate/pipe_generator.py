@@ -786,7 +786,7 @@ def draw_text_callback(self):
             draw_property(
                 self,
                 "End Connector: {}".format(end_connector),
-                "Select from available connectors",
+                self.generate_key_hint("Alt", "Select from available connectors"),
                 active=self.key_alt,
                 alt_mode=self.key_shift_alt,
                 mouse_value=False)

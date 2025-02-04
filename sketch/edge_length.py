@@ -22,7 +22,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ---
-# Contributors: Shaddow
+# Contributors: Shaddow, Tristo (HM)
 # ---
 
 import bpy
@@ -55,7 +55,10 @@ class ND_OT_edge_length(BaseOperator):
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.distance_input_stream) and self.hard_stream_reset or no_stream(self.distance_input_stream):
-                    self.distance = self.starting_distance
+                    if not self.offset_distance:
+                        self.distance = sum(self.starting_distances) / len(self.starting_distances)
+                    else:
+                        self.distance = 0
                     self.dirty = True
                 self.distance_input_stream = new_stream()
 

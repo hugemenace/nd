@@ -31,7 +31,7 @@ from .. __init__ import bl_info
 from .. lib.objects import is_planar, get_real_active_object
 from . ops import build_icon_lookup_table
 from .. lib.addons import is_addon_enabled
-from .. lib.polling import ctx_edit_mode
+from .. lib.polling import ctx_edit_mode, app_minor_version
 
 
 SECTION_COUNT = 1
@@ -156,7 +156,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.operator("nd.screw", icon=icons['nd.screw'])
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
-            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
+            if app_minor_version() >= (4, 3):
+                layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
 
             self.draw_make_edge_face_ops(context)
 
@@ -244,7 +245,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_mod_profile_extrude = True
             replay_prediction_count += 1
 
-        if self.profile or has_mod_pipe_generator:
+        if app_minor_version() >= (4, 3) and (self.profile or has_mod_pipe_generator):
             layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
             has_mod_pipe_generator = True
             replay_prediction_count += 1
@@ -289,7 +290,8 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if self.profile:
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
-            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator']) if not has_mod_pipe_generator else None
+            if app_minor_version() >= (4, 3):
+                layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator']) if not has_mod_pipe_generator else None
             layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
 

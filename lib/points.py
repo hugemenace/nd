@@ -28,10 +28,36 @@
 import bpy
 import gpu
 import bgl
-from mathutils import Vector, Matrix
+from mathutils import Matrix
 from gpu_extras.batch import batch_for_shader
 from . preferences import get_preferences
 from . polling import app_minor_version
+
+
+vertex_shader = '''
+    uniform mat4 viewProjectionMatrix;
+    in vec3 pos;
+
+    void main() {
+        gl_Position = viewProjectionMatrix * vec4(pos, 1.0);
+    }
+'''
+
+fragment_shader = '''
+    uniform vec4 color;
+    out vec4 fragColor;
+
+    float circle(in vec2 origin, in float radius) {
+        vec2 dist = origin - vec2(0.5);
+        return 1.0 - smoothstep(radius - (radius * 0.35), radius + (radius * 0.01), dot(dist, dist) * 4.0);
+    }
+
+    void main() {
+        vec4 circle = vec4(circle(gl_PointCoord, 0.5));
+        float gamma = 2.2;
+        fragColor = pow(circle * color, vec4(gamma));
+    }
+'''
 
 
 def register_points_handler(cls):
@@ -70,10 +96,13 @@ def init_points(cls):
     cls.guide_line = ()
 
 
-def draw_points(shader, points, size, color):
-    gpu.state.point_size_set(size)
+def draw_circles(shader, points, radius, color):
+    gpu.state.point_size_set(radius)
     batch = batch_for_shader(shader, 'POINTS', {"pos": points})
+    gpu.state.blend_set("ALPHA")
     shader.bind()
+    view_projection_matrix = bpy.context.region_data.perspective_matrix
+    shader.uniform_float("viewProjectionMatrix", Matrix(view_projection_matrix))
     shader.uniform_float("color", color)
     batch.draw(shader)
 
@@ -90,15 +119,16 @@ def draw_guideline(shader, line, size, color):
 
 def update_points(cls):
     shader = None
+    circle_shader = gpu.types.GPUShader(vertex_shader, fragment_shader)
 
     if app_minor_version() < (4, 0):
         shader = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
     else:
         shader = gpu.shader.from_builtin('UNIFORM_COLOR')
 
-    draw_points(shader, cls.primary_points, 10, get_preferences().points_primary_color)
-    draw_points(shader, cls.secondary_points, 6, get_preferences().points_secondary_color)
-    draw_points(shader, cls.tertiary_points, 12, get_preferences().points_tertiary_color)
     draw_guideline(shader, cls.guide_line, 2, get_preferences().points_guide_line_color)
+    draw_circles(circle_shader, cls.primary_points, 20, get_preferences().points_primary_color)
+    draw_circles(circle_shader, cls.secondary_points, 15, get_preferences().points_secondary_color)
+    draw_circles(circle_shader, cls.tertiary_points, 25, get_preferences().points_tertiary_color)
 
     redraw_regions()

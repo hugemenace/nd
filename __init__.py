@@ -703,6 +703,9 @@ def load_collection_data_from_file(file_name):
 
 @persistent
 def load_generators(_a, _b):
+    if lib.polling.app_minor_version() < (4, 3):
+        return
+
     load_gn_data_from_file('hole_generator')
     load_gn_data_from_file('pipe_generator')
     load_collection_data_from_file('pipe_generator')

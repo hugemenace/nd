@@ -713,7 +713,9 @@ def draw_text_callback(self):
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=False)
 
-        vertex_radius = self.vertex_radius_attr.data[self.selected_vertex_index].value
+        vertex = self.vertex_cache[self.selected_vertex_index][0]
+
+        vertex_radius = self.vertex_radius_attr.data[vertex.index].value
         draw_property(
             self,
             f"Vertex Radius: {(vertex_radius * self.display_unit_scale):.2f}{self.unit_suffix}",
@@ -723,7 +725,7 @@ def draw_text_callback(self):
             mouse_value=True,
             input_stream=self.vertex_radius_input_streams[self.selected_vertex_index])
 
-        vertex_segments = self.vertex_segments_attr.data[self.selected_vertex_index].value
+        vertex_segments = self.vertex_segments_attr.data[vertex.index].value
         draw_property(
             self,
             f"Vertex Segments: {vertex_segments}",

@@ -38,6 +38,7 @@ from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
+from .. lib.math import round_dec
 
 
 socket_map = {
@@ -55,7 +56,7 @@ socket_map = {
 
 
 default_profile_radius = 0.01
-default_profile_segments = 16
+default_profile_segments = 32
 default_base_corner_radius = 0.02
 default_base_corner_segments = 8
 
@@ -206,13 +207,13 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.vertex_radius_input_streams[self.selected_vertex_index]) and self.key_ctrl:
                     vertex = self.vertex_cache[self.selected_vertex_index][0]
                     vertex_radius = self.vertex_radius_attr.data[vertex.index].value
-                    vertex_radius += self.step_size
+                    vertex_radius = round_dec(vertex_radius + self.step_size)
                     self.vertex_radius_attr.data[vertex.index].value = vertex_radius
                     self.dirty = True
                 elif no_stream(self.vertex_segments_input_streams[self.selected_vertex_index]) and self.key_alt:
                     vertex = self.vertex_cache[self.selected_vertex_index][0]
                     vertex_segments = self.vertex_segments_attr.data[vertex.index].value
-                    vertex_segments += 1
+                    vertex_segments = 2 if vertex_segments == 1 else vertex_segments + segment_factor
                     self.vertex_segments_attr.data[vertex.index].value = vertex_segments
                     self.dirty = True
             if self.mode == MODE_PIPE:
@@ -223,10 +224,10 @@ CTRL — Remove existing modifiers"""
                     self.profile_segments = 4 if self.profile_segments == 3 else self.profile_segments + segment_factor
                     self.dirty = True
                 elif no_stream(self.profile_radius_input_stream) and self.key_no_modifiers:
-                    self.profile_radius += self.step_size
+                    self.profile_radius = round_dec(self.profile_radius + self.step_size)
                     self.dirty = True
                 elif no_stream(self.base_corner_radius_input_stream) and self.key_ctrl:
-                    self.base_corner_radius += self.step_size
+                    self.base_corner_radius = round_dec(self.step_size + self.base_corner_radius)
                     self.dirty = True
                 elif no_stream(self.base_corner_segments_input_stream) and self.key_ctrl_alt:
                     self.base_corner_segments = 2 if self.base_corner_segments == 1 else self.base_corner_segments + segment_factor
@@ -263,13 +264,13 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.vertex_radius_input_streams[self.selected_vertex_index]) and self.key_ctrl:
                     vertex = self.vertex_cache[self.selected_vertex_index][0]
                     vertex_radius = self.vertex_radius_attr.data[vertex.index].value
-                    vertex_radius = max(0, vertex_radius - self.step_size)
+                    vertex_radius = max(0, round_dec(vertex_radius - self.step_size))
                     self.vertex_radius_attr.data[vertex.index].value = vertex_radius
                     self.dirty = True
                 elif no_stream(self.vertex_segments_input_streams[self.selected_vertex_index]) and self.key_alt:
                     vertex = self.vertex_cache[self.selected_vertex_index][0]
                     vertex_segments = self.vertex_segments_attr.data[vertex.index].value
-                    vertex_segments = max(0, vertex_segments - 1)
+                    vertex_segments = max(0, vertex_segments - segment_factor)
                     self.vertex_segments_attr.data[vertex.index].value = vertex_segments
                     self.dirty = True
             if self.mode == MODE_PIPE:
@@ -280,10 +281,10 @@ CTRL — Remove existing modifiers"""
                     self.profile_segments = max(3, self.profile_segments - segment_factor)
                     self.dirty = True
                 elif no_stream(self.profile_radius_input_stream) and self.key_no_modifiers:
-                    self.profile_radius = max(0, self.profile_radius - self.step_size)
+                    self.profile_radius = max(0, round_dec(self.profile_radius - self.step_size))
                     self.dirty = True
                 elif no_stream(self.base_corner_radius_input_stream) and self.key_ctrl:
-                    self.base_corner_radius = max(0, self.base_corner_radius - self.step_size)
+                    self.base_corner_radius = max(0, round_dec(self.base_corner_radius - self.step_size))
                     self.dirty = True
                 elif no_stream(self.base_corner_segments_input_stream) and self.key_ctrl_alt:
                     self.base_corner_segments = max(1, self.base_corner_segments - segment_factor)
@@ -716,9 +717,11 @@ def draw_text_callback(self):
         vertex = self.vertex_cache[self.selected_vertex_index][0]
 
         vertex_radius = self.vertex_radius_attr.data[vertex.index].value
+        str_base_radius = f"Vertex Radius: {(self.base_corner_radius * self.display_unit_scale):.2f}{self.unit_suffix} (Base)"
+        str_custom_radius = f"Vertex Radius: {(vertex_radius * self.display_unit_scale):.2f}{self.unit_suffix}"
         draw_property(
             self,
-            f"Vertex Radius: {(vertex_radius * self.display_unit_scale):.2f}{self.unit_suffix}",
+            str_base_radius if vertex_radius == 0 else str_custom_radius,
             self.generate_key_hint("Ctrl", self.unit_step_hint),
             active=self.key_ctrl,
             alt_mode=self.key_shift_ctrl,
@@ -726,10 +729,12 @@ def draw_text_callback(self):
             input_stream=self.vertex_radius_input_streams[self.selected_vertex_index])
 
         vertex_segments = self.vertex_segments_attr.data[vertex.index].value
+        str_base_segments = f"Vertex Segments: {self.base_corner_segments} (Base)"
+        str_custom_segments = f"Vertex Segments: {vertex_segments}"
         draw_property(
             self,
-            f"Vertex Segments: {vertex_segments}",
-            self.generate_key_hint("Alt", self.unit_step_hint),
+            str_base_segments if vertex_segments == 0 else str_custom_segments,
+            self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
             active=self.key_alt,
             alt_mode=self.key_shift_alt,
             mouse_value=True,

@@ -25,7 +25,7 @@
 # Contributors: Tristo (HM)
 # ---
 
-from math import radians
+from math import radians, floor
 from mathutils import Vector, Matrix
 
 
@@ -143,3 +143,9 @@ def generate_bounding_box(coords):
         Vector((max_x, max_y, max_z)),
         Vector((max_x, max_y, min_z))
     ]
+
+
+def round_dec(value, points=5):
+    dec_place = pow(10, points)
+    offset = 5 / (dec_place * 10)
+    return floor((value + offset) * dec_place) / dec_place

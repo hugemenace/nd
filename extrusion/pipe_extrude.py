@@ -36,6 +36,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
+from .. lib.math import round_dec
 
 
 mod_skin = "Skin — ND PIPE"
@@ -84,7 +85,7 @@ CTRL — Remove existing modifiers"""
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.extrusion_diameter_input_stream) and self.key_no_modifiers:
-                self.extrusion_diameter += self.step_size
+                self.extrusion_diameter = round_dec(self.extrusion_diameter + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
@@ -95,7 +96,7 @@ CTRL — Remove existing modifiers"""
                 self.segments = max(1, self.segments - segment_factor)
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.extrusion_diameter_input_stream) and self.key_no_modifiers:
-                self.extrusion_diameter = max(0, self.extrusion_diameter - self.step_size)
+                self.extrusion_diameter = max(0, round_dec(self.extrusion_diameter - self.step_size))
                 self.dirty = True
 
         if pressed(event, {'S'}):

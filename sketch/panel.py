@@ -37,6 +37,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.objects import create_duplicate_liftable_geometry, get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected
+from .. lib.math import round_dec
 
 
 class ND_OT_panel(BaseOperator):
@@ -74,13 +75,13 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         if self.key_step_up:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
-                    self.inset += self.step_size
+                    self.inset = round_dec(self.inset + self.step_size)
                     self.dirty = True
 
         if self.key_step_down:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
-                    self.inset = max(0, self.inset - self.step_size)
+                    self.inset = max(0, round_dec(self.inset - self.step_size))
                     self.dirty = True
 
         if self.stage == 1 and self.key_confirm:

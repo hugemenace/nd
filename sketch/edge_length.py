@@ -35,7 +35,7 @@ from .. lib.preferences import get_preferences, get_scene_unit_factor
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
-from .. lib.math import v3_distance, v3_average, v3_direction
+from .. lib.math import v3_distance, v3_average, v3_direction, round_dec
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
@@ -77,12 +77,12 @@ class ND_OT_edge_length(BaseOperator):
 
         if self.key_step_up:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
-                self.distance += self.step_size
+                self.distance = round_dec(self.distance + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
-                self.distance = self.distance - self.step_size
+                self.distance = round_dec(self.distance - self.step_size)
                 self.dirty = True
 
         if self.key_confirm:

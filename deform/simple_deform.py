@@ -37,6 +37,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_exists, obj_moddable, ctx_obj_mode, ctx_objects_selected
+from .. lib.math import round_dec
 
 
 mod_deform = "Deform — ND SD"
@@ -96,7 +97,7 @@ CTRL — Remove existing modifiers"""
                 if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle + angle_factor)
                 elif no_stream(self.factor_input_stream):
-                    self.factor += factor_factor
+                    self.factor = round_dec(self.factor + factor_factor)
 
                 self.dirty = True
 
@@ -105,7 +106,7 @@ CTRL — Remove existing modifiers"""
                 if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
                     self.angle = min(360, self.angle - angle_factor)
                 elif no_stream(self.factor_input_stream):
-                    self.factor -= factor_factor
+                    self.factor = round_dec(self.factor - factor_factor)
 
                 self.dirty = True
 

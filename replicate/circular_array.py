@@ -40,6 +40,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_exists, obj_is_mesh, ctx_obj_mode, ctx_objects_selected
+from .. lib.math import round_dec
 
 
 mod_displace = 'Displace — ND CA'
@@ -103,7 +104,7 @@ CTRL — Remove existing modifiers"""
                 self.angle = min(360, self.angle + angle_factor)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset += self.step_size
+                self.offset = round_dec(self.offset + self.step_size)
                 self.dirty = True
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = 2 if self.count == 1 else self.count + count_factor
@@ -114,7 +115,7 @@ CTRL — Remove existing modifiers"""
                 self.angle = max(-360, self.angle - angle_factor)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset -= self.step_size
+                self.offset = round_dec(self.offset - self.step_size)
                 self.dirty = True
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = max(2, self.count - count_factor)

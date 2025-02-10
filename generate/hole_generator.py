@@ -37,6 +37,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, ctx_objects_selected_range, ctx_objects_selected, app_minor_version
+from .. lib.math import round_dec
 
 
 socket_map = {
@@ -138,13 +139,13 @@ class ND_OT_hole_generator(BaseOperator):
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
-                self.hole_diameter += self.step_size
+                self.hole_diameter = round_dec(self.hole_diameter + self.step_size)
                 self.dirty = True
             elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
-                self.hole_depth += self.step_size
+                self.hole_depth = round_dec(self.hole_depth + self.step_size)
                 self.dirty = True
             elif no_stream(self.counter_diameter_input_stream) and self.key_ctrl_alt:
-                self.counter_diameter += self.step_size
+                self.counter_diameter = round_dec(self.counter_diameter + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
@@ -155,13 +156,13 @@ class ND_OT_hole_generator(BaseOperator):
                 self.segments = max(3, self.segments - segment_factor)
                 self.dirty = True
             elif no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
-                self.hole_diameter = max(0, self.hole_diameter - self.step_size)
+                self.hole_diameter = max(0, round_dec(self.hole_diameter - self.step_size))
                 self.dirty = True
             elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
-                self.hole_depth -= self.step_size
+                self.hole_depth = round_dec(self.hole_depth - self.step_size)
                 self.dirty = True
             elif no_stream(self.counter_diameter_input_stream) and self.key_ctrl_alt:
-                self.counter_diameter = max(0, self.counter_diameter - self.step_size)
+                self.counter_diameter = max(0, round_dec(self.counter_diameter - self.step_size))
                 self.dirty = True
 
         if self.key_confirm:

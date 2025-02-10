@@ -36,6 +36,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_moddable, ctx_objects_selected
+from .. lib.math import round_dec
 
 
 mod_array_x = "Array³ X — ND"
@@ -105,7 +106,8 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][IDX_OFFSET] += relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
+                step = relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
+                self.axes[self.axis][IDX_OFFSET] = round_dec(self.axes[self.axis][IDX_OFFSET] + step)
                 self.dirty = True
 
         if self.key_step_down:
@@ -120,7 +122,8 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
-                self.axes[self.axis][IDX_OFFSET] -= relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
+                step = relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
+                self.axes[self.axis][IDX_OFFSET] = round_dec(self.axes[self.axis][IDX_OFFSET] - step)
                 self.dirty = True
 
         if self.key_confirm:

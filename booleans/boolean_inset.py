@@ -37,6 +37,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object, set_object_util_visibility
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode, app_minor_version
+from .. lib.math import round_dec
 
 
 class ND_OT_bool_inset(BaseOperator):
@@ -65,12 +66,12 @@ class ND_OT_bool_inset(BaseOperator):
 
         if self.key_step_up:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
-                self.thickness += self.step_size
+                self.thickness = round_dec(self.thickness + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
-                self.thickness = max(0, self.thickness - self.step_size)
+                self.thickness = max(0, round_dec(self.thickness - self.step_size))
                 self.dirty = True
 
         if self.key_confirm:

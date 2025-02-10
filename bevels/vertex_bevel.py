@@ -35,6 +35,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.polling import ctx_edit_mode, obj_is_mesh, obj_verts_selected, app_minor_version
+from .. lib.math import round_dec
 
 
 mod_bevel = "Bevel — ND VB"
@@ -99,10 +100,10 @@ CTRL — Remove existing modifiers"""
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
-                self.profile = min(1, self.profile + profile_factor)
+                self.profile = min(1, round_dec(self.profile + profile_factor))
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width += self.step_size
+                self.width = round_dec(self.width + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
@@ -113,10 +114,10 @@ CTRL — Remove existing modifiers"""
                 self.segments = max(1, self.segments - segment_factor)
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
-                self.profile = max(0, self.profile - profile_factor)
+                self.profile = max(0, round_dec(self.profile - profile_factor))
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(0, self.width - self.step_size)
+                self.width = max(0, round_dec(self.width - self.step_size))
                 self.dirty = True
 
         if self.key_confirm:

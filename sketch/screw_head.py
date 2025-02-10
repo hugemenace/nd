@@ -39,6 +39,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier
 from .. lib.polling import ctx_obj_mode
+from .. lib.math import round_dec
 
 
 mod_displace = "Offset — ND SH"
@@ -81,10 +82,10 @@ class ND_OT_screw_head(BaseOperator):
                 self.update_head_type(context)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset += self.step_size
+                self.offset = round_dec(self.offset + self.step_size)
                 self.dirty = True
             elif no_stream(self.scale_input_stream) and self.key_alt:
-                self.scale += scale_factor
+                self.scale = round_dec(self.scale + scale_factor)
                 self.dirty = True
 
         if self.key_step_down:
@@ -93,10 +94,10 @@ class ND_OT_screw_head(BaseOperator):
                 self.update_head_type(context)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset -= self.step_size
+                self.offset = round_dec(self.offset - self.step_size)
                 self.dirty = True
             elif no_stream(self.scale_input_stream) and self.key_alt:
-                self.scale -= scale_factor
+                self.scale = round_dec(self.scale - scale_factor)
                 self.dirty = True
 
         if self.key_confirm:

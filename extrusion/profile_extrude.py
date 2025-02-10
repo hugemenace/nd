@@ -37,6 +37,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency, add_smooth_by_angle
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
+from .. lib.math import round_dec
 
 
 mod_screw = "Extrusion — ND PE"
@@ -89,18 +90,18 @@ CTRL — Remove existing modifiers"""
 
         if self.key_step_up:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
-                self.extrusion_length += self.step_size
+                self.extrusion_length = round_dec(self.extrusion_length + self.step_size)
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset += self.step_size
+                self.offset = round_dec(self.offset + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
-                self.extrusion_length = max(0, self.extrusion_length - self.step_size)
+                self.extrusion_length = max(0, round_dec(self.extrusion_length - self.step_size))
                 self.dirty = True
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
-                self.offset -= self.step_size
+                self.offset = round_dec(self.offset - self.step_size)
                 self.dirty = True
 
         if self.key_confirm:

@@ -36,6 +36,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, add_smooth_by_angle, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_exists, obj_is_mesh, app_minor_version
+from .. lib.math import round_dec
 
 
 mod_bevel = "Bevel — ND B"
@@ -125,13 +126,13 @@ SHIFT — Create a stacked bevel modifier"""
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
-                self.profile = min(1, self.profile + profile_factor)
+                self.profile = min(1, round_dec(self.profile + profile_factor))
                 self.dirty = True
             elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
                 self.angle = min(360, self.angle + angle_factor)
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width += self.step_size
+                self.width = round_dec(self.width + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
@@ -142,13 +143,13 @@ SHIFT — Create a stacked bevel modifier"""
                 self.segments = max(1, self.segments - segment_factor)
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
-                self.profile = max(0, self.profile - profile_factor)
+                self.profile = max(0, round_dec(self.profile - profile_factor))
                 self.dirty = True
             elif no_stream(self.angle_input_stream) and self.key_ctrl_alt:
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(0, self.width - self.step_size)
+                self.width = max(0, round_dec(self.width - self.step_size))
                 self.dirty = True
 
         if self.key_confirm:

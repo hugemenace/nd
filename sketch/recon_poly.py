@@ -36,6 +36,7 @@ from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier
 from .. lib.polling import ctx_obj_mode
+from .. lib.math import round_dec
 
 
 mod_displace = "Radius — ND RCP"
@@ -101,10 +102,10 @@ class ND_OT_recon_poly(BaseOperator):
                 self.segments = 4 if self.segments == 3 else self.segments + segment_factor
                 self.dirty = True
             elif no_stream(self.inner_radius_input_stream) and self.key_ctrl:
-                self.inner_radius += self.step_size
+                self.inner_radius = round_dec(self.inner_radius + self.step_size)
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width += self.step_size
+                self.width = round_dec(self.width + self.step_size)
                 self.dirty = True
 
         if self.key_step_down:
@@ -115,11 +116,11 @@ class ND_OT_recon_poly(BaseOperator):
                 self.segments = max(3, self.segments - segment_factor)
                 self.dirty = True
             elif no_stream(self.inner_radius_input_stream) and self.key_ctrl:
-                self.inner_radius = max(0, self.inner_radius - self.step_size)
+                self.inner_radius = max(0, round_dec(self.inner_radius - self.step_size))
                 self.width = max(self.computed_inner_radius() * -1, self.width)
                 self.dirty = True
             elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
-                self.width = max(self.computed_inner_radius() * -1, self.width - self.step_size)
+                self.width = max(self.computed_inner_radius() * -1, round_dec(self.width - self.step_size))
                 self.dirty = True
 
         if self.key_confirm:

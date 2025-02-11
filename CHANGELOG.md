@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.47.0](https://github.com/hugemenace/nd/compare/v1.46.0...v1.47.0) (2025-02-11)
+
+
+### Features
+
+* add edge length operator ([6be21e1](https://github.com/hugemenace/nd/commit/6be21e1705eb2146206fcd73114e7479e3d998d8))
+* add GN hole generator ([9ec830b](https://github.com/hugemenace/nd/commit/9ec830b6465e7740065bb3adf78a3ab93e3efb55))
+* add GN pipe generator ([4b6e6c9](https://github.com/hugemenace/nd/commit/4b6e6c91cd516f2fa2517c8b9e26515f9dc90f6a))
+* add the pipe generator operator to the fast menu replacing pipe extrude ([0ad1b0e](https://github.com/hugemenace/nd/commit/0ad1b0e733bab6ee5749dab226de1538ab6bd55e))
+
+
+### Bug Fixes
+
+* fix the Flare energy offset parameter reset after energy levels have been randomised ([8bfc0c4](https://github.com/hugemenace/nd/commit/8bfc0c48d0ee7ba1aeab68df346781d6f3cd6475))
+
 ## [1.46.0](https://github.com/hugemenace/nd/compare/v1.45.0...v1.46.0) (2024-11-23)
 
 

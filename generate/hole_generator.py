@@ -27,7 +27,7 @@
 
 import bpy
 import bmesh
-from math import radians
+from math import radians, degrees
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
@@ -56,7 +56,7 @@ socket_map = {
 hole_types = {
     "simple": 0,
     "counterbore": 1,
-    "countersunk": 2,
+    "countersink": 2,
 }
 
 hole_type_names = list(map(lambda x: x.capitalize(), hole_types.keys()))
@@ -71,99 +71,186 @@ drill_point_names = list(map(lambda x: x.capitalize(), drill_points.keys()))
 default_hole_diameter = 0.01
 default_segments = 32
 default_hole_depth = 0.01
-default_counter_diameter = 0.015
+default_countersink_angle = 45
+default_drill_point_angle = 45
+
+MODE_HOLE = 0
+MODE_COUNTER = 1
+MODE_DRILL = 2
+
+modes = ["Hole", "Counter", "Drill"]
 
 
 class ND_OT_hole_generator(BaseOperator):
     bl_idname = "nd.hole_generator"
     bl_label = "Hole Generator"
-    bl_description = """Generates a simple, counterbored, or countersunk hole with an optional drill point."""
+    bl_description = """Generates a drill hole with the option to counterbore or countersink."""
 
 
     def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
+        angle_factor = 1 if self.key_shift else 5
 
         if self.key_numeric_input:
-            if self.key_no_modifiers:
-                self.hole_diameter_input_stream = update_stream(self.hole_diameter_input_stream, event.type)
-                self.hole_diameter = get_stream_value(self.hole_diameter_input_stream, self.unit_scaled_factor)
-                self.dirty = True
-            elif self.key_alt:
-                self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
-                self.segments = int(get_stream_value(self.segments_input_stream, min_value=3))
-                self.dirty = True
-            elif self.key_ctrl:
-                self.hole_depth_input_stream = update_stream(self.hole_depth_input_stream, event.type)
-                self.hole_depth = get_stream_value(self.hole_depth_input_stream, self.unit_scaled_factor)
-                self.dirty = True
-            elif self.key_ctrl_alt:
-                self.counter_diameter_input_stream = update_stream(self.counter_diameter_input_stream, event.type)
-                self.counter_diameter = get_stream_value(self.counter_diameter_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+            if self.mode == MODE_HOLE:
+                if self.key_no_modifiers:
+                    self.hole_diameter_input_stream = update_stream(self.hole_diameter_input_stream, event.type)
+                    self.hole_diameter = get_stream_value(self.hole_diameter_input_stream, self.unit_scaled_factor)
+                    self.dirty = True
+                elif self.key_alt:
+                    self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
+                    self.segments = int(get_stream_value(self.segments_input_stream, min_value=3))
+                    self.dirty = True
+                elif self.key_ctrl:
+                    self.hole_depth_input_stream = update_stream(self.hole_depth_input_stream, event.type)
+                    self.hole_depth = get_stream_value(self.hole_depth_input_stream, self.unit_scaled_factor)
+                    self.dirty = True
+            if self.mode == MODE_COUNTER:
+                if self.key_no_modifiers and not self.is_simple_hole():
+                    self.counter_diameter_input_stream = update_stream(self.counter_diameter_input_stream, event.type)
+                    self.counter_diameter = get_stream_value(self.counter_diameter_input_stream, self.unit_scaled_factor)
+                    self.dirty = True
+                elif self.key_ctrl and self.is_counterbore_hole():
+                    self.counterbore_depth_input_stream = update_stream(self.counterbore_depth_input_stream, event.type)
+                    self.counterbore_depth = get_stream_value(self.counterbore_depth_input_stream, self.unit_scaled_factor)
+                    self.dirty = True
+                elif self.key_ctrl and self.is_countersink_hole():
+                    self.countersink_angle_input_stream = update_stream(self.countersink_angle_input_stream, event.type)
+                    self.countersink_angle = get_stream_value(self.countersink_angle_input_stream, min_value=0, max_value=90)
+                    self.dirty = True
+            if self.mode == MODE_DRILL:
+                if self.key_no_modifiers and self.is_drill_angle():
+                    self.drill_point_angle_input_stream = update_stream(self.drill_point_angle_input_stream, event.type)
+                    self.drill_point_angle = get_stream_value(self.drill_point_angle_input_stream, min_value=0, max_value=90)
+                    self.dirty = True
 
         if self.key_reset:
-            if self.key_no_modifiers:
-                if has_stream(self.hole_diameter_input_stream) and self.hard_stream_reset or no_stream(self.hole_diameter_input_stream):
-                    self.hole_diameter = default_hole_diameter
-                    self.dirty = True
-                self.hole_diameter_input_stream = new_stream()
-            elif self.key_alt:
-                if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
-                    self.segments = default_segments
-                    self.dirty = True
-                self.segments_input_stream = new_stream()
-            elif self.key_ctrl:
-                if has_stream(self.hole_depth_input_stream) and self.hard_stream_reset or no_stream(self.hole_depth_input_stream):
-                    self.hole_depth = default_hole_depth
-                    self.dirty = True
-                self.hole_depth_input_stream = new_stream()
-            elif self.key_ctrl_alt:
-                if has_stream(self.counter_diameter_input_stream) and self.hard_stream_reset or no_stream(self.counter_diameter_input_stream):
-                    self.counter_diameter = default_counter_diameter
-                    self.dirty = True
-                self.counter_diameter_input_stream = new_stream()
+            if self.mode == MODE_HOLE:
+                if self.key_no_modifiers:
+                    if has_stream(self.hole_diameter_input_stream) and self.hard_stream_reset or no_stream(self.hole_diameter_input_stream):
+                        self.hole_diameter = default_hole_diameter
+                        self.dirty = True
+                    self.hole_diameter_input_stream = new_stream()
+                elif self.key_alt:
+                    if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
+                        self.segments = default_segments
+                        self.dirty = True
+                    self.segments_input_stream = new_stream()
+                elif self.key_ctrl:
+                    if has_stream(self.hole_depth_input_stream) and self.hard_stream_reset or no_stream(self.hole_depth_input_stream):
+                        self.hole_depth = default_hole_depth
+                        self.dirty = True
+                    self.hole_depth_input_stream = new_stream()
+            if self.mode == MODE_COUNTER:
+                if self.key_no_modifiers and not self.is_simple_hole():
+                    if has_stream(self.counter_diameter_input_stream) and self.hard_stream_reset or no_stream(self.counter_diameter_input_stream):
+                        self.counter_diameter = None
+                        self.dirty = True
+                    self.counter_diameter_input_stream = new_stream()
+                elif self.key_ctrl and self.is_counterbore_hole():
+                    if has_stream(self.counterbore_depth_input_stream) and self.hard_stream_reset or no_stream(self.counterbore_depth_input_stream):
+                        self.counterbore_depth = None
+                        self.dirty = True
+                    self.counterbore_depth_input_stream = new_stream()
+                elif self.key_ctrl and self.is_countersink_hole():
+                    if has_stream(self.countersink_angle_input_stream) and self.hard_stream_reset or no_stream(self.countersink_angle_input_stream):
+                        self.countersink_angle = default_countersink_angle
+                        self.dirty = True
+                    self.countersink_angle_input_stream = new_stream()
+            if self.mode == MODE_DRILL:
+                if self.key_no_modifiers and self.is_drill_angle():
+                    if has_stream(self.drill_point_angle_input_stream) and self.hard_stream_reset or no_stream(self.drill_point_angle_input_stream):
+                        self.drill_point_angle = default_drill_point_angle
+                        self.dirty = True
+                    self.drill_point_angle_input_stream = new_stream()
 
-        if pressed(event, {'H'}):
+        if pressed(event, {'H'}) and self.mode == MODE_COUNTER:
             self.hole_type = (self.hole_type + 1) % len(hole_types)
             self.dirty = True
 
-        if pressed(event, {'D'}):
+        if pressed(event, {'D'}) and self.mode == MODE_DRILL:
             self.drill_point = (self.drill_point + 1) % len(drill_points)
             self.dirty = True
 
-        if self.key_step_up:
-            if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
-                self.segments = 4 if self.segments == 3 else self.segments + segment_factor
-                self.dirty = True
-            elif no_stream(self.segments_input_stream) and self.key_alt:
-                self.segments = 4 if self.segments == 3 else self.segments + segment_factor
-                self.dirty = True
-            elif no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
-                self.hole_diameter = round_dec(self.hole_diameter + self.step_size)
-                self.dirty = True
-            elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
-                self.hole_depth = round_dec(self.hole_depth + self.step_size)
-                self.dirty = True
-            elif no_stream(self.counter_diameter_input_stream) and self.key_ctrl_alt:
-                self.counter_diameter = round_dec(self.counter_diameter + self.step_size)
+        if pressed(event, {'C'}):
+            self.mode = (self.mode + 1) % len(modes)
+            self.dirty = True
+
+        if pressed(event, {'R'}) and self.mode == MODE_COUNTER:
+            if not self.is_simple_hole():
+                self.counter_diameter = None
+                self.counterbore_depth = None
                 self.dirty = True
 
+        if self.key_step_up:
+            if self.mode == MODE_HOLE:
+                if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
+                    self.segments = 4 if self.segments == 3 else self.segments + segment_factor
+                    self.dirty = True
+                elif no_stream(self.segments_input_stream) and self.key_alt:
+                    self.segments = 4 if self.segments == 3 else self.segments + segment_factor
+                    self.dirty = True
+                elif no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
+                    self.hole_diameter = round_dec(self.hole_diameter + self.step_size)
+                    self.dirty = True
+                elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
+                    self.hole_depth = round_dec(self.hole_depth + self.step_size)
+                    self.dirty = True
+            if self.mode == MODE_COUNTER:
+                if no_stream(self.counter_diameter_input_stream) and self.key_no_modifiers and not self.is_simple_hole():
+                    (isCounterDiameterSet, counter_diameter) = self.get_counter_diameter()
+                    if not isCounterDiameterSet:
+                        self.counter_diameter = counter_diameter
+                    self.counter_diameter = round_dec(self.counter_diameter + self.step_size)
+                    self.dirty = True
+                elif no_stream(self.counterbore_depth_input_stream) and self.key_ctrl and self.is_counterbore_hole():
+                    (isCounterboreDepthSet, counterbore_depth) = self.get_counterbore_depth()
+                    if not isCounterboreDepthSet:
+                        self.counterbore_depth = counterbore_depth
+                    self.counterbore_depth = round_dec(self.counterbore_depth + self.step_size)
+                    self.dirty = True
+                elif no_stream(self.countersink_angle_input_stream) and self.key_ctrl and self.is_countersink_hole():
+                    self.countersink_angle = min(90, self.countersink_angle + angle_factor)
+                    self.dirty = True
+            if self.mode == MODE_DRILL:
+                if no_stream(self.drill_point_angle_input_stream) and self.key_no_modifiers and self.is_drill_angle():
+                    self.drill_point_angle = min(90, self.drill_point_angle + angle_factor)
+                    self.dirty = True
+
         if self.key_step_down:
-            if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
-                self.segments = max(3, self.segments - segment_factor)
-                self.dirty = True
-            elif no_stream(self.segments_input_stream) and self.key_alt:
-                self.segments = max(3, self.segments - segment_factor)
-                self.dirty = True
-            elif no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
-                self.hole_diameter = max(0, round_dec(self.hole_diameter - self.step_size))
-                self.dirty = True
-            elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
-                self.hole_depth = round_dec(self.hole_depth - self.step_size)
-                self.dirty = True
-            elif no_stream(self.counter_diameter_input_stream) and self.key_ctrl_alt:
-                self.counter_diameter = max(0, round_dec(self.counter_diameter - self.step_size))
-                self.dirty = True
+            if self.mode == MODE_HOLE:
+                if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
+                    self.segments = max(3, self.segments - segment_factor)
+                    self.dirty = True
+                elif no_stream(self.segments_input_stream) and self.key_alt:
+                    self.segments = max(3, self.segments - segment_factor)
+                    self.dirty = True
+                elif no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
+                    self.hole_diameter = max(0, round_dec(self.hole_diameter - self.step_size))
+                    self.dirty = True
+                elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
+                    self.hole_depth = round_dec(self.hole_depth - self.step_size)
+                    self.dirty = True
+            if self.mode == MODE_COUNTER:
+                if no_stream(self.counter_diameter_input_stream) and self.key_no_modifiers and not self.is_simple_hole():
+                    (isCounterDiameterSet, counter_diameter) = self.get_counter_diameter()
+                    if not isCounterDiameterSet:
+                        self.counter_diameter = counter_diameter
+                    self.counter_diameter = max(0, round_dec(self.counter_diameter - self.step_size))
+                    self.dirty = True
+                elif no_stream(self.counterbore_depth_input_stream) and self.key_ctrl and self.is_counterbore_hole():
+                    (isCounterboreDepthSet, counterbore_depth) = self.get_counterbore_depth()
+                    if not isCounterboreDepthSet:
+                        self.counterbore_depth = counterbore_depth
+                    self.counterbore_depth = round_dec(self.counterbore_depth - self.step_size)
+                    self.dirty = True
+                elif no_stream(self.countersink_angle_input_stream) and self.key_ctrl and self.is_countersink_hole():
+                    self.countersink_angle = max(0, self.countersink_angle - angle_factor)
+                    self.dirty = True
+            if self.mode == MODE_DRILL:
+                if no_stream(self.drill_point_angle_input_stream) and self.key_no_modifiers and self.is_drill_angle():
+                    self.drill_point_angle = max(0, self.drill_point_angle - angle_factor)
+                    self.dirty = True
 
         if self.key_confirm:
             self.finish(context)
@@ -174,19 +261,38 @@ class ND_OT_hole_generator(BaseOperator):
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
-                self.hole_diameter = max(0, self.hole_diameter + self.mouse_value)
-                self.dirty = True
-            elif no_stream(self.segments_input_stream) and self.key_alt:
-                self.segments = max(3, self.segments + self.mouse_step)
-                self.dirty = True
-            elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
-                self.hole_depth += self.mouse_value
-                self.dirty = True
-            elif no_stream(self.counter_diameter_input_stream) and self.key_ctrl_alt:
-                self.counter_diameter = max(0, self.counter_diameter + self.mouse_value)
-                self.dirty = True
-
+            if self.mode == MODE_HOLE:
+                if no_stream(self.hole_diameter_input_stream) and self.key_no_modifiers:
+                    self.hole_diameter = max(0, self.hole_diameter + self.mouse_value)
+                    self.dirty = True
+                elif no_stream(self.segments_input_stream) and self.key_alt:
+                    self.segments = max(3, self.segments + self.mouse_step)
+                    self.dirty = True
+                elif no_stream(self.hole_depth_input_stream) and self.key_ctrl:
+                    self.hole_depth += self.mouse_value
+                    self.dirty = True
+            if self.mode == MODE_COUNTER:
+                if no_stream(self.counter_diameter_input_stream) and self.key_no_modifiers:
+                    if self.mouse_value != 0:
+                        (isCounterDiameterSet, counter_diameter) = self.get_counter_diameter()
+                        if not isCounterDiameterSet:
+                            self.counter_diameter = counter_diameter
+                        self.counter_diameter = max(0, self.counter_diameter + self.mouse_value)
+                        self.dirty = True
+                elif no_stream(self.counterbore_depth_input_stream) and self.key_ctrl and self.is_counterbore_hole():
+                    if self.mouse_value != 0:
+                        (isCounterboreDepthSet, counterbore_depth) = self.get_counterbore_depth()
+                        if not isCounterboreDepthSet:
+                            self.counterbore_depth = counterbore_depth
+                        self.counterbore_depth = max(0, self.counterbore_depth + self.mouse_value)
+                        self.dirty = True
+                elif no_stream(self.countersink_angle_input_stream) and self.key_ctrl and self.is_countersink_hole():
+                    self.countersink_angle = self.countersink_angle = max(0, min(90, self.countersink_angle + self.mouse_value_mag))
+                    self.dirty = True
+            if self.mode == MODE_DRILL:
+                if no_stream(self.drill_point_angle_input_stream) and self.key_no_modifiers and self.is_drill_angle():
+                    self.drill_point_angle = self.drill_point_angle = max(0, min(90, self.drill_point_angle + self.mouse_value_mag))
+                    self.dirty = True
 
     def do_invoke(self, context, event):
         try:
@@ -199,10 +305,15 @@ class ND_OT_hole_generator(BaseOperator):
 
         self.selected_objects = context.selected_objects
 
+        self.mode = MODE_HOLE
+
         self.segments_input_stream = new_stream()
         self.hole_diameter_input_stream = new_stream()
         self.hole_depth_input_stream = new_stream()
         self.counter_diameter_input_stream = new_stream()
+        self.counterbore_depth_input_stream = new_stream()
+        self.countersink_angle_input_stream = new_stream()
+        self.drill_point_angle_input_stream = new_stream()
 
         self.hole_type = hole_types["simple"]
         self.drill_point = drill_points["flat"]
@@ -210,7 +321,10 @@ class ND_OT_hole_generator(BaseOperator):
         self.segments = default_segments
         self.hole_diameter = default_hole_diameter
         self.hole_depth = default_hole_depth
-        self.counter_diameter = default_counter_diameter
+        self.counter_diameter = None
+        self.counterbore_depth = None
+        self.countersink_angle = default_countersink_angle
+        self.drill_point_angle = default_drill_point_angle
 
         self.target_object = get_real_active_object(context)
         previous_op = False
@@ -266,19 +380,27 @@ class ND_OT_hole_generator(BaseOperator):
         self.hole_diameter_prev = self.hole_diameter = self.hole_gen[socket_map["hole_diameter"]]
         self.hole_depth_prev = self.hole_depth = self.hole_gen[socket_map["hole_depth"]]
         self.counter_diameter_prev = self.counter_diameter = self.hole_gen[socket_map["counter_diameter"]]
+        self.counterbore_depth_prev = self.counterbore_depth = self.hole_gen[socket_map["counterbore_depth"]]
+        self.countersink_angle_prev = self.countersink_angle = degrees(self.hole_gen[socket_map["countersink_angle"]])
         self.hole_type_prev = self.hole_type = self.hole_gen[socket_map["hole_type"]]
         self.drill_point_prev = self.drill_point = self.hole_gen[socket_map["drill_point"]]
+        self.drill_point_angle_prev = self.drill_point_angle = degrees(self.hole_gen[socket_map["drill_point_angle"]])
 
         if get_preferences().lock_overlay_parameters_on_recall:
             self.hole_diameter_input_stream = set_stream(self.hole_diameter)
             self.segments_input_stream = set_stream(self.segments)
             self.hole_depth_input_stream = set_stream(self.hole_depth)
             self.counter_diameter_input_stream = set_stream(self.counter_diameter)
+            self.counterbore_depth_input_stream = set_stream(self.counterbore_depth)
+            self.countersink_angle_input_stream = set_stream(self.countersink_angle)
+            self.drill_point_angle_input_stream = set_stream(self.drill_point_angle)
 
 
     def add_hole_generator(self, context):
         hole_gen = new_modifier(context.active_object, 'Hole Generator — ND', 'NODES', rectify=False)
         hole_gen.node_group = bpy.data.node_groups['ND.HoleGenerator']
+
+        hole_gen[socket_map["protrusion_distance"]] = 0.005
 
         self.hole_gen = hole_gen
 
@@ -317,21 +439,59 @@ class ND_OT_hole_generator(BaseOperator):
         bpy.context.view_layer.objects.active = self.hole_gen_object
 
 
+    def get_counter_diameter(self):
+        if self.counter_diameter != None:
+            return (True, self.counter_diameter)
+
+        return (False, self.hole_diameter * 1.8)
+
+
+    def get_counterbore_depth(self):
+        if self.counterbore_depth != None:
+            return (True, self.counterbore_depth)
+
+        return (False, min(self.hole_depth * 0.15, self.hole_diameter * 0.5))
+
+
+    def is_countersink_hole(self):
+        return self.hole_type == hole_types["countersink"]
+
+
+    def is_counterbore_hole(self):
+        return self.hole_type == hole_types["counterbore"]
+
+
+    def is_simple_hole(self):
+        return self.hole_type == hole_types["simple"]
+
+
+    def is_drill_flat(self):
+        return self.drill_point == drill_points["flat"]
+
+
+    def is_drill_angle(self):
+        return self.drill_point == drill_points["angle"]
+
+
     def operate(self, context):
+        (isCounterDiameterSet, counter_diameter) = self.get_counter_diameter()
+        (isCounterboreDepthSet, counterbore_depth) = self.get_counterbore_depth()
+
+        if isCounterDiameterSet:
+            self.counter_diameter = counter_diameter
+
+        if isCounterboreDepthSet:
+            self.counterbore_depth = counterbore_depth
+
         self.hole_gen[socket_map["segments"]] = int(self.segments)
         self.hole_gen[socket_map["hole_diameter"]] = self.hole_diameter
-        self.hole_gen[socket_map["counter_diameter"]] = self.counter_diameter
+        self.hole_gen[socket_map["counter_diameter"]] = counter_diameter
         self.hole_gen[socket_map["hole_depth"]] = self.hole_depth
         self.hole_gen[socket_map["hole_type"]] = self.hole_type
         self.hole_gen[socket_map["drill_point"]] = self.drill_point
-
-        if not self.summoned:
-            self.hole_gen[socket_map["protrusion_distance"]] = 0.005
-
-            if self.hole_type == hole_types["simple"]:
-                self.counter_diameter = self.hole_diameter * 1.25
-
-            self.hole_gen[socket_map["counterbore_depth"]] = self.hole_depth * 0.15
+        self.hole_gen[socket_map["drill_point_angle"]] = radians(self.drill_point_angle)
+        self.hole_gen[socket_map["counterbore_depth"]] = counterbore_depth
+        self.hole_gen[socket_map["countersink_angle"]] = radians(self.countersink_angle)
 
         self.hole_gen.node_group.interface_update(context)
 
@@ -348,8 +508,11 @@ class ND_OT_hole_generator(BaseOperator):
             self.hole_diameter = self.hole_diameter_prev
             self.hole_depth = self.hole_depth_prev
             self.counter_diameter = self.counter_diameter_prev
+            self.counterbore_depth = self.counterbore_depth_prev
+            self.countersink_angle = self.countersink_angle
             self.hole_type = self.hole_type_prev
             self.drill_point = self.drill_point_prev
+            self.drill_point_angle = self.drill_point_angle
 
             self.operate(context)
 
@@ -370,52 +533,97 @@ class ND_OT_hole_generator(BaseOperator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_property(
-        self,
-        f"Hole Diameter: {(self.hole_diameter * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.unit_step_hint,
-        active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True,
-        input_stream=self.hole_diameter_input_stream)
-
-    draw_property(
-        self,
-        f"Segments: {self.segments}",
-        self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
-        active=self.key_alt,
-        alt_mode=self.key_shift_alt,
-        mouse_value=True,
-        input_stream=self.segments_input_stream)
-
-    draw_property(
-        self,
-        f"Hole Depth: {(self.hole_depth * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.generate_key_hint("Ctrl", self.unit_step_hint),
-        active=self.key_ctrl,
-        alt_mode=self.key_shift_ctrl,
-        mouse_value=True,
-        input_stream=self.hole_depth_input_stream)
-
-    if self.hole_type == hole_types["counterbore"] or self.hole_type == hole_types["countersunk"]:
+    if self.mode == MODE_HOLE:
         draw_property(
             self,
-            f"Counter Diameter: {(self.counter_diameter * self.display_unit_scale):.2f}{self.unit_suffix}",
-            self.generate_key_hint("Ctrl + Alt", self.unit_step_hint),
-            active=self.key_ctrl_alt,
-            alt_mode=self.key_shift_ctrl_alt,
+            f"Hole Diameter: {(self.hole_diameter * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.unit_step_hint,
+            active=self.key_no_modifiers,
+            alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,
-            input_stream=self.counter_diameter_input_stream)
+            input_stream=self.hole_diameter_input_stream)
+
+        draw_property(
+            self,
+            f"Segments: {self.segments}",
+            self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
+            active=self.key_alt,
+            alt_mode=self.key_shift_alt,
+            mouse_value=True,
+            input_stream=self.segments_input_stream)
+
+        draw_property(
+            self,
+            f"Hole Depth: {(self.hole_depth * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.generate_key_hint("Ctrl", self.unit_step_hint),
+            active=self.key_ctrl,
+            alt_mode=self.key_shift_ctrl,
+            mouse_value=True,
+            input_stream=self.hole_depth_input_stream)
+
+    if self.mode == MODE_COUNTER:
+        if not self.is_simple_hole():
+            (isSet, counter_diameter) = self.get_counter_diameter()
+            auto_suffix = "" if isSet else " (Auto)"
+            draw_property(
+                self,
+                f"Counter Diameter: {(counter_diameter * self.display_unit_scale):.2f}{self.unit_suffix}{auto_suffix}",
+                self.unit_step_hint,
+                active=self.key_no_modifiers,
+                alt_mode=self.key_shift_no_modifiers,
+                mouse_value=True,
+                input_stream=self.counter_diameter_input_stream)
+
+        if self.is_counterbore_hole():
+            (isSet, counterbore_depth) = self.get_counterbore_depth()
+            auto_suffix = "" if isSet else " (Auto)"
+            draw_property(
+                self,
+                f"Counterbore Depth: {(counterbore_depth * self.display_unit_scale):.2f}{self.unit_suffix}{auto_suffix}",
+                self.generate_key_hint("Ctrl", self.unit_step_hint),
+                active=self.key_ctrl,
+                alt_mode=self.key_shift_ctrl,
+                mouse_value=True,
+                input_stream=self.counterbore_depth_input_stream)
+
+        if self.is_countersink_hole():
+            draw_property(
+                self,
+                f"Countersink Angle: {(self.countersink_angle):.0f}°",
+                self.generate_key_hint("Ctrl", self.generate_step_hint(5, 1)),
+                active=self.key_ctrl,
+                alt_mode=self.key_shift_ctrl,
+                mouse_value=True,
+                input_stream=self.countersink_angle_input_stream)
+
+        if not self.is_simple_hole():
+            draw_hint(self, "Reset Automation [R]", "Set all parameters to automatic")
+
+        draw_hint(
+            self,
+            "Hole Type [H]: {}".format(hole_type_names[self.hole_type]),
+            ", ".join(hole_type_names))
+
+    if self.mode == MODE_DRILL:
+        if self.drill_point == drill_points["angle"]:
+            draw_property(
+                self,
+                f"Drill Point Angle: {(self.drill_point_angle):.0f}°",
+                self.generate_step_hint(5, 1),
+                active=self.key_no_modifiers,
+                alt_mode=self.key_shift_no_modifiers,
+                mouse_value=True,
+                input_stream=self.drill_point_angle_input_stream)
+
+        draw_hint(
+            self,
+            "Drill Point [D]: {}".format(drill_point_names[self.drill_point]),
+            ", ".join(drill_point_names))
 
     draw_hint(
         self,
-        "Hole Type [H]: {}".format(hole_type_names[self.hole_type]),
-        ", ".join(hole_type_names))
-
-    draw_hint(
-        self,
-        "Drill Point [D]: {}".format(drill_point_names[self.drill_point]),
-        ", ".join(drill_point_names))
+        "Configuration Mode [C]: {}".format(modes[self.mode]),
+        "Switch modes: {}".format(", ".join(modes)))
 
 
 def register():

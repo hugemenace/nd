@@ -263,6 +263,7 @@ CTRL — Remove existing modifiers"""
             self.lattice_points_v = self.lattice_points_v_prev = self.lattice_obj.data.points_v
             self.lattice_points_w = self.lattice_points_w_prev = self.lattice_obj.data.points_w
             self.interpolation_mode = self.interpolation_mode_prev = self.interpolation_modes.index(self.lattice_obj.data.interpolation_type_u)
+            self.uniform = self.lattice_points_v == self.lattice_points_u and self.lattice_points_w == self.lattice_points_u
 
         if get_preferences().lock_overlay_parameters_on_recall:
             self.lattice_points_u_input_stream = set_stream(self.lattice_points_u)

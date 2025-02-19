@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.48.0](https://github.com/hugemenace/nd/compare/v1.47.0...v1.48.0) (2025-02-19)
+
+
+### Features
+
+* add a 'Boolean Connectors' option to the GN Pipe Generator modifier ([96f8745](https://github.com/hugemenace/nd/commit/96f87450c26a278e1710085b0ce8884dec5a20c7))
+* add the new Generators menu to the N-Panel on Blender 4.3+ ([72ead0e](https://github.com/hugemenace/nd/commit/72ead0e310a694fdf02861def588047bc2774446))
+
+
+### Bug Fixes
+
+* ensure the Generators shortcut menu (Shift Alt G) is not bound on Blender versions lower than 4.3 ([5d4087c](https://github.com/hugemenace/nd/commit/5d4087ce9ebcf0d53d62f1e4d9eabfdf927ab666))
+* fix the Pipe Generator error when corner mode is activated on an edge with less than 3 vertices ([af41930](https://github.com/hugemenace/nd/commit/af41930944e1a7a3a48cf0dcb84bf2729574e4a1))
+
 ## [1.47.0](https://github.com/hugemenace/nd/compare/v1.46.0...v1.47.0) (2025-02-11)
 
 

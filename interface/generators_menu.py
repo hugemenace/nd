@@ -28,6 +28,7 @@
 import bpy
 from . import ops
 from . common import render_ops
+from .. lib.polling import app_minor_version
 from .. __init__ import bl_info
 
 
@@ -48,17 +49,18 @@ class ND_MT_generators_menu(bpy.types.Menu):
 def register():
     bpy.utils.register_class(ND_MT_generators_menu)
 
-    for mapping in [('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
-        keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
-        entry = keymap.keymap_items.new("wm.call_menu", 'G', 'PRESS', shift=True, alt=True)
-        entry.properties.name = "ND_MT_generators_menu"
-        keys.append((keymap, entry))
+    if app_minor_version() >= (4, 3):
+        for mapping in [('Mesh', 'EMPTY'), ('Object Mode', 'EMPTY')]:
+            keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
+            entry = keymap.keymap_items.new("wm.call_menu", 'G', 'PRESS', shift=True, alt=True)
+            entry.properties.name = "ND_MT_generators_menu"
+            keys.append((keymap, entry))
 
 
 def unregister():
-    for keymap, entry in keys:
-        keymap.keymap_items.remove(entry)
-
-    keys.clear()
+    if app_minor_version() >= (4, 3):
+        for keymap, entry in keys:
+            keymap.keymap_items.remove(entry)
+        keys.clear()
 
     bpy.utils.unregister_class(ND_MT_generators_menu)

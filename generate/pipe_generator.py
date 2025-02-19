@@ -79,7 +79,7 @@ CTRL — Remove existing modifiers"""
         angle_factor = 1 if self.key_shift else 10
 
         if self.key_numeric_input:
-            if self.mode == MODE_CORNERS:
+            if self.has_corners() and self.mode == MODE_CORNERS:
                 if self.key_ctrl:
                     self.vertex_radius_input_streams[self.selected_vertex_index] = update_stream(self.vertex_radius_input_streams[self.selected_vertex_index], event.type)
                     self.vertex_radius_attr.data[self.selected_vertex_index].value = get_stream_value(self.vertex_radius_input_streams[self.selected_vertex_index], self.unit_scaled_factor)
@@ -119,7 +119,7 @@ CTRL — Remove existing modifiers"""
                     self.dirty = True
 
         if self.key_reset:
-            if self.mode == MODE_CORNERS:
+            if self.has_corners() and self.mode == MODE_CORNERS:
                 if self.key_ctrl:
                     if has_stream(self.vertex_radius_input_streams[self.selected_vertex_index]) and self.hard_stream_reset or no_stream(self.vertex_radius_input_streams[self.selected_vertex_index]):
                         self.vertex_radius_attr.data[self.selected_vertex_index].value = 0.0
@@ -175,7 +175,7 @@ CTRL — Remove existing modifiers"""
             self.mode = (self.mode + 1) % len(modes)
             self.dirty = True
 
-        if self.mode == MODE_CORNERS and pressed(event, {'R'}):
+        if self.has_corners() and self.mode == MODE_CORNERS and pressed(event, {'R'}):
             vertex = self.vertex_cache[self.selected_vertex_index][0]
             self.vertex_radius_attr.data[vertex.index].value = 0.0
             self.vertex_segments_attr.data[vertex.index].value = 0
@@ -188,7 +188,7 @@ CTRL — Remove existing modifiers"""
             self.sync_connectors = True
             self.dirty = True
 
-        if self.mode == MODE_CORNERS and pressed(event, {'A'}):
+        if self.has_corners() and self.mode == MODE_CORNERS and pressed(event, {'A'}):
             for i, attr in enumerate(self.vertex_radius_attr.data):
                 attr.value = 0.0
 
@@ -200,7 +200,7 @@ CTRL — Remove existing modifiers"""
             self.dirty = True
 
         if self.key_step_up:
-            if self.mode == MODE_CORNERS:
+            if self.has_corners() and self.mode == MODE_CORNERS:
                 if self.key_no_modifiers:
                     self.selected_vertex_index = (self.selected_vertex_index + 1) % len(self.vertex_cache)
                     self.dirty = True
@@ -257,7 +257,7 @@ CTRL — Remove existing modifiers"""
                     self.dirty = True
 
         if self.key_step_down:
-            if self.mode == MODE_CORNERS:
+            if self.has_corners() and self.mode == MODE_CORNERS:
                 if self.key_no_modifiers:
                     self.selected_vertex_index = (self.selected_vertex_index - 1) % len(self.vertex_cache)
                     self.dirty = True
@@ -321,7 +321,7 @@ CTRL — Remove existing modifiers"""
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
-            if self.mode == MODE_CORNERS:
+            if self.has_corners() and self.mode == MODE_CORNERS:
                 if self.key_ctrl:
                     vertex = self.vertex_cache[self.selected_vertex_index][0]
                     vertex_radius = self.vertex_radius_attr.data[vertex.index].value
@@ -561,12 +561,16 @@ CTRL — Remove existing modifiers"""
         self.pipe_gen_object.data.auto_smooth_angle = radians(float(get_preferences().default_smoothing_angle))
 
 
+    def has_corners(self):
+        return len(self.vertex_cache) > 0
+
+
     def operate(self, context):
         self.primary_points = []
         self.secondary_points = []
         self.disc_points = []
 
-        if self.mode == MODE_CORNERS:
+        if self.has_corners() and self.mode == MODE_CORNERS:
             selected_vertex = self.vertex_cache[self.selected_vertex_index]
 
             self.primary_points = [selected_vertex[1]]
@@ -706,42 +710,45 @@ def draw_text_callback(self):
             ", ".join(["Yes", "No"]))
 
     if self.mode == MODE_CORNERS:
-        draw_property(
-            self,
-            f"Vertex: {self.selected_vertex_index + 1}/{len(self.vertex_cache)}",
-            "Current active vertex",
-            active=self.key_no_modifiers,
-            alt_mode=self.key_shift_no_modifiers,
-            mouse_value=False)
+        if not self.has_corners():
+            draw_hint(self, "No corners found", "At least 3 vertices are required to define corners")
+        else:
+            draw_property(
+                self,
+                f"Vertex: {self.selected_vertex_index + 1}/{len(self.vertex_cache)}",
+                "Current active vertex",
+                active=self.key_no_modifiers,
+                alt_mode=self.key_shift_no_modifiers,
+                mouse_value=False)
 
-        vertex = self.vertex_cache[self.selected_vertex_index][0]
+            vertex = self.vertex_cache[self.selected_vertex_index][0]
 
-        vertex_radius = self.vertex_radius_attr.data[vertex.index].value
-        str_base_radius = f"Vertex Radius: {(self.base_corner_radius * self.display_unit_scale):.2f}{self.unit_suffix} (Base)"
-        str_custom_radius = f"Vertex Radius: {(vertex_radius * self.display_unit_scale):.2f}{self.unit_suffix}"
-        draw_property(
-            self,
-            str_base_radius if vertex_radius == 0 else str_custom_radius,
-            self.generate_key_hint("Ctrl", self.unit_step_hint),
-            active=self.key_ctrl,
-            alt_mode=self.key_shift_ctrl,
-            mouse_value=True,
-            input_stream=self.vertex_radius_input_streams[self.selected_vertex_index])
+            vertex_radius = self.vertex_radius_attr.data[vertex.index].value
+            str_base_radius = f"Vertex Radius: {(self.base_corner_radius * self.display_unit_scale):.2f}{self.unit_suffix} (Base)"
+            str_custom_radius = f"Vertex Radius: {(vertex_radius * self.display_unit_scale):.2f}{self.unit_suffix}"
+            draw_property(
+                self,
+                str_base_radius if vertex_radius == 0 else str_custom_radius,
+                self.generate_key_hint("Ctrl", self.unit_step_hint),
+                active=self.key_ctrl,
+                alt_mode=self.key_shift_ctrl,
+                mouse_value=True,
+                input_stream=self.vertex_radius_input_streams[self.selected_vertex_index])
 
-        vertex_segments = self.vertex_segments_attr.data[vertex.index].value
-        str_base_segments = f"Vertex Segments: {self.base_corner_segments} (Base)"
-        str_custom_segments = f"Vertex Segments: {vertex_segments}"
-        draw_property(
-            self,
-            str_base_segments if vertex_segments == 0 else str_custom_segments,
-            self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
-            active=self.key_alt,
-            alt_mode=self.key_shift_alt,
-            mouse_value=True,
-            input_stream=self.vertex_segments_input_streams[self.selected_vertex_index])
+            vertex_segments = self.vertex_segments_attr.data[vertex.index].value
+            str_base_segments = f"Vertex Segments: {self.base_corner_segments} (Base)"
+            str_custom_segments = f"Vertex Segments: {vertex_segments}"
+            draw_property(
+                self,
+                str_base_segments if vertex_segments == 0 else str_custom_segments,
+                self.generate_key_hint("Alt", self.generate_step_hint(2, 1)),
+                active=self.key_alt,
+                alt_mode=self.key_shift_alt,
+                mouse_value=True,
+                input_stream=self.vertex_segments_input_streams[self.selected_vertex_index])
 
-        draw_hint(self, "Reset Corner [R]", "Reverts active corner parameters to default values")
-        draw_hint(self, "Reset All Corners [A]", "Reverts ALL corner parameters to default values")
+            draw_hint(self, "Reset Corner [R]", "Reverts active corner parameters to default values")
+            draw_hint(self, "Reset All Corners [A]", "Reverts ALL corner parameters to default values")
 
     if self.mode == MODE_ENDS:
         start_connector = "None"

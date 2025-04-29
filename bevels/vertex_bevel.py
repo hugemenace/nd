@@ -56,11 +56,16 @@ CTRL — Remove existing modifiers"""
     def do_modal(self, context, event):
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
+        percent_factor = 1 if self.key_shift else 10
 
         if self.key_numeric_input:
-            if self.key_no_modifiers:
+            if not self.is_width_percent() and self.key_no_modifiers:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
                 self.width = get_stream_value(self.width_input_stream, self.unit_scaled_factor)
+                self.dirty = True
+            elif self.is_width_percent() and self.key_no_modifiers:
+                self.percentage_input_stream = update_stream(self.percentage_input_stream, event.type)
+                self.percentage = get_stream_value(self.percentage_input_stream, min_value=0, max_value=100)
                 self.dirty = True
             elif self.key_alt:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
@@ -72,11 +77,16 @@ CTRL — Remove existing modifiers"""
                 self.dirty = True
 
         if self.key_reset:
-            if self.key_no_modifiers:
+            if not self.is_width_percent() and self.key_no_modifiers:
                 if has_stream(self.width_input_stream) and self.hard_stream_reset or no_stream(self.width_input_stream):
                     self.width = 0
                     self.dirty = True
                 self.width_input_stream = new_stream()
+            elif self.is_width_percent() and self.key_no_modifiers:
+                if has_stream(self.percentage_input_stream) and self.hard_stream_reset or no_stream(self.percentage_input_stream):
+                    self.percentage = 0
+                    self.dirty = True
+                self.percentage_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
                     self.segments = 1
@@ -92,6 +102,14 @@ CTRL — Remove existing modifiers"""
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
 
+        if pressed(event, {'F'}):
+            self.width_type = (self.width_type + 1) % len(self.width_types)
+            self.width_input_stream = new_stream()
+            self.percentage_input_stream = new_stream()
+            self.width = 0
+            self.percentage = 0
+            self.dirty = True
+
         if self.key_step_up:
             if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
@@ -102,8 +120,11 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, round_dec(self.profile + profile_factor))
                 self.dirty = True
-            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.is_width_percent() and not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = round_dec(self.width + self.step_size)
+                self.dirty = True
+            elif self.is_width_percent() and not self.extend_mouse_values and no_stream(self.percentage_input_stream) and self.key_no_modifiers:
+                self.percentage = min(100, round_dec(self.percentage + percent_factor))
                 self.dirty = True
 
         if self.key_step_down:
@@ -116,8 +137,11 @@ CTRL — Remove existing modifiers"""
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, round_dec(self.profile - profile_factor))
                 self.dirty = True
-            elif not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.is_width_percent() and not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, round_dec(self.width - self.step_size))
+                self.dirty = True
+            elif self.is_width_percent() and not self.extend_mouse_values and no_stream(self.percentage_input_stream) and self.key_no_modifiers:
+                self.percentage = max(0, round_dec(self.percentage - percent_factor))
                 self.dirty = True
 
         if self.key_confirm:
@@ -132,8 +156,11 @@ CTRL — Remove existing modifiers"""
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments + self.mouse_step)
                 self.dirty = True
-            elif no_stream(self.width_input_stream) and self.key_no_modifiers:
+            elif not self.is_width_percent() and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, self.width + self.mouse_value)
+                self.dirty = True
+            elif self.is_width_percent() and no_stream(self.percentage_input_stream) and self.key_no_modifiers:
+                self.percentage = max(0, min(100, self.percentage + self.mouse_value_mag))
                 self.dirty = True
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, min(1, self.profile + self.mouse_value))
@@ -172,11 +199,15 @@ CTRL — Remove existing modifiers"""
         self.dirty = False
 
         self.segments = 1
+        self.width_types = ['OFFSET', 'WIDTH', 'DEPTH', 'PERCENT', 'ABSOLUTE']
+        self.width_type = self.width_types.index('WIDTH')
         self.width = 0
+        self.percentage = 0
         self.profile = 0.5
 
         self.segments_input_stream = new_stream()
         self.width_input_stream = new_stream()
+        self.percentage_input_stream = new_stream()
         self.profile_input_stream = new_stream()
 
         self.target_object = context.active_object
@@ -240,10 +271,16 @@ CTRL — Remove existing modifiers"""
         return ctx_edit_mode(context) and obj_is_mesh(target_object)
 
 
+    def is_width_percent(self):
+        return self.width_type == self.width_types.index('PERCENT')
+
+
     def summon_old_operator(self, context):
         self.summoned = True
 
+        self.width_type = self.width_types.index(self.bevel.offset_type)
         self.width_prev = self.width = self.bevel.width
+        self.percentage_prev = self.percentage = self.bevel.width_pct
         self.segments_prev = self.segments = self.bevel.segments
         self.profile_prev = self.profile = self.bevel.profile
 
@@ -319,7 +356,12 @@ CTRL — Remove existing modifiers"""
 
 
     def operate(self, context):
-        self.bevel.width = self.width
+        self.bevel.offset_type = self.width_types[self.width_type]
+
+        final_width = self.percentage if self.is_width_percent() else self.width
+        self.bevel.width_pct = final_width
+        self.bevel.width = final_width
+
         self.bevel.segments = self.segments
         self.bevel.profile = self.profile
 
@@ -366,14 +408,24 @@ CTRL — Remove existing modifiers"""
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_property(
-        self,
-        f"Width: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.unit_step_hint,
-        active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True,
-        input_stream=self.width_input_stream)
+    if self.is_width_percent():
+        draw_property(
+            self,
+            f"Percentage: {self.percentage:.1f}%",
+            self.generate_step_hint(10, 1),
+            active=self.key_no_modifiers,
+            alt_mode=self.key_shift_no_modifiers,
+            mouse_value=True,
+            input_stream=self.percentage_input_stream)
+    else:
+        draw_property(
+            self,
+            f"{self.width_types[self.width_type].capitalize()}: {(self.width * self.display_unit_scale):.2f}{self.unit_suffix}",
+            self.unit_step_hint,
+            active=self.key_no_modifiers,
+            alt_mode=self.key_shift_no_modifiers,
+            mouse_value=True,
+            input_stream=self.width_input_stream)
 
     draw_property(
         self,
@@ -392,6 +444,11 @@ def draw_text_callback(self):
         alt_mode=self.key_shift_ctrl,
         mouse_value=True,
         input_stream=self.profile_input_stream)
+
+    draw_hint(
+        self,
+        "Width Type [F]: {0}".format(self.width_types[self.width_type].capitalize()),
+        "{}".format(", ".join([m.capitalize() for m in self.width_types])))
 
     draw_hint(
         self,

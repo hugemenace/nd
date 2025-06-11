@@ -38,6 +38,7 @@ from .. lib.collections import move_to_utils_collection, isolate_in_utils_collec
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_moddable, obj_is_curve, obj_exists, ctx_edit_mode, ctx_obj_mode, ctx_objects_selected, ctx_min_objects_selected, app_minor_version
+from .. lib.preferences import get_preferences
 
 
 class ND_OT_mirror(BaseOperator):

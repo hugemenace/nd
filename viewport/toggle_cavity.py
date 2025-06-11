@@ -25,37 +25,24 @@
 # Contributors: Tristo (HM)
 # ---
 
-import importlib
-from . import toggle_wireframes
-from . import toggle_face_orientation
-from . import toggle_utils_collection
-from . import toggle_clear_view
-from . import toggle_custom_view
-from . import toggle_cavity
-from . import silhouette
+import bpy
 
 
-registerables = (
-    toggle_wireframes,
-    toggle_face_orientation,
-    toggle_utils_collection,
-    toggle_clear_view,
-    toggle_custom_view,
-    toggle_cavity,
-    silhouette,
-)
+class ND_OT_toggle_cavity(bpy.types.Operator):
+    bl_idname = "nd.toggle_cavity"
+    bl_label = "Cavity"
+    bl_description = "Toggle cavity visibility"
 
 
-def reload():
-    for registerable in registerables:
-        importlib.reload(registerable)
+    def execute(self, context):
+        bpy.context.space_data.shading.show_cavity = not bpy.context.space_data.shading.show_cavity
+
+        return {'FINISHED'}
 
 
 def register():
-    for registerable in registerables:
-        registerable.register()
+    bpy.utils.register_class(ND_OT_toggle_cavity)
 
 
 def unregister():
-    for registerable in registerables:
-        registerable.unregister()
+    bpy.utils.unregister_class(ND_OT_toggle_cavity)

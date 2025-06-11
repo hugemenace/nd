@@ -135,6 +135,7 @@ viewport_ops = [
     ("nd.toggle_utils_collection", "OUTLINER_COLLECTION", None, "DYNAMIC", False),
     None, # Separator
     ("nd.silhouette", "CLIPUV_DEHLT", None, None, False),
+    ("nd.toggle_cavity", "MOD_SUBSURF", None, None, False),
     None, # Separator
     ("nd.toggle_custom_view", "OVERLAY", None, None, False),
     ("nd.toggle_clear_view", "OVERLAY", None, None, False),

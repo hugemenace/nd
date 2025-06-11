@@ -147,6 +147,8 @@ ALT — Duplicate mesh before applying modifiers"""
     def remove_vertex_groups(self, obj):
         vertex_groups = obj.vertex_groups.values()
         for vg in vertex_groups:
+            if not vg.name.startswith("ND —"):
+                continue
             obj.vertex_groups.remove(vg)
 
 

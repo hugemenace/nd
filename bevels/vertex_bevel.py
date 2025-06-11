@@ -98,16 +98,12 @@ CTRL — Remove existing modifiers"""
                     self.dirty = True
                 self.profile_input_stream = new_stream()
 
-        if pressed(event, {'W'}):
+        if pressed(event, {'E'}):
             self.target_object.show_wire = not self.target_object.show_wire
             self.target_object.show_in_front = not self.target_object.show_in_front
 
-        if pressed(event, {'F'}):
+        if pressed(event, {'W'}):
             self.width_type = (self.width_type + 1) % len(self.width_types)
-            self.width_input_stream = new_stream()
-            self.percentage_input_stream = new_stream()
-            self.width = 0
-            self.percentage = 0
             self.dirty = True
 
         if self.key_step_up:
@@ -278,7 +274,7 @@ CTRL — Remove existing modifiers"""
     def summon_old_operator(self, context):
         self.summoned = True
 
-        self.width_type = self.width_types.index(self.bevel.offset_type)
+        self.width_type_prev = self.width_type = self.width_types.index(self.bevel.offset_type)
         self.width_prev = self.width = self.bevel.width
         self.percentage_prev = self.percentage = self.bevel.width_pct
         self.segments_prev = self.segments = self.bevel.segments
@@ -287,6 +283,7 @@ CTRL — Remove existing modifiers"""
         if get_preferences().lock_overlay_parameters_on_recall:
             self.segments_input_stream = set_stream(self.segments)
             self.width_input_stream = set_stream(self.width)
+            self.percentage_input_stream = set_stream(self.percentage)
             self.profile_input_stream = set_stream(self.profile)
 
 
@@ -390,6 +387,8 @@ CTRL — Remove existing modifiers"""
 
         if self.summoned:
             self.bevel.width = self.width_prev
+            self.bevel.width_pct = self.percentage_prev
+            self.bevel.offset_type = self.width_types[self.width_type_prev]
             self.bevel.segments = self.segments_prev
             self.bevel.profile = self.profile_prev
 
@@ -411,7 +410,7 @@ def draw_text_callback(self):
     if self.is_width_percent():
         draw_property(
             self,
-            f"Percentage: {self.percentage:.1f}%",
+            f"Percentage: {self.percentage:.2f}%",
             self.generate_step_hint(10, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -447,12 +446,12 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Width Type [F]: {0}".format(self.width_types[self.width_type].capitalize()),
+        "Width Type [W]: {0}".format(self.width_types[self.width_type].capitalize()),
         "{}".format(", ".join([m.capitalize() for m in self.width_types])))
 
     draw_hint(
         self,
-        "Enhanced Wireframe [W]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        "Enhanced Wireframe [E]: {0}".format("Yes" if self.target_object.show_wire else "No"),
         "Display the objects's wireframe over solid shading")
 
 

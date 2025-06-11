@@ -28,14 +28,16 @@
 import bpy
 import bmesh
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
+from .. lib.modifiers import is_sba_mod
 
 
 class ND_OT_apply_modifiers(bpy.types.Operator):
     bl_idname = "nd.apply_modifiers"
     bl_label = "Apply Modifiers"
-    bl_description = """Prepare the selected object(s) for destructive operations by applying applicable modifiers
-SHIFT — Hard apply (apply all modifiers)
-ALT — Duplicate mesh before applying modifiers"""
+    bl_description = """Apply all modifiers except for Object Bevel, SBA, WN, and Triangulate.
+CTRL — Soft apply (only apply viewport visible modifiers)
+SHIFT — Hard apply (apply ALL modifiers, no exceptions)
+ALT — Duplicate the mesh before applying modifiers"""
     bl_options = {'UNDO'}
 
 
@@ -65,8 +67,9 @@ ALT — Duplicate mesh before applying modifiers"""
         mesh_objects = [obj for obj in valid_objects if obj.type == 'MESH']
         for obj in mesh_objects:
             self.collapse_modifiers(obj)
-            self.remove_vertex_groups(obj)
-            self.remove_edge_weights(obj)
+            if self.apply_mode != 'SOFT':
+                self.remove_vertex_groups(obj)
+                self.remove_edge_weights(obj)
 
         curve_objects = [obj for obj in valid_objects if obj.type == 'CURVE']
         if len(curve_objects) > 0:
@@ -83,28 +86,37 @@ ALT — Duplicate mesh before applying modifiers"""
 
 
     def invoke(self, context, event):
-        self.hard_apply = event.shift
+        self.apply_mode = 'REGULAR'
+
+        if event.shift:
+            self.apply_mode = 'HARD'
+        elif event.ctrl:
+            self.apply_mode = 'SOFT'
+
         self.duplicate = event.alt
 
         return self.execute(context)
 
 
     def collapse_modifiers(self, obj):
-        safe_mod_types = ['WEIGHTED_NORMAL', 'TRIANGULATE', 'NODES']
+        safe_mod_types = ['WEIGHTED_NORMAL', 'TRIANGULATE']
 
         mods = [mod for mod in obj.modifiers]
         mods_to_apply = []
         mods_to_remove = []
 
-        if self.hard_apply:
+        if self.apply_mode != 'REGULAR':
             mods_to_apply = [mod.name for mod in mods if mod.show_viewport]
             mods_to_remove = [mod.name for mod in mods if not mod.show_viewport]
 
-        if not self.hard_apply:
+        if self.apply_mode == 'REGULAR':
             skip_weld = False
 
             for index, mod in enumerate(mods):
                 if mod.type in safe_mod_types:
+                    continue
+
+                if is_sba_mod(mod):
                     continue
 
                 if skip_weld and mod.type == 'WELD' and "— ND B" in mod.name:
@@ -136,12 +148,13 @@ ALT — Duplicate mesh before applying modifiers"""
                     with bpy.context.temp_override(object=obj):
                         bpy.ops.object.modifier_remove(modifier=mod_name)
 
-        for mod_name in mods_to_remove:
-            if app_minor_version() < (4, 0):
-                bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
-            else:
-                with bpy.context.temp_override(object=obj):
-                    bpy.ops.object.modifier_remove(modifier=mod_name)
+        if self.apply_mode != 'SOFT':
+            for mod_name in mods_to_remove:
+                if app_minor_version() < (4, 0):
+                    bpy.ops.object.modifier_remove({'object': obj}, modifier=mod_name)
+                else:
+                    with bpy.context.temp_override(object=obj):
+                        bpy.ops.object.modifier_remove(modifier=mod_name)
 
 
     def remove_vertex_groups(self, obj):

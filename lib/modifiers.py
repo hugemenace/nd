@@ -92,9 +92,22 @@ def rectify_mod_order(object, mod_name):
     move_mod_to_index(object, mod_name, matching_mod_index)
 
 
+def is_sba_mod(mod):
+    if mod.type != 'NODES':
+        return False
+
+    if mod.name.startswith("Smooth — ND SBA") or mod.name.startswith("Smooth by Angle"):
+        return True
+
+    if mod.node_group is not None and mod.node_group.name.startswith("Smooth by Angle"):
+        return True
+
+    return False
+
+
 def get_sba_mod(object):
     for mod in object.modifiers:
-        if mod.type == 'NODES' and (mod.name.startswith("Smooth — ND SBA") or mod.name.startswith("Smooth by Angle")):
+        if is_sba_mod(mod):
             return mod
 
     return None

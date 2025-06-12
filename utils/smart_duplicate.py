@@ -58,7 +58,7 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        util_objects = get_all_util_objects(context.selected_objects)
+        util_objects = get_util_objects_for(context.selected_objects)
         isolate_utils(util_objects)
 
         for obj in util_objects:

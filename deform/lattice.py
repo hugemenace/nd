@@ -184,7 +184,17 @@ CTRL — Remove existing modifiers"""
             return {'CANCELLED'}
 
         if event.ctrl:
-            remove_modifiers_ending_with(context.selected_objects, ' — ND L')
+            # Remove all lattice objects
+            mods = [m for m in context.active_object.modifiers if m.name.endswith(' — ND L')]
+            lattice_objs = [m.object for m in mods if m.type == 'LATTICE']
+            for lattice_obj in lattice_objs:
+                if lattice_obj and lattice_obj.type == 'LATTICE':
+                    bpy.data.lattices.remove(lattice_obj.data, do_unlink=True)
+
+            # Remove all lattice modifiers
+            for mod in mods:
+                context.active_object.modifiers.remove(mod)
+
             return {'FINISHED'}
 
         self.dirty = False

@@ -32,7 +32,6 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object, set_object_util_visibility
@@ -182,12 +181,6 @@ class ND_OT_bool_inset(BaseOperator):
 
     def finish(self, context):
         self.reference_obj.hide_set(False)
-
-        move_to_utils_collection(self.reference_obj)
-        move_to_utils_collection(self.intersecting_obj)
-
-        if get_preferences().hide_unrelated_utils_after_op:
-            isolate_in_utils_collection([self.reference_obj, self.intersecting_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)

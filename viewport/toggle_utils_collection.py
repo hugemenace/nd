@@ -26,8 +26,7 @@
 # ---
 
 import bpy
-from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection, has_visible_utils
-from .. lib.objects import get_all_util_objects
+from .. lib.collections import hide_all_utils, isolate_utils, has_visible_utils, get_util_objects_for
 
 
 keys = []
@@ -47,9 +46,7 @@ SHIFT — Display all utils for the selected objects"""
 
 
     def execute(self, context):
-        data = get_utils_layer()
-        if data is not None:
-            hide_utils_collection(has_visible_utils())
+        hide_all_utils(has_visible_utils())
 
         return {'FINISHED'}
 
@@ -58,17 +55,10 @@ SHIFT — Display all utils for the selected objects"""
         isolated_object_mode = event.shift and not self.mode == 'RESTRICTED'
 
         if isolated_object_mode and len(context.selected_objects) > 0:
-            data = get_utils_layer()
-            if data is None:
-                return {'FINISHED'}
-
             selected_objects = context.selected_objects.copy()
 
-            util_objects = get_all_util_objects(selected_objects)
-            util_objects.extend(selected_objects)
-
-            hide_utils_collection(True)
-            isolate_in_utils_collection(util_objects)
+            util_objects = get_util_objects_for(selected_objects)
+            isolate_utils(util_objects)
 
             return {'FINISHED'}
 

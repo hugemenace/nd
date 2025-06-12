@@ -29,131 +29,84 @@ import bpy
 from . preferences import get_preferences
 
 
-def create_utils_collection():
-    collection = bpy.data.collections.new(get_preferences().utils_collection_name)
-    bpy.context.scene.collection.children.link(collection)
-    collection.color_tag = get_preferences().utils_collection_color
-    collection.hide_render = True
+def is_util_object(obj):
+    if obj.name not in bpy.context.view_layer.objects:
+        return False
 
-    return collection
-
-
-def get_all_collections(obj):
-    collections = []
-    for collection in bpy.data.collections:
-        if obj.name in [obj.name for obj in collection.all_objects]:
-            collections.append(collection)
-
-    return collections
-
-
-def move_to_utils_collection(obj):
-    utils_collection_name = get_preferences().utils_collection_name
-
-    utils_collection = bpy.data.collections.get(utils_collection_name)
-    if utils_collection is None:
-        utils_collection = create_utils_collection()
-
-    object_collections = get_all_collections(obj)
-    if utils_collection in object_collections:
-        return
-
-    remove_obj_from_all_collections(obj)
-    utils_collection.objects.link(obj)
-
-
-def remove_obj_from_all_collections(obj):
-    for collection in obj.users_collection[:]:
-        collection.objects.unlink(obj)
-
-
-def get_utils_layer():
-    layers = bpy.context.view_layer.layer_collection
-    for layer in layers.children:
-        if layer.name == get_preferences().utils_collection_name:
-            return (layer, layer.collection)
-
-    return None
+    return obj.type == 'EMPTY' or obj.display_type == 'WIRE'
 
 
 def get_all_util_objects():
-    data = get_utils_layer()
-
-    if data is None:
-        return []
-
-    layer, collection = data
-    return collection.all_objects
+    return [obj for obj in bpy.context.scene.objects if is_util_object(obj)]
 
 
-def hide_utils_collection(hide):
-    data = get_utils_layer()
-    if data is not None:
-        layer, collection = data
+def get_util_objects_for(target_objs):
+    util_objects = set()  # Use set to avoid duplicates
+    processed_objects = set()  # Track processed objects to avoid infinite loops
 
-        layer.hide_viewport = False
-        layer.exclude = False
-        collection.hide_viewport = False
+    def process_object(obj):
+        if obj in processed_objects:
+            return
+        processed_objects.add(obj)
 
-        should_hide_viewport = get_preferences().disable_utils_in_viewport
+        # 1. Check if this object itself is a util object
+        if is_util_object(obj):
+            util_objects.add(obj)
 
-        obj_names = [obj.name for obj in collection.all_objects]
-        for obj_name in obj_names:
-            obj = bpy.data.objects[obj_name]
-            obj.hide_set(hide)
-            obj.hide_viewport = should_hide_viewport and hide
+        # 2. Process all children recursively
+        for child in obj.children:
+            process_object(child)
+
+        # 3. Check modifier references
+        if hasattr(obj, 'modifiers'):
+            for modifier in obj.modifiers:
+                referenced_obj = get_modifier_object_reference(modifier)
+                if referenced_obj and is_util_object(referenced_obj):
+                    util_objects.add(referenced_obj)
+                    # Recursively process the referenced object too
+                    process_object(referenced_obj)
+
+    def get_modifier_object_reference(modifier):
+        # Common object reference properties across different modifiers
+        object_properties = [
+            'object',          # Boolean, Array, Mirror, etc.
+            'target',          # Shrinkwrap, Surface Deform, etc.
+            'mirror_object',   # Mirror modifier
+            'offset_object',   # Array modifier
+            'start_cap',       # Array modifier
+            'end_cap',         # Array modifier
+            'curve_object',    # Curve modifier
+            'auxiliary_target' # Surface Deform
+        ]
+
+        for prop in object_properties:
+            if hasattr(modifier, prop):
+                obj_ref = getattr(modifier, prop)
+                if obj_ref is not None:
+                    return obj_ref
+
+        return None
+
+    # Process each target object
+    for target_obj in target_objs:
+        if target_obj is not None:
+            process_object(target_obj)
+
+    return list(util_objects)
+
+
+def isolate_utils(target_objs):
+    for obj in target_objs:
+        obj.hide_set(False)
+
+
+def hide_all_utils(hide):
+    for obj in get_all_util_objects():
+        obj.hide_set(hide)
 
 
 def has_visible_utils():
-    data = get_utils_layer()
-    if data is not None:
-        layer, collection = data
-
-        if layer.exclude:
-            return False
-
-        layer.hide_viewport = False
-        layer.exclude = False
-        collection.hide_viewport = False
-
-        obj_names = [obj.name for obj in collection.all_objects]
-        for obj_name in obj_names:
-            obj = bpy.data.objects[obj_name]
-            if not obj.hide_get() and not obj.hide_viewport:
-                return True
-
+    for obj in get_all_util_objects():
+        if not obj.hide_get():
+            return True
     return False
-
-
-def isolate_in_utils_collection(target_objs):
-    data = get_utils_layer()
-    if data is not None:
-        layer, collection = data
-
-        layer.hide_viewport = False
-        layer.exclude = False
-        collection.hide_viewport = False
-
-        should_hide_viewport = get_preferences().disable_utils_in_viewport
-
-        obj_names = [obj.name for obj in collection.all_objects]
-        target_obj_names = [obj.name for obj in target_objs]
-
-        for obj_name in obj_names:
-            obj = bpy.data.objects[obj_name]
-            obj.hide_set(obj.name not in target_obj_names)
-            obj.hide_viewport = should_hide_viewport and hide
-
-
-def show_utils(target_objs):
-    data = get_utils_layer()
-    if data is not None:
-        layer, collection = data
-
-        layer.hide_viewport = False
-        layer.exclude = False
-        collection.hide_viewport = False
-
-        for obj in target_objs:
-            obj.hide_set(False)
-            obj.hide_viewport = False

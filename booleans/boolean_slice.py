@@ -26,7 +26,6 @@
 # ---
 
 import bpy
-from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object, set_object_util_visibility
@@ -92,10 +91,6 @@ ALT — Do not clean the reference object's mesh"""
 
         reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
         intersecting_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
-
-        move_to_utils_collection(reference_obj)
-        if get_preferences().hide_unrelated_utils_after_op:
-            isolate_in_utils_collection([reference_obj])
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

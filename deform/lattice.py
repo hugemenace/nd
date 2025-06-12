@@ -31,7 +31,6 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
-from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection, show_utils, hide_utils_collection
 from .. lib.math import generate_bounding_box, v3_average
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
@@ -228,11 +227,11 @@ CTRL — Remove existing modifiers"""
             bpy.ops.object.modifier_remove(modifier=self.lattice.name)
             self.prepare_new_operator(context)
 
-        if self.summoned and get_preferences().hide_unrelated_utils_after_op:
-            isolate_in_utils_collection([self.lattice_obj])
-
-        if self.summoned and not get_preferences().hide_unrelated_utils_after_op:
-            show_utils([self.lattice_obj])
+        self.unhid_lattice_obj = False
+        if self.summoned and self.lattice_obj:
+            if self.lattice_obj.hide_get():
+                self.unhid_lattice_obj = True
+                self.lattice_obj.hide_set(False)
 
         self.operate(context)
 
@@ -352,9 +351,6 @@ CTRL — Remove existing modifiers"""
 
 
     def finish(self, context):
-        move_to_utils_collection(self.lattice_obj)
-        if get_preferences().hide_unrelated_utils_after_op:
-            isolate_in_utils_collection([self.lattice_obj])
         self.select_lattice_object(context)
 
         unregister_draw_handler()
@@ -371,7 +367,8 @@ CTRL — Remove existing modifiers"""
             self.lattice_obj.data.interpolation_type_v = interpolation_mode
             self.lattice_obj.data.interpolation_type_w = interpolation_mode
 
-            hide_utils_collection(True)
+            if self.unhid_lattice_obj:
+                self.lattice_obj.hide_set(True)
 
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.lattice.name)

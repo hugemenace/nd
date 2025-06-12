@@ -33,7 +33,6 @@ from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.collections import move_to_utils_collection, hide_utils_collection
 from .. lib.preferences import get_preferences
 from .. lib.objects import set_origin
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
@@ -229,7 +228,8 @@ CTRL — Remove existing modifiers"""
         self.rotator_obj.empty_display_size = 1
         self.rotator_obj.empty_display_type = 'PLAIN_AXES'
 
-        bpy.context.scene.collection.objects.link(self.rotator_obj)
+        users_collection = self.reference_obj.users_collection[0] if self.reference_obj.users_collection else bpy.context.scene.collection
+        users_collection.objects.link(self.rotator_obj)
 
         if self.single_obj_mode or self.faux_origin:
             self.rotator_obj.location = (0, 0, 0)
@@ -345,10 +345,6 @@ CTRL — Remove existing modifiers"""
 
 
     def finish(self, context):
-        if not self.summoned:
-            move_to_utils_collection(self.rotator_obj)
-            hide_utils_collection(True)
-
         unregister_draw_handler()
         unregister_axis_handler()
 

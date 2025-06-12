@@ -30,7 +30,7 @@ import bmesh
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.collections import hide_utils_collection, isolate_in_utils_collection
+from .. lib.collections import isolate_utils
 from .. lib.preferences import get_preferences
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
@@ -186,8 +186,12 @@ SHIFT — Cycle through the modifier stack"""
             for counter, mod in enumerate(self.target_obj.modifiers):
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
+            # Hide all utility objects before isolating the current set.
+            for mod in self.util_mods:
+                mod.object.hide_set(True)
+
             util_obj = self.util_mods[self.util_current_index].object
-            isolate_in_utils_collection(self.frozen_utils.union({util_obj}))
+            isolate_utils(self.frozen_utils.union({util_obj}))
             bpy.ops.object.select_all(action='DESELECT')
             util_obj.select_set(True)
             bpy.context.view_layer.objects.active = util_obj
@@ -203,8 +207,6 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def prepare_mode(self, context):
-        hide_utils_collection(True)
-
         self.revert_mods(context)
 
         if self.mod_cycle:
@@ -259,8 +261,6 @@ SHIFT — Cycle through the modifier stack"""
 
 
     def revert(self, context):
-        hide_utils_collection(True)
-
         self.revert_mods(context)
         self.target_obj.show_wire = self.show_wireframe_prev
 

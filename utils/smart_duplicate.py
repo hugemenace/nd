@@ -26,8 +26,7 @@
 # ---
 
 import bpy
-from .. lib.collections import hide_utils_collection, get_utils_layer, isolate_in_utils_collection
-from .. lib.objects import get_all_util_objects
+from .. lib.collections import isolate_utils, get_util_objects_for
 from .. lib.polling import ctx_obj_mode, list_ok
 
 
@@ -59,21 +58,13 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        data = get_utils_layer()
-        if data is None:
-            self.perform_duplicate(context)
-            return {'FINISHED'}
-
-        hide_utils_collection(True)
         util_objects = get_all_util_objects(context.selected_objects)
-        isolate_in_utils_collection(util_objects)
+        isolate_utils(util_objects)
 
         for obj in util_objects:
             obj.select_set(True)
 
         self.perform_duplicate(context)
-
-        hide_utils_collection(True)
 
         return {'FINISHED'}
 

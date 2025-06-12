@@ -34,7 +34,6 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.axis import init_axis, register_axis_handler, unregister_axis_handler
 from .. lib.viewport import set_3d_cursor
 from .. lib.math import v3_average, create_rotation_matrix_from_vertex, create_rotation_matrix_from_edge, create_rotation_matrix_from_face, v3_center
-from .. lib.collections import move_to_utils_collection, isolate_in_utils_collection
 from .. lib.modifiers import new_modifier, remove_modifiers_starting_with
 from .. lib.objects import get_real_active_object
 from .. lib.polling import obj_moddable, obj_is_curve, obj_exists, ctx_edit_mode, ctx_obj_mode, ctx_objects_selected, ctx_min_objects_selected, app_minor_version
@@ -123,6 +122,7 @@ CTRL — Remove existing modifiers"""
         self.symmetrize = False
         self.reference_objs = [context.active_object]
         self.mirror_obj = None
+        self.target_obj = get_real_active_object(context)
 
         if obj_is_curve(context.active_object) and self.geometry_mode:
             self.report({'INFO'}, "The mirror across selected geometry feature cannot be used on curves")
@@ -310,24 +310,20 @@ CTRL — Remove existing modifiers"""
         bpy.ops.object.delete()
 
         empty = bpy.data.objects.new("empty", None)
-        bpy.context.scene.collection.objects.link(empty)
+
         empty.empty_display_size = 1
         empty.empty_display_type = 'PLAIN_AXES'
         empty.location = location
         empty.rotation_euler = rotation.to_euler()
 
-        if len(self.reference_objs) == 1:
-            empty.parent = self.reference_objs[0]
-            empty.matrix_parent_inverse = self.reference_objs[0].matrix_world.inverted()
-
         empty.name = "ND — Mirror Geometry"
+        users_collection = self.target_obj.users_collection[0] if self.target_obj.users_collection else bpy.context.scene.collection
+        users_collection.objects.link(empty)
 
-        move_to_utils_collection(empty)
-        if get_preferences().hide_unrelated_utils_after_op:
-            isolate_in_utils_collection([empty])
+        empty.parent = self.target_obj
+        empty.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
 
         self.mirror_obj = empty
-
         self.add_mirror_modifiers()
 
         init_axis(self, self.mirror_obj, self.axis)

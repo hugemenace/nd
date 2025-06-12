@@ -238,11 +238,6 @@ class NDPreferences(AddonPreferences):
         step=1,
     )
 
-    utils_collection_name: StringProperty(
-        name="Utils Collection Name",
-        default="Utils",
-    )
-
     overlay_dpi: IntProperty(
         name="Overlay DPI",
         default=72,
@@ -340,32 +335,6 @@ class NDPreferences(AddonPreferences):
         default=(74/255, 144/255, 226/255),
         subtype='COLOR_GAMMA',
         size=3,
-    )
-
-    utils_collection_color: EnumProperty(
-        name="Utils collection color",
-        items=[
-            ("NONE", "None", ""),
-            ("COLOR_01", "Red", ""),
-            ("COLOR_02", "Orange", ""),
-            ("COLOR_03", "Yellow", ""),
-            ("COLOR_04", "Green", ""),
-            ("COLOR_05", "Blue", ""),
-            ("COLOR_06", "Purple", ""),
-            ("COLOR_07", "Pink", ""),
-            ("COLOR_08", "Brown", ""),
-        ],
-        default="COLOR_02",
-    )
-
-    disable_utils_in_viewport: BoolProperty(
-        name="Disable utils in viewport when toggling",
-        default=False,
-    )
-
-    hide_unrelated_utils_after_op: BoolProperty(
-        name="Hide unrelated utils after operation",
-        default=True,
     )
 
     tabs: EnumProperty(
@@ -518,10 +487,6 @@ class NDPreferences(AddonPreferences):
 
     def draw_general(self, box):
         general_prefs = [
-            "utils_collection_name",
-            "utils_collection_color",
-            "disable_utils_in_viewport",
-            "hide_unrelated_utils_after_op",
             "use_fast_booleans",
             "recon_poly_solidify",
             "recon_poly_inscribed",

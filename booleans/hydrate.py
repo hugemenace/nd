@@ -49,12 +49,12 @@ class ND_OT_hydrate(BaseOperator):
 
         if self.key_step_up:
             if self.key_no_modifiers:
-                self.active_collection = (self.active_collection + 1) % (len(self.all_collections) + 1)
+                self.active_collection = (self.active_collection + 1) % len(self.scene_collections)
                 self.dirty = True
 
         if self.key_step_down:
             if self.key_no_modifiers:
-                self.active_collection = (self.active_collection - 1) % (len(self.all_collections) + 1)
+                self.active_collection = (self.active_collection - 1) % len(self.scene_collections)
                 self.dirty = True
 
         if self.key_confirm:
@@ -67,16 +67,19 @@ class ND_OT_hydrate(BaseOperator):
 
         if get_preferences().enable_mouse_values:
             if self.key_no_modifiers:
-                self.active_collection = (self.active_collection + self.mouse_step) % (len(self.all_collections) + 1)
+                self.active_collection = (self.active_collection + self.mouse_step) % len(self.scene_collections)
                 self.dirty = True
 
 
     def do_invoke(self, context, event):
         self.dirty = False
 
-        self.clear_parent = False
-        self.all_collections = [c.name for c in bpy.data.collections]
-        self.active_collection = len(self.all_collections)
+        self.clear_parent = True
+
+        self.scene_collections = [bpy.context.scene.collection]
+        self.scene_collections.extend(bpy.context.scene.collection.children_recursive)
+        self.collection_names = [c.name for c in self.scene_collections]
+        self.active_collection = 0
 
         self.operate(context)
 
@@ -112,32 +115,21 @@ class ND_OT_hydrate(BaseOperator):
             new_obj.data = obj.data.copy()
             new_obj.animation_data_clear()
 
-            if new_obj.name.startswith("Bool — "):
-                new_obj.name = new_obj.name[7:]
-                new_obj.data.name = new_obj.name
+            if self.clear_parent:
+                world_matrix = new_obj.matrix_world.copy()
+                new_obj.parent = None
+                new_obj.matrix_world = world_matrix
 
-            if self.active_collection >= len(self.all_collections):
-                bpy.context.collection.objects.link(new_obj)
-            else:
-                bpy.data.collections[self.active_collection].objects.link(new_obj)
+            bpy.context.scene.collection.objects.link(new_obj)
+            if self.active_collection != 0:
+                bpy.context.scene.collection.objects.unlink(new_obj)
+                self.scene_collections[self.active_collection].objects.link(new_obj)
 
             set_object_util_visibility(new_obj, hidden=False)
-
-            new_objects.append((new_obj, obj))
-
-            if self.clear_parent:
-                bpy.ops.object.select_all(action='DESELECT')
-                new_obj.select_set(True)
-                bpy.context.view_layer.objects.active = new_obj
-
-                if app_minor_version() < (4, 0):
-                    bpy.ops.object.parent_clear({'object': new_obj}, type='CLEAR_KEEP_TRANSFORM')
-                else:
-                    with bpy.context.temp_override(object=new_obj):
-                        bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
+            new_objects.append(new_obj)
 
         bpy.ops.object.select_all(action='DESELECT')
-        for new_obj, orig_obj in new_objects:
+        for new_obj in new_objects:
             new_obj.select_set(True)
 
         unregister_draw_handler()
@@ -152,7 +144,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Collection: {0}".format("N/A — Scene" if self.active_collection >= len(self.all_collections) else self.all_collections[self.active_collection]),
+        "Collection: {0}".format(self.collection_names[self.active_collection]),
         "Where to place the new object...",
         active=True,
         mouse_value=True,

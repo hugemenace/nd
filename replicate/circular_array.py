@@ -224,7 +224,7 @@ CTRL — Remove existing modifiers"""
             self.reference_obj_matrix_world_backup = self.reference_obj.matrix_world.copy()
 
         self.rotator_obj = bpy.data.objects.new("empty", None)
-        self.rotator_obj.name = "ND — Circular Array Rotator"
+        self.rotator_obj.name = "Circular Array Rotator"
         self.rotator_obj.empty_display_size = 1
         self.rotator_obj.empty_display_type = 'PLAIN_AXES'
 

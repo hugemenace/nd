@@ -315,8 +315,8 @@ CTRL — Remove existing modifiers"""
         empty.empty_display_type = 'PLAIN_AXES'
         empty.location = location
         empty.rotation_euler = rotation.to_euler()
+        empty.name = "Mirror Pivot"
 
-        empty.name = "ND — Mirror Geometry"
         users_collection = self.target_obj.users_collection[0] if self.target_obj.users_collection else bpy.context.scene.collection
         users_collection.objects.link(empty)
 

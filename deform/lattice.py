@@ -302,8 +302,8 @@ CTRL — Remove existing modifiers"""
 
         context.active_object.location = eval_obj.matrix_world @ center
         context.active_object.rotation_euler = eval_obj.rotation_euler
-        context.active_object.name = "ND — Lattice"
-        context.active_object.data.name = "ND — Lattice"
+        context.active_object.name = "Lattice"
+        context.active_object.data.name = "Lattice"
         context.active_object.data.use_outside = True
 
         if app_minor_version() >= (4, 1):

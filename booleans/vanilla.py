@@ -83,8 +83,9 @@ ALT — Do not clean the reference object's mesh"""
             if not self.do_not_clean_mesh:
                 remove_problematic_boolean_mods(reference_obj)
 
-        reference_obj.parent = target_obj
-        reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
+        if not reference_obj.parent:
+            reference_obj.parent = target_obj
+            reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 
         bpy.ops.object.select_all(action='DESELECT')
         reference_obj.select_set(True)

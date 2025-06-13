@@ -144,10 +144,11 @@ class ND_OT_bool_inset(BaseOperator):
 
         remove_problematic_boolean_mods(self.intersecting_obj)
 
-        self.reference_obj.parent = self.target_obj
-        self.intersecting_obj.parent = self.target_obj
+        if not self.reference_obj.parent:
+            self.reference_obj.parent = self.target_obj
+            self.reference_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
 
-        self.reference_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
+        self.intersecting_obj.parent = self.target_obj
         self.intersecting_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
 
         bpy.ops.object.select_all(action='DESELECT')

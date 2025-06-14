@@ -32,10 +32,10 @@ from .. lib.collections import hide_all_utils, isolate_utils, has_visible_utils,
 keys = []
 
 
-class ND_OT_toggle_utils_collection(bpy.types.Operator):
-    bl_idname = "nd.toggle_utils_collection"
+class ND_OT_toggle_utils(bpy.types.Operator):
+    bl_idname = "nd.toggle_utils"
     bl_label = "Utils Visibility"
-    bl_description = """Toggle utils collection visibility
+    bl_description = """Toggle the visibility of all util objects in the scene.
 SHIFT — Display all utils for the selected objects"""
 
 
@@ -66,12 +66,12 @@ SHIFT — Display all utils for the selected objects"""
 
 
 def register():
-    bpy.utils.register_class(ND_OT_toggle_utils_collection)
+    bpy.utils.register_class(ND_OT_toggle_utils)
 
     for mapping in [('Object Mode', 'EMPTY')]:
         keymap = bpy.context.window_manager.keyconfigs.addon.keymaps.new(name=mapping[0], space_type=mapping[1])
 
-        entry = keymap.keymap_items.new("nd.toggle_utils_collection", 'T', 'PRESS', shift=True)
+        entry = keymap.keymap_items.new("nd.toggle_utils", 'T', 'PRESS', shift=True)
         entry.properties.mode = 'RESTRICTED'
         keys.append((keymap, entry))
 
@@ -82,4 +82,4 @@ def unregister():
 
     keys.clear()
 
-    bpy.utils.unregister_class(ND_OT_toggle_utils_collection)
+    bpy.utils.unregister_class(ND_OT_toggle_utils)

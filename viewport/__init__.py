@@ -29,6 +29,7 @@ import importlib
 from . import toggle_wireframes
 from . import toggle_face_orientation
 from . import toggle_utils
+from . import capture_utils
 from . import toggle_clear_view
 from . import toggle_custom_view
 from . import toggle_cavity
@@ -39,6 +40,7 @@ registerables = (
     toggle_wireframes,
     toggle_face_orientation,
     toggle_utils,
+    capture_utils,
     toggle_clear_view,
     toggle_custom_view,
     toggle_cavity,

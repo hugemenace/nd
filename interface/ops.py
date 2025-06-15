@@ -133,6 +133,7 @@ viewport_ops = [
     ("nd.toggle_wireframes", 'MOD_WIREFRAME', None, None, False),
     ("nd.toggle_face_orientation", "ORIENTATION_NORMAL", None, None, False),
     ("nd.toggle_utils", "OUTLINER_COLLECTION", None, "DYNAMIC", False),
+    ("nd.capture_utils", "CON_OBJECTSOLVER", None, None, False),
     None, # Separator
     ("nd.silhouette", "CLIPUV_DEHLT", None, None, False),
     ("nd.toggle_cavity", "MOD_SUBSURF", None, None, False),

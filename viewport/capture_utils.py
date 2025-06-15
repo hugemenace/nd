@@ -25,39 +25,38 @@
 # Contributors: Tristo (HM)
 # ---
 
-import importlib
-from . import toggle_wireframes
-from . import toggle_face_orientation
-from . import toggle_utils
-from . import capture_utils
-from . import toggle_clear_view
-from . import toggle_custom_view
-from . import toggle_cavity
-from . import silhouette
+import bpy
+from .. lib.collections import hide_all_utils, isolate_utils, has_visible_utils, get_util_objects_for, get_all_util_objects
 
 
-registerables = (
-    toggle_wireframes,
-    toggle_face_orientation,
-    toggle_utils,
-    capture_utils,
-    toggle_clear_view,
-    toggle_custom_view,
-    toggle_cavity,
-    silhouette,
-)
+class ND_OT_capture_utils(bpy.types.Operator):
+    bl_idname = "nd.capture_utils"
+    bl_label = "Capture Utils"
+    bl_description = """Display and select all utils in the scene.
+SHIFT — Only display and select utils for the selected objects"""
 
 
-def reload():
-    for registerable in registerables:
-        importlib.reload(registerable)
+    def invoke(self, context, event):
+        util_objects = []
+
+        if event.shift and len(context.selected_objects) > 0:
+            selected_objects = context.selected_objects.copy()
+            util_objects.extend(get_util_objects_for(selected_objects))
+        else:
+            util_objects.extend(get_all_util_objects())
+
+        isolate_utils(util_objects)
+
+        bpy.ops.object.select_all(action='DESELECT')
+        for obj in util_objects:
+            obj.select_set(True)
+
+        return {'FINISHED'}
 
 
 def register():
-    for registerable in registerables:
-        registerable.register()
+    bpy.utils.register_class(ND_OT_capture_utils)
 
 
 def unregister():
-    for registerable in registerables:
-        registerable.unregister()
+    bpy.utils.unregister_class(ND_OT_capture_utils)

@@ -36,13 +36,26 @@ keys = []
 class ND_OT_smart_duplicate(bpy.types.Operator):
     bl_idname = "nd.smart_duplicate"
     bl_label = "Smart Duplicate"
-    bl_description = """Duplicate the selected objects with their utils"""
+    bl_description = """Duplicate the selected objects with their utils
+SHIFT — Deep duplicate (includes children)"""
 
+
+    hotkeyed: bpy.props.BoolProperty(
+        name="Hotkeyed",
+        description="Indicates if this operator was invoked via a hotkey",
+        default=False
+    )
 
     mode: bpy.props.EnumProperty(items=[
         ('DUPLICATE', 'Duplicate', 'Perform a duplicate operation'),
         ('LINKED', 'Linked', 'Perform a linked duplicate operation'),
     ], name="Mode", default='DUPLICATE')
+
+    deep: bpy.props.BoolProperty(
+        name="Deep Duplicate",
+        description="Include children of selected objects in the duplication",
+        default=False
+    )
 
 
     @classmethod
@@ -58,11 +71,19 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
 
 
     def invoke(self, context, event):
-        util_objects = get_util_objects_for(context.selected_objects)
+        deep_duplicate = (not self.hotkeyed and event.shift) or self.deep
+        util_objects = get_util_objects_for(context.selected_objects, include_children=deep_duplicate)
         isolate_utils(util_objects)
 
         for obj in util_objects:
             obj.select_set(True)
+
+        if deep_duplicate:
+            for obj in context.selected_objects:
+                child_objects = list(obj.children_recursive)
+                for child in child_objects:
+                    if child not in util_objects:
+                        child.select_set(True)
 
         self.perform_duplicate(context)
 
@@ -77,10 +98,26 @@ def register():
 
         entry = keymap.keymap_items.new("nd.smart_duplicate", 'D', 'PRESS', shift=True, alt=True)
         entry.properties.mode = "DUPLICATE"
+        entry.properties.deep = False
+        entry.properties.hotkeyed = True
+        keys.append((keymap, entry))
+
+        entry = keymap.keymap_items.new("nd.smart_duplicate", 'D', 'PRESS', shift=True, ctrl=True, alt=True)
+        entry.properties.mode = "DUPLICATE"
+        entry.properties.deep = True
+        entry.properties.hotkeyed = True
         keys.append((keymap, entry))
 
         entry = keymap.keymap_items.new("nd.smart_duplicate", 'S', 'PRESS', shift=True, alt=True)
         entry.properties.mode = "LINKED"
+        entry.properties.deep = False
+        entry.properties.hotkeyed = True
+        keys.append((keymap, entry))
+
+        entry = keymap.keymap_items.new("nd.smart_duplicate", 'S', 'PRESS', shift=True, ctrl=True, alt=True)
+        entry.properties.mode = "LINKED"
+        entry.properties.deep = True
+        entry.properties.hotkeyed = True
         keys.append((keymap, entry))
 
 

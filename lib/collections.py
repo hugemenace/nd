@@ -46,7 +46,7 @@ def get_all_util_objects():
     return [obj for obj in bpy.context.scene.objects if is_util_object(obj)]
 
 
-def get_util_objects_for(target_objs):
+def get_util_objects_for(target_objs, include_children=True):
     util_objects = set()  # Use set to avoid duplicates
     processed_objects = set()  # Track processed objects to avoid infinite loops
 
@@ -60,8 +60,9 @@ def get_util_objects_for(target_objs):
             util_objects.add(obj)
 
         # 2. Process all children recursively
-        for child in obj.children:
-            process_object(child)
+        if include_children and hasattr(obj, 'children'):
+            for child in obj.children:
+                process_object(child)
 
         # 3. Check modifier references
         if hasattr(obj, 'modifiers'):

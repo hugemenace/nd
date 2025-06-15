@@ -33,7 +33,13 @@ def is_util_object(obj):
     if obj.name not in bpy.context.view_layer.objects:
         return False
 
-    return obj.type == 'EMPTY' or obj.display_type == 'WIRE'
+    if obj.type == 'EMPTY' and obj.instance_type == 'NONE' and obj.empty_display_type != 'IMAGE':
+        return True
+
+    if obj.type == 'MESH' and (obj.display_type == 'WIRE' or obj.display_type == 'BOUNDS'):
+        return True
+
+    return False
 
 
 def get_all_util_objects():

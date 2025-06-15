@@ -28,7 +28,7 @@
 import bpy
 from .. lib.preferences import get_preferences
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
-from .. lib.objects import get_real_active_object, set_object_util_visibility
+from .. lib.objects import get_real_active_object, set_object_util_visibility, get_objects_in_hierarchy
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode, app_minor_version
 
 
@@ -83,7 +83,16 @@ ALT — Do not clean the reference object's mesh"""
             if not self.do_not_clean_mesh:
                 remove_problematic_boolean_mods(reference_obj)
 
-        if not reference_obj.parent:
+        # If the reference object doesn't have a parent, or its parent is in the hierarchy of the target object,
+        # we can safely set the target object as the parent of the reference object.
+        objects_in_hierarchy = get_objects_in_hierarchy(target_obj)
+        if not reference_obj.parent or reference_obj.parent in objects_in_hierarchy:
+            if reference_obj.parent:
+                # Clear the parent first and keep the transform
+                matrix_world = reference_obj.matrix_world.copy()
+                reference_obj.parent = None
+                reference_obj.matrix_world = matrix_world
+            # Set the target object as the parent of the reference object
             reference_obj.parent = target_obj
             reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 

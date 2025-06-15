@@ -180,3 +180,23 @@ def set_object_util_visibility(obj, hidden=True):
     obj.visible_shadow = not hidden
     obj.visible_transmission = not hidden
     obj.visible_volume_scatter = not hidden
+
+
+def get_objects_in_hierarchy(obj):
+    objects = set()
+
+    root_object = obj
+    while root_object.parent:
+        root_object = root_object.parent
+
+    print(f"Root object: {root_object.name}")
+
+    def get_children_recursive(parent):
+        for child in parent.children:
+            objects.add(child)
+            get_children_recursive(child)
+
+    get_children_recursive(root_object)
+    objects.add(root_object)
+
+    return list(objects)

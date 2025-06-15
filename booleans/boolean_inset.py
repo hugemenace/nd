@@ -34,7 +34,7 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
-from .. lib.objects import get_real_active_object, set_object_util_visibility
+from .. lib.objects import get_real_active_object, set_object_util_visibility, get_objects_in_hierarchy
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode, app_minor_version
 from .. lib.math import round_dec
 
@@ -105,14 +105,14 @@ class ND_OT_bool_inset(BaseOperator):
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.active_object.name else b
 
-        self.target_obj = context.active_object
+        target_obj = context.active_object
 
         self.intersecting_obj = context.active_object.copy()
         self.intersecting_obj.data = context.active_object.data.copy()
         self.intersecting_obj.animation_data_clear()
         context.collection.objects.link(self.intersecting_obj)
 
-        self.boolean_diff = new_modifier(self.target_obj, "Inset/Outset — ND Bool", 'BOOLEAN', rectify=True)
+        self.boolean_diff = new_modifier(target_obj, "Inset/Outset — ND Bool", 'BOOLEAN', rectify=True)
         self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
         self.boolean_diff.object = self.intersecting_obj
         self.boolean_diff.solver = solver
@@ -144,16 +144,25 @@ class ND_OT_bool_inset(BaseOperator):
 
         remove_problematic_boolean_mods(self.intersecting_obj)
 
-        if not self.reference_obj.parent:
-            self.reference_obj.parent = self.target_obj
-            self.reference_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
+        # If the reference object doesn't have a parent, or its parent is in the hierarchy of the target object,
+        # we can safely set the target object as the parent of the reference object.
+        objects_in_hierarchy = get_objects_in_hierarchy(target_obj)
+        if not self.reference_obj.parent or self.reference_obj.parent in objects_in_hierarchy:
+            if self.reference_obj.parent:
+                # Clear the parent first and keep the transform
+                matrix_world = self.reference_obj.matrix_world.copy()
+                self.reference_obj.parent = None
+                self.reference_obj.matrix_world = matrix_world
+            # Set the target object as the parent of the reference object
+            self.reference_obj.parent = target_obj
+            self.reference_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 
-        self.intersecting_obj.parent = self.target_obj
-        self.intersecting_obj.matrix_parent_inverse = self.target_obj.matrix_world.inverted()
+        self.intersecting_obj.parent = target_obj
+        self.intersecting_obj.matrix_parent_inverse = target_obj.matrix_world.inverted()
 
         bpy.ops.object.select_all(action='DESELECT')
 
-        ensure_tail_mod_consistency(self.target_obj)
+        ensure_tail_mod_consistency(target_obj)
 
         self.operate(context)
 

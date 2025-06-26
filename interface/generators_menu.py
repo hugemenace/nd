@@ -36,7 +36,7 @@ keys = []
 
 
 class ND_MT_generators_menu(bpy.types.Menu):
-    bl_label = "ND v%s — Generators" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "Generators — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_generators_menu"
 
 

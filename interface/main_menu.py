@@ -37,7 +37,7 @@ keys = []
 
 
 class ND_MT_main_menu(bpy.types.Menu):
-    bl_label = "ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "Main Menu — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_main_menu"
 
 
@@ -58,15 +58,15 @@ class ND_MT_main_menu(bpy.types.Menu):
             layout.menu("ND_MT_generators_menu", text="Generators", icon='GEOMETRY_SET')
 
         layout.separator()
-        layout.menu("ND_MT_boolean_menu", icon='MOD_BOOLEAN')
-        layout.menu("ND_MT_bevel_menu", icon='MOD_BEVEL')
-        layout.menu("ND_MT_extrude_menu", icon='MOD_SOLIDIFY')
-        layout.menu("ND_MT_replicate_menu", icon='MOD_ARRAY')
-        layout.menu("ND_MT_deform_menu", icon='MOD_SIMPLEDEFORM')
-        layout.menu("ND_MT_simplify_menu", icon='MOD_REMESH')
+        layout.menu("ND_MT_boolean_menu", text="Booleans", icon='MOD_BOOLEAN')
+        layout.menu("ND_MT_bevel_menu", text="Bevels", icon='MOD_BEVEL')
+        layout.menu("ND_MT_extrude_menu", text="Extrusion", icon='MOD_SOLIDIFY')
+        layout.menu("ND_MT_replicate_menu", text="Replicate", icon='MOD_ARRAY')
+        layout.menu("ND_MT_deform_menu", text="Deform", icon='MOD_SIMPLEDEFORM')
+        layout.menu("ND_MT_simplify_menu", text="Simplify", icon='MOD_REMESH')
         layout.separator()
-        layout.menu("ND_MT_shading_menu", icon='SHADING_RENDERED')
-        layout.menu("ND_MT_scene_menu", icon='SCENE_DATA')
+        layout.menu("ND_MT_shading_menu", text="Shading", icon='SHADING_RENDERED')
+        layout.menu("ND_MT_scene_menu", text="Scene", icon='SCENE_DATA')
         layout.menu("ND_MT_data_menu", text="Data", icon='OUTLINER_DATA_MESH')
         layout.separator()
         layout.menu("ND_MT_packaging_menu", text="Packaging", icon='OUTLINER_COLLECTION')

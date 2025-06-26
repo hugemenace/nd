@@ -42,7 +42,7 @@ icons = build_icon_lookup_table()
 
 
 class ND_MT_fast_menu(bpy.types.Menu):
-    bl_label = "ND v%s — Fast (Predict)" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "Fast Menu — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_fast_menu"
 
 

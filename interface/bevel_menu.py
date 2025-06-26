@@ -27,11 +27,12 @@
 
 import bpy
 from . import ops
+from .. __init__ import bl_info
 from . common import render_ops
 
 
 class ND_MT_bevel_menu(bpy.types.Menu):
-    bl_label = "Bevels"
+    bl_label = "Bevels — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_bevel_menu"
 
 

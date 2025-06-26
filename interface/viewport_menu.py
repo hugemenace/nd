@@ -35,7 +35,7 @@ keys = []
 
 
 class ND_MT_viewport_menu(bpy.types.Menu):
-    bl_label = "ND v%s — Viewport" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "Viewport — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_viewport_menu"
 
 

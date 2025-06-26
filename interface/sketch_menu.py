@@ -35,7 +35,7 @@ keys = []
 
 
 class ND_MT_sketch_menu(bpy.types.Menu):
-    bl_label = "ND v%s — Sketch" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "Sketch — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_sketch_menu"
 
 

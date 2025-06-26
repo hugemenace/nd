@@ -35,7 +35,7 @@ keys = []
 
 
 class ND_MT_utils_menu(bpy.types.Menu):
-    bl_label = "ND v%s — Utils" % ('.'.join([str(v) for v in bl_info['version']]))
+    bl_label = "Utils — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_utils_menu"
 
 

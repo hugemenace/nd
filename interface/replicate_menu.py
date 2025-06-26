@@ -27,11 +27,12 @@
 
 import bpy
 from . import ops
+from .. __init__ import bl_info
 from . common import render_ops
 
 
 class ND_MT_replicate_menu(bpy.types.Menu):
-    bl_label = "Replicate"
+    bl_label = "Replicate — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_replicate_menu"
 
 

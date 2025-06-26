@@ -27,11 +27,12 @@
 
 import bpy
 from . import ops
+from .. __init__ import bl_info
 from . common import render_ops
 
 
 class ND_MT_shading_menu(bpy.types.Menu):
-    bl_label = "Shading"
+    bl_label = "Shading — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_shading_menu"
 
 

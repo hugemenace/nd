@@ -27,13 +27,14 @@
 
 import bpy
 from . import ops
+from .. __init__ import bl_info
 from . common import render_ops
 from .. icons import get_icon_value
 from .. packaging.create_id_material import ND_MATERIALS
 
 
 class ND_MT_id_material_menu(bpy.types.Menu):
-    bl_label = "Material Selection"
+    bl_label = "Material Selection — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_MT_id_material_menu"
 
 

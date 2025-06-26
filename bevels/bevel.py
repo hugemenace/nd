@@ -46,7 +46,7 @@ mod_summon_list = [mod_bevel]
 
 class ND_OT_bevel(BaseOperator):
     bl_idname = "nd.bevel"
-    bl_label = "Bevel"
+    bl_label = "Object Bevel"
     bl_description = """Adds a bevel modifier to the selected object
 CTRL — Remove existing modifiers
 SHIFT — Create a stacked bevel modifier"""

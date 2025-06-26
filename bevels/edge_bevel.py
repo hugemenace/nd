@@ -45,7 +45,7 @@ mod_summon_list = [mod_bevel, mod_weld]
 
 class ND_OT_edge_bevel(BaseOperator):
     bl_idname = "nd.edge_bevel"
-    bl_label = "Edge Bevel"
+    bl_label = "Edge Bevel (Weighted)"
     bl_description = """Adds a weighted edge bevel modifier to the selected object
 SHIFT — Place modifiers at the top of the stack
 CTRL — Remove existing modifiers"""

@@ -43,6 +43,7 @@ from . import extrude_menu
 from . import replicate_menu
 from . import deform_menu
 from . import viewport_menu
+from . import data_menu
 from . import reset_theme
 from . import ops
 from . import common
@@ -66,6 +67,7 @@ registerables = (
     replicate_menu,
     deform_menu,
     viewport_menu,
+    data_menu,
     reset_theme,
 )
 

@@ -34,7 +34,6 @@ standalone_ops = [
 sketch_ops = [
     ("nd.single_vertex", 'DOT', None, None, False),
     ("nd.make_manifold", 'OUTLINER_DATA_SURFACE', None, None, False),
-    ("nd.clear_vgs", 'GROUP_VERTEX', None, None, False),
     ("nd.edge_length", 'FIXED_SIZE', None, None, False),
     None, # Separator
     ("nd.view_align", 'ORIENTATION_VIEW', None, None, False),
@@ -100,6 +99,10 @@ shading_ops = [
     ("nd.wn", 'MOD_NORMALEDIT', None, None, False),
 ]
 
+data_ops = [
+    ("nd.clear_vgs", 'GROUP_VERTEX', None, None, False),
+]
+
 packaging_ops = [
     ("nd.bulk_create_id_materials", 'NODE_COMPOSITING', None, None, False),
     ("nd.clear_materials", 'NODE_MATERIAL', None, None, False),
@@ -146,7 +149,7 @@ viewport_ops = [
 def build_icon_lookup_table():
     icon_lookup = {}
     for op in standalone_ops + sketch_ops + generator_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + \
-    deform_ops + simplify_ops + shading_ops + scene_ops + packaging_ops + util_ops + viewport_ops:
+    deform_ops + simplify_ops + shading_ops + scene_ops + data_ops + packaging_ops + util_ops + viewport_ops:
         if op is None:
             continue
 

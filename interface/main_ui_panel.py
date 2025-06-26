@@ -56,6 +56,7 @@ op_sections = [
     ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)], True),
     ("Shading", ops.shading_ops, "shading", [("nd.smooth", None), ("nd.wn", None)], True),
     ("Scene", ops.scene_ops, "scene", [("nd.flare", None), ("nd.clean_utils", None)], True),
+    ("Data", ops.data_ops, "data", [("nd.clear_vgs", None)], True),
     ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)], True),
     ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None), ("nd.apply_modifiers", None)], True),
     ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils", 'DYNAMIC'), ("nd.toggle_clear_view", None)], True),
@@ -78,6 +79,7 @@ class MainUIPanelProps(bpy.types.PropertyGroup):
     simplify: BoolProperty(default=False)
     shading: BoolProperty(default=False)
     scene: BoolProperty(default=False)
+    data: BoolProperty(default=False)
     packaging: BoolProperty(default=False)
     utils: BoolProperty(default=False)
     viewport: BoolProperty(default=False)
@@ -107,6 +109,7 @@ class ND_OT_toggle_sections(bpy.types.Operator):
         props.simplify = toggle
         props.shading = toggle
         props.scene = toggle
+        props.data = toggle
         props.packaging = toggle
         props.export = toggle
         props.utils = toggle

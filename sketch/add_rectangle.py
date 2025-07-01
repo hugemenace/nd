@@ -150,45 +150,25 @@ class ND_OT_add_rectangle(BaseOperator):
 
 
     def operate(self, context):
-        self.primary_points = [self.start_point, self.end_point]
-        self.secondary_points = [point for point in self.calculate_rectangle() if point not in [self.start_point, self.end_point]]
-       
-
+        if not self.from_center:
+            self.primary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[2]]
+            self.secondary_points = [self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
+        else:
+            self.primary_points = [self.start_point, self.calculate_rectangle()[2]]
+            self.secondary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
         self.dirty = False
 
 
     def finish(self, context):
-        local_vector = self.end_point - self.start_point
-        x_len = local_vector.dot(self.tangent)
-        y_len = local_vector.dot(self.bitangent)
-        
-        local_corners = [
-            (0, 0, 0),
-            (x_len, 0, 0),
-            (x_len, y_len, 0),
-            (0, y_len, 0),
-        ]
-        
         mesh = bpy.data.meshes.new("ND - Plane")
-        mesh.from_pydata(local_corners, [], [(0, 1, 2, 3)])
+        mesh.from_pydata(self.calculate_rectangle(local=True), [], [(0, 1, 2, 3)])
         mesh.update()
         
         obj = bpy.data.objects.new("ND - Plane", mesh)
         bpy.context.collection.objects.link(obj)
         
-        z_axis = self.hit_normal.normalized()
-        x_axis = self.tangent.normalized()
-        y_axis = self.bitangent.normalized()
-        
-        rotation_matrix = mathutils.Matrix((
-            x_axis.to_4d(),
-            y_axis.to_4d(),
-            z_axis.to_4d(),
-            (0, 0, 0, 1)
-        )).transposed()
-        
         obj.location = self.start_point
-        obj.rotation_euler = rotation_matrix.to_euler()
+        obj.rotation_euler = self.calculate_matrix().to_euler()
         
         bpy.ops.object.select_all(action='DESELECT')
         obj.select_set(True)
@@ -203,47 +183,65 @@ class ND_OT_add_rectangle(BaseOperator):
         unregister_points_handler()
 
 
-    def calculate_rectangle(self):
+    def calculate_rectangle(self, local=False):
         local_vector = self.end_point - self.start_point
         x_len = local_vector.dot(self.tangent)
         y_len = local_vector.dot(self.bitangent)
+        if self.force_dimensions: 
+            max_abs = max(abs(x_len), abs(y_len))
 
-        corners = [
-            self.start_point,
-            self.start_point + self.tangent * x_len,
-            self.start_point + self.tangent * x_len + self.bitangent * y_len,
-            self.start_point + self.bitangent * y_len,
-        ]
+            x_len = -max_abs if x_len < 0 else max_abs
+            y_len = -max_abs if y_len < 0 else max_abs
         
-        return corners
+        if not self.from_center:
+            corners = [
+                mathutils.Vector((0, 0, 0)),
+                mathutils.Vector((x_len, 0, 0)),
+                mathutils.Vector((x_len, y_len, 0)),
+                mathutils.Vector((0, y_len, 0)),
+            ]
+        else:
+            corners = [
+                mathutils.Vector((-x_len, -y_len, 0)),
+                mathutils.Vector((x_len, -y_len, 0)),
+                mathutils.Vector((x_len, y_len, 0)),
+                mathutils.Vector((-x_len, y_len, 0)),
+            ]
 
-
+        if not local:
+            matrix = self.calculate_matrix()
+            corners = [(matrix @ point) + self.start_point for point in corners]
+            return corners
+        else:
+            return corners
+    
+    def calculate_matrix(self):
+        z_axis = self.hit_normal.normalized()
+        x_axis = self.tangent.normalized()
+        y_axis = self.bitangent.normalized()
+        
+        rotation_matrix = mathutils.Matrix((
+            x_axis.to_4d(),
+            y_axis.to_4d(),
+            z_axis.to_4d(),
+            (0, 0, 0, 1)
+        )).transposed()
+        return rotation_matrix
 
 
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_property(
-        self,
-        f"Distance: {(self.distance * self.display_unit_scale):.2f}{self.unit_suffix}",
-        self.unit_step_hint,
-        active=self.key_no_modifiers,
-        alt_mode=self.key_shift_no_modifiers,
-        mouse_value=True,
-        input_stream=self.distance_input_stream)
-
-
     draw_hint(
         self,
-        "Affect [A]: {}".format(self.anchors[self.current_anchor].capitalize()),
-        "Affect ({})".format(", ".join([m.capitalize() for m in self.anchors])))
+        "From Center [C]: {}".format('True' if self.from_center else 'False'),
+        "False, True")
     
-
     draw_hint(
         self,
-        "Distance [D]: {}".format('Offset' if self.offset_distance else 'Absolute'),
-        "Absolute, Offset")
-    
+        "Force Dimensions [D]: {}".format('True' if self.force_dimensions else 'False'),
+        "False, True")
+
 
 def register():
     bpy.utils.register_class(ND_OT_add_rectangle)

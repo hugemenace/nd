@@ -37,6 +37,7 @@ from ..lib.numeric_input import update_stream, no_stream, get_stream_value, new_
 from ..lib.objects import get_real_active_object
 from ..lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
 from ..lib.math import v3_distance, v3_average
+from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
 def ray_plane_intersection(ray_origin, ray_direction, plane_point, plane_normal):
@@ -73,11 +74,17 @@ class ND_OT_add_rectangle(BaseOperator):
         self.hit_normal = None
         self.tangent = None
         self.bitangent = None
+        
+        self.from_center = False
+        self.force_dimensions = False
 
         capture_modifier_keys(self, None, event.mouse_x)
 
         init_overlay(self, event)
-        register_draw_handler(self, draw_text_callback)
+        register_draw_handler(self, draw_text_callback)       
+        
+        init_points(self)
+        register_points_handler(self)
 
         context.window_manager.modal_handler_add(self)
 
@@ -114,6 +121,16 @@ class ND_OT_add_rectangle(BaseOperator):
             self.finish(context)
 
             return {'FINISHED'}
+    
+        if pressed(event, {'C'}):
+            self.from_center = not self.from_center
+
+            self.dirty = True
+            
+        if pressed(event, {'D'}):
+            self.force_dimensions = not self.force_dimensions
+            
+            self.dirty
 
         if event.type == 'MOUSEMOVE' and self.active:
             region = context.region
@@ -133,6 +150,9 @@ class ND_OT_add_rectangle(BaseOperator):
 
 
     def operate(self, context):
+        self.primary_points = [self.start_point, self.end_point]
+        self.secondary_points = [point for point in self.calculate_rectangle() if point not in [self.start_point, self.end_point]]
+       
 
         self.dirty = False
 
@@ -174,9 +194,13 @@ class ND_OT_add_rectangle(BaseOperator):
         obj.select_set(True)
         bpy.context.view_layer.objects.active = obj
         
-        unregister_draw_handler()     
+        unregister_draw_handler()
+        unregister_points_handler()  
         bpy.ops.nd.solidify('INVOKE_DEFAULT')
-
+        
+    def revert(self, context):
+        unregister_draw_handler()
+        unregister_points_handler()
 
 
     def calculate_rectangle(self):
@@ -193,8 +217,7 @@ class ND_OT_add_rectangle(BaseOperator):
         
         return corners
 
-    def revert(self, context):
-        unregister_draw_handler()
+
 
 
 def draw_text_callback(self):
@@ -229,3 +252,5 @@ def register():
 def unregister():
     bpy.utils.unregister_class(ND_OT_add_rectangle)
     unregister_draw_handler()
+    unregister_points_handler()
+

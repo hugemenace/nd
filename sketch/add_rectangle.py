@@ -1,0 +1,231 @@
+# ███╗   ██╗██████╗
+# ████╗  ██║██╔══██╗
+# ██╔██╗ ██║██║  ██║
+# ██║╚██╗██║██║  ██║
+# ██║ ╚████║██████╔╝
+# ╚═╝  ╚═══╝╚═════╝
+#
+# ND (Non-Destructive) Blender Add-on
+# Copyright (C) 2024 Tristan S. & Ian J. (HugeMenace)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# ---
+# Contributors: Shaddow
+# ---
+
+import bpy
+import bpy_extras
+import mathutils
+from math import radians
+from ..lib.base_operator import BaseOperator
+from ..lib.overlay import init_overlay, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
+from ..lib.events import capture_modifier_keys, pressed
+from ..lib.preferences import get_preferences, get_scene_unit_factor
+from ..lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream, set_stream
+from ..lib.objects import get_real_active_object
+from ..lib.polling import ctx_edit_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
+from ..lib.math import v3_distance, v3_average
+
+
+def ray_plane_intersection(ray_origin, ray_direction, plane_point, plane_normal):
+    denom = ray_direction.dot(plane_normal)
+    if abs(denom) < 1e-6:
+        return None
+    d = (plane_point - ray_origin).dot(plane_normal) / denom
+    if d < 0:
+        return None
+    return ray_origin + ray_direction * d
+
+
+def get_plane_axes(normal):
+    up = mathutils.Vector((0.0, 0.0, 1.0))
+    if abs(normal.dot(up)) > 0.999:
+        up = mathutils.Vector((0.0, 1.0, 0.0))
+    tangent = normal.cross(up).normalized()
+    bitangent = normal.cross(tangent).normalized()
+    return tangent, bitangent
+
+
+class ND_OT_add_rectangle(BaseOperator):
+    bl_idname = "nd.add_rectangle"
+    bl_label = "Add rectangle"
+    bl_description = """Interactivly add a rectangle"""
+
+    def do_invoke(self, context, event):
+        self.dirty = False
+        
+        self.active = False
+        
+        self.start_point = None
+        self.end_point = None
+        self.hit_normal = None
+        self.tangent = None
+        self.bitangent = None
+
+        capture_modifier_keys(self, None, event.mouse_x)
+
+        init_overlay(self, event)
+        register_draw_handler(self, draw_text_callback)
+
+        context.window_manager.modal_handler_add(self)
+
+        return {'RUNNING_MODAL'}
+
+
+    def get_mouse_raycast(self, context, event):
+        region = context.region
+        rv3d = context.space_data.region_3d
+        coord = (event.mouse_region_x, event.mouse_region_y)
+
+        depsgraph = context.evaluated_depsgraph_get()
+
+        view_vector = bpy_extras.view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
+        ray_origin = bpy_extras.view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
+
+        result, location, normal, _, _, _ = context.scene.ray_cast(depsgraph, ray_origin, view_vector)
+
+        return result, location, normal
+
+
+
+    def do_modal(self, context, event):
+        if self.key_confirm and not self.active: 
+                hit, location, normal = self.get_mouse_raycast(context, event)
+                if hit:
+                    self.start_point = location
+                    self.hit_normal = normal
+
+                    self.tangent, self.bitangent = get_plane_axes(normal)
+                    self.end_point = location
+                    self.active = True
+        elif self.key_confirm:
+            self.finish(context)
+
+            return {'FINISHED'}
+
+        if event.type == 'MOUSEMOVE' and self.active:
+            region = context.region
+            rv3d = context.space_data.region_3d
+            coord = (event.mouse_region_x, event.mouse_region_y)
+
+            view_vector = bpy_extras.view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
+            ray_origin = bpy_extras.view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
+            end_point = ray_plane_intersection(ray_origin, view_vector, self.start_point, self.hit_normal)
+
+            if end_point is not None:
+                self.end_point = end_point
+            self.dirty = True
+
+
+        return {'RUNNING_MODAL'}
+
+
+    def operate(self, context):
+
+        self.dirty = False
+
+
+    def finish(self, context):
+        local_vector = self.end_point - self.start_point
+        x_len = local_vector.dot(self.tangent)
+        y_len = local_vector.dot(self.bitangent)
+        
+        local_corners = [
+            (0, 0, 0),
+            (x_len, 0, 0),
+            (x_len, y_len, 0),
+            (0, y_len, 0),
+        ]
+        
+        mesh = bpy.data.meshes.new("ND - Plane")
+        mesh.from_pydata(local_corners, [], [(0, 1, 2, 3)])
+        mesh.update()
+        
+        obj = bpy.data.objects.new("ND - Plane", mesh)
+        bpy.context.collection.objects.link(obj)
+        
+        z_axis = self.hit_normal.normalized()
+        x_axis = self.tangent.normalized()
+        y_axis = self.bitangent.normalized()
+        
+        rotation_matrix = mathutils.Matrix((
+            x_axis.to_4d(),
+            y_axis.to_4d(),
+            z_axis.to_4d(),
+            (0, 0, 0, 1)
+        )).transposed()
+        
+        obj.location = self.start_point
+        obj.rotation_euler = rotation_matrix.to_euler()
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        
+        unregister_draw_handler()     
+        bpy.ops.nd.solidify('INVOKE_DEFAULT')
+
+
+
+    def calculate_rectangle(self):
+        local_vector = self.end_point - self.start_point
+        x_len = local_vector.dot(self.tangent)
+        y_len = local_vector.dot(self.bitangent)
+
+        corners = [
+            self.start_point,
+            self.start_point + self.tangent * x_len,
+            self.start_point + self.tangent * x_len + self.bitangent * y_len,
+            self.start_point + self.bitangent * y_len,
+        ]
+        
+        return corners
+
+    def revert(self, context):
+        unregister_draw_handler()
+
+
+def draw_text_callback(self):
+    draw_header(self)
+
+    draw_property(
+        self,
+        f"Distance: {(self.distance * self.display_unit_scale):.2f}{self.unit_suffix}",
+        self.unit_step_hint,
+        active=self.key_no_modifiers,
+        alt_mode=self.key_shift_no_modifiers,
+        mouse_value=True,
+        input_stream=self.distance_input_stream)
+
+
+    draw_hint(
+        self,
+        "Affect [A]: {}".format(self.anchors[self.current_anchor].capitalize()),
+        "Affect ({})".format(", ".join([m.capitalize() for m in self.anchors])))
+    
+
+    draw_hint(
+        self,
+        "Distance [D]: {}".format('Offset' if self.offset_distance else 'Absolute'),
+        "Absolute, Offset")
+    
+
+def register():
+    bpy.utils.register_class(ND_OT_add_rectangle)
+
+
+def unregister():
+    bpy.utils.unregister_class(ND_OT_add_rectangle)
+    unregister_draw_handler()

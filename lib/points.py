@@ -155,8 +155,7 @@ def draw_outline(shader, points, size, color):
     gpu.state.line_width_set(size)
 
     outline_points = [v for i in range(len(points)) for v in (points[i], points[(i + 1) % len(points)])]
-    print(f"Drawing {len(outline_points)//2} lines with vertices: {outline_points}")
-
+    
     batch = batch_for_shader(shader, 'LINES', {"pos": outline_points})
     shader.bind()
     shader.uniform_float("color", color)

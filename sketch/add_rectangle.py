@@ -40,25 +40,6 @@ from ..lib.math import v3_distance, v3_average
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
-def ray_plane_intersection(ray_origin, ray_direction, plane_point, plane_normal):
-    denom = ray_direction.dot(plane_normal)
-    if abs(denom) < 1e-6:
-        return None
-    d = (plane_point - ray_origin).dot(plane_normal) / denom
-    if d < 0:
-        return None
-    return ray_origin + ray_direction * d
-
-
-def get_plane_axes(normal):
-    up = mathutils.Vector((0.0, 0.0, 1.0))
-    if abs(normal.dot(up)) > 0.999:
-        up = mathutils.Vector((0.0, 1.0, 0.0))
-    tangent = normal.cross(up).normalized()
-    bitangent = normal.cross(tangent).normalized()
-    return tangent, bitangent
-
-
 class ND_OT_add_rectangle(BaseOperator):
     bl_idname = "nd.add_rectangle"
     bl_label = "Add rectangle"
@@ -71,12 +52,19 @@ class ND_OT_add_rectangle(BaseOperator):
         
         self.start_point = None
         self.end_point = None
+        self.target_obj = None
+        self.face_index = None
         self.hit_normal = None
+        self.normal = None
         self.tangent = None
         self.bitangent = None
         
         self.from_center = False
         self.force_dimensions = False
+        self.orientations = ["Local", "World", "Cursor", "View"]
+        self.local_orientation = ["Default", "Closest Edge", "Longest Edge"]
+        self.current_orientation = 0
+        self.current_local_orienation = 0
 
         capture_modifier_keys(self, None, event.mouse_x)
 
@@ -91,30 +79,16 @@ class ND_OT_add_rectangle(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    def get_mouse_raycast(self, context, event):
-        region = context.region
-        rv3d = context.space_data.region_3d
-        coord = (event.mouse_region_x, event.mouse_region_y)
-
-        depsgraph = context.evaluated_depsgraph_get()
-
-        view_vector = bpy_extras.view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
-        ray_origin = bpy_extras.view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
-
-        result, location, normal, _, _, _ = context.scene.ray_cast(depsgraph, ray_origin, view_vector)
-
-        return result, location, normal
-
-
-
     def do_modal(self, context, event):
         if self.key_confirm and not self.active: 
-                hit, location, normal = self.get_mouse_raycast(context, event)
+                hit, location, hit_normal, face_index, target_obj = self.get_mouse_raycast(context, event)
                 if hit:
                     self.start_point = location
-                    self.hit_normal = normal
+                    self.hit_normal = hit_normal
+                    self.target_obj = target_obj
+                    self.face_index = face_index
 
-                    self.tangent, self.bitangent = get_plane_axes(normal)
+                    self.set_plane_axes(context)
                     self.end_point = location
                     self.active = True
         elif self.key_confirm:
@@ -131,6 +105,11 @@ class ND_OT_add_rectangle(BaseOperator):
             self.force_dimensions = not self.force_dimensions
             
             self.dirty
+            
+        if pressed(event, {'A'}):
+            self.current_orientation = (self.current_orientation + 1) % len(self.orientations)
+            self.set_plane_axes(context)
+            self.dirty = True
 
         if event.type == 'MOUSEMOVE' and self.active:
             region = context.region
@@ -139,25 +118,31 @@ class ND_OT_add_rectangle(BaseOperator):
 
             view_vector = bpy_extras.view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
             ray_origin = bpy_extras.view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
-            end_point = ray_plane_intersection(ray_origin, view_vector, self.start_point, self.hit_normal)
+            end_point = self.ray_plane_intersection(ray_origin, view_vector, self.start_point, self.normal)
 
             if end_point is not None:
                 self.end_point = end_point
+            
             self.dirty = True
+            
+        if self.key_movement_passthrough:
+            return {'PASS_THROUGH'}
 
 
         return {'RUNNING_MODAL'}
 
 
     def operate(self, context):
-        if not self.from_center:
-            self.primary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[2]]
-            self.secondary_points = [self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
-            self.outline = self.calculate_rectangle()
-        else:
-            self.primary_points = [self.start_point, self.calculate_rectangle()[2]]
-            self.secondary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
-            self.outline = self.calculate_rectangle()
+        if self.active:
+            if not self.from_center:
+                self.primary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[2]]
+                self.secondary_points = [self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
+                self.outline = self.calculate_rectangle()
+            else:
+                self.primary_points = [self.start_point, self.calculate_rectangle()[2]]
+                self.secondary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
+                self.outline = self.calculate_rectangle()
+            
         self.dirty = False
 
 
@@ -180,9 +165,25 @@ class ND_OT_add_rectangle(BaseOperator):
         unregister_points_handler()  
         bpy.ops.nd.solidify('INVOKE_DEFAULT')
         
+        
     def revert(self, context):
         unregister_draw_handler()
         unregister_points_handler()
+
+
+    def get_mouse_raycast(self, context, event):
+        region = context.region
+        rv3d = context.space_data.region_3d
+        coord = (event.mouse_region_x, event.mouse_region_y)
+
+        depsgraph = context.evaluated_depsgraph_get()
+
+        view_vector = bpy_extras.view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
+        ray_origin = bpy_extras.view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
+
+        result, location, normal, face_index, obj, _ = context.scene.ray_cast(depsgraph, ray_origin, view_vector)
+
+        return result, location, normal, face_index, obj
 
 
     def calculate_rectangle(self, local=False):
@@ -217,6 +218,7 @@ class ND_OT_add_rectangle(BaseOperator):
         else:
             return corners
     
+    
     def calculate_matrix(self):
         z_axis = self.hit_normal.normalized()
         x_axis = self.tangent.normalized()
@@ -231,6 +233,45 @@ class ND_OT_add_rectangle(BaseOperator):
         return rotation_matrix
 
 
+    def set_plane_axes(self ,context):
+        if self.current_orientation == 0:
+            up = mathutils.Vector((0.0, 0.0, 1.0))
+            if abs(self.hit_normal.dot(up)) > 0.999:
+                up = mathutils.Vector((0.0, 1.0, 0.0))
+            tangent = self.hit_normal.cross(up).normalized()
+            bitangent = self.hit_normal.cross(tangent).normalized()
+            self.normal = self.hit_normal
+            
+        elif self.current_orientation == 1:
+            tangent = mathutils.Vector((1.0, 0.0, 0.0))
+            bitangent = mathutils.Vector((0.0, 1.0, 0.0))
+            self.normal = mathutils.Vector((0.0, 1.0, 0.0))
+            
+        elif self.current_orientation == 2:
+            matrix = context.scene.cursor.matrix.to_3x3()
+            tangent = matrix.col[0]
+            bitangent = matrix.col[1]
+            self.normal = matrix.col[2]
+            
+        elif self.current_orientation == 3:
+            matrix = context.space_data.region_3d.view_rotation.to_matrix()
+            tangent = matrix.col[0]
+            bitangent = matrix.col[1]
+            self.normal = matrix.col[2]
+
+        self.tangent, self.bitangent = tangent, bitangent
+
+
+    def ray_plane_intersection(self, ray_origin, ray_direction, plane_point, plane_normal):
+        denom = ray_direction.dot(plane_normal)
+        if abs(denom) < 1e-6:
+            return None
+        d = (plane_point - ray_origin).dot(plane_normal) / denom
+        if d < 0:
+            return None
+        return ray_origin + ray_direction * d
+
+
 def draw_text_callback(self):
     draw_header(self)
 
@@ -243,6 +284,11 @@ def draw_text_callback(self):
         self,
         "Force Dimensions [D]: {}".format('True' if self.force_dimensions else 'False'),
         "False, True")
+    
+    draw_hint(
+        self,
+        "Orientation [A]: {}".format(self.orientations[self.current_orientation].capitalize()),
+        ", ".join([m.capitalize() for m in self.orientations]))
 
 
 def register():

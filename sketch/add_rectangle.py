@@ -153,9 +153,11 @@ class ND_OT_add_rectangle(BaseOperator):
         if not self.from_center:
             self.primary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[2]]
             self.secondary_points = [self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
+            self.outline = self.calculate_rectangle()
         else:
             self.primary_points = [self.start_point, self.calculate_rectangle()[2]]
             self.secondary_points = [self.calculate_rectangle()[0], self.calculate_rectangle()[1], self.calculate_rectangle()[3]]
+            self.outline = self.calculate_rectangle()
         self.dirty = False
 
 

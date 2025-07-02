@@ -43,7 +43,7 @@ class ND_MT_packaging_menu(bpy.types.Menu):
         layout = self.layout
         layout.operator_context = 'INVOKE_DEFAULT'
 
-        layout.menu("ND_MT_id_material_menu", icon='COLOR')
+        layout.menu("ND_MT_id_material_menu", text="Materials", icon='COLOR')
         render_ops(ops.packaging_ops, layout, new_row=False, use_separator=True)
 
 

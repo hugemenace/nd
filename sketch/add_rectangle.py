@@ -49,6 +49,7 @@ class ND_OT_add_rectangle(BaseOperator):
         self.dirty = False
         
         self.active = False
+        self.override_orientation = False
         
         self.start_point = None
         self.end_point = None
@@ -64,7 +65,7 @@ class ND_OT_add_rectangle(BaseOperator):
         self.orientations = ["Local", "World", "Cursor", "View"]
         self.local_orientation = ["Default", "Closest Edge", "Longest Edge"]
         self.current_orientation = 0
-        self.current_local_orienation = 0
+        self.current_local_orientation = 0
 
         capture_modifier_keys(self, None, event.mouse_x)
 
@@ -91,6 +92,23 @@ class ND_OT_add_rectangle(BaseOperator):
                     self.set_plane_axes(context)
                     self.end_point = location
                     self.active = True
+                else:
+                    self.current_orientation = 3
+                    self.set_plane_axes(context)
+                    
+                    region = context.region
+                    rv3d = context.space_data.region_3d
+                    coord = (event.mouse_region_x, event.mouse_region_y)
+
+                    view_vector = bpy_extras.view3d_utils.region_2d_to_vector_3d(region, rv3d, coord)
+                    ray_origin = bpy_extras.view3d_utils.region_2d_to_origin_3d(region, rv3d, coord)
+                    cursor_pos = context.scene.cursor.location
+                    
+                    self.start_point = self.ray_plane_intersection(ray_origin, view_vector, cursor_pos, self.normal)
+                    self.active = True
+                    self.override_orientation = True
+                    
+                    
         elif self.key_confirm:
             self.finish(context)
 
@@ -106,9 +124,14 @@ class ND_OT_add_rectangle(BaseOperator):
             
             self.dirty
             
-        if pressed(event, {'A'}):
+        if pressed(event, {'A'}) and not self.override_orientation:
             self.current_orientation = (self.current_orientation + 1) % len(self.orientations)
-            self.set_plane_axes(context)
+            if self.active: self.set_plane_axes(context)
+            self.dirty = True
+            
+        if pressed(event, {'S'}) and not self.override_orientation:
+            self.current_local_orientation = (self.current_local_orientation + 1) % len(self.local_orientation)
+            if self.active: self.set_plane_axes(context)
             self.dirty = True
 
         if event.type == 'MOUSEMOVE' and self.active:
@@ -220,7 +243,7 @@ class ND_OT_add_rectangle(BaseOperator):
     
     
     def calculate_matrix(self):
-        z_axis = self.hit_normal.normalized()
+        z_axis = self.normal.normalized()
         x_axis = self.tangent.normalized()
         y_axis = self.bitangent.normalized()
         
@@ -235,17 +258,32 @@ class ND_OT_add_rectangle(BaseOperator):
 
     def set_plane_axes(self ,context):
         if self.current_orientation == 0:
-            up = mathutils.Vector((0.0, 0.0, 1.0))
-            if abs(self.hit_normal.dot(up)) > 0.999:
-                up = mathutils.Vector((0.0, 1.0, 0.0))
-            tangent = self.hit_normal.cross(up).normalized()
-            bitangent = self.hit_normal.cross(tangent).normalized()
-            self.normal = self.hit_normal
-            
+            if self.current_local_orientation == 0:
+                cross_vector = self.target_obj.matrix_world.col[0].xyz.normalized()
+                if abs(self.hit_normal.dot(cross_vector)) > 0.999:
+                    cross_vector = self.target_obj.matrix_world.col[1].xyz.normalized()
+                tangent = self.hit_normal.cross(cross_vector).normalized()
+                bitangent = self.hit_normal.cross(tangent).normalized()
+                self.normal = self.hit_normal
+                
+            elif self.current_local_orientation == 1:
+                v1, v2 = self.get_closest_edge()
+                edge_direction = (v2 - v1).normalized()
+                tangent = self.hit_normal.cross(edge_direction).normalized()
+                bitangent = self.hit_normal.cross(tangent).normalized()
+                self.normal = self.hit_normal
+                
+            elif self.current_local_orientation == 2:
+                v1, v2 = self.get_longest_edge()
+                edge_direction = (v2 - v1).normalized()
+                tangent = self.hit_normal.cross(edge_direction).normalized()
+                bitangent = self.hit_normal.cross(tangent).normalized()
+                self.normal = self.hit_normal
+                
         elif self.current_orientation == 1:
             tangent = mathutils.Vector((1.0, 0.0, 0.0))
             bitangent = mathutils.Vector((0.0, 1.0, 0.0))
-            self.normal = mathutils.Vector((0.0, 1.0, 0.0))
+            self.normal = mathutils.Vector((0.0, 0.0, 1.0))
             
         elif self.current_orientation == 2:
             matrix = context.scene.cursor.matrix.to_3x3()
@@ -272,6 +310,52 @@ class ND_OT_add_rectangle(BaseOperator):
         return ray_origin + ray_direction * d
 
 
+    def get_closest_edge(self):
+        mesh = self.target_obj.data
+        vert_indices = mesh.polygons[self.face_index].vertices
+
+        min_distance = float('inf')
+        closest_edge = None
+        verts_world = [self.target_obj.matrix_world @ mesh.vertices[i].co for i in vert_indices]
+
+        for i in range(len(verts_world)):
+            v1 = verts_world[i]
+            v2 = verts_world[(i + 1) % len(verts_world)]
+            
+            closest_point = mathutils.geometry.intersect_point_line(self.start_point, v1, v2)[0]
+            distance = (self.start_point - closest_point).length
+
+            if distance < min_distance:
+                min_distance = distance
+                closest_edge = (v1, v2)
+
+        return closest_edge
+    
+    
+    def get_longest_edge(self):
+        mesh = self.target_obj.data
+        vert_indices = mesh.polygons[self.face_index].vertices
+
+        max_length = -1
+        longest_edge = None
+
+        verts_world = [self.target_obj.matrix_world @ mesh.vertices[i].co for i in vert_indices]
+
+        num_verts = len(verts_world)
+
+        for i in range(num_verts):
+            v1 = verts_world[i]
+            v2 = verts_world[(i + 1) % num_verts]
+
+            edge_length = (v2 - v1).length
+
+            if edge_length > max_length:
+                max_length = edge_length
+                longest_edge = (v1, v2)
+
+        return longest_edge
+        
+    
 def draw_text_callback(self):
     draw_header(self)
 
@@ -285,10 +369,23 @@ def draw_text_callback(self):
         "Force Dimensions [D]: {}".format('True' if self.force_dimensions else 'False'),
         "False, True")
     
-    draw_hint(
-        self,
-        "Orientation [A]: {}".format(self.orientations[self.current_orientation].capitalize()),
-        ", ".join([m.capitalize() for m in self.orientations]))
+    if not self.override_orientation:
+        draw_hint(
+            self,
+            "Orientation [A]: {}".format(self.orientations[self.current_orientation].capitalize()),
+            ", ".join([m.capitalize() for m in self.orientations]))
+        
+    else:
+        draw_hint(
+            self,
+            "Orientation Overwritten : {}".format(self.orientations[self.current_orientation].capitalize()),
+            "Orientation Overwritten")
+    
+    if self.current_orientation == 0:
+        draw_hint(
+            self,
+            "Rotation [S]: {}".format(self.local_orientation[self.current_local_orientation].capitalize()),
+            ", ".join([m.capitalize() for m in self.local_orientation]))
 
 
 def register():

@@ -39,6 +39,9 @@ def is_util_object(obj):
     if obj.type == 'MESH' and (obj.display_type == 'WIRE' or obj.display_type == 'BOUNDS'):
         return True
 
+    if obj.type == 'LATTICE':
+        return True
+
     return False
 
 

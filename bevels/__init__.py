@@ -28,12 +28,14 @@
 import importlib
 from . import vertex_bevel
 from . import edge_bevel
+from . import edge_bevel_attr
 from . import bevel
 
 
 registerables = (
     vertex_bevel,
     edge_bevel,
+    edge_bevel_attr,
     bevel,
 )
 

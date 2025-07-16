@@ -22,7 +22,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ---
-# Contributors: Tristo (HM)
+# Contributors: Tristo (HM), Ian (HM)
 # ---
 
 import bpy
@@ -64,6 +64,7 @@ class ND_OT_swap_solver(BaseOperator):
 
         self.solve_mode = None
         self.boolean_mods = set()
+        self.boolean_mods_snapshot = {}
         self.solver_options = ['FAST', 'EXACT']
         if app_minor_version() >= (4, 5):
             self.solver_options.append('MANIFOLD')
@@ -84,6 +85,9 @@ class ND_OT_swap_solver(BaseOperator):
                 continue
             mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
             self.boolean_mods.update(mods)
+
+        for mod in self.boolean_mods:
+            self.boolean_mods_snapshot[mod] = mod.solver
 
         detected_solver_types = []
         for mod in self.boolean_mods:
@@ -120,6 +124,9 @@ class ND_OT_swap_solver(BaseOperator):
 
 
     def revert(self, context):
+        for mod in self.boolean_mods:
+            mod.solver = self.boolean_mods_snapshot[mod]
+
         unregister_draw_handler()
 
 

@@ -30,7 +30,7 @@ import bmesh
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.polling import ctx_obj_mode, list_ok
+from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
 
 
 class ND_OT_swap_solver(BaseOperator):
@@ -43,11 +43,10 @@ class ND_OT_swap_solver(BaseOperator):
     def do_modal(self, context, event):
         if pressed(event, {'S'}):
             if self.solve_mode is None:
-                self.solve_mode = 'FAST'
-            elif self.solve_mode == 'FAST':
-                self.solve_mode = 'EXACT'
-            elif self.solve_mode == 'EXACT':
-                self.solve_mode = 'FAST'
+                self.solve_mode = self.solver_options[0]
+            else:
+                solve_mode_index = self.solver_options.index(self.solve_mode)
+                self.solve_mode = self.solver_options[(solve_mode_index + 1) % len(self.solver_options)]
 
             self.dirty = True
 
@@ -65,6 +64,9 @@ class ND_OT_swap_solver(BaseOperator):
 
         self.solve_mode = None
         self.boolean_mods = []
+        self.solver_options = ['FAST', 'EXACT']
+        if app_minor_version() >= (4, 5):
+            self.solver_options.append('MANIFOLD')
 
         all_scene_objects = [obj for obj in bpy.data.objects if obj.type == 'MESH']
         mesh_object_names = [obj.name for obj in context.selected_objects if obj.type == 'MESH']
@@ -77,16 +79,12 @@ class ND_OT_swap_solver(BaseOperator):
                 if mod.object and mod.object.name in mesh_object_names:
                     self.boolean_mods.append(mod)
 
+        detected_solver_types = []
         for mod in self.boolean_mods:
-            if mod.solver == 'FAST':
-                fast_solver_count += 1
-            elif mod.solver == 'EXACT':
-                exact_solver_count += 1
+            detected_solver_types.append(mod.solver)
 
-        if fast_solver_count == len(self.boolean_mods):
-            self.solve_mode = 'FAST'
-        elif exact_solver_count == len(self.boolean_mods):
-            self.solve_mode = 'EXACT'
+        if len(set(detected_solver_types)) == 1:
+            self.solve_mode = detected_solver_types[0]
 
         capture_modifier_keys(self, None, event.mouse_x)
 
@@ -125,7 +123,7 @@ def draw_text_callback(self):
     draw_hint(
         self,
         "Solver [S]: {0}".format(self.solve_mode.capitalize() if self.solve_mode else "Mixed"),
-        "Select the solver mode (Fast, Exact)")
+        "Select the solver mode ({0})".format(", ".join([m.capitalize() for m in self.solver_options])))
 
 
 def register():

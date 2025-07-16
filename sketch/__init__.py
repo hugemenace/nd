@@ -36,6 +36,7 @@ from . import screw_head
 from . import clear_vgs
 from . import make_manifold
 from . import edge_length
+from . import add_rectangle
 
 
 registerables = (
@@ -49,6 +50,7 @@ registerables = (
     clear_vgs,
     make_manifold,
     edge_length,
+    add_rectangle
 )
 
 

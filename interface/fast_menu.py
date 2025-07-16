@@ -150,6 +150,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
         if context.mode == 'EDIT_MESH':
             layout.operator("nd.vertex_bevel", icon=icons['nd.vertex_bevel'])
             layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
+            layout.operator("nd.edge_bevel_attr", icon=icons['nd.edge_bevel_attr'])
             layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
             layout.operator("nd.clear_vgs", icon=icons['nd.clear_vgs'])
             layout.separator()

@@ -32,7 +32,6 @@ from .. import lib
 from . import ops
 from . common import create_box, render_ops, web_link
 from .. lib.preferences import get_preferences
-from .. lib.polling import app_minor_version
 
 
 links = [
@@ -45,21 +44,21 @@ links = [
 
 
 op_sections = [
-    ("Standalone", ops.standalone_ops, "standalone", [("nd.cycle", None)], True),
-    ("Sketch", ops.sketch_ops, "sketch", [("nd.single_vertex", None), ("nd.panel", None), ("nd.recon_poly", None)], True),
-    ("Generators", ops.generator_ops, "generators", [("nd.hole_generator", None), ("nd.pipe_generator", None)], (app_minor_version() >= (4, 3))),
-    ("Booleans", ops.boolean_ops, "booleans", [("nd.bool_vanilla", "DIFFERENCE"), ("nd.bool_vanilla", "UNION"), ("nd.bool_vanilla", "INTERSECT")], True),
-    ("Bevels", ops.bevel_ops, "bevels", [("nd.bevel", None), ("nd.vertex_bevel", None), ("nd.edge_bevel", None)], True),
-    ("Extrusion", ops.extrusion_ops, "extrusion", [("nd.solidify", None), ("nd.screw", None), ("nd.profile_extrude", None)], True),
-    ("Replicate", ops.replicate_ops, "replicate", [("nd.array_cubed", None), ("nd.circular_array", None), ("nd.mirror", None)], True),
-    ("Deform", ops.deform_ops, "deform", [("nd.lattice", None), ("nd.simple_deform", None)], True),
-    ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)], True),
-    ("Shading", ops.shading_ops, "shading", [("nd.smooth", None), ("nd.wn", None)], True),
-    ("Scene", ops.scene_ops, "scene", [("nd.flare", None), ("nd.clean_utils", None)], True),
-    ("Data", ops.data_ops, "data", [("nd.clear_vgs", None)], True),
-    ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)], True),
-    ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None), ("nd.apply_modifiers", None)], True),
-    ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils", 'DYNAMIC'), ("nd.toggle_clear_view", None)], True),
+    ("Standalone", ops.standalone_ops, "standalone", [("nd.cycle", None)]),
+    ("Sketch", ops.sketch_ops, "sketch", [("nd.single_vertex", None), ("nd.panel", None), ("nd.recon_poly", None)]),
+    ("Generators", ops.generator_ops, "generators", [("nd.hole_generator", None), ("nd.pipe_generator", None)]),
+    ("Booleans", ops.boolean_ops, "booleans", [("nd.bool_vanilla", "DIFFERENCE"), ("nd.bool_vanilla", "UNION"), ("nd.bool_vanilla", "INTERSECT")]),
+    ("Bevels", ops.bevel_ops, "bevels", [("nd.bevel", None), ("nd.vertex_bevel", None), ("nd.edge_bevel", None)]),
+    ("Extrusion", ops.extrusion_ops, "extrusion", [("nd.solidify", None), ("nd.screw", None), ("nd.profile_extrude", None)]),
+    ("Replicate", ops.replicate_ops, "replicate", [("nd.array_cubed", None), ("nd.circular_array", None), ("nd.mirror", None)]),
+    ("Deform", ops.deform_ops, "deform", [("nd.lattice", None), ("nd.simple_deform", None)]),
+    ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)]),
+    ("Shading", ops.shading_ops, "shading", [("nd.smooth", None), ("nd.wn", None)]),
+    ("Scene", ops.scene_ops, "scene", [("nd.flare", None), ("nd.clean_utils", None)]),
+    ("Data", ops.data_ops, "data", [("nd.clear_vgs", None)]),
+    ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)]),
+    ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None), ("nd.apply_modifiers", None)]),
+    ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils", 'DYNAMIC'), ("nd.toggle_clear_view", None)]),
 ]
 
 
@@ -155,9 +154,7 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
                   row.scale_y = 1.2
                   web_link(url, label, icon, row)
 
-        for label, collection, prop, shortcuts, visible in op_sections:
-            if not visible:
-                continue
+        for label, collection, prop, shortcuts in op_sections:
             box = create_box(label, layout, props, prop, icons, shortcuts)
             if getattr(props, prop):
                 render_ops(collection, box)

@@ -41,6 +41,9 @@ from .. lib.points import init_points, register_points_handler, unregister_point
 from .. lib.math import round_dec
 
 
+MIN_BLENDER_VERSION = (4, 3)
+
+
 socket_map = {
     "profile_segments": "Socket_5",
     "profile_radius": "Socket_2",
@@ -71,7 +74,9 @@ class ND_OT_pipe_generator(BaseOperator):
     bl_idname = "nd.pipe_generator"
     bl_label = "Pipe Generator"
     bl_description = """Generates a pipe from an edge path with customisable corner parameters
-CTRL — Remove existing modifiers"""
+CTRL — Remove existing modifiers
+
+Min Blender Version: %s""" % ('.'.join([str(v) for v in MIN_BLENDER_VERSION]))
 
 
     def do_modal(self, context, event):
@@ -466,6 +471,9 @@ CTRL — Remove existing modifiers"""
 
     @classmethod
     def poll(cls, context):
+        if app_minor_version() < MIN_BLENDER_VERSION:
+            return False
+
         if ctx_obj_mode(context):
             target_object = get_real_active_object(context)
             return obj_is_mesh(target_object) and ctx_objects_selected(context, 1)

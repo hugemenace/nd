@@ -40,6 +40,9 @@ from .. lib.polling import ctx_obj_mode, ctx_objects_selected_range, ctx_objects
 from .. lib.math import round_dec
 
 
+MIN_BLENDER_VERSION = (4, 3)
+
+
 socket_map = {
     "hole_type": "Socket_3",
     "drill_point": "Socket_4",
@@ -84,7 +87,9 @@ modes = ["Hole", "Counter", "Drill"]
 class ND_OT_hole_generator(BaseOperator):
     bl_idname = "nd.hole_generator"
     bl_label = "Hole Generator"
-    bl_description = """Generates a drill hole with the option to counterbore or countersink."""
+    bl_description = """Generates a drill hole with the option to counterbore or countersink.
+
+Min Blender Version: %s""" % ('.'.join([str(v) for v in MIN_BLENDER_VERSION]))
 
 
     def do_modal(self, context, event):
@@ -354,6 +359,9 @@ class ND_OT_hole_generator(BaseOperator):
 
     @classmethod
     def poll(cls, context):
+        if app_minor_version() < MIN_BLENDER_VERSION:
+            return False
+
         return ctx_obj_mode(context) and ctx_objects_selected_range(context, 0, 1)
 
 

@@ -22,7 +22,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 # ---
-# Contributors: Tristo (HM)
+# Contributors: Tristo (HM), Ian (HM)
 # ---
 
 import bpy
@@ -172,6 +172,8 @@ CTRL — Remove existing modifiers"""
             self.report({'INFO'}, "No vertices selected.")
             return {'CANCELLED'}
 
+        bpy.context.scene.tool_settings.vertex_group_weight = 1.0 # Reset vertex weight slider if users set it for some reason
+
         if event.ctrl:
             old_vgroup_names = []
             for object in context.selected_objects:
@@ -212,13 +214,13 @@ CTRL — Remove existing modifiers"""
 
         bm = bmesh.from_edit_mesh(self.target_object.data)
         bm.verts.ensure_lookup_table()
-        selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
+        self.selected_vert_indices = [vert.index for vert in bm.verts if vert.select]
         bm.free()
 
         self.vgroup_match = None
         for group in self.target_object.vertex_groups:
             vgroup_vert_indices = [vert.index for vert in self.target_object.data.vertices if group.index in [i.group for i in vert.groups]]
-            if len(set(vgroup_vert_indices) & set(selected_vert_indices)) > 0:
+            if len(set(vgroup_vert_indices) & set(self.selected_vert_indices)) > 0:
                 if self.vgroup_match:
                     self.report({'INFO'}, "Multiple vertex groups selected, unable to continue operation.")
                     return {'CANCELLED'}
@@ -228,10 +230,11 @@ CTRL — Remove existing modifiers"""
             group, vgroup_vert_indices = self.vgroup_match
 
             self.group = group
-            self.vgroup_difference = [i for i in selected_vert_indices if i not in vgroup_vert_indices]
+            self.vgroup_difference = [i for i in self.selected_vert_indices if i not in vgroup_vert_indices]
 
             bpy.ops.object.mode_set(mode='OBJECT')
             self.group.add(self.vgroup_difference, 1.0, 'ADD')
+            self.group.add(vgroup_vert_indices, 1.0, 'REPLACE')
             bpy.ops.object.mode_set(mode='EDIT')
 
             bpy.ops.mesh.select_all(action='DESELECT')
@@ -317,6 +320,10 @@ CTRL — Remove existing modifiers"""
     def add_vertex_group(self, context):
         vgroup = self.target_object.vertex_groups.new(name="ND — Bevel")
         bpy.ops.object.vertex_group_assign()
+
+        bpy.ops.object.mode_set(mode='OBJECT')
+        vgroup.add(self.selected_vert_indices, 1.0, 'REPLACE')
+        bpy.ops.object.mode_set(mode='EDIT')
 
         self.vgroup = vgroup
 

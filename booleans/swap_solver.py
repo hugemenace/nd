@@ -30,7 +30,7 @@ import bmesh
 from .. lib.base_operator import BaseOperator
 from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, toggle_operator_passthrough, register_draw_handler, unregister_draw_handler, draw_header, draw_property, draw_hint
 from .. lib.events import capture_modifier_keys, pressed
-from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
+from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version, obj_moddable
 
 
 class ND_OT_swap_solver(BaseOperator):
@@ -63,7 +63,7 @@ class ND_OT_swap_solver(BaseOperator):
         self.dirty = False
 
         self.solve_mode = None
-        self.boolean_mods = []
+        self.boolean_mods = set()
         self.solver_options = ['FAST', 'EXACT']
         if app_minor_version() >= (4, 5):
             self.solver_options.append('MANIFOLD')
@@ -77,7 +77,13 @@ class ND_OT_swap_solver(BaseOperator):
             mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
             for mod in mods:
                 if mod.object and mod.object.name in mesh_object_names:
-                    self.boolean_mods.append(mod)
+                    self.boolean_mods.add(mod)
+
+        for obj in context.selected_objects:
+            if not obj_moddable(obj):
+                continue
+            mods = [mod for mod in obj.modifiers if mod.type == 'BOOLEAN']
+            self.boolean_mods.update(mods)
 
         detected_solver_types = []
         for mod in self.boolean_mods:

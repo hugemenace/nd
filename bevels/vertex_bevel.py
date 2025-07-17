@@ -172,8 +172,6 @@ CTRL — Remove existing modifiers"""
             self.report({'INFO'}, "No vertices selected.")
             return {'CANCELLED'}
 
-        bpy.context.scene.tool_settings.vertex_group_weight = 1.0 # Reset vertex weight slider if users set it for some reason
-
         if event.ctrl:
             old_vgroup_names = []
             for object in context.selected_objects:
@@ -226,6 +224,9 @@ CTRL — Remove existing modifiers"""
                     return {'CANCELLED'}
                 self.vgroup_match = (group, vgroup_vert_indices)
 
+        self.vertex_group_weight_previous = bpy.context.scene.tool_settings.vertex_group_weight
+        bpy.context.scene.tool_settings.vertex_group_weight = 1.0
+        
         if self.vgroup_match:
             group, vgroup_vert_indices = self.vgroup_match
 
@@ -385,6 +386,8 @@ CTRL — Remove existing modifiers"""
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.mode_set(mode='EDIT')
 
+        bpy.context.scene.tool_settings.vertex_group_weight = self.vertex_group_weight_previous
+
         unregister_draw_handler()
 
 
@@ -407,6 +410,8 @@ CTRL — Remove existing modifiers"""
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.bevel.name)
             self.target_object.vertex_groups.remove(self.vgroup)
+
+        bpy.context.scene.tool_settings.vertex_group_weight = self.vertex_group_weight_previous
 
         unregister_draw_handler()
 

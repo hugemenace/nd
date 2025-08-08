@@ -140,6 +140,11 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
+    enable_util_viewport_disable: BoolProperty(
+        name="Toggle 'Disable in Viewports' when changing utility visibility",
+        default=False,
+    )
+
     enable_axis_helper: BoolProperty(
         name="Enable Axis Visualization",
         default=True,
@@ -503,6 +508,7 @@ class NDPreferences(AddonPreferences):
             ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True, True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False, True],
             ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False, not lib.addons.is_extension()],
+            ["NOTE: May cause viewport-disabled utils to be lost when realising instances", "enable_util_viewport_disable", False, True],
             ["Enable experimental features (requires Blender restart)", "enable_experimental_features", False, True]]
 
         for label, prop, expanded, visible in general_boxed_prefs:

@@ -27,7 +27,6 @@
 
 import bpy
 import gpu
-import bgl
 from mathutils import Matrix
 from gpu_extras.batch import batch_for_shader
 from . preferences import get_preferences

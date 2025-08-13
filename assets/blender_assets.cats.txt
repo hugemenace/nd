@@ -1,0 +1,17 @@
+# This is an Asset Catalog Definition file for Blender.
+#
+# Empty lines and lines starting with `#` will be ignored.
+# The first non-ignored line should be the version indicator.
+# Other lines are of the format "UUID:catalog/path/for/assets:simple catalog name"
+
+VERSION 1
+
+293443ab-1894-42e1-8407-ded73538c71d:ND:ND
+8c8c89c4-c13b-4e6e-aa1e-821e6bc9ec42:ND/Generators:ND-Generators
+a0776291-5d30-4396-8ab8-f6cb66eff59b:ND/Operators:ND-Operators
+e562a9fd-bcc4-406a-ba93-ac9f0b10778c:ND/Prefabs:ND-Prefabs
+eaec51b5-f0a9-4320-8d36-5946fb86bf38:ND/Prefabs/Beams:ND-Prefabs-Beams
+ad217292-95eb-4d81-92d1-080ee0afdfd8:ND/Prefabs/Patterns:ND-Prefabs-Patterns
+62f08d20-c269-43c5-b8e9-6ee4a2262d1a:ND/Prefabs/Pipes:ND-Prefabs-Pipes
+83dbe5c2-268c-4b8e-8bb4-e310559e5dcb:ND/Prefabs/Primitives:ND-Prefabs-Primitives
+4ecbfc1d-f393-41d8-b0f8-777dc1018605:ND/Selectors:ND-Selectors

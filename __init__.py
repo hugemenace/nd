@@ -142,7 +142,7 @@ class NDPreferences(AddonPreferences):
 
     enable_util_viewport_disable: BoolProperty(
         name="Toggle 'Disable in Viewports' when changing utility visibility",
-        default=False,
+        default=True,
     )
 
     enable_axis_helper: BoolProperty(

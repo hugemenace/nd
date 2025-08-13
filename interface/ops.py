@@ -44,6 +44,7 @@ sketch_ops = [
     ("nd.circularize", 'MESH_CIRCLE', None, None, False),
     ("nd.recon_poly", 'SURFACE_NCURVE', None, None, False),
     ("nd.screw_head", 'CANCEL', None, None, False),
+    ("nd.add_rectangle", 'MESH_CUBE', None, None, False),
 ]
 
 generator_ops = [

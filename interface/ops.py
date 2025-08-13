@@ -121,6 +121,8 @@ scene_ops = [
 ]
 
 util_ops = [
+    ("nd.mark_as_util", 'FILE_HIDDEN', None, None, False),
+    None, # Separator
     ("nd.set_origin", 'TRANSFORM_ORIGINS', None, None, False),
     ("nd.snap_align", 'SNAP_ON', None, None, False),
     None, # Separator
@@ -128,7 +130,6 @@ util_ops = [
     ("nd.smart_duplicate", 'LINKED', "Linked Duplicate", "LINKED", False),
     None, # Separator
     ("nd.sync_modifiers", 'SYSTEM', None, None, False),
-    None, # Separator
     ("nd.apply_modifiers", 'ORPHAN_DATA', None, None, False),
 ]
 

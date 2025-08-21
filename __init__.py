@@ -46,6 +46,7 @@ from bpy.app.handlers import persistent
 from . import lib
 from . import interface
 from . import booleans
+from . import data
 from . import bevels
 from . import deform
 from . import extrusion
@@ -65,6 +66,7 @@ from . import generate
 registerables = (
     interface,
     booleans,
+    data,
     bevels,
     deform,
     extrusion,

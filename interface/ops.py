@@ -101,6 +101,7 @@ shading_ops = [
 
 data_ops = [
     ("nd.clear_vgs", 'GROUP_VERTEX', None, None, False),
+    ("nd.vgroup_editor", 'MOD_VERTEX_WEIGHT', None, None, False),
 ]
 
 packaging_ops = [

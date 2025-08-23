@@ -113,6 +113,7 @@ def init_points(cls):
     cls.secondary_points = []
     cls.tertiary_points = []
     cls.guide_line = ()
+    cls.outline = []
 
 
 def draw_discs(shader, points, radius, color):
@@ -145,7 +146,19 @@ def draw_guideline(shader, line, size, color):
     shader.bind()
     shader.uniform_float("color", color)
     batch.draw(shader)
+    
 
+def draw_outline(shader, points, size, color):
+    gpu.state.depth_test_set('NONE')
+    gpu.state.blend_set('ALPHA')
+    gpu.state.line_width_set(size)
+
+    outline_points = [v for i in range(len(points)) for v in (points[i], points[(i + 1) % len(points)])]
+    
+    batch = batch_for_shader(shader, 'LINES', {"pos": outline_points})
+    shader.bind()
+    shader.uniform_float("color", color)
+    batch.draw(shader)
 
 def update_points(cls):
     shader = None
@@ -158,6 +171,7 @@ def update_points(cls):
         shader = gpu.shader.from_builtin('UNIFORM_COLOR')
 
     draw_guideline(shader, cls.guide_line, 2, get_preferences().points_guide_line_color)
+    draw_outline(shader, cls.outline, 2, get_preferences().points_guide_line_color)
     draw_circles(circle_shader, cls.primary_points, 20, get_preferences().points_primary_color)
     draw_circles(circle_shader, cls.secondary_points, 15, get_preferences().points_secondary_color)
     draw_circles(circle_shader, cls.tertiary_points, 25, get_preferences().points_tertiary_color)

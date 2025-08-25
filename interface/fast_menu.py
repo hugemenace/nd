@@ -152,7 +152,7 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.edge_bevel", icon=icons['nd.edge_bevel'])
             layout.operator("nd.edge_bevel_attr", icon=icons['nd.edge_bevel_attr'])
             layout.operator("nd.make_manifold", icon=icons['nd.make_manifold'])
-            layout.operator("nd.clear_vgs", icon=icons['nd.clear_vgs'])
+            layout.operator("nd.clear_vertex_groups", icon=icons['nd.clear_vertex_groups'])
             layout.separator()
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.operator("nd.screw", icon=icons['nd.screw'])

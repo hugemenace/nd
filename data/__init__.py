@@ -28,11 +28,13 @@
 import importlib
 from . import clear_vertex_groups
 from . import vertex_group_editor
+from . import clear_edge_marks
 
 
 registerables = (
     clear_vertex_groups,
     vertex_group_editor,
+    clear_edge_marks,
 )
 
 

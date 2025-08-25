@@ -103,6 +103,7 @@ data_ops = [
     ("nd.vertex_group_editor", 'MOD_VERTEX_WEIGHT', None, None, False),
     None, # Separator
     ("nd.clear_vertex_groups", 'GROUP_VERTEX', None, None, False),
+    ("nd.clear_edge_marks", 'MOD_EDGESPLIT', None, None, False),
 ]
 
 packaging_ops = [

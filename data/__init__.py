@@ -26,13 +26,13 @@
 # ---
 
 import importlib
-from . import vgroup_editor
 from . import clear_vertex_groups
+from . import vertex_group_editor
 
 
 registerables = (
-    vgroup_editor,
     clear_vertex_groups,
+    vertex_group_editor,
 )
 
 

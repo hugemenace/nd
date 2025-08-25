@@ -100,7 +100,8 @@ shading_ops = [
 ]
 
 data_ops = [
-    ("nd.vgroup_editor", 'MOD_VERTEX_WEIGHT', None, None, False),
+    ("nd.vertex_group_editor", 'MOD_VERTEX_WEIGHT', None, None, False),
+    None, # Separator
     ("nd.clear_vertex_groups", 'GROUP_VERTEX', None, None, False),
 ]
 

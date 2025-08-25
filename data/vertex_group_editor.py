@@ -40,8 +40,8 @@ from .. lib.math import v3_distance, v3_average, v3_direction, round_dec
 from .. lib.points import init_points, register_points_handler, unregister_points_handler
 
 
-class ND_OT_vgroup_editor(BaseOperator):
-    bl_idname = "nd.vgroup_editor"
+class ND_OT_vertex_group_editor(BaseOperator):
+    bl_idname = "nd.vertex_group_editor"
     bl_label = "Vertex Group Editor"
     bl_description = "Edit vertex groups and member vertex weights interactively"
 
@@ -244,10 +244,10 @@ def draw_text_callback(self):
 
 
 def register():
-    bpy.utils.register_class(ND_OT_vgroup_editor)
+    bpy.utils.register_class(ND_OT_vertex_group_editor)
 
 
 def unregister():
-    bpy.utils.unregister_class(ND_OT_vgroup_editor)
+    bpy.utils.unregister_class(ND_OT_vertex_group_editor)
     unregister_draw_handler()
     unregister_points_handler()

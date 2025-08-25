@@ -226,7 +226,7 @@ CTRL — Remove existing modifiers"""
 
         self.vertex_group_weight_previous = bpy.context.scene.tool_settings.vertex_group_weight
         bpy.context.scene.tool_settings.vertex_group_weight = 1.0
-        
+
         if self.vgroup_match:
             group, vgroup_vert_indices = self.vgroup_match
 
@@ -464,7 +464,7 @@ def draw_text_callback(self):
     draw_hint(
         self,
         "Enhanced Wireframe [E]: {0}".format("Yes" if self.target_object.show_wire else "No"),
-        "Display the objects's wireframe over solid shading")
+        "Display the object's wireframe over solid shading")
 
 
 def register():

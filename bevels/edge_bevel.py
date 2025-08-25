@@ -534,7 +534,7 @@ def draw_text_callback(self):
     draw_hint(
         self,
         "Enhanced Wireframe [E]: {0}".format("Yes" if self.target_object.show_wire else "No"),
-        "Display the objects's wireframe over solid shading")
+        "Display the object's wireframe over solid shading")
 
     draw_hint(
         self,

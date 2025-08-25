@@ -26,10 +26,12 @@
 # ---
 
 import importlib
+from . import clear_vgs
 from . import vgroup_editor
 
 
 registerables = (
+    clear_vgs,
     vgroup_editor,
 )
 

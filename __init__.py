@@ -673,7 +673,6 @@ def register():
         prefs.update_available = lib.updates.update_available(version)
     else:
         prefs.update_available = False
-    
 
 
 def unregister():

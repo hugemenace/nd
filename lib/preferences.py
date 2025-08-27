@@ -33,6 +33,13 @@ def get_preferences():
     return bpy.context.preferences.addons[get_registered_addon_name()].preferences
 
 
+def is_vulkan():
+    try:
+        return bpy.context.preferences.system.gpu_backend == 'VULKAN'
+    except AttributeError:
+        return False
+
+
 def get_scene_unit_scale():
     if bpy.context.scene.unit_settings.system == 'NONE':
         return 1.0

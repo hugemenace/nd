@@ -60,7 +60,6 @@ from . import standalone
 from . import utils
 from . import viewport
 from . import icons
-from . import generate
 
 
 registerables = (
@@ -80,7 +79,6 @@ registerables = (
     utils,
     viewport,
     icons,
-    generate,
 )
 
 

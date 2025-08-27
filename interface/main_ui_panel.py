@@ -26,12 +26,15 @@
 # ---
 
 import bpy
+import os
+import addon_utils
 from bpy.props import BoolProperty, PointerProperty
 from .. __init__ import bl_info
 from .. import lib
 from . import ops
 from . common import create_box, render_ops, web_link
 from .. lib.preferences import get_preferences
+from .. lib.polling import app_minor_version
 
 
 links = [
@@ -117,6 +120,62 @@ class ND_OT_toggle_sections(bpy.types.Operator):
         return {'FINISHED'}
 
 
+def get_ND_asset_library_path():
+    for mod in addon_utils.modules():
+        name = mod.bl_info['name']
+        if name == "ND" or name == "HugeMenace — ND":
+            path = mod.__file__
+            directory = os.path.dirname(path)
+            directory = os.path.join(directory, "assets")
+            return directory
+    else:
+        return None
+
+
+def ND_asset_library_installed():
+    asset_path = get_ND_asset_library_path()
+    if asset_path:
+        libs = bpy.context.preferences.filepaths.asset_libraries
+        for lib in libs:
+            if asset_path == lib.path:
+                return True
+    return False
+
+
+class ND_OT_install_asset_lib(bpy.types.Operator):
+    bl_idname = "nd.install_asset_lib"
+    bl_label = "Install Asset Library"
+    bl_description = "Install the asset library"
+
+
+    @classmethod
+    def poll(cls, context):
+        return not ND_asset_library_installed()
+
+
+    def execute(self, context):
+        if app_minor_version() < (4, 5):
+            self.report({'WARNING'}, "ND Asset Library can only be installed in Blender 4.5 or later.")
+            return {'CANCELLED'}
+
+        asset_path = get_ND_asset_library_path()
+        if asset_path:
+            index = len(bpy.context.preferences.filepaths.asset_libraries)
+            bpy.ops.preferences.asset_library_add()
+            new_lib = bpy.context.preferences.filepaths.asset_libraries[index]
+            new_lib.name = "ND Asset Library"
+            new_lib.path = asset_path
+            new_lib.import_method = 'APPEND_REUSE'
+
+            self.report({'INFO'}, "ND Asset Library installed successfully.")
+
+            return {'FINISHED'}
+
+        self.report({'WARN'}, "ND Asset Library installation failed.")
+
+        return {'CANCELLED'}
+
+
 class ND_PT_main_ui_panel(bpy.types.Panel):
     bl_label = "Main Panel — ND v%s" % ('.'.join([str(v) for v in bl_info['version']]))
     bl_idname = "ND_PT_main_ui_panel"
@@ -128,6 +187,11 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
     def draw(self, context):
         props = context.window_manager.nd_panel_props
         layout = self.layout
+
+        if app_minor_version() >= (4, 5) and not ND_asset_library_installed():
+            row = layout.column()
+            row.scale_y = 1.5
+            row.operator("nd.install_asset_lib")
 
         row = layout.column()
         row.operator("nd.toggle_sections")
@@ -147,12 +211,12 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
             web_link("https://docs.nd.hugemenace.co/#/getting-started/changelog", "View Changelog", "DOCUMENTS", row)
 
         if not lib.addons.is_extension():
-          box = create_box("Useful Links", layout, props, "display_links", icons, [])
-          if props.display_links:
-              for url, label, icon in links:
-                  row = box.row(align=True)
-                  row.scale_y = 1.2
-                  web_link(url, label, icon, row)
+            box = create_box("Useful Links", layout, props, "display_links", icons, [])
+            if props.display_links:
+                for url, label, icon in links:
+                    row = box.row(align=True)
+                    row.scale_y = 1.2
+                    web_link(url, label, icon, row)
 
         for label, collection, prop, shortcuts in op_sections:
             box = create_box(label, layout, props, prop, icons, shortcuts)
@@ -164,6 +228,7 @@ def register():
     if get_preferences().enable_sidebar:
         bpy.utils.register_class(ND_PT_main_ui_panel)
         bpy.utils.register_class(ND_OT_toggle_sections)
+        bpy.utils.register_class(ND_OT_install_asset_lib)
         bpy.utils.register_class(MainUIPanelProps)
 
         bpy.types.WindowManager.nd_panel_props = PointerProperty(type=MainUIPanelProps)
@@ -173,6 +238,7 @@ def unregister():
     if get_preferences().enable_sidebar:
         bpy.utils.unregister_class(ND_PT_main_ui_panel)
         bpy.utils.unregister_class(ND_OT_toggle_sections)
+        bpy.utils.unregister_class(ND_OT_install_asset_lib)
         bpy.utils.unregister_class(MainUIPanelProps)
 
         del bpy.types.WindowManager.nd_panel_props

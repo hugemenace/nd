@@ -107,9 +107,10 @@ def get_util_objects_for(target_objs, include_children=True):
 
 def set_util_visibility(target_objs, hidden=True):
     for obj in target_objs:
-        obj.hide_set(hidden)
-        if get_preferences().enable_util_viewport_disable:
+        if get_preferences().utils_toggle_behaviour == "DISABLE":
             obj.hide_viewport = hidden
+        else:
+            obj.hide_set(hidden)
 
 
 def isolate_utils(target_objs):
@@ -123,6 +124,8 @@ def hide_all_utils(hide):
 
 def has_visible_utils():
     for obj in get_all_util_objects():
-        if not obj.hide_get():
-            return True
+        if get_preferences().utils_toggle_behaviour == "DISABLE":
+            return not obj.hide_viewport
+        else:
+            return not obj.hide_get()
     return False

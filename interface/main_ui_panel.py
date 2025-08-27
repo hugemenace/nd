@@ -58,7 +58,7 @@ op_sections = [
     ("Simplify", ops.simplify_ops, "simplify", [("nd.decimate", None), ("nd.weld", None)]),
     ("Shading", ops.shading_ops, "shading", [("nd.smooth", None), ("nd.wn", None)]),
     ("Scene", ops.scene_ops, "scene", [("nd.flare", None), ("nd.clean_utils", None)]),
-    ("Data", ops.data_ops, "data", [("nd.clear_vertex_groups", None)]),
+    ("Data", ops.data_ops, "data", [("nd.vertex_group_editor", None), ("nd.clear_vertex_groups", None), ("nd.clear_edge_marks", None)]),
     ("Packaging", ops.packaging_ops, "packaging", [("nd.set_lod_suffix", "LOW"), ("nd.set_lod_suffix", "HIGH"), ("nd.triangulate", None)]),
     ("Utils", ops.util_ops, "utils", [("nd.set_origin", None), ("nd.snap_align", None), ("nd.apply_modifiers", None)]),
     ("Viewport", ops.viewport_ops, "viewport", [("nd.toggle_wireframes", None), ("nd.toggle_utils", 'DYNAMIC'), ("nd.toggle_clear_view", None)]),

@@ -142,9 +142,13 @@ class NDPreferences(AddonPreferences):
         default=True,
     )
 
-    enable_util_viewport_disable: BoolProperty(
-        name="Toggle 'Disable in Viewports' when changing utility visibility",
-        default=True,
+    utils_toggle_behaviour: EnumProperty(
+        name="Utils toggle behaviour",
+        items=[
+            ("DISABLE", "Disable in Viewports", ""),
+            ("HIDE", "Hide in Viewport", ""),
+        ],
+        default="DISABLE",
     )
 
     enable_axis_helper: BoolProperty(
@@ -510,7 +514,7 @@ class NDPreferences(AddonPreferences):
             ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True, True],
             ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False, True],
             ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False, not lib.addons.is_extension()],
-            ["NOTE: May cause viewport-disabled utils to be lost when realising instances", "enable_util_viewport_disable", False, True],
+            ["Utils toggle behaviour", "utils_toggle_behaviour", True, True],
             ["Enable experimental features (requires Blender restart)", "enable_experimental_features", False, True]]
 
         for label, prop, expanded, visible in general_boxed_prefs:
@@ -638,6 +642,19 @@ class NDPreferences(AddonPreferences):
             column = box.column(align=True)
             row = column.row()
             row.prop(self, pref)
+
+
+@persistent
+def post_load_handler(_a, _b):
+    # When ND loads, automatically show 'disable in viewport' within the outliner view for utils toggle clarity
+    for area in bpy.context.window.screen.areas:
+        if area.type == 'OUTLINER':
+            for space in area.spaces:
+                if space.type == 'OUTLINER':
+                    space.show_restrict_column_viewport = True
+
+
+bpy.app.handlers.load_post.append(post_load_handler)
 
 
 def register():

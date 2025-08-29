@@ -90,6 +90,11 @@ class NDPreferences(AddonPreferences):
         default="0.0.0",
     )
 
+    hide_asset_library_install_prompt: BoolProperty(
+        name="Hide Asset Library Install Prompt",
+        default=False,
+    )
+
     update_available: BoolProperty(
         name="Update Available",
         default=False,
@@ -541,7 +546,8 @@ class NDPreferences(AddonPreferences):
             ["lock_overlay_parameters_on_recall"],
             ["enable_sidebar"],
             ["enable_axis_helper"],
-            ["axis_base_thickness", "axis_active_thickness", "axis_inactive_opacity"]]
+            ["axis_base_thickness", "axis_active_thickness", "axis_inactive_opacity"],
+            ["hide_asset_library_install_prompt"]]
 
         for prefs in ui_prefs:
             column = box.column(align=True)

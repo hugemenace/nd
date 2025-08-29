@@ -167,6 +167,8 @@ class ND_OT_install_asset_lib(bpy.types.Operator):
             new_lib.path = asset_path
             new_lib.import_method = 'APPEND_REUSE'
 
+            get_preferences().hide_asset_library_install_prompt = True
+
             self.report({'INFO'}, "ND Asset Library installed successfully.")
 
             return {'FINISHED'}
@@ -174,6 +176,18 @@ class ND_OT_install_asset_lib(bpy.types.Operator):
         self.report({'WARN'}, "ND Asset Library installation failed.")
 
         return {'CANCELLED'}
+
+
+class ND_OT_install_asset_lib_ignore(bpy.types.Operator):
+    bl_idname = "nd.install_asset_lib_ignore"
+    bl_label = "Ignore Asset Library Prompt"
+    bl_description = "Hide the asset library installation prompt. Can be re-enabled in preferences under UI."
+
+
+    def execute(self, context):
+        get_preferences().hide_asset_library_install_prompt = True
+        self.report({'INFO'}, "ND Asset Library installation prompt hidden.")
+        return {'FINISHED'}
 
 
 class ND_PT_main_ui_panel(bpy.types.Panel):
@@ -188,10 +202,14 @@ class ND_PT_main_ui_panel(bpy.types.Panel):
         props = context.window_manager.nd_panel_props
         layout = self.layout
 
-        if app_minor_version() >= (4, 5) and not ND_asset_library_installed():
-            row = layout.column()
+        if not get_preferences().hide_asset_library_install_prompt and app_minor_version() >= (4, 5):
+            box = layout.box()
+            row = box.row()
+            row.label(text="Install the ND Asset Library?", icon='ASSET_MANAGER')
+            row = box.row(align=True)
             row.scale_y = 1.5
-            row.operator("nd.install_asset_lib")
+            row.operator("nd.install_asset_lib", text="Install")
+            row.operator("nd.install_asset_lib_ignore", text="Ignore")
 
         row = layout.column()
         row.operator("nd.toggle_sections")
@@ -229,6 +247,7 @@ def register():
         bpy.utils.register_class(ND_PT_main_ui_panel)
         bpy.utils.register_class(ND_OT_toggle_sections)
         bpy.utils.register_class(ND_OT_install_asset_lib)
+        bpy.utils.register_class(ND_OT_install_asset_lib_ignore)
         bpy.utils.register_class(MainUIPanelProps)
 
         bpy.types.WindowManager.nd_panel_props = PointerProperty(type=MainUIPanelProps)
@@ -239,6 +258,7 @@ def unregister():
         bpy.utils.unregister_class(ND_PT_main_ui_panel)
         bpy.utils.unregister_class(ND_OT_toggle_sections)
         bpy.utils.unregister_class(ND_OT_install_asset_lib)
+        bpy.utils.unregister_class(ND_OT_install_asset_lib_ignore)
         bpy.utils.unregister_class(MainUIPanelProps)
 
         del bpy.types.WindowManager.nd_panel_props

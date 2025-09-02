@@ -50,20 +50,23 @@ class ND_OT_set_lod_suffix(bpy.types.Operator):
 
     def execute(self, context):
         for obj in context.selected_objects:
+            new_name = obj.name
+            has_prexisting_lod = False
+
+            if "_low" in obj.name or "_high" in obj.name:
+                # Replace "_low" or "_high" with the self.mode value
+                new_name = obj.name.replace("_low", f"_{self.mode.lower()}").replace("_high", f"_{self.mode.lower()}")
+                has_prexisting_lod = True
+
             # Remove Blender's .001, .002, etc naming convention
-            old_name = re.sub(r"(.+?)(?:\.[0-9]+)+$", r"\1", obj.name)
+            new_name = re.sub(r"(.+?)(?:\.[0-9]+)+$", r"\1", new_name)
 
             # Remove ZenSet's _1, _2, etc naming convention
-            old_name = re.sub(r"(.+?)(?:_[0-9]+)+$", r"\1", old_name)
+            new_name = re.sub(r"(.+?)(?:_[0-9]+)+$", r"\1", new_name)
 
-            name_segments = old_name.split("_")
-
-            # Remove existing _high / _low suffixes.
-            if name_segments[-1].lower() in ['high', 'low']:
-                name_segments.pop()
-
-            name_segments.append(self.mode.lower())
-            new_name = "_".join(name_segments)
+            # Append the new LOD suffix if there wasn't a pre-existing one
+            if not has_prexisting_lod:
+                new_name += f"_{self.mode.lower()}"
 
             obj.name = new_name
 

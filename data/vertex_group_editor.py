@@ -118,6 +118,8 @@ class ND_OT_vertex_group_editor(BaseOperator):
         self.weight = 1.0
         self.is_editing = False
 
+        self.set_random_seed()
+
         self.bm = bmesh.from_edit_mesh(context.active_object.data)
         self.bm.verts.ensure_lookup_table()
 
@@ -176,11 +178,17 @@ class ND_OT_vertex_group_editor(BaseOperator):
             self.secondary_points = []
 
 
+    def set_random_seed(self):
+        self.random_seed = round_dec(random.random() * 1000000, 0)
+        random.seed(self.random_seed)
+
+
     def set_vertex_weights(self, randomize=False):
         if not randomize:
             self.vertex_groups[self.vertex_group_index].add(self.selected_vert_indices, self.weight, 'REPLACE')
             return
 
+        self.set_random_seed()
         for v in self.selected_vert_indices:
             self.vertex_groups[self.vertex_group_index].add([v], random.uniform(0.0, 1.0), 'REPLACE')
 
@@ -241,6 +249,11 @@ def draw_text_callback(self):
             self,
             "Randomize Weights [R]",
             "Randomize the vertex weights for the selected group")
+
+        draw_hint(
+            self,
+            f"Random Seed: {self.random_seed:.0f}",
+            "The auto-generated seed used for randomizing weights")
 
 
 def register():

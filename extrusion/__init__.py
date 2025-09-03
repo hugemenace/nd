@@ -29,14 +29,12 @@ import importlib
 from . import solidify
 from . import screw
 from . import profile_extrude
-from . import pipe_extrude
 
 
 registerables = (
     solidify,
     screw,
     profile_extrude,
-    pipe_extrude,
 )
 
 

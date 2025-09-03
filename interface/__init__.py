@@ -29,7 +29,6 @@ import importlib
 from . import main_ui_panel
 from . import main_menu
 from . import sketch_menu
-from . import generators_menu
 from . import utils_menu
 from . import fast_menu
 from . import boolean_menu
@@ -53,7 +52,6 @@ registerables = (
     main_ui_panel,
     main_menu,
     sketch_menu,
-    generators_menu,
     utils_menu,
     fast_menu,
     boolean_menu,

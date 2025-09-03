@@ -107,8 +107,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
         layout.operator_context = 'INVOKE_DEFAULT'
 
         layout.operator("nd.single_vertex", icon=icons['nd.single_vertex'])
-        layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
-        layout.separator()
         layout.operator("mesh.primitive_plane_add", icon='MESH_PLANE')
         layout.operator("mesh.primitive_cube_add", icon='MESH_CUBE')
 
@@ -157,7 +155,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
             layout.operator("nd.screw", icon=icons['nd.screw'])
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude'])
-            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
 
             self.draw_make_edge_face_ops(context)
 
@@ -206,24 +203,20 @@ class ND_MT_fast_menu(bpy.types.Menu):
         mod_names = [mod.name for mod in target_object.modifiers]
 
         has_mod_profile_extrude = False
-        has_mod_pipe_generator = False
         has_mod_solidify = False
         has_mod_boolean = False
         has_mod_screw = False
         has_mod_array_cubed = False
         has_mod_circular_array = False
         has_mod_circularize = False
-        has_mod_recon_poly = False
 
         for name in mod_names:
             has_mod_profile_extrude = has_mod_profile_extrude or bool("— ND PE" in name)
-            has_mod_pipe_generator = has_mod_pipe_generator or bool("Pipe Generator" in name)
             has_mod_solidify = has_mod_solidify or bool("— ND SOL" in name)
             has_mod_boolean = has_mod_boolean or bool("— ND Bool" in name)
             has_mod_screw = has_mod_screw or bool("— ND SCR" in name)
             has_mod_array_cubed = has_mod_array_cubed or bool("Array³" in name)
             has_mod_circular_array = has_mod_circular_array or bool("— ND CA" in name)
-            has_mod_recon_poly = has_mod_recon_poly or bool("— ND RCP" in name)
             has_mod_circularize = has_mod_circularize or bool("— ND CIRC" in name)
 
         was_profile_extrude = has_mod_profile_extrude and not has_mod_solidify
@@ -245,11 +238,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
             has_mod_profile_extrude = True
             replay_prediction_count += 1
 
-        if self.profile or has_mod_pipe_generator:
-            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator'])
-            has_mod_pipe_generator = True
-            replay_prediction_count += 1
-
         if has_mod_screw:
             layout.operator("nd.screw", icon=icons['nd.screw'])
             replay_prediction_count += 1
@@ -260,10 +248,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if has_mod_circular_array:
             layout.operator("nd.circular_array", icon=icons['nd.circular_array'])
-            replay_prediction_count += 1
-
-        if has_mod_recon_poly:
-            layout.operator("nd.recon_poly", icon=icons['nd.recon_poly'])
             replay_prediction_count += 1
 
         if has_mod_circularize:
@@ -290,7 +274,6 @@ class ND_MT_fast_menu(bpy.types.Menu):
 
         if self.profile:
             layout.operator("nd.profile_extrude", icon=icons['nd.profile_extrude']) if not has_mod_profile_extrude else None
-            layout.operator("nd.pipe_generator", icon=icons['nd.pipe_generator']) if not has_mod_pipe_generator else None
             layout.operator("nd.screw", icon=icons['nd.screw']) if not has_mod_screw else None
             layout.operator("nd.mirror", icon=icons['nd.mirror'])
 

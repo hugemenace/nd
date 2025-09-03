@@ -42,13 +42,6 @@ sketch_ops = [
     ("nd.panel", 'MOD_EXPLODE', None, None, False),
     None, # Separator
     ("nd.circularize", 'MESH_CIRCLE', None, None, False),
-    ("nd.recon_poly", 'SURFACE_NCURVE', None, None, False),
-    ("nd.screw_head", 'CANCEL', None, None, False),
-]
-
-generator_ops = [
-    ("nd.hole_generator", 'PROP_CON', None, None, False),
-    ("nd.pipe_generator", 'GRAPH', None, None, False),
 ]
 
 boolean_ops = [
@@ -75,7 +68,6 @@ extrusion_ops = [
     ("nd.solidify", 'MOD_SOLIDIFY', None, None, False),
     ("nd.screw", 'MOD_SCREW', None, None, False),
     ("nd.profile_extrude", 'EMPTY_SINGLE_ARROW', None, None, False),
-    ("nd.pipe_extrude", 'ANIM', None, None, False),
 ]
 
 replicate_ops = [
@@ -152,7 +144,7 @@ viewport_ops = [
 
 def build_icon_lookup_table():
     icon_lookup = {}
-    for op in standalone_ops + sketch_ops + generator_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + \
+    for op in standalone_ops + sketch_ops + boolean_ops + bevel_ops + extrusion_ops + replicate_ops + \
     deform_ops + simplify_ops + shading_ops + scene_ops + data_ops + packaging_ops + util_ops + viewport_ops:
         if op is None:
             continue

@@ -110,16 +110,6 @@ class NDPreferences(AddonPreferences):
         default=False,
     )
 
-    recon_poly_solidify: BoolProperty(
-        name="Automatically run Solidify after Recon Poly",
-        default=False,
-    )
-
-    recon_poly_inscribed: BoolProperty(
-        name="Automatically set Recon Poly extents to Inscribed (vs. Circumscribed)",
-        default=True,
-    )
-
     enable_mouse_values: BoolProperty(
         name="Enable Mouse Values (move mouse to change values)",
         default=True,
@@ -395,11 +385,6 @@ class NDPreferences(AddonPreferences):
         default="X",
     )
 
-    custom_screw_heads_path: StringProperty(
-        name="Custom Screw Heads",
-        subtype='FILE_PATH',
-    )
-
     overlay_show_annotation: BoolProperty(
         name="Show Annotations",
         default=False
@@ -502,8 +487,6 @@ class NDPreferences(AddonPreferences):
     def draw_general(self, box):
         general_prefs = [
             "use_fast_booleans",
-            "recon_poly_solidify",
-            "recon_poly_inscribed",
             "create_custom_transform_orientation",
             "enable_right_click_select",
             "enable_auto_smooth"]
@@ -515,7 +498,6 @@ class NDPreferences(AddonPreferences):
 
         general_boxed_prefs = [
             ["The default angle to use for bevel and smoothing operations", "default_smoothing_angle", True, True],
-            ["Set a path for a custom screw heads .blend file", "custom_screw_heads_path", False, True],
             ["Automatically check if ND is up to date when Blender starts", "enable_update_check", False, not lib.addons.is_extension()],
             ["Utils toggle behaviour", "utils_toggle_behaviour", True, True],
             ["Enable experimental features (requires Blender restart)", "enable_experimental_features", False, True]]

@@ -30,9 +30,7 @@ from . import view_align
 from . import geo_lift
 from . import panel
 from . import single_vertex
-from . import recon_poly
 from . import circularize
-from . import screw_head
 from . import make_manifold
 from . import edge_length
 
@@ -42,9 +40,7 @@ registerables = (
     geo_lift,
     panel,
     single_vertex,
-    recon_poly,
     circularize,
-    screw_head,
     make_manifold,
     edge_length,
 )

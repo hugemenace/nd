@@ -48,8 +48,7 @@ links = [
 
 op_sections = [
     ("Standalone", ops.standalone_ops, "standalone", [("nd.cycle", None)]),
-    ("Sketch", ops.sketch_ops, "sketch", [("nd.single_vertex", None), ("nd.panel", None), ("nd.recon_poly", None)]),
-    ("Generators", ops.generator_ops, "generators", [("nd.hole_generator", None), ("nd.pipe_generator", None)]),
+    ("Sketch", ops.sketch_ops, "sketch", [("nd.single_vertex", None), ("nd.panel", None), ("nd.circularize", None)]),
     ("Booleans", ops.boolean_ops, "booleans", [("nd.bool_vanilla", "DIFFERENCE"), ("nd.bool_vanilla", "UNION"), ("nd.bool_vanilla", "INTERSECT")]),
     ("Bevels", ops.bevel_ops, "bevels", [("nd.bevel", None), ("nd.vertex_bevel", None), ("nd.edge_bevel", None)]),
     ("Extrusion", ops.extrusion_ops, "extrusion", [("nd.solidify", None), ("nd.screw", None), ("nd.profile_extrude", None)]),
@@ -72,7 +71,6 @@ class MainUIPanelProps(bpy.types.PropertyGroup):
     display_links: BoolProperty(default=False)
     standalone: BoolProperty(default=False)
     sketch: BoolProperty(default=False)
-    generators: BoolProperty(default=False)
     booleans: BoolProperty(default=False)
     bevels: BoolProperty(default=False)
     extrusion: BoolProperty(default=False)
@@ -102,7 +100,6 @@ class ND_OT_toggle_sections(bpy.types.Operator):
         props.display_links = toggle
         props.standalone = toggle
         props.sketch = toggle
-        props.generators = toggle
         props.booleans = toggle
         props.bevels = toggle
         props.extrusion = toggle

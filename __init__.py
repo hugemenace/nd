@@ -596,7 +596,7 @@ class NDPreferences(AddonPreferences):
             row.label(text=keymap)
 
             for kmi in km.keymap_items:
-                if (kmi.idname == "wm.call_menu" and kmi.name.startswith(name)) or kmi.idname.startswith("nd."):
+                if (kmi.idname == "wm.call_menu" and kmi.name.endswith(name)) or kmi.idname.startswith("nd."):
                     column = box.column(align=True)
                     row = column.row()
                     rna_keymap_ui.draw_kmi(["ADDON", "USER", "DEFAULT"], kc, km, kmi, row, 0)

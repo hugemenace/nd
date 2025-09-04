@@ -26,7 +26,7 @@
 # ---
 
 import bpy
-from .. lib.objects import set_object_util_visibility
+from .. lib.objects import configure_object_as_util
 from .. lib.polling import ctx_obj_mode, ctx_min_objects_selected, objs_are_mesh
 
 
@@ -56,7 +56,7 @@ SHIFT — Recursively mark all children of the selected objects as utilities"""
 
 
     def set_util_visibility(self, obj, visible, deep=False):
-        set_object_util_visibility(obj, visible)
+        configure_object_as_util(obj, visible)
 
         if deep:
             for child in obj.children:

@@ -186,10 +186,6 @@ SHIFT — Cycle through the modifier stack"""
             for counter, mod in enumerate(self.target_obj.modifiers):
                 self.set_mod_visible(mod, counter <= self.mod_current_index)
         elif self.util_count > 0:
-            # Hide all utility objects before isolating the current set.
-            for mod in self.util_mods:
-                mod.object.hide_set(True)
-
             util_obj = self.util_mods[self.util_current_index].object
             hide_all_utils(True)
             isolate_utils(self.frozen_utils.union({util_obj}))

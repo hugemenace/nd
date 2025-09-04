@@ -171,15 +171,15 @@ def get_real_active_object(context):
     return active
 
 
-def set_object_util_visibility(obj, hidden=True):
-    obj.display_type = 'WIRE' if hidden else 'SOLID'
-    obj.hide_render = hidden
-    obj.visible_camera = not hidden
-    obj.visible_diffuse = not hidden
-    obj.visible_glossy = not hidden
-    obj.visible_shadow = not hidden
-    obj.visible_transmission = not hidden
-    obj.visible_volume_scatter = not hidden
+def configure_object_as_util(obj, util=True):
+    obj.display_type = 'WIRE' if util else 'SOLID'
+    obj.hide_render = util
+    obj.visible_camera = not util
+    obj.visible_diffuse = not util
+    obj.visible_glossy = not util
+    obj.visible_shadow = not util
+    obj.visible_transmission = not util
+    obj.visible_volume_scatter = not util
 
 
 def get_objects_in_hierarchy(obj):

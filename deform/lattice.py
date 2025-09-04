@@ -36,6 +36,7 @@ from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new
 from .. lib.modifiers import new_modifier, remove_modifiers_ending_with, ensure_tail_mod_consistency
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_is_mesh, ctx_objects_selected, app_minor_version
+from .. lib.collections import hide_obj, unhide_obj, is_obj_hidden
 
 
 mod_lattice = "Lattice — ND L"
@@ -229,9 +230,9 @@ CTRL — Remove existing modifiers"""
 
         self.unhid_lattice_obj = False
         if self.summoned and self.lattice_obj:
-            if self.lattice_obj.hide_get():
+            if is_obj_hidden(self.lattice_obj):
                 self.unhid_lattice_obj = True
-                self.lattice_obj.hide_set(False)
+                unhide_obj(self.lattice_obj)
 
         self.operate(context)
 
@@ -368,7 +369,7 @@ CTRL — Remove existing modifiers"""
             self.lattice_obj.data.interpolation_type_w = interpolation_mode
 
             if self.unhid_lattice_obj:
-                self.lattice_obj.hide_set(True)
+                hide_obj(self.lattice_obj)
 
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.lattice.name)

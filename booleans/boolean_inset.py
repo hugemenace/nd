@@ -34,9 +34,10 @@ from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.numeric_input import update_stream, no_stream, get_stream_value, new_stream, has_stream
 from .. lib.modifiers import new_modifier, remove_problematic_boolean_mods, ensure_tail_mod_consistency
-from .. lib.objects import get_real_active_object, set_object_util_visibility, get_objects_in_hierarchy
+from .. lib.objects import get_real_active_object, configure_object_as_util, get_objects_in_hierarchy
 from .. lib.polling import obj_exists, objs_are_mesh, ctx_objects_selected, ctx_obj_mode, app_minor_version
 from .. lib.math import round_dec
+from .. lib.collections import hide_obj, unhide_obj
 
 
 class ND_OT_bool_inset(BaseOperator):
@@ -133,13 +134,13 @@ class ND_OT_bool_inset(BaseOperator):
 
         self.reference_obj_name_prev = self.reference_obj.name
 
-        set_object_util_visibility(self.reference_obj, hidden=True)
+        configure_object_as_util(self.reference_obj, util=True)
         self.reference_obj.data.name = self.reference_obj.name
-        self.reference_obj.hide_set(True)
+        hide_obj(self.reference_obj)
 
         remove_problematic_boolean_mods(self.reference_obj)
 
-        set_object_util_visibility(self.intersecting_obj, hidden=True)
+        configure_object_as_util(self.intersecting_obj, util=True)
         self.intersecting_obj.data.name = self.intersecting_obj.name
 
         remove_problematic_boolean_mods(self.intersecting_obj)
@@ -190,7 +191,7 @@ class ND_OT_bool_inset(BaseOperator):
 
 
     def finish(self, context):
-        self.reference_obj.hide_set(False)
+        unhide_obj(self.reference_obj)
 
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)
@@ -204,11 +205,11 @@ class ND_OT_bool_inset(BaseOperator):
         bpy.ops.object.modifier_remove(modifier=self.boolean_diff.name)
         bpy.data.meshes.remove(self.intersecting_obj.data, do_unlink=True)
 
-        set_object_util_visibility(self.reference_obj, hidden=False)
+        configure_object_as_util(self.reference_obj, util=False)
         self.reference_obj.name = self.reference_obj_name_prev
         self.reference_obj.data.name = self.reference_obj_name_prev
         self.reference_obj.parent = None
-        self.reference_obj.hide_set(False)
+        unhide_obj(self.reference_obj)
 
         unregister_draw_handler()
 

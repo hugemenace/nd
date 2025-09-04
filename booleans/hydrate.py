@@ -32,7 +32,7 @@ from .. lib.overlay import update_overlay, init_overlay, toggle_pin_overlay, tog
 from .. lib.events import capture_modifier_keys, pressed
 from .. lib.preferences import get_preferences
 from .. lib.polling import ctx_obj_mode, list_ok, app_minor_version
-from .. lib.objects import set_object_util_visibility
+from .. lib.objects import configure_object_as_util
 
 
 class ND_OT_hydrate(BaseOperator):
@@ -125,7 +125,7 @@ class ND_OT_hydrate(BaseOperator):
                 bpy.context.scene.collection.objects.unlink(new_obj)
                 self.scene_collections[self.active_collection].objects.link(new_obj)
 
-            set_object_util_visibility(new_obj, hidden=False)
+            configure_object_as_util(new_obj, util=False)
             new_objects.append(new_obj)
 
         bpy.ops.object.select_all(action='DESELECT')

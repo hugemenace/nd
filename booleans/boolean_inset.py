@@ -102,6 +102,8 @@ class ND_OT_bool_inset(BaseOperator):
         self.thickness_input_stream = new_stream()
 
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
+        if app_minor_version() >= (5, 0) and solver == 'FAST':
+            solver = 'FLOAT'
 
         a, b = context.selected_objects
         self.reference_obj = a if a.name != context.active_object.name else b

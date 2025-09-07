@@ -55,6 +55,8 @@ ALT — Do not clean the reference object's mesh"""
             return {'CANCELLED'}
 
         solver = 'FAST' if get_preferences().use_fast_booleans else 'EXACT'
+        if app_minor_version() >= (5, 0) and solver == 'FAST':
+            solver = 'FLOAT'
 
         target_obj = context.active_object
 

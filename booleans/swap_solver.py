@@ -65,9 +65,12 @@ class ND_OT_swap_solver(BaseOperator):
         self.solve_mode = None
         self.boolean_mods = set()
         self.boolean_mods_snapshot = {}
+
         self.solver_options = ['FAST', 'EXACT']
         if app_minor_version() >= (4, 5):
             self.solver_options.append('MANIFOLD')
+        if app_minor_version() >= (5, 0):
+            self.solver_options[0] = 'FLOAT'
 
         all_scene_objects = [obj for obj in bpy.data.objects if obj.type == 'MESH']
         mesh_object_names = [obj.name for obj in context.selected_objects if obj.type == 'MESH']

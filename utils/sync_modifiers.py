@@ -246,7 +246,7 @@ ALT — Override util references on all sync'd objects"""
 
             if "_use_attribute" in key_table[key]:
                 use_attribute = key_table[key]["_use_attribute"]
-                mod[key + "_use_attribute"] = use_attribute
+                mod[key + "_use_attribute"] = bool(use_attribute)
                 if not use_attribute:
                     self.create_gnmod_driver(master_modifier, mod, key)
 

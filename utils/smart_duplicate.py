@@ -37,7 +37,7 @@ class ND_OT_smart_duplicate(bpy.types.Operator):
     bl_idname = "nd.smart_duplicate"
     bl_label = "Smart Duplicate"
     bl_description = """Duplicate the selected objects with their utils
-SHIFT — Deep duplicate (includes children)"""
+SHIFT — Deep duplicate (includes all children)"""
 
 
     hotkeyed: bpy.props.BoolProperty(
@@ -72,7 +72,7 @@ SHIFT — Deep duplicate (includes children)"""
 
     def invoke(self, context, event):
         deep_duplicate = (not self.hotkeyed and event.shift) or self.deep
-        util_objects = get_util_objects_for(context.selected_objects, include_children=deep_duplicate)
+        util_objects = get_util_objects_for(context.selected_objects, include_children=True)
         isolate_utils(util_objects)
 
         for obj in util_objects:

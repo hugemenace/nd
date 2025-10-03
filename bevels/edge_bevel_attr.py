@@ -374,7 +374,19 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
 
         self.bevel = bevel
 
-        if self.early_apply:
+        has_previous_weld = False
+        previous_weld_index = 0
+        for i, mod in enumerate(self.target_object.modifiers):
+            if mod.name == mod_weld and mod.type == 'WELD':
+                has_previous_weld = True
+                previous_weld_index = i
+                break
+
+        if has_previous_weld:
+            while self.target_object.modifiers[previous_weld_index].name != self.bevel.name:
+                bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
+
+        if not has_previous_weld and self.early_apply:
             while self.target_object.modifiers[0].name != self.bevel.name:
                 bpy.ops.object.modifier_move_up(modifier=self.bevel.name)
 

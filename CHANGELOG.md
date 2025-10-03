@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/hugemenace/nd/compare/v1.48.0...v2.0.0) (2025-10-03)
+
+
+### Features
+
+* add "Install Asset Library" button to the N-panel menu for Blender 4.5+ ([887f3a6](https://github.com/hugemenace/nd/commit/887f3a65e16a2e7b0973f18b300974cd8163a188))
+* add a Data category to the main menu and N-panel to house data-related operators (e.g., clear vertex groups) ([3b83c07](https://github.com/hugemenace/nd/commit/3b83c07375d155eed7fdd6e8674bec6dea1f93b9))
+* add a soft-apply mode to the Apply Modifiers operator and tighten up the default behaviour & tooltip ([d954903](https://github.com/hugemenace/nd/commit/d9549035fa9e340852334032c0fb039354293d14))
+* add additional width types to the edge bevel operator ([9d61f31](https://github.com/hugemenace/nd/commit/9d61f317ae9819e0c29a96237262b855ea0ea2c1))
+* add additional width types to the object bevel operator ([1b65eea](https://github.com/hugemenace/nd/commit/1b65eea2365e6f7cbeb3f02616c7d5ccaf73fe61))
+* add additional width types to the vertex bevel operator ([17c0d85](https://github.com/hugemenace/nd/commit/17c0d85ea8f6dbcd763cb8ec280376e84f059fd0))
+* add attribute-based edge bevel operator ([83671af](https://github.com/hugemenace/nd/commit/83671afe3ebae9bdbf7b700f4886850c40346c87))
+* add Blender 4.5+ Vulkan support for shaders (points, lines, etc) ([a27c5db](https://github.com/hugemenace/nd/commit/a27c5db62fb874275a33b170610ec9c5f09422a9))
+* add capture utils operator to display and exclusively select all utils or the selected objects' utils ([51c1642](https://github.com/hugemenace/nd/commit/51c164296694e95d89b4bb5af8bdbaa34c7bef7a))
+* add Cavity toggle to viewport menu ([42bf283](https://github.com/hugemenace/nd/commit/42bf2834f771a4d66b91100e681e57a292ed640a))
+* add clear edge marks data operator ([6c9ad7e](https://github.com/hugemenace/nd/commit/6c9ad7e84f55e32994463b601bb16c7b2f619ccd))
+* add integrated GN-powered asset library ([1edba4e](https://github.com/hugemenace/nd/commit/1edba4edd0e0fec69e9751b43cfe48b359c97ae0))
+* add Mark As Util operator to utils menu ([bd84295](https://github.com/hugemenace/nd/commit/bd842957a147e4c2f61eb11ba7365bd2d2060da0))
+* add target execution, revert functionality, and Blender 4.5 manifold support to swap solver operator ([a772d0a](https://github.com/hugemenace/nd/commit/a772d0a9014d0920f2a30ea1affad782831a1f80))
+* add the deep alt mode option to smart and linked duplicate operators to allow for recursive child duplication ([7cf213a](https://github.com/hugemenace/nd/commit/7cf213a7149b02c9702dbe33308006b5913dcb7b))
+* add vgroup editor operator ([5030b2e](https://github.com/hugemenace/nd/commit/5030b2e316476033b6e88749ac04af9cd2dd1617))
+* add viewport utils toggle behaviour preference ([1d5be79](https://github.com/hugemenace/nd/commit/1d5be7950869590d022a83d17259c0b40b565e7f))
+* remove the Utils collection in favour of utility and target object co-location and natural scene hierarchy ([88f2aed](https://github.com/hugemenace/nd/commit/88f2aed0e8f0dfa2cc1748c262bebcfd59172bee))
+
+
+### Bug Fixes
+
+* ensure GN mod use_attribute properties are casted to bools before setting during sync-modifiers operations ([ec9b1ab](https://github.com/hugemenace/nd/commit/ec9b1ab3bfb21d30e43397a7fe3e256ac86c95ed))
+* ensure that CTRL-clicking the lattice operator removes any object associated lattice meshes, not just the modifier(s) ([27c215b](https://github.com/hugemenace/nd/commit/27c215bc919e779def79391463432017119455fc))
+* ensure that performing a boolean operation with an existing cutter doesn't detach that cutter from its current parent ([f6ef118](https://github.com/hugemenace/nd/commit/f6ef118c0cffec9529b05d40aa2d6405135cc429))
+* ensure that the Hydrate operator only cycles through collections in the active scene ([3d66591](https://github.com/hugemenace/nd/commit/3d66591ebe921646b1a4c233e9c56080ecb005dc))
+* ensure that vertex weights are set as expected on new or recalled vertex bevel operations ([15b67c1](https://github.com/hugemenace/nd/commit/15b67c1e79d3aab26866f8d3c581b8a483c1be79))
+* ensure the apply modifiers operator only removes vertex groups created by other ND operators ([4a1fe06](https://github.com/hugemenace/nd/commit/4a1fe0649a1912f7a52a89c07923f08cb6c204c3))
+* ensure the lattice operator's uniform setting is restored when recalling an object lattice ([303b6e0](https://github.com/hugemenace/nd/commit/303b6e0376b42ec7eb136852733f3d0b6d27b334))
+* ensure the triangulate operator's Keep Normals behaviour is consistent across all supported Blender versions ([08d71d6](https://github.com/hugemenace/nd/commit/08d71d626ba795fe87559545e820d63dc637512f))
+* fix the mirror get_preferences error when in alt mode ([4b3a9bb](https://github.com/hugemenace/nd/commit/4b3a9bb1c614cebc686a33dcf8cafcc9890631e8))
+* remove bgl import from points draw handler ([0e53f57](https://github.com/hugemenace/nd/commit/0e53f578ad570b713991376ef6133ad63e070697))
+
 ## [1.48.0](https://github.com/hugemenace/nd/compare/v1.47.0...v1.48.0) (2025-02-19)
 
 

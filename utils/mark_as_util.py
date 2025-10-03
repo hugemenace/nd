@@ -35,6 +35,7 @@ class ND_OT_mark_as_util(bpy.types.Operator):
     bl_label = "Mark as Utility"
     bl_description = """Mark the selected objects as utilities
 CTRL — Unmark the selected objects as utilities
+ALT — Do not use the last object as a parent
 SHIFT — Recursively mark all children of the selected objects as utilities"""
 
 
@@ -48,19 +49,42 @@ SHIFT — Recursively mark all children of the selected objects as utilities"""
     def invoke(self, context, event):
         revert = event.ctrl
         deep = event.shift
+        no_parent = event.alt
 
-        for obj in bpy.context.selected_objects:
-            self.set_util_visibility(obj, not revert, deep=deep)
+        if revert:
+            for obj in bpy.context.selected_objects:
+                self.set_util_visibility(obj, False, deep=deep)
+                if obj.parent:
+                    obj_matrix_world = obj.matrix_world.copy()
+                    obj.parent = None
+                    obj.matrix_world = obj_matrix_world
+            return {'FINISHED'}
+
+        multi_select = len(context.selected_objects) > 1
+        if not multi_select or no_parent:
+            for obj in bpy.context.selected_objects:
+                self.set_util_visibility(obj, True, deep=deep)
+        else:
+            selection = context.selected_objects.copy()
+            selection.remove(context.active_object)
+            for obj in selection:
+                self.set_util_visibility(obj, True, deep=deep)
+                if obj.parent:
+                    obj_matrix_world = obj.matrix_world.copy()
+                    obj.parent = None
+                    obj.matrix_world = obj_matrix_world
+                obj.parent = context.active_object
+                obj.matrix_parent_inverse = context.active_object.matrix_world.inverted()
 
         return {'FINISHED'}
 
 
-    def set_util_visibility(self, obj, visible, deep=False):
-        configure_object_as_util(obj, visible)
+    def set_util_visibility(self, obj, set_util, deep=False):
+        configure_object_as_util(obj, set_util)
 
         if deep:
             for child in obj.children:
-                self.set_util_visibility(child, visible, deep=True)
+                self.set_util_visibility(child, set_util, deep=True)
 
 
 def register():

@@ -162,7 +162,7 @@ class ND_OT_install_asset_lib(bpy.types.Operator):
             new_lib = bpy.context.preferences.filepaths.asset_libraries[index]
             new_lib.name = "ND Asset Library"
             new_lib.path = asset_path
-            new_lib.import_method = 'APPEND_REUSE'
+            new_lib.import_method = 'APPEND'
 
             get_preferences().hide_asset_library_install_prompt = True
 

@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "nd"
-version = "2.0.0"
+version = "2.1.0"
 name = "ND"
 tagline = "Non-Destructive Modeling Toolkit"
 maintainer = "HugeMenace <hello@hugemenace.co>"

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/hugemenace/nd/compare/v2.0.0...v2.1.0) (2025-10-20)
+
+
+### Features
+
+* add generate caps option to fittings and flush fittings option to Pipe generator ([fc14a67](https://github.com/hugemenace/nd/commit/fc14a67e268ed11d569194bbece91ec99763ab70))
+* add Mesh Smooth operator to the asset library ([4c16322](https://github.com/hugemenace/nd/commit/4c1632249f6154437f03e8a4cf5f8f7ba05cb188))
+* add specialised Cable Generator to the asset library ([fe89bcf](https://github.com/hugemenace/nd/commit/fe89bcf044b29a6a5084404c20ef56ae006902c0))
+* add specialised Pipe Generator and fittings to the asset library ([215db2c](https://github.com/hugemenace/nd/commit/215db2c56fce8fdf1173537a87763c415a3c66b2))
+
 ## [2.0.0](https://github.com/hugemenace/nd/compare/v1.48.0...v2.0.0) (2025-10-03)
 
 

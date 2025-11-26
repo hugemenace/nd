@@ -36,13 +36,7 @@ class ND_OT_toggle_custom_view(bpy.types.Operator):
 
 
     def execute(self, context):
-        self.overlay_options = ["show_annotation", "show_axis_x", "show_axis_y", "show_axis_z",
-        "show_bones", "show_cursor", "show_extras", "show_floor",
-        "show_motion_paths", "show_object_origins", "show_object_origins_all", "show_ortho_grid",
-        "show_outline_selected", "show_relationship_lines", "show_stats", "show_text"]
-
         self.prefs = get_preferences()
-        self.pref_keys = list(self.prefs.keys())
         self.overlay = bpy.context.space_data.overlay
 
         if not bpy.context.space_data.overlay.show_overlays:
@@ -54,13 +48,22 @@ class ND_OT_toggle_custom_view(bpy.types.Operator):
     def handle_standard_mode(self):
         bpy.context.space_data.overlay.show_overlays = True
 
-        toggle = any([not "overlay_" + option in self.pref_keys and getattr(self.overlay, option) for option in self.overlay_options])
-        for option in self.overlay_options:
-            pref_option = "overlay_" + option
-            if pref_option in self.pref_keys:
-                setattr(self.overlay, option, self.prefs[pref_option])
-            else:
-                setattr(self.overlay, option, not toggle)
+        self.overlay.show_annotation = self.prefs.overlay_show_annotation or not self.overlay.show_annotation
+        self.overlay.show_axis_x = self.prefs.overlay_show_axis_x or not self.overlay.show_axis_x
+        self.overlay.show_axis_y = self.prefs.overlay_show_axis_y or not self.overlay.show_axis_y
+        self.overlay.show_axis_z = self.prefs.overlay_show_axis_z or not self.overlay.show_axis_z
+        self.overlay.show_bones = self.prefs.overlay_show_bones or not self.overlay.show_bones
+        self.overlay.show_cursor = self.prefs.overlay_show_cursor or not self.overlay.show_cursor
+        self.overlay.show_extras = self.prefs.overlay_show_extras or not self.overlay.show_extras
+        self.overlay.show_floor = self.prefs.overlay_show_floor or not self.overlay.show_floor
+        self.overlay.show_motion_paths = self.prefs.overlay_show_motion_paths or not self.overlay.show_motion_paths
+        self.overlay.show_object_origins = self.prefs.overlay_show_object_origins or not self.overlay.show_object_origins
+        self.overlay.show_object_origins_all = self.prefs.overlay_show_object_origins_all or not self.overlay.show_object_origins_all
+        self.overlay.show_ortho_grid = self.prefs.overlay_show_ortho_grid or not self.overlay.show_ortho_grid
+        self.overlay.show_outline_selected = self.prefs.overlay_show_outline_selected or not self.overlay.show_outline_selected
+        self.overlay.show_relationship_lines = self.prefs.overlay_show_relationship_lines or not self.overlay.show_relationship_lines
+        self.overlay.show_stats = self.prefs.overlay_show_stats or not self.overlay.show_stats
+        self.overlay.show_text = self.prefs.overlay_show_text or not self.overlay.show_text
 
         return {'FINISHED'}
 
@@ -68,12 +71,22 @@ class ND_OT_toggle_custom_view(bpy.types.Operator):
     def handle_recovery_mode(self):
         bpy.context.space_data.overlay.show_overlays = True
 
-        for option in self.overlay_options:
-            pref_option = "overlay_" + option
-            if pref_option in self.pref_keys:
-                setattr(self.overlay, option, self.prefs[pref_option])
-            else:
-                setattr(self.overlay, option, False)
+        self.overlay.show_annotation = self.prefs.overlay_show_annotation
+        self.overlay.show_axis_x = self.prefs.overlay_show_axis_x
+        self.overlay.show_axis_y = self.prefs.overlay_show_axis_y
+        self.overlay.show_axis_z = self.prefs.overlay_show_axis_z
+        self.overlay.show_bones = self.prefs.overlay_show_bones
+        self.overlay.show_cursor = self.prefs.overlay_show_cursor
+        self.overlay.show_extras = self.prefs.overlay_show_extras
+        self.overlay.show_floor = self.prefs.overlay_show_floor
+        self.overlay.show_motion_paths = self.prefs.overlay_show_motion_paths
+        self.overlay.show_object_origins = self.prefs.overlay_show_object_origins
+        self.overlay.show_object_origins_all = self.prefs.overlay_show_object_origins_all
+        self.overlay.show_ortho_grid = self.prefs.overlay_show_ortho_grid
+        self.overlay.show_outline_selected = self.prefs.overlay_show_outline_selected
+        self.overlay.show_relationship_lines = self.prefs.overlay_show_relationship_lines
+        self.overlay.show_stats = self.prefs.overlay_show_stats
+        self.overlay.show_text = self.prefs.overlay_show_text
 
         return {'FINISHED'}
 

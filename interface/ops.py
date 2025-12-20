@@ -62,6 +62,8 @@ bevel_ops = [
     ("nd.vertex_bevel", 'VERTEXSEL', None, None, False),
     ("nd.edge_bevel", 'EDGESEL', None, None, False),
     ("nd.edge_bevel_attr", 'UV_EDGESEL', None, None, False),
+    None, # Separator
+    ("nd.bevel_resolution", 'MOD_DECIM', None, None, False),
 ]
 
 extrusion_ops = [

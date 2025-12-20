@@ -30,6 +30,7 @@ from . import vertex_bevel
 from . import edge_bevel
 from . import edge_bevel_attr
 from . import bevel
+from . import bevel_resolution
 
 
 registerables = (
@@ -37,6 +38,7 @@ registerables = (
     edge_bevel,
     edge_bevel_attr,
     bevel,
+    bevel_resolution,
 )
 
 

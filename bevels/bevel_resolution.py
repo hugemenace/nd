@@ -244,9 +244,8 @@ def draw_text_callback(self):
         draw_property(
             self,
             "Factor: {}".format(self.format_change_factor()),
-            self.generate_step_hint(1, 1),
+            self.generate_step_hint(1),
             active=self.key_no_modifiers,
-            alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,
             input_stream=self.segment_change_input_stream)
     else:
@@ -262,9 +261,8 @@ def draw_text_callback(self):
     draw_property(
             self,
             "Minimum: {}".format(self.minimum_segments),
-            self.generate_key_hint("Ctrl", self.generate_step_hint(1, 1)),
+            self.generate_key_hint("Ctrl", self.generate_step_hint(1)),
             active=self.key_ctrl,
-            alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,
             input_stream=self.segment_change_input_stream)
 

@@ -39,23 +39,15 @@ from .. lib.polling import ctx_obj_mode, list_ok
 class ND_OT_bevel_resolution(BaseOperator):
     bl_idname = "nd.bevel_resolution"
     bl_label = "Bevel Resolution"
-    bl_description = """Adjust Bevel resolution of selected objects by some constant offset or a factor"""
+    bl_description = """Adjust all bevel resolutions for the selected objects"""
 
 
     def do_modal(self, context, event):
-        segment_factor = 1 if self.key_shift or self.change_mode == self.change_modes.index("MULTIPLICATIVE") else 2
-        
-        
-        if self.key_numeric_input:
-            self.segment_change_input_stream = update_stream(self.segment_change_input_stream, event.type)
-            self.segment_change = get_stream_value(self.segment_change_input_stream)
-            self.dirty = True
+        segment_factor = 1 if self.key_shift or self.change_mode == self.change_modes.index("FACTOR") else 2
 
         if self.key_reset:
-            if has_stream(self.segment_change_input_stream) and self.hard_stream_reset or no_stream(self.segment_change_input_stream):
-                self.segment_change = 0
-                self.dirty = True
-            self.segment_change_input_stream = new_stream()
+            self.segment_change = 0
+            self.dirty = True
 
         if pressed(event, {'E'}):
             for obj in self.selected_objects:
@@ -73,31 +65,45 @@ class ND_OT_bevel_resolution(BaseOperator):
             self.capture_mods(context)
             self.dirty = True
 
-        if self.change_mode == self.change_modes.index('MULTIPLICATIVE'):
+        if self.change_mode == self.change_modes.index('FACTOR'):
             if pressed(event, {'R'}):
                 self.round_mode = (self.round_mode + 1) % len(self.round_modes)
                 self.dirty = True
 
-        if self.key_step_up and no_stream(self.segment_change_input_stream):
+        if self.key_step_up:
             if self.key_no_modifiers:
                 self.segment_change = self.segment_change + segment_factor
                 self.dirty = True
             elif self.extend_mouse_values:
                 self.segment_change = self.segment_change + segment_factor
+                self.dirty = True
+            elif self.key_ctrl:
+                self.minimum_segments = self.minimum_segments + 1
                 self.dirty = True
 
-        if self.key_step_down and no_stream(self.segment_change_input_stream):
+        if self.key_step_down:
             if self.key_no_modifiers:
                 self.segment_change = self.segment_change - segment_factor
                 self.dirty = True
             elif self.extend_mouse_values:
                 self.segment_change = self.segment_change - segment_factor
+                self.dirty = True
+            elif self.key_ctrl:
+                self.minimum_segments = max(self.minimum_segments - 1, 1)
                 self.dirty = True
                 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.segment_change_input_stream):
+            if self.key_no_modifiers:
                 self.segment_change = self.segment_change + self.mouse_step 
                 self.dirty = True
+            elif self.key_ctrl:
+                self.minimum_segments = max(self.minimum_segments + self.mouse_step, 1)
+                self.dirty = True
+                
+
+                
+        if self.change_mode == self.change_modes.index('FACTOR'):
+            self.segment_change = max( -9, min(9, self.segment_change))
 
         if self.key_confirm:
             self.finish(context)
@@ -116,11 +122,12 @@ class ND_OT_bevel_resolution(BaseOperator):
         self.dirty = False
 
         self.segment_change = 0
+        self.minimum_segments = 2
 
-        self.change_modes = ['ADDATIVE', 'MULTIPLICATIVE']
-        self.change_mode = self.change_modes.index('ADDATIVE')
+        self.change_modes = ['COUNT', 'FACTOR']
+        self.change_mode = self.change_modes.index('COUNT')
 
-        self.affect_modes = ['EDGE BEVELS', 'LAST', 'ALL']
+        self.affect_modes = ['EDGE BEVELS', 'VERTEX BEVELS', 'ALL']
         self.affect_mode = self.affect_modes.index('EDGE BEVELS')
 
         self.round_modes = ['ROUND', 'CEIL', 'FLOOR']
@@ -129,7 +136,6 @@ class ND_OT_bevel_resolution(BaseOperator):
         self.segment_change_input_stream = new_stream()
 
         self.target_object = context.active_object
-        self.summoned_mod_index = 0
         
         self.capture_mods(context)
 
@@ -157,10 +163,10 @@ class ND_OT_bevel_resolution(BaseOperator):
                 pass
 
             elif self.affect_mode == self.affect_modes.index('EDGE BEVELS'):
-                mods = [mod for mod in mods if "ND B" in mod.name]
-
-            elif self.affect_mode == self.affect_modes.index('LAST'):
-                mods = [mods[-1]]
+                mods = [mod for mod in mods if mod.affect == 'EDGES']
+                
+            elif self.affect_mode == self.affect_modes.index('VERTEX BEVELS'):
+                mods = [mod for mod in mods if mod.affect == 'VERTICES']
 
             else:
                 pass
@@ -179,6 +185,13 @@ class ND_OT_bevel_resolution(BaseOperator):
             return self.segment_change +1
         else:
             return 1 / (-self.segment_change +1)
+        
+        
+    def format_change_factor(self):
+        if self.segment_change >= 0:
+            return self.segment_change +1
+        else:
+            return "1 / {}".format(-self.segment_change +1)
 
 
     @classmethod
@@ -188,22 +201,22 @@ class ND_OT_bevel_resolution(BaseOperator):
 
 
     def operate(self, context):
-        print(self.change_mode + self.change_modes.index('ADDATIVE'))
+        print(self.change_mode + self.change_modes.index('COUNT'))
         for mod in self.bevel_mods:
             
             segment_prev = self.bevel_segments_prev[self.bevel_mods.index((mod))]
-            if self.change_mode == self.change_modes.index('MULTIPLICATIVE'):
+            if self.change_mode == self.change_modes.index('FACTOR'):
                 segment_new = segment_prev * self.calc_change_factor()
                 
                 if self.round_mode == self.round_modes.index('ROUND'):
-                    mod.segments = round(segment_new)
+                    mod.segments = max(round(segment_new), self.minimum_segments)
                 elif self.round_mode == self.round_modes.index('CEIL'):
-                    mod.segments = ceil(segment_new)
+                    mod.segments = max(ceil(segment_new), self.minimum_segments)
                 elif self.round_mode == self.round_modes.index('FLOOR'):
-                    mod.segments = floor(segment_new)
-
-            elif self.change_mode == self.change_modes.index('ADDATIVE'):
-                mod.segments = max(1, segment_prev + self.segment_change)
+                    mod.segments = max(floor(segment_new), self.minimum_segments)
+                    
+            elif self.change_mode == self.change_modes.index('COUNT'):
+                mod.segments = max(segment_prev + self.segment_change, self.minimum_segments)
 
         self.dirty = False
 
@@ -227,11 +240,11 @@ class ND_OT_bevel_resolution(BaseOperator):
 def draw_text_callback(self):
     draw_header(self)
 
-    if self.change_mode == self.change_modes.index('MULTIPLICATIVE'):
+    if self.change_mode == self.change_modes.index('FACTOR'):
         draw_property(
             self,
-            "Factor: {}".format(self.calc_change_factor()),
-            self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(1, 1)),
+            "Factor: {}".format(self.format_change_factor()),
+            self.generate_step_hint(1, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,
@@ -240,8 +253,17 @@ def draw_text_callback(self):
         draw_property(
             self,
             "Offset: {}".format(self.segment_change),
-            self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
+            self.generate_step_hint(2, 1),
             active=self.key_no_modifiers,
+            alt_mode=self.key_shift_no_modifiers,
+            mouse_value=True,
+            input_stream=self.segment_change_input_stream)
+    
+    draw_property(
+            self,
+            "Minimum: {}".format(self.minimum_segments),
+            self.generate_key_hint("Ctrl", self.generate_step_hint(1, 1)),
+            active=self.key_ctrl,
             alt_mode=self.key_shift_no_modifiers,
             mouse_value=True,
             input_stream=self.segment_change_input_stream)
@@ -256,7 +278,7 @@ def draw_text_callback(self):
         "Affect [A]: {}".format(self.affect_modes[self.affect_mode].capitalize()),
         ", ".join([m.capitalize() for m in self.affect_modes]))
 
-    if self.change_mode == self.change_modes.index('MULTIPLICATIVE'):
+    if self.change_mode == self.change_modes.index('FACTOR'):
         draw_hint(
             self,
             "Round [R]: {}".format(self.round_modes[self.round_mode].capitalize()),

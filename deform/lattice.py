@@ -82,15 +82,15 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_v = self.lattice_points_u
                     self.lattice_points_w = self.lattice_points_u
 
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 self.lattice_points_v_input_stream = update_stream(self.lattice_points_v_input_stream, event.type)
                 self.lattice_points_v = int(get_stream_value(self.lattice_points_v_input_stream, min_value=2))
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.lattice_points_w_input_stream = update_stream(self.lattice_points_w_input_stream, event.type)
                 self.lattice_points_w = int(get_stream_value(self.lattice_points_w_input_stream, min_value=2))
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
@@ -105,16 +105,16 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_w_input_stream = new_stream()
 
                 self.lattice_points_u_input_stream = new_stream()
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 if has_stream(self.lattice_points_v_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_v_input_stream):
                     self.lattice_points_v = 2
-                    self.dirty = True
+                    self.mark_dirty()
                 self.lattice_points_v_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.lattice_points_w_input_stream) and self.hard_stream_reset or no_stream(self.lattice_points_w_input_stream):
                     self.lattice_points_w = 2
-                    self.dirty = True
+                    self.mark_dirty()
                 self.lattice_points_w_input_stream = new_stream()
 
         if self.key_step_up:
@@ -122,51 +122,51 @@ CTRL — Remove existing modifiers"""
                 self.lattice_points_u += 1
                 self.lattice_points_v = self.lattice_points_u
                 self.lattice_points_w = self.lattice_points_u
-                self.dirty = True
+                self.mark_dirty()
             elif not self.uniform:
                 if no_stream(self.lattice_points_u_input_stream) and self.key_no_modifiers:
                     self.lattice_points_u += 1
-                    self.dirty = True
+                    self.mark_dirty()
                 elif no_stream(self.lattice_points_v_input_stream) and self.key_alt:
                     self.lattice_points_v += 1
-                    self.dirty = True
+                    self.mark_dirty()
                 elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w += 1
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u = max(2, self.lattice_points_u - 1)
                 self.lattice_points_v = self.lattice_points_u
                 self.lattice_points_w = self.lattice_points_u
-                self.dirty = True
+                self.mark_dirty()
             elif not self.uniform:
                 if no_stream(self.lattice_points_u_input_stream) and self.key_no_modifiers:
                     self.lattice_points_u = max(2, self.lattice_points_u - 1)
-                    self.dirty = True
+                    self.mark_dirty()
                 elif no_stream(self.lattice_points_v_input_stream) and self.key_alt:
                     self.lattice_points_v = max(2, self.lattice_points_v - 1)
-                    self.dirty = True
+                    self.mark_dirty()
                 elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w = max(2, self.lattice_points_w - 1)
-                    self.dirty = True
+                    self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.lattice_points_u_input_stream) and self.uniform:
+            if no_stream(self.lattice_points_u_input_stream) and self.uniform and self.has_mouse_step:
                 self.lattice_points_u = max(2, self.lattice_points_u + self.mouse_step)
                 self.lattice_points_v = self.lattice_points_u
                 self.lattice_points_w = self.lattice_points_u
-                self.dirty = True
-            elif not self.uniform:
+                self.mark_dirty()
+            elif not self.uniform and self.has_mouse_step:
                 if no_stream(self.lattice_points_u_input_stream) and self.key_no_modifiers:
                     self.lattice_points_u = max(2, self.lattice_points_u + self.mouse_step)
-                    self.dirty = True
+                    self.mark_dirty()
                 elif no_stream(self.lattice_points_v_input_stream) and self.key_alt:
                     self.lattice_points_v = max(2, self.lattice_points_v + self.mouse_step)
-                    self.dirty = True
+                    self.mark_dirty()
                 elif no_stream(self.lattice_points_w_input_stream) and self.key_ctrl:
                     self.lattice_points_w = max(2, self.lattice_points_w + self.mouse_step)
-                    self.dirty = True
+                    self.mark_dirty()
 
 
     def do_invoke(self, context, event):

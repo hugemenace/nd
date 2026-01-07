@@ -69,26 +69,26 @@ SHIFT — Cycle through the modifier stack"""
         if self.key_step_up:
             if self.mod_cycle:
                 self.mod_current_index = min(self.mod_current_index + 1, self.mod_count - 1)
-                self.dirty = True
+                self.mark_dirty()
             elif not self.mod_cycle and self.util_count > 0:
                 self.util_current_index = (self.util_current_index + 1) % self.util_count
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.mod_cycle:
                 self.mod_current_index = max(self.mod_current_index - 1, -1)
-                self.dirty = True
+                self.mark_dirty()
             elif not self.mod_cycle and self.util_count > 0:
                 self.util_current_index = (self.util_current_index - 1) % self.util_count
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if self.mod_cycle:
+            if self.mod_cycle and self.has_mouse_step:
                 self.mod_current_index = max(-1, min(self.mod_current_index + self.mouse_step, self.mod_count - 1))
-                self.dirty = True
-            elif not self.mod_cycle and self.util_count > 0:
+                self.mark_dirty()
+            elif not self.mod_cycle and self.util_count > 0 and self.has_mouse_step:
                 self.util_current_index = (self.util_current_index + self.mouse_step) % self.util_count
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

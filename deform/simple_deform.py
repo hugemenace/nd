@@ -83,19 +83,19 @@ CTRL — Remove existing modifiers"""
                     self.factor_input_stream = update_stream(self.factor_input_stream, event.type)
                     self.factor = get_stream_value(self.factor_input_stream)
 
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if self.is_angular[self.methods[self.current_method]]:
                     if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
                         self.angle = 0
-                        self.dirty = True
+                        self.mark_dirty()
                     self.angle_input_stream = new_stream()
                 else:
                     if has_stream(self.factor_input_stream) and self.hard_stream_reset or no_stream(self.factor_input_stream):
                         self.factor = 0
-                        self.dirty = True
+                        self.mark_dirty()
                     self.factor_input_stream = new_stream()
 
         if self.key_step_up:
@@ -105,7 +105,7 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.factor_input_stream):
                     self.factor = round_dec(self.factor + factor_factor)
 
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.key_no_modifiers:
@@ -114,7 +114,7 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.factor_input_stream):
                     self.factor = round_dec(self.factor - factor_factor)
 
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if self.key_no_modifiers:
@@ -123,7 +123,7 @@ CTRL — Remove existing modifiers"""
                 elif no_stream(self.factor_input_stream):
                     self.factor += self.mouse_value
 
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

@@ -70,27 +70,27 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 if self.key_no_modifiers:
                     self.inset_input_stream = update_stream(self.inset_input_stream, event.type)
                     self.inset = get_stream_value(self.inset_input_stream, self.unit_scaled_factor)
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.key_reset:
             if self.stage == 1:
                 if self.key_no_modifiers:
                     if has_stream(self.inset_input_stream) and self.hard_stream_reset or no_stream(self.inset_input_stream):
                         self.inset = 0
-                        self.dirty = True
+                        self.mark_dirty()
                     self.inset_input_stream = new_stream()
 
         if self.key_step_up:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = round_dec(self.inset + self.step_size)
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.key_step_down:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = max(0, round_dec(self.inset - self.step_size))
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.stage == 1 and self.key_confirm:
             self.finish(context)
@@ -100,7 +100,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             if self.has_valid_selection(context):
                 self.isolate_geometry(context)
                 self.stage = 1
-                self.dirty = True
+                self.mark_dirty()
 
         if self.stage == 0 and self.key_select:
             return {'PASS_THROUGH'}
@@ -109,7 +109,7 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = max(0, self.inset + self.mouse_value)
-                    self.dirty = True
+                    self.mark_dirty()
 
 
     def do_invoke(self, context, event):

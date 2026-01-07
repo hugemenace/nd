@@ -66,8 +66,12 @@ class BaseOperator(bpy.types.Operator):
         pass
 
 
-    def invoke(self, context, event):
+    def mark_dirty(self):
         self.dirty = True
+
+
+    def invoke(self, context, event):
+        self.mark_dirty()
 
         self.unit_factor = get_scene_unit_factor()
         self.unit_suffix = get_scene_unit_suffix()
@@ -83,6 +87,16 @@ class BaseOperator(bpy.types.Operator):
         self.hard_stream_reset = get_preferences().overlay_reset_key_behaviour == 'RESET'
 
         return self.do_invoke(context, event)
+
+
+    def update_if_dirty(self, context):
+        if not self.dirty:
+            return False
+
+        self.operate(context)
+        self.dirty = False
+
+        return True
 
 
     def modal(self, context, event):
@@ -102,31 +116,15 @@ class BaseOperator(bpy.types.Operator):
 
         on_cancel_fn = self.modal_config.get('ON_CANCEL', None)
         if on_cancel_fn and self.key_cancel:
-            print("Running on_cancel_fn")
-            on_cancel_fn(self, context)
-            return {'CANCELLED'}
+            return on_cancel_fn(self, context) or {'CANCELLED'}
 
         on_confirm_alt_fn = self.modal_config.get('ON_CONFIRM_ALT', None)
         if on_confirm_alt_fn and self.key_confirm_alternative:
-            print("Running on_confirm_alt_fn")
-            on_confirm_alt_fn(self, context)
-            return {'FINISHED'}
-
-        on_confirm_alt_ret_fn = self.modal_config.get('ON_CONFIRM_ALT_RET', None)
-        if on_confirm_alt_ret_fn and self.key_confirm_alternative:
-            print("Running on_confirm_alt_ret_fn")
-            return on_confirm_alt_ret_fn(self, context)
+            return on_confirm_alt_fn(self, context) or {'FINISHED'}
 
         on_confirm_fn = self.modal_config.get('ON_CONFIRM', None)
         if on_confirm_fn and self.key_confirm:
-            print("Running on_confirm_fn")
-            on_confirm_fn(self, context)
-            return {'FINISHED'}
-
-        on_confirm_ret_fn = self.modal_config.get('ON_CONFIRM_RET', None)
-        if on_confirm_ret_fn and self.key_confirm:
-            print("Running on_confirm_ret_fn")
-            return on_confirm_ret_fn(self, context)
+            return on_confirm_fn(self, context) or {'FINISHED'}
 
         if self.modal_config.get('MOVEMENT_PASSTHROUGH', False) and self.key_movement_passthrough:
             return {'PASS_THROUGH'}
@@ -137,18 +135,16 @@ class BaseOperator(bpy.types.Operator):
         for key, fn in self.key_callbacks.items():
             if pressed(event, {key}):
                 fn(self, context, event)
-                self.dirty = True
+                self.mark_dirty()
 
         # Subclass hook-in
-        override_return = self.do_modal(context, event)
+        return_override = self.do_modal(context, event)
 
-        if self.dirty:
-            self.operate(context)
-            self.dirty = False
+        self.update_if_dirty(context)
 
         update_overlay(self, context, event)
 
-        return override_return if override_return else {'RUNNING_MODAL'}
+        return return_override or {'RUNNING_MODAL'}
 
 
     def yes_no_str(self, value):

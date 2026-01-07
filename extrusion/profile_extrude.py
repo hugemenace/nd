@@ -81,47 +81,47 @@ CTRL — Remove existing modifiers"""
             if self.key_no_modifiers:
                 self.extrusion_length_input_stream = update_stream(self.extrusion_length_input_stream, event.type)
                 self.extrusion_length = get_stream_value(self.extrusion_length_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
                 self.offset = get_stream_value(self.offset_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.extrusion_length_input_stream) and self.hard_stream_reset or no_stream(self.extrusion_length_input_stream):
                     self.extrusion_length = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.extrusion_length_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.offset_input_stream) and self.hard_stream_reset or no_stream(self.offset_input_stream):
                     self.offset = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.offset_input_stream = new_stream()
 
         if self.key_step_up:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = round_dec(self.extrusion_length + self.step_size)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset = round_dec(self.offset + self.step_size)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, round_dec(self.extrusion_length - self.step_size))
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset = round_dec(self.offset - self.step_size)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length + self.mouse_value)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

@@ -63,17 +63,17 @@ class ND_OT_hydrate(BaseOperator):
         if self.key_step_up:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection + 1) % len(self.scene_collections)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection - 1) % len(self.scene_collections)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers:
+            if self.key_no_modifiers and self.has_mouse_step:
                 self.active_collection = (self.active_collection + self.mouse_step) % len(self.scene_collections)
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

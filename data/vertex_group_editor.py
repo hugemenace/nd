@@ -71,7 +71,7 @@ class ND_OT_vertex_group_editor(BaseOperator):
             if self.key_no_modifiers:
                 self.weight_input_stream = update_stream(self.weight_input_stream, event.type)
                 self.weight = get_stream_value(self.weight_input_stream)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
@@ -80,29 +80,29 @@ class ND_OT_vertex_group_editor(BaseOperator):
                         self.distance = sum(self.starting_distances) / len(self.starting_distances)
                     else:
                         self.distance = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.weight_input_stream = new_stream()
 
         if self.key_step_up:
             if not self.is_editing and self.key_no_modifiers:
                 self.vertex_group_index = (self.vertex_group_index + 1) % len(self.vertex_groups)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_editing and self.key_no_modifiers:
                 self.weight = min(self.weight + weight_factor, 1.0)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if not self.is_editing and self.key_no_modifiers:
                 self.vertex_group_index = (self.vertex_group_index - 1) % len(self.vertex_groups)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_editing and self.key_no_modifiers:
                 self.weight = max(self.weight - weight_factor, 0.0)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight + self.mouse_value))
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

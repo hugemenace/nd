@@ -81,26 +81,26 @@ CTRL — Remove existing modifiers"""
             if self.key_no_modifiers:
                 self.count_streams[self.axis] = update_stream(self.count_streams[self.axis], event.type)
                 self.axes[self.axis][IDX_COUNT] = int(get_stream_value(self.count_streams[self.axis]))
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.offset_streams[self.axis] = update_stream(self.offset_streams[self.axis], event.type)
                 if self.axes[self.axis][IDX_RELATIVE]:
                     self.axes[self.axis][IDX_OFFSET] = get_stream_value(self.offset_streams[self.axis])
                 else:
                     self.axes[self.axis][IDX_OFFSET] = get_stream_value(self.offset_streams[self.axis], self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.offset_streams[self.axis]) and self.hard_stream_reset or no_stream(self.offset_streams[self.axis]):
                     self.axes[self.axis][IDX_COUNT] = 1
                     self.axes[self.axis][IDX_OFFSET] = abs(self.axes[self.axis][IDX_OFFSET])
-                    self.dirty = True
+                    self.mark_dirty()
                 self.count_streams[self.axis] = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.offset_streams[self.axis]) and self.hard_stream_reset or no_stream(self.offset_streams[self.axis]):
                     self.axes[self.axis][IDX_OFFSET] = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.offset_streams[self.axis] = new_stream()
 
         if self.key_step_up:
@@ -113,11 +113,11 @@ CTRL — Remove existing modifiers"""
                 else:
                     self.axes[self.axis][IDX_COUNT] = new_count
 
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 step = relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
                 self.axes[self.axis][IDX_OFFSET] = round_dec(self.axes[self.axis][IDX_OFFSET] + step)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
@@ -129,14 +129,14 @@ CTRL — Remove existing modifiers"""
                 else:
                     self.axes[self.axis][IDX_COUNT] = new_count
 
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 step = relative_offset_step_size if self.axes[self.axis][IDX_RELATIVE] else self.step_size
                 self.axes[self.axis][IDX_OFFSET] = round_dec(self.axes[self.axis][IDX_OFFSET] - step)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers and abs(self.mouse_step) > 0:
+            if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers and self.has_mouse_step:
                 if self.mouse_step > 0:
                     new_count = self.axes[self.axis][IDX_COUNT] + (1 if self.axes[self.axis][IDX_OFFSET] >= 0 else -1)
                 elif self.mouse_step < 0:
@@ -148,10 +148,10 @@ CTRL — Remove existing modifiers"""
                 else:
                     self.axes[self.axis][IDX_COUNT] = new_count
 
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_streams[self.axis]) and self.key_ctrl:
                 self.axes[self.axis][IDX_OFFSET] += self.mouse_value
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

@@ -66,31 +66,31 @@ class ND_OT_bevel_resolution(BaseOperator):
 
         if self.key_reset:
             self.segment_change = 0
-            self.dirty = True
+            self.mark_dirty()
 
         if self.key_step_up:
             if self.key_no_modifiers:
                 self.segment_change = self.segment_change + segment_factor
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.minimum_segments = self.minimum_segments + 1
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.key_no_modifiers:
                 self.segment_change = self.segment_change - segment_factor
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.minimum_segments = max(self.minimum_segments - 1, 1)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers:
+            if self.key_no_modifiers and self.has_mouse_step:
                 self.segment_change = self.segment_change + self.mouse_step
-                self.dirty = True
-            elif self.key_ctrl:
+                self.mark_dirty()
+            elif self.key_ctrl and self.has_mouse_step:
                 self.minimum_segments = max(self.minimum_segments + self.mouse_step, 1)
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

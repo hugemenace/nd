@@ -203,7 +203,7 @@ class ND_OT_snap_align(BaseOperator):
 
         self.reference_obj.hide_set(False)
 
-        self.dirty = True
+        self.mark_dirty()
         self.operate(context)
 
 

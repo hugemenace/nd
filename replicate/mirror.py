@@ -62,8 +62,8 @@ CTRL — Remove existing modifiers"""
     modal_config = {
         'MOVEMENT_PASSTHROUGH': True,
         'ON_CANCEL': lambda cls, context: cls.revert(context),
-        'ON_CONFIRM_RET': lambda cls, context: cls.handle_on_confirm(context),
-        'ON_CONFIRM_ALT_RET': lambda cls, context: cls.handle_on_confirm_alt(context),
+        'ON_CONFIRM': lambda cls, context: cls.handle_on_confirm(context),
+        'ON_CONFIRM_ALT': lambda cls, context: cls.handle_on_confirm_alt(context),
     }
 
 

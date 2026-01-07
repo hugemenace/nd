@@ -68,7 +68,7 @@ class ND_OT_edge_length(BaseOperator):
             if self.key_no_modifiers:
                 self.distance_input_stream = update_stream(self.distance_input_stream, event.type)
                 self.distance = get_stream_value(self.distance_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
@@ -77,23 +77,23 @@ class ND_OT_edge_length(BaseOperator):
                         self.distance = sum(self.starting_distances) / len(self.starting_distances)
                     else:
                         self.distance = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.distance_input_stream = new_stream()
 
         if self.key_step_up:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance = round_dec(self.distance + self.step_size)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance = round_dec(self.distance - self.step_size)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance = max(0, self.distance + self.mouse_value) if not self.offset_distance else self.distance + self.mouse_value
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

@@ -73,40 +73,40 @@ class ND_OT_flare(BaseOperator):
             if self.key_no_modifiers:
                 self.rotation_input_stream = update_stream(self.rotation_input_stream, event.type)
                 self.rotation = get_stream_value(self.rotation_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 self.height_offset_input_stream = update_stream(self.height_offset_input_stream, event.type)
                 self.height_offset = get_stream_value(self.height_offset_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.scale_input_stream = update_stream(self.scale_input_stream, event.type)
                 self.scale = get_stream_value(self.scale_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl_alt:
                 self.energy_offset_input_stream = update_stream(self.energy_offset_input_stream, event.type)
                 self.energy_offset = get_stream_value(self.energy_offset_input_stream)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.rotation_input_stream) and self.hard_stream_reset or no_stream(self.rotation_input_stream):
                     self.rotation = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.rotation_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.height_offset_input_stream) and self.hard_stream_reset or no_stream(self.height_offset_input_stream):
                     self.height_offset = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.height_offset_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.scale_input_stream) and self.hard_stream_reset or no_stream(self.scale_input_stream):
                     self.scale = 1
-                    self.dirty = True
+                    self.mark_dirty()
                 self.scale_input_stream = new_stream()
             elif self.key_ctrl_alt:
                 if has_stream(self.enery_offset_input_stream) and self.hard_stream_reset or no_stream(self.enery_offset_input_stream):
                     self.enery_offset = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.enery_offset_input_stream = new_stream()
 
         if self.key_step_up:
@@ -118,7 +118,7 @@ class ND_OT_flare(BaseOperator):
                 self.scale += scale_factor
             elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset += energy_factor
-            self.dirty = True
+            self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.rotation_input_stream) and self.key_no_modifiers:
@@ -129,7 +129,7 @@ class ND_OT_flare(BaseOperator):
                 self.scale = max(0, self.scale - scale_factor)
             elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset -= energy_factor
-            self.dirty = True
+            self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.height_offset_input_stream) and self.key_alt:
@@ -140,7 +140,7 @@ class ND_OT_flare(BaseOperator):
                 self.energy_offset += self.mouse_value * 2500
             elif no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation + self.mouse_value_mag) % 360
-            self.dirty = True
+            self.mark_dirty()
 
 
     def reset_values(self, context):

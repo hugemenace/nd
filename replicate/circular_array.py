@@ -89,65 +89,65 @@ CTRL — Remove existing modifiers"""
             if self.key_no_modifiers:
                 self.count_input_stream = update_stream(self.count_input_stream, event.type)
                 self.count = int(get_stream_value(self.count_input_stream, min_value=2))
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
                 self.angle = get_stream_value(self.angle_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
                 self.offset = get_stream_value(self.offset_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.count_input_stream) and self.hard_stream_reset or no_stream(self.count_input_stream):
                     self.count = 2
-                    self.dirty = True
+                    self.mark_dirty()
                 self.count_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
                     self.angle = 360
-                    self.dirty = True
+                    self.mark_dirty()
                 self.angle_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.offset_input_stream) and self.hard_stream_reset or no_stream(self.offset_input_stream):
                     self.offset = self.reference_obj.dimensions[self.axis] if self.single_obj_mode else 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.offset_input_stream = new_stream()
 
         if self.key_step_up:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = min(360, self.angle + angle_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset = round_dec(self.offset + self.step_size)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = 2 if self.count == 1 else self.count + count_factor
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, self.angle - angle_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset = round_dec(self.offset - self.step_size)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = max(2, self.count - count_factor)
-                self.dirty = True
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
-                self.dirty = True
-            elif no_stream(self.count_input_stream) and self.key_no_modifiers:
+                self.mark_dirty()
+            elif no_stream(self.count_input_stream) and self.key_no_modifiers and self.has_mouse_step:
                 self.count = max(2, self.count + self.mouse_step)
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):

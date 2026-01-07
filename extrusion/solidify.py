@@ -51,6 +51,12 @@ class ND_OT_solidify(BaseOperator):
 CTRL — Remove existing modifiers"""
 
 
+    key_callbacks = {
+        'W': lambda cls, context, event: cls.handle_cycle_weighting(context, event),
+        'M': lambda cls, context, event: cls.handle_toggle_complex_mode(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_numeric_input:
             if self.key_no_modifiers:
@@ -73,14 +79,6 @@ CTRL — Remove existing modifiers"""
                     self.offset = 0
                     self.dirty = True
                 self.offset_input_stream = new_stream()
-
-        if pressed(event, {'W'}):
-            self.weighting = self.weighting + 1 if self.weighting < 1 else -1
-            self.dirty = True
-
-        if pressed(event, {'M'}):
-            self.complex_mode = not self.complex_mode
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
@@ -157,6 +155,14 @@ CTRL — Remove existing modifiers"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_cycle_weighting(self, context, event):
+        self.weighting = self.weighting + 1 if self.weighting < 1 else -1
+
+
+    def handle_toggle_complex_mode(self, context, event):
+        self.complex_mode = not self.complex_mode
 
 
     def prepare_new_operator(self, context):

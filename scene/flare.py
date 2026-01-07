@@ -44,6 +44,13 @@ class ND_OT_flare(BaseOperator):
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'R': lambda cls, context, event: cls.handle_generate_rig(context, event),
+        'C': lambda cls, context, event: cls.handle_randomise_colors(context, event),
+        'E': lambda cls, context, event: cls.handle_randomise_energy(context, event),
+    }
+
+
     def do_modal(self, context, event):
         rotation_factor = 1 if self.key_shift else 15
         height_factor = 0.1 if self.key_shift else 1
@@ -89,15 +96,6 @@ class ND_OT_flare(BaseOperator):
                     self.enery_offset = 0
                     self.dirty = True
                 self.enery_offset_input_stream = new_stream()
-
-        if pressed(event, {'R'}):
-            self.generate_rig(context)
-
-        if pressed(event, {'C'}):
-            self.randomise_colors(context)
-
-        if pressed(event, {'E'}):
-            self.randomise_energy(context)
 
         if self.key_step_up:
             if no_stream(self.rotation_input_stream) and self.key_no_modifiers:
@@ -193,7 +191,7 @@ class ND_OT_flare(BaseOperator):
             self.prev_lights_snapshot = [(light.data.energy, light.data.size, light.data.color.copy(), light.location.copy()) for light in existing_lights]
         else:
             self.create_empty(context)
-            self.generate_rig(context)
+            self.handle_generate_rig(context, event)
 
         self.operate(context)
 
@@ -233,7 +231,7 @@ class ND_OT_flare(BaseOperator):
         self.lights = []
 
 
-    def generate_rig(self, context):
+    def handle_generate_rig(self, context, event):
         self.regenerated_rig = True
         self.lights = getattr(self, 'lights', [])
 
@@ -246,12 +244,12 @@ class ND_OT_flare(BaseOperator):
         self.operate(context)
 
 
-    def randomise_colors(self, context):
+    def handle_randomise_colors(self, context, event):
         for light, height, energy in self.lights:
             light.data.color = (random(), random(), random())
 
 
-    def randomise_energy(self, context):
+    def handle_randomise_energy(self, context, event):
         self.energy_offset_input_stream = new_stream()
         self.energy_offset = 0
 

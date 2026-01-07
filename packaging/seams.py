@@ -46,6 +46,11 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_toggle_auto_smooth(context, event),
+    }
+
+
     def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else self.base_angle_factor
 
@@ -61,10 +66,6 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
                     self.angle = degrees(context.active_object.data.auto_smooth_angle)
                     self.dirty = True
                 self.angle_input_stream = new_stream()
-
-        if pressed(event, {'A'}):
-            self.commit_auto_smooth = not self.commit_auto_smooth
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
@@ -130,6 +131,10 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_toggle_auto_smooth(self, context, event):
+        self.commit_auto_smooth = not self.commit_auto_smooth
 
 
     def operate(self, context):

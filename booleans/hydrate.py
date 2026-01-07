@@ -42,11 +42,12 @@ class ND_OT_hydrate(BaseOperator):
     bl_options = {'UNDO'}
 
 
-    def do_modal(self, context, event):
-        if pressed(event, {'C'}):
-            self.clear_parent = not self.clear_parent
-            self.dirty = True
+    key_callbacks = {
+        'C': lambda cls, context, event: cls.handle_toggle_clear_parent(context, event),
+    }
 
+
+    def do_modal(self, context, event):
         if self.key_step_up:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection + 1) % len(self.scene_collections)
@@ -91,6 +92,10 @@ class ND_OT_hydrate(BaseOperator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
+
+
+    def handle_toggle_clear_parent(self, context, event):
+        self.clear_parent = not self.clear_parent
 
 
     def get_valid_objects(self, context):

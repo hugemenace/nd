@@ -52,6 +52,16 @@ CTRL — Remove existing modifiers
 SHIFT — Create a stacked bevel modifier"""
 
 
+    key_callbacks = {
+        'H': lambda cls, context, event: cls.handle_toggle_harden_normals(context, event),
+        'C': lambda cls, context, event: cls.handle_toggle_clamp_overlap(context, event),
+        'S': lambda cls, context, event: cls.handle_toggle_loop_slide(context, event),
+        'E': lambda cls, context, event: cls.handle_toggle_enhanced_wireframe(context, event),
+        'W': lambda cls, context, event: cls.handle_cycle_width_type(context, event),
+        'R': lambda cls, context, event: cls.handle_recall_previous_bevel(context, event),
+    }
+
+
     def do_modal(self, context, event):
         profile_factor = 0.01 if self.key_shift else 0.1
         segment_factor = 1 if self.key_shift else 2
@@ -106,31 +116,6 @@ SHIFT — Create a stacked bevel modifier"""
                     self.angle = int(get_preferences().default_smoothing_angle)
                     self.dirty = True
                 self.angle_input_stream = new_stream()
-
-        if pressed(event, {'H'}):
-            self.harden_normals = not self.harden_normals
-            self.dirty = True
-
-        if pressed(event, {'C'}):
-            self.clamp_overlap = not self.clamp_overlap
-            self.dirty = True
-
-        if pressed(event, {'S'}):
-            self.loop_slide = not self.loop_slide
-            self.dirty = True
-
-        if pressed(event, {'E'}):
-            self.target_object.show_wire = not self.target_object.show_wire
-            self.target_object.show_in_front = not self.target_object.show_in_front
-
-        if pressed(event, {'W'}):
-            self.width_type = (self.width_type + 1) % len(self.width_types)
-            self.dirty = True
-
-        if pressed(event, {'R'}) and len(self.current_bevel_mods) > 1:
-            self.summoned_mod_index = (self.summoned_mod_index + 1) % len(self.current_bevel_mods)
-            self.revert(context, True)
-            self.summon_old_operator(context)
 
         if self.key_step_up:
             if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
@@ -269,6 +254,36 @@ SHIFT — Create a stacked bevel modifier"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_exists(target_object) and obj_is_mesh(target_object)
+
+
+    def handle_toggle_harden_normals(self, context, event):
+        self.harden_normals = not self.harden_normals
+
+
+    def handle_toggle_clamp_overlap(self, context, event):
+        self.clamp_overlap = not self.clamp_overlap
+
+
+    def handle_toggle_loop_slide(self, context, event):
+        self.loop_slide = not self.loop_slide
+
+
+    def handle_toggle_enhanced_wireframe(self, context, event):
+        self.target_object.show_wire = not self.target_object.show_wire
+        self.target_object.show_in_front = not self.target_object.show_in_front
+
+
+    def handle_cycle_width_type(self, context, event):
+        self.width_type = (self.width_type + 1) % len(self.width_types)
+
+
+    def handle_recall_previous_bevel(self, context, event):
+        if len(self.current_bevel_mods) <= 1:
+            return
+
+        self.summoned_mod_index = (self.summoned_mod_index + 1) % len(self.current_bevel_mods)
+        self.revert(context, True)
+        self.summon_old_operator(context)
 
 
     def prepare_new_operator(self, context):

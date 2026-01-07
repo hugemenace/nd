@@ -28,7 +28,7 @@
 import bpy
 from . preferences import get_scene_unit_factor, get_scene_unit_suffix, get_scene_unit_scale, get_preferences
 from .. lib.overlay import update_overlay, toggle_pin_overlay, toggle_operator_passthrough
-from .. lib.events import capture_modifier_keys
+from .. lib.events import capture_modifier_keys, pressed
 
 
 class BaseOperator(bpy.types.Operator):
@@ -90,6 +90,11 @@ class BaseOperator(bpy.types.Operator):
 
         # Subclass hook-in
         override_return = self.do_modal(context, event)
+
+        for key, fn in self.key_callbacks.items():
+            if pressed(event, {key}):
+                fn(self, context, event)
+                self.dirty = True
 
         if self.dirty:
             self.operate(context)

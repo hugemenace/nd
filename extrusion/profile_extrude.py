@@ -53,6 +53,13 @@ class ND_OT_profile_extrude(BaseOperator):
 CTRL — Remove existing modifiers"""
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_cycle_extrusion_axis(context, event),
+        'W': lambda cls, context, event: cls.handle_cycle_weighting(context, event),
+        'E': lambda cls, context, event: cls.handle_toggle_calculate_edges(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_numeric_input:
             if self.key_no_modifiers:
@@ -75,18 +82,6 @@ CTRL — Remove existing modifiers"""
                     self.offset = 0
                     self.dirty = True
                 self.offset_input_stream = new_stream()
-
-        if pressed(event, {'A'}):
-            self.axis = (self.axis + 1) % 3
-            self.dirty = True
-
-        if pressed(event, {'W'}):
-            self.weighting = self.weighting + 1 if self.weighting < 1 else -1
-            self.dirty = True
-
-        if pressed(event, {'E'}):
-            self.calculate_edges = not self.calculate_edges
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
@@ -170,6 +165,18 @@ CTRL — Remove existing modifiers"""
 
         if ctx_edit_mode(context):
             return obj_is_mesh(context.active_object)
+
+
+    def handle_cycle_extrusion_axis(self, context, event):
+        self.axis = (self.axis + 1) % 3
+
+
+    def handle_cycle_weighting(self, context, event):
+        self.weighting = self.weighting + 1 if self.weighting < 1 else -1
+
+
+    def handle_toggle_calculate_edges(self, context, event):
+        self.calculate_edges = not self.calculate_edges
 
 
     def prepare_new_operator(self, context):

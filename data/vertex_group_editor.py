@@ -46,6 +46,12 @@ class ND_OT_vertex_group_editor(BaseOperator):
     bl_description = "Edit vertex groups and member vertex weights interactively"
 
 
+    key_callbacks = {
+        'S': lambda cls, context, event: cls.handle_toggle_set_weight(context, event),
+        'R': lambda cls, context, event: cls.handle_randomize_weights(context, event),
+    }
+
+
     def do_modal(self, context, event):
         weight_factor = 0.01 if self.key_shift else 0.1
 
@@ -64,15 +70,6 @@ class ND_OT_vertex_group_editor(BaseOperator):
                         self.distance = 0
                     self.dirty = True
                 self.weight_input_stream = new_stream()
-
-        if pressed(event, {'S'}):
-            self.weight = 1.0
-            self.is_editing = not self.is_editing
-            self.dirty = True
-
-        if pressed(event, {'R'}):
-            self.set_vertex_weights(randomize=True)
-            self.dirty = True
 
         if self.key_step_up:
             if not self.is_editing and self.key_no_modifiers:
@@ -167,6 +164,15 @@ class ND_OT_vertex_group_editor(BaseOperator):
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_toggle_set_weight(self, context, event):
+        self.weight = 1.0
+        self.is_editing = not self.is_editing
+
+
+    def handle_randomize_weights(self, context, event):
+        self.set_vertex_weights(randomize=True)
 
 
     def update_point_visualisation(self):

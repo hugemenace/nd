@@ -45,6 +45,12 @@ class ND_OT_edge_length(BaseOperator):
     bl_description = """Accurately define or offset the length of any selected disconnected edges"""
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_cycle_anchor(context, event),
+        'D': lambda cls, context, event: cls.handle_toggle_distance_type(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_numeric_input:
             if self.key_no_modifiers:
@@ -61,19 +67,6 @@ class ND_OT_edge_length(BaseOperator):
                         self.distance = 0
                     self.dirty = True
                 self.distance_input_stream = new_stream()
-
-        if pressed(event, {'A'}):
-            self.current_anchor = (self.current_anchor + 1) % len(self.anchors)
-            self.dirty = True
-
-        if pressed(event, {'D'}):
-            self.offset_distance = not self.offset_distance
-
-            offset_distance = (sum(self.starting_distances) / len(self.starting_distances)) * -1.0
-            absolute_distance = sum(self.starting_distances) / len(self.starting_distances)
-
-            self.distance += absolute_distance if not self.offset_distance else offset_distance
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
@@ -178,6 +171,19 @@ class ND_OT_edge_length(BaseOperator):
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_cycle_anchor(self, context, event):
+        self.current_anchor = (self.current_anchor + 1) % len(self.anchors)
+
+
+    def handle_toggle_distance_type(self, context, event):
+        self.offset_distance = not self.offset_distance
+
+        offset_distance = (sum(self.starting_distances) / len(self.starting_distances)) * -1.0
+        absolute_distance = sum(self.starting_distances) / len(self.starting_distances)
+
+        self.distance += absolute_distance if not self.offset_distance else offset_distance
 
 
     def operate(self, context):

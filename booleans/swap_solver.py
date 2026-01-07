@@ -40,16 +40,12 @@ class ND_OT_swap_solver(BaseOperator):
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'S': lambda cls, context, event: cls.handle_toggle_solve_mode(context, event),
+    }
+
+
     def do_modal(self, context, event):
-        if pressed(event, {'S'}):
-            if self.solve_mode is None:
-                self.solve_mode = self.solver_options[0]
-            else:
-                solve_mode_index = self.solver_options.index(self.solve_mode)
-                self.solve_mode = self.solver_options[(solve_mode_index + 1) % len(self.solver_options)]
-
-            self.dirty = True
-
         if self.key_confirm:
             self.finish(context)
 
@@ -113,6 +109,15 @@ class ND_OT_swap_solver(BaseOperator):
     def poll(cls, context):
         mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
         return ctx_obj_mode(context) and list_ok(mesh_objects)
+
+
+    def handle_toggle_solve_mode(self, context, event):
+        if self.solve_mode is None:
+            self.solve_mode = self.solver_options[0]
+            return
+
+        solve_mode_index = self.solver_options.index(self.solve_mode)
+        self.solve_mode = self.solver_options[(solve_mode_index + 1) % len(self.solver_options)]
 
 
     def operate(self, context):

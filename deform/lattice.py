@@ -51,6 +51,12 @@ CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'U': lambda cls, context, event: cls.handle_toggle_uniform(context, event),
+        'M': lambda cls, context, event: cls.handle_cycle_interpolation_mode(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_numeric_input:
             if self.key_no_modifiers:
@@ -98,25 +104,6 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_w = 2
                     self.dirty = True
                 self.lattice_points_w_input_stream = new_stream()
-
-        if pressed(event, {'U'}):
-            self.uniform = not self.uniform
-
-            if self.uniform:
-                self.lattice_points_v_input_stream = self.lattice_points_u_input_stream
-                self.lattice_points_w_input_stream = self.lattice_points_u_input_stream
-
-                self.lattice_points_v = self.lattice_points_u
-                self.lattice_points_w = self.lattice_points_u
-            else:
-                self.lattice_points_v_input_stream = new_stream()
-                self.lattice_points_w_input_stream = new_stream()
-
-            self.dirty = True
-
-        if pressed(event, {'M'}):
-            self.interpolation_mode = (self.interpolation_mode + 1) % len(self.interpolation_modes)
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
@@ -250,6 +237,24 @@ CTRL — Remove existing modifiers"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_toggle_uniform(self, context, event):
+        self.uniform = not self.uniform
+
+        if self.uniform:
+            self.lattice_points_v_input_stream = self.lattice_points_u_input_stream
+            self.lattice_points_w_input_stream = self.lattice_points_u_input_stream
+
+            self.lattice_points_v = self.lattice_points_u
+            self.lattice_points_w = self.lattice_points_u
+        else:
+            self.lattice_points_v_input_stream = new_stream()
+            self.lattice_points_w_input_stream = new_stream()
+
+
+    def handle_cycle_interpolation_mode(self, context, event):
+        self.interpolation_mode = (self.interpolation_mode + 1) % len(self.interpolation_modes)
 
 
     def prepare_new_operator(self, context):

@@ -47,6 +47,12 @@ class ND_OT_panel(BaseOperator):
 SHIFT — Do not clean duplicate mesh before extraction"""
 
 
+    key_callbacks = {
+        'F': lambda cls, context, event: cls.handle_toggle_individual_faces(context, event),
+        'E': lambda cls, context, event: cls.handle_toggle_xray_mode(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_numeric_input:
             if self.stage == 1:
@@ -62,15 +68,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                         self.inset = 0
                         self.dirty = True
                     self.inset_input_stream = new_stream()
-
-        if pressed(event, {'F'}):
-            if self.stage == 1:
-                self.individual = not self.individual
-                self.dirty = True
-
-        if pressed(event, {'E'}):
-            self.xray_mode = not self.xray_mode
-            self.dirty = True
 
         if self.key_step_up:
             if self.stage == 1:
@@ -144,9 +141,16 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
+    def handle_toggle_individual_faces(self, context, event):
+        if self.stage == 1:
+            self.individual = not self.individual
+
+
+    def handle_toggle_xray_mode(self, context, event):
+        self.xray_mode = not self.xray_mode
+
+
     def isolate_geometry(self, context):
-
-
         self.delete_unselected_panel_geometry()
         self.update_panel_edit_mesh(True)
 

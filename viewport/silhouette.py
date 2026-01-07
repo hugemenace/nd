@@ -40,15 +40,16 @@ class ND_OT_silhouette(BaseOperator):
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'D': lambda cls, context, event: cls.handle_toggle_inversion(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_confirm:
             self.finish(context)
 
             return {'FINISHED'}
-
-        if pressed(event, {'D'}):
-            self.inverted = not self.inverted
-            self.dirty = True
 
         if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
@@ -86,6 +87,10 @@ class ND_OT_silhouette(BaseOperator):
     @classmethod
     def poll(cls, context):
         return ctx_obj_mode(context)
+
+
+    def handle_toggle_inversion(self, context, event):
+        self.inverted = not self.inverted
 
 
     def operate(self, context):

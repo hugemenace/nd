@@ -50,23 +50,14 @@ CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_cycle_axis(context, event),
+        'F': lambda cls, context, event: cls.handle_toggle_flip(context, event),
+        'S': lambda cls, context, event: cls.handle_toggle_symmetrize(context, event),
+    }
+
+
     def do_modal(self, context, event):
-        if pressed(event, {'A'}):
-            self.axis = (self.axis + 1) % 3
-            self.dirty = True
-
-        if pressed(event, {'F'}):
-            self.flip = not self.flip
-            self.dirty = True
-
-        if pressed(event, {'S'}):
-            if self.geometry_mode and not self.geometry_ready:
-                self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
-                self.set_selection_mode(context)
-            else:
-                self.symmetrize = not self.symmetrize
-                self.dirty = True
-
         if self.key_one:
             if self.geometry_mode and not self.geometry_ready:
                 self.geometry_selection_type = 0
@@ -170,6 +161,22 @@ CTRL — Remove existing modifiers"""
 
         if ctx_edit_mode(context):
             return obj_moddable(context.active_object)
+
+
+    def handle_cycle_axis(self, context, event):
+        self.axis = (self.axis + 1) % 3
+
+
+    def handle_toggle_flip(self, context, event):
+        self.flip = not self.flip
+
+
+    def handle_toggle_symmetrize(self, context, event):
+        if self.geometry_mode and not self.geometry_ready:
+            self.geometry_selection_type = (self.geometry_selection_type + 1) % 3
+            self.set_selection_mode(context)
+        else:
+            self.symmetrize = not self.symmetrize
 
 
     def set_selection_mode(self, context):

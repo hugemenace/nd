@@ -55,6 +55,12 @@ ALT — Use faux origin (for origin-reliant procedural geometry)
 CTRL — Remove existing modifiers"""
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_cycle_axis(context, event),
+        'D': lambda cls, context, event: cls.handle_toggle_displacement_mode(context, event),
+    }
+
+
     def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else 15
         count_factor = 1 if self.key_shift else 2
@@ -89,14 +95,6 @@ CTRL — Remove existing modifiers"""
                     self.offset = self.reference_obj.dimensions[self.axis] if self.single_obj_mode else 0
                     self.dirty = True
                 self.offset_input_stream = new_stream()
-
-        if pressed(event, {'A'}):
-            self.axis = (self.axis + 1) % 3
-            self.dirty = True
-
-        if pressed(event, {'D'}):
-            self.displace_axis = (self.displace_axis + 1) % 3
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.angle_input_stream) and self.key_alt:
@@ -202,6 +200,14 @@ CTRL — Remove existing modifiers"""
             return True
         else:
             return False
+
+
+    def handle_cycle_axis(self, context, event):
+        self.axis = (self.axis + 1) % 3
+
+
+    def handle_toggle_displacement_mode(self, context, event):
+        self.displace_axis = (self.displace_axis + 1) % 3
 
 
     def prepare_new_operator(self, context):

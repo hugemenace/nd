@@ -41,32 +41,20 @@ class ND_OT_bevel_resolution(BaseOperator):
     bl_description = """Adjust all bevel resolutions for the selected objects"""
 
 
+    key_callbacks = {
+        'E': lambda cls, context, event: cls.handle_toggle_enhanced_wireframe(context, event),
+        'M': lambda cls, context, event: cls.handle_cycle_mode(context, event),
+        'A': lambda cls, context, event: cls.handle_cycle_affect(context, event),
+        'R': lambda cls, context, event: cls.handle_cycle_rounding(context, event),
+    }
+
+
     def do_modal(self, context, event):
         is_factor_mode = self.change_mode == self.change_modes.index("FACTOR")
         segment_factor = 1 if self.key_shift or is_factor_mode else 2
 
         if self.key_reset:
             self.segment_change = 0
-            self.dirty = True
-
-        if pressed(event, {'E'}):
-            for obj in self.selected_objects:
-                obj.show_wire = not obj.show_wire
-                obj.show_in_front = not obj.show_in_front
-
-        if pressed(event, {'M'}):
-            self.change_mode = (self.change_mode + 1) % len(self.change_modes)
-            self.segment_change = 0
-            self.dirty = True
-
-        if pressed(event, {'A'}):
-            self.affect_mode = (self.affect_mode + 1) % len(self.affect_modes)
-            self.reset_mods()
-            self.capture_mods(context)
-            self.dirty = True
-
-        if pressed(event, {'R'}) and is_factor_mode:
-            self.round_mode = (self.round_mode + 1) % len(self.round_modes)
             self.dirty = True
 
         if self.key_step_up:
@@ -133,6 +121,27 @@ class ND_OT_bevel_resolution(BaseOperator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
+
+
+    def handle_toggle_enhanced_wireframe(self, context, event):
+        for obj in self.selected_objects:
+            obj.show_wire = not obj.show_wire
+            obj.show_in_front = not obj.show_in_front
+
+
+    def handle_cycle_mode(self, context, event):
+        self.change_mode = (self.change_mode + 1) % len(self.change_modes)
+        self.segment_change = 0
+
+
+    def handle_cycle_affect(self, context, event):
+        self.affect_mode = (self.affect_mode + 1) % len(self.affect_modes)
+        self.reset_mods()
+        self.capture_mods(context)
+
+
+    def handle_cycle_rounding(self, context, event):
+        self.round_mode = (self.round_mode + 1) % len(self.round_modes)
 
 
     def capture_mods(self, context):

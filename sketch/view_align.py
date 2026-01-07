@@ -45,27 +45,16 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'S': lambda cls, context, event: cls.handle_cycle_selection_type(context, event),
+        'E': lambda cls, context, event: cls.handle_toggle_xray_mode(context, event),
+        'ONE': lambda cls, context, event: cls.handle_set_selection(context, event, 0),
+        'TWO': lambda cls, context, event: cls.handle_set_selection(context, event, 1),
+        'THREE': lambda cls, context, event: cls.handle_set_selection(context, event, 2),
+    }
+
+
     def do_modal(self, context, event):
-        if pressed(event, {'S'}):
-            self.selection_type = (self.selection_type + 1) % 3
-            self.set_selection_mode(context)
-
-        if pressed(event, {'E'}):
-            self.xray_mode = not self.xray_mode
-            self.dirty = True
-
-        if self.key_one:
-            self.selection_type = 0
-            self.set_selection_mode(context)
-
-        if self.key_two:
-            self.selection_type = 1
-            self.set_selection_mode(context)
-
-        if self.key_three:
-            self.selection_type = 2
-            self.set_selection_mode(context)
-
         if self.key_confirm_alternative:
             return self.finish(context)
 
@@ -103,6 +92,20 @@ SHIFT — Do not clean duplicate mesh before extraction"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_cycle_selection_type(self, context, event):
+        self.selection_type = (self.selection_type + 1) % 3
+        self.set_selection_mode(context)
+
+
+    def handle_toggle_xray_mode(self, context, event):
+        self.xray_mode = not self.xray_mode
+
+
+    def handle_set_selection(self, context, event, selection_type):
+        self.selection_type = selection_type
+        self.set_selection_mode(context)
 
 
     def set_selection_mode(self, context):

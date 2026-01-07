@@ -53,6 +53,13 @@ class ND_OT_screw(BaseOperator):
 CTRL — Remove existing modifiers"""
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_cycle_screw_axis(context, event),
+        'O': lambda cls, context, event: cls.handle_cycle_offset_axis(context, event),
+        'F': lambda cls, context, event: cls.handle_toggle_flip_normals(context, event),
+    }
+
+
     def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
         angle_factor = 1 if self.key_shift else 10
@@ -87,18 +94,6 @@ CTRL — Remove existing modifiers"""
                     self.offset = 0
                     self.dirty = True
                 self.offset_input_stream = new_stream()
-
-        if pressed(event, {'A'}):
-            self.axis = (self.axis + 1) % 3
-            self.dirty = True
-
-        if pressed(event, {'O'}):
-            self.offset_axis = (self.offset_axis + 1) % 3
-            self.dirty = True
-
-        if pressed(event, {'F'}):
-            self.flip_normals = not self.flip_normals
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.offset_input_stream) and self.key_ctrl:
@@ -204,6 +199,18 @@ CTRL — Remove existing modifiers"""
 
         if ctx_edit_mode(context):
             return obj_moddable(context.active_object)
+
+
+    def handle_cycle_screw_axis(self, context, event):
+        self.axis = (self.axis + 1) % 3
+
+
+    def handle_cycle_offset_axis(self, context, event):
+        self.offset_axis = (self.offset_axis + 1) % 3
+
+
+    def handle_toggle_flip_normals(self, context, event):
+        self.flip_normals = not self.flip_normals
 
 
     def prepare_new_operator(self, context):

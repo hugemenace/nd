@@ -56,6 +56,12 @@ class ND_OT_array_cubed(BaseOperator):
 CTRL — Remove existing modifiers"""
 
 
+    key_callbacks = {
+        'A': lambda cls, context, event: cls.handle_cycle_axis(context, event),
+        'D': lambda cls, context, event: cls.handle_toggle_displacement_mode(context, event),
+    }
+
+
     def do_modal(self, context, event):
         relative_offset_step_size = 0.1 if self.key_shift else 1
 
@@ -84,15 +90,6 @@ CTRL — Remove existing modifiers"""
                     self.axes[self.axis][IDX_OFFSET] = 0
                     self.dirty = True
                 self.offset_streams[self.axis] = new_stream()
-
-        if pressed(event, {'A'}):
-            self.axis = (self.axis + 1) % 3
-            self.dirty = True
-
-        if pressed(event, {'D'}):
-            relative = self.axes[self.axis][IDX_RELATIVE]
-            self.axes[self.axis][IDX_RELATIVE] = not relative
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers:
@@ -198,6 +195,15 @@ CTRL — Remove existing modifiers"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_cycle_axis(self, context, event):
+        self.axis = (self.axis + 1) % 3
+
+
+    def handle_toggle_displacement_mode(self, context, event):
+        relative = self.axes[self.axis][IDX_RELATIVE]
+        self.axes[self.axis][IDX_RELATIVE] = not relative
 
 
     def prepare_new_operator(self, context):

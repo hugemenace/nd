@@ -52,6 +52,12 @@ CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'M': lambda cls, context, event: cls.handle_cycle_deform_method(context, event),
+        'A': lambda cls, context, event: cls.handle_cycle_deform_axis(context, event),
+    }
+
+
     def do_modal(self, context, event):
         factor_factor = 0.01 if self.key_shift else 0.1
         angle_factor = 1 if self.key_shift else 10
@@ -79,18 +85,6 @@ CTRL — Remove existing modifiers"""
                         self.factor = 0
                         self.dirty = True
                     self.factor_input_stream = new_stream()
-
-        if pressed(event, {'M'}):
-            self.current_method = (self.current_method + 1) % len(self.methods)
-            self.angle_input_stream = new_stream()
-            self.factor_input_stream = new_stream()
-            self.factor = 0
-            self.angle = 0
-            self.dirty = True
-
-        if pressed(event, {'A'}):
-            self.axis = (self.axis + 1) % 3
-            self.dirty = True
 
         if self.key_step_up:
             if self.key_no_modifiers:
@@ -175,6 +169,18 @@ CTRL — Remove existing modifiers"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_exists(target_object) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_cycle_deform_method(self, context, event):
+        self.current_method = (self.current_method + 1) % len(self.methods)
+        self.angle_input_stream = new_stream()
+        self.factor_input_stream = new_stream()
+        self.factor = 0
+        self.angle = 0
+
+
+    def handle_cycle_deform_axis(self, context, event):
+        self.axis = (self.axis + 1) % 3
 
 
     def prepare_new_operator(self, context):

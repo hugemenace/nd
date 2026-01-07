@@ -46,6 +46,11 @@ class ND_OT_bool_inset(BaseOperator):
     bl_description = "Perform a boolean operation on the selected objects"
 
 
+    key_callbacks = {
+        'M': lambda cls, context, event: cls.handle_toggle_outset(context, event),
+    }
+
+
     def do_modal(self, context, event):
         if self.key_numeric_input:
             if self.key_no_modifiers:
@@ -59,10 +64,6 @@ class ND_OT_bool_inset(BaseOperator):
                     self.thickness = 0
                     self.dirty = True
                 self.thickness_input_stream = new_stream()
-
-        if pressed(event, {'M'}):
-            self.outset = not self.outset
-            self.dirty = True
 
         if self.key_step_up:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
@@ -183,6 +184,10 @@ class ND_OT_bool_inset(BaseOperator):
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_exists(target_object) and objs_are_mesh(context.selected_objects) and ctx_objects_selected(context, 2)
+
+
+    def handle_toggle_outset(self, context, event):
+        self.outset = not self.outset
 
 
     def operate(self, context):

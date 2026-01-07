@@ -45,27 +45,15 @@ class ND_OT_snap_align(BaseOperator):
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'C': lambda cls, context, event: cls.handle_capture_point(context, event),
+        'R': lambda cls, context, event: cls.handle_reset_points(context, event),
+    }
+
+
     def do_modal(self, context, event):
-        if pressed(event, {'C'}):
-            if self.snap_point and len(self.capture_points) < 2:
-                self.capture_points.append(self.snap_point)
-
-                if len(self.capture_points) == 1:
-                    self.guide_line = (self.capture_points[0][0], self.reference_obj.location)
-                else:
-                    self.guide_line = (self.capture_points[0][0], self.capture_points[1][0])
-
-                self.dirty = True
-
-        if pressed(event, {'R'}):
-            self.capture_points = []
-            self.guide_line = ()
-
-            self.dirty = True
-
         if self.key_confirm:
             self.finish(context)
-
             return {'FINISHED'}
 
         if self.key_movement_passthrough:
@@ -151,6 +139,21 @@ class ND_OT_snap_align(BaseOperator):
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 2)
+
+
+    def handle_capture_point(self, context, event):
+        if self.snap_point and len(self.capture_points) < 2:
+            self.capture_points.append(self.snap_point)
+
+            if len(self.capture_points) == 1:
+                self.guide_line = (self.capture_points[0][0], self.reference_obj.location)
+            else:
+                self.guide_line = (self.capture_points[0][0], self.capture_points[1][0])
+
+
+    def handle_reset_points(self, context, event):
+        self.capture_points = []
+        self.guide_line = ()
 
 
     def operate(self, context):

@@ -44,35 +44,16 @@ SHIFT — Cycle through the modifier stack"""
     bl_options = {'UNDO'}
 
 
+    key_callbacks = {
+        'M': lambda cls, context, event: cls.handle_toggle_mod_cycle(context, event),
+        'F': lambda cls, context, event: cls.handle_toggle_freeze_state(context, event),
+        'A': lambda cls, context, event: cls.handle_toggle_applied_util(context, event),
+        'D': lambda cls, context, event: cls.handle_toggle_mod(context, event),
+        'W': lambda cls, context, event: cls.handle_toggle_wireframe(context, event),
+    }
+
+
     def do_modal(self, context, event):
-        if pressed(event, {'M'}):
-            self.mod_cycle = not self.mod_cycle
-            self.prepare_mode(context)
-
-            self.dirty = True
-
-        if pressed(event, {'F'}):
-            if self.mod_cycle:
-                self.freeze_mod_cycle_state = not self.freeze_mod_cycle_state
-                self.dirty = True
-            else:
-                self.toggle_frozen_util()
-                self.dirty = True
-
-        if pressed(event, {'A'}):
-            if not self.mod_cycle:
-                self.toggle_applied_util()
-                self.dirty = True
-
-        if pressed(event, {'D'}):
-            if not self.mod_cycle:
-                self.toggle_mod()
-                self.dirty = True
-
-        if pressed(event, {'W'}):
-            self.show_wireframe = not self.show_wireframe
-            self.dirty = True
-
         if self.key_step_up:
             if self.mod_cycle:
                 self.mod_current_index = min(self.mod_current_index + 1, self.mod_count - 1)
@@ -152,6 +133,32 @@ SHIFT — Cycle through the modifier stack"""
     def poll(cls, context):
         target_object = get_real_active_object(context)
         return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
+    def handle_toggle_mod_cycle(self, context, event):
+        self.mod_cycle = not self.mod_cycle
+        self.prepare_mode(context)
+
+
+    def handle_toggle_freeze_state(self, context, event):
+        if self.mod_cycle:
+            self.freeze_mod_cycle_state = not self.freeze_mod_cycle_state
+        else:
+            self.toggle_frozen_util()
+
+
+    def handle_toggle_applied_util(self, context, event):
+        if not self.mod_cycle:
+            self.toggle_applied_util()
+
+
+    def handle_toggle_mod(self, context, event):
+        if not self.mod_cycle:
+            self.toggle_mod()
+
+
+    def handle_toggle_wireframe(self, context, event):
+        self.show_wireframe = not self.show_wireframe
 
 
     def set_mod_visible(self, mod, visible):

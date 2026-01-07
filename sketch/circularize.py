@@ -229,7 +229,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments),
+        f"Segments: {self.segments}",
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         mouse_value=True,

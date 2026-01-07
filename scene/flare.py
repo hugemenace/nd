@@ -327,7 +327,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Rotation: {0:.2f}".format(self.rotation),
+        f"Rotation: {self.rotation:.2f}",
         self.generate_step_hint(15, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -336,7 +336,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Height Offset: {0:.2f}".format(self.height_offset),
+        f"Height Offset: {self.height_offset:.2f}",
         self.generate_key_hint("Alt", self.generate_step_hint(1, 0.1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -345,7 +345,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Scale: {0:.2f}".format(self.scale),
+        f"Scale: {self.scale:.2f}",
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -354,7 +354,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Energy Offset: {0:.1e}".format(self.energy_offset),
+        f"Energy Offset: {self.energy_offset:.1e}",
         self.generate_key_hint("Ctrl + Alt", self.generate_step_hint("10k", "1k")),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,

@@ -328,7 +328,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments),
+        f"Segments: {self.segments}",
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -337,7 +337,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Angle: {0:.2f}°".format(self.angle),
+        f"Angle: {self.angle:.2f}°",
         self.generate_key_hint("Alt", self.generate_step_hint(10, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -354,20 +354,16 @@ def draw_text_callback(self):
             mouse_value=True,
             input_stream=self.offset_input_stream)
 
-    draw_hint(
-        self,
-        "Screw Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Axis to revolve around (X, Y, Z)")
+    axes = ['X', 'Y', 'Z']
+
+    draw_hint(self, f"Screw Axis [A]: {axes[self.axis]}", self.list_options_str(axes))
 
     if self.object_type == 'MESH':
-        draw_hint(
-            self,
-            "Offset Axis [O]: {}".format(['X', 'Y', 'Z'][self.offset_axis]),
-            "Axis to offset origin along (X, Y, Z)")
+        draw_hint(self, f"Offset Axis [O]: {axes[self.offset_axis]}", self.list_options_str(axes))
 
     draw_hint(
         self,
-        "Flip Normals [F]: {}".format("Yes" if self.flip_normals else "No"),
+        f"Flip Normals [F]: {self.yes_no_str(self.flip_normals)}",
         "Flip the normals of the resulting mesh")
 
 

@@ -160,7 +160,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Angle: {0:.2f}°".format(self.angle),
+        f"Angle: {self.angle:.2f}°",
         self.generate_step_hint(self.base_angle_factor, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -170,8 +170,8 @@ def draw_text_callback(self):
     if app_minor_version() >= (4, 1):
         draw_hint(
             self,
-            "Ignore Sharpness [S]: {}".format("Yes" if self.ignore_sharpness else "No"),
-            "Ignore sharpness when smoothing")
+            f"Ignore Sharpness [S]: {self.yes_no_str(self.ignore_sharpness)}",
+            "Ignore edges marked as sharp")
 
 
 def register():

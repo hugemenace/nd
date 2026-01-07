@@ -181,7 +181,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Angle: {0:.2f}°".format(self.angle),
+        f"Angle: {self.angle:.2f}°",
         self.generate_step_hint(self.base_angle_factor, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
@@ -190,7 +190,7 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Auto Smooth [A]: {0}".format("Yes" if self.commit_auto_smooth else "No"),
+        f"Auto Smooth [A]: {self.yes_no_str(self.commit_auto_smooth)}",
         "Set auto smooth angle to 180° on completion")
 
 

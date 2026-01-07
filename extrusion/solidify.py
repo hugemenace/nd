@@ -266,15 +266,17 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.offset_input_stream)
 
+    weightings = ['Negative', 'Neutral', 'Positive']
     draw_hint(
         self,
-        "Weighting [W]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
-        "Negative, Neutral, Positive")
+        f"Weighting [W]: {weightings[1 + round(self.weighting)]}",
+        self.list_options_str(weightings))
 
+    extrusion_modes = ['Simple', 'Complex']
     draw_hint(
         self,
-        "Mode [M]: {}".format("Complex" if self.complex_mode else "Simple"),
-        "Extrusion Algorithm (Simple, Complex)")
+        "Extrusion Mode [M]: {}".format("Complex" if self.complex_mode else "Simple"),
+        self.list_options_str(extrusion_modes))
 
 
 def register():

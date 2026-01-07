@@ -97,3 +97,23 @@ class BaseOperator(bpy.types.Operator):
         update_overlay(self, context, event)
 
         return override_return if override_return else {'RUNNING_MODAL'}
+
+
+    def yes_no_str(self, value):
+        return "Yes" if value else "No"
+
+
+    def list_options_str(self, options, capitalize=True):
+        def fmt(opt):
+            return str(opt).capitalize() if capitalize else str(opt)
+
+        options_list = list(options)
+        options_str = ""
+        if len(options_list) == 1:
+            options_str = fmt(options_list[0])
+        elif len(options_list) == 2:
+            options_str = " or ".join([fmt(opt) for opt in options_list])
+        else:
+            options_str = ", ".join([fmt(opt) for opt in options_list[:-1]]) + ", or " + fmt(options_list[-1])
+
+        return f"Options: {options_str}"

@@ -424,24 +424,26 @@ def draw_text_callback(self):
     if self.geometry_mode and not self.geometry_ready:
         draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to mirrored across")
 
+        selection_types = ['Vertex', 'Edge', 'Face']
         draw_hint(
             self,
-            "Selection Type [S,1,2,3]: {0}".format(['Vertex', 'Edge', 'Face'][self.geometry_selection_type]),
-            "Type of geometry to select (Vertex, Edge, Face)")
+            f"Selection Type [S, 1, 2, 3]: {selection_types[self.geometry_selection_type]}",
+            self.list_options_str(selection_types))
     elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
+        axes = ['X', 'Y', 'Z']
         draw_hint(
             self,
-            "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
-            "Axis to mirror across (X, Y, Z)")
+            f"Axis [A]: {axes[self.axis]}",
+            self.list_options_str(axes))
 
         draw_hint(
             self,
-            "Flipped [F]: {}".format('Yes' if self.flip else 'No'),
+            f"Flipped [F]: {self.yes_no_str(self.flip)}",
             "Flip the mirror direction")
 
         draw_hint(
             self,
-            "Symmetrize [S]: {}".format('Yes' if self.symmetrize else 'No'),
+            f"Symmetrize [S]: {self.yes_no_str(self.symmetrize)}",
             "Immediately apply the mirror modifier")
 
 

@@ -144,7 +144,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Collection: {0}".format(self.collection_names[self.active_collection]),
+        f"Collection: {self.collection_names[self.active_collection]}",
         "Where to place the new object...",
         active=True,
         mouse_value=True,
@@ -152,7 +152,7 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Clear Parent [C]: {0}".format("Yes" if self.clear_parent else "No"),
+        f"Clear Parent [C]: {self.yes_no_str(self.clear_parent)}",
         "Unparent the new object from the original target object")
 
 

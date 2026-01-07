@@ -42,7 +42,8 @@ class ND_OT_bevel_resolution(BaseOperator):
 
 
     def do_modal(self, context, event):
-        segment_factor = 1 if self.key_shift or self.change_mode == self.change_modes.index("FACTOR") else 2
+        is_factor_mode = self.change_mode == self.change_modes.index("FACTOR")
+        segment_factor = 1 if self.key_shift or is_factor_mode else 2
 
         if self.key_reset:
             self.segment_change = 0
@@ -64,16 +65,12 @@ class ND_OT_bevel_resolution(BaseOperator):
             self.capture_mods(context)
             self.dirty = True
 
-        if self.change_mode == self.change_modes.index('FACTOR'):
-            if pressed(event, {'R'}):
-                self.round_mode = (self.round_mode + 1) % len(self.round_modes)
-                self.dirty = True
+        if pressed(event, {'R'}) and is_factor_mode:
+            self.round_mode = (self.round_mode + 1) % len(self.round_modes)
+            self.dirty = True
 
         if self.key_step_up:
             if self.key_no_modifiers:
-                self.segment_change = self.segment_change + segment_factor
-                self.dirty = True
-            elif self.extend_mouse_values:
                 self.segment_change = self.segment_change + segment_factor
                 self.dirty = True
             elif self.key_ctrl:
@@ -82,9 +79,6 @@ class ND_OT_bevel_resolution(BaseOperator):
 
         if self.key_step_down:
             if self.key_no_modifiers:
-                self.segment_change = self.segment_change - segment_factor
-                self.dirty = True
-            elif self.extend_mouse_values:
                 self.segment_change = self.segment_change - segment_factor
                 self.dirty = True
             elif self.key_ctrl:
@@ -130,11 +124,9 @@ class ND_OT_bevel_resolution(BaseOperator):
         self.target_object = context.active_object
 
         self.capture_mods(context)
-
         self.operate(context)
 
         capture_modifier_keys(self, None, event.mouse_x)
-
         init_overlay(self, event)
         register_draw_handler(self, draw_text_callback)
 
@@ -147,56 +139,55 @@ class ND_OT_bevel_resolution(BaseOperator):
         self.bevel_mods = []
         self.bevel_segments_prev = []
 
+        affect_type = self.affect_modes[self.affect_mode]
+
         for obj in self.selected_objects:
             mods = [mod for mod in obj.modifiers if mod.type == 'BEVEL']
 
-            if self.affect_mode != self.affect_modes.index('ALL'):
-                mods = [mod for mod in mods if mod.affect == self.affect_modes[self.affect_mode]]
+            if affect_type != 'ALL':
+                mods = [mod for mod in mods if mod.affect == affect_type]
 
             self.bevel_mods.extend(mods)
             self.bevel_segments_prev.extend([mod.segments for mod in mods])
 
 
     def reset_mods(self):
-        for mod in self.bevel_mods:
-            mod.segments = self.bevel_segments_prev[self.bevel_mods.index(mod)]
+        for i, mod in enumerate(self.bevel_mods):
+            mod.segments = self.bevel_segments_prev[i]
 
 
     def calc_change_factor(self):
         if self.segment_change >= 0:
-            return self.segment_change +1
-        else:
-            return 1 / (-self.segment_change +1)
+            return self.segment_change + 1
+        return 1 / (-self.segment_change + 1)
 
 
     def format_change_factor(self):
         if self.segment_change >= 0:
-            return self.segment_change +1
-        else:
-            return "1 / {}".format(-self.segment_change +1)
+            return self.segment_change + 1
+        return "1 / {}".format(-self.segment_change + 1)
 
 
     @classmethod
     def poll(cls, context):
-
         return ctx_obj_mode(context) and objs_are_mesh(context.selected_objects)
 
 
-    def operate(self, context):
-        for mod in self.bevel_mods:
+    rounding_funcs = {
+        'ROUND': round,
+        'CEIL': ceil,
+        'FLOOR': floor
+    }
 
-            segment_prev = self.bevel_segments_prev[self.bevel_mods.index((mod))]
+    def operate(self, context):
+        rounding_func = self.rounding_funcs[self.round_modes[self.round_mode]]
+
+        for i, mod in enumerate(self.bevel_mods):
+            segment_prev = self.bevel_segments_prev[i]
 
             if self.change_mode == self.change_modes.index('FACTOR'):
                 segment_new = segment_prev * self.calc_change_factor()
-
-                if self.round_mode == self.round_modes.index('ROUND'):
-                    mod.segments = max(round(segment_new), self.minimum_segments)
-                elif self.round_mode == self.round_modes.index('CEIL'):
-                    mod.segments = max(ceil(segment_new), self.minimum_segments)
-                elif self.round_mode == self.round_modes.index('FLOOR'):
-                    mod.segments = max(floor(segment_new), self.minimum_segments)
-
+                mod.segments = max(rounding_func(segment_new), self.minimum_segments)
             elif self.change_mode == self.change_modes.index('COUNT'):
                 mod.segments = max(segment_prev + self.segment_change, self.minimum_segments)
 
@@ -222,17 +213,19 @@ class ND_OT_bevel_resolution(BaseOperator):
 def draw_text_callback(self):
     draw_header(self)
 
-    if self.change_mode == self.change_modes.index('FACTOR'):
+    is_factor_mode = self.change_mode == self.change_modes.index('FACTOR')
+
+    if is_factor_mode:
         draw_property(
             self,
-            "Factor: {}".format(self.format_change_factor()),
+            f"Factor: {self.format_change_factor()}",
             self.generate_step_hint(1),
             active=self.key_no_modifiers,
             mouse_value=True)
     else:
         draw_property(
             self,
-            "Offset: {}".format(self.segment_change),
+            f"Offset: {self.segment_change}",
             self.generate_step_hint(2, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -240,30 +233,30 @@ def draw_text_callback(self):
 
     draw_property(
             self,
-            "Minimum: {}".format(self.minimum_segments),
+            f"Minimum: {self.minimum_segments}",
             self.generate_key_hint("Ctrl", self.generate_step_hint(1)),
             active=self.key_ctrl,
             mouse_value=True)
 
     draw_hint(
         self,
-        "Mode [M]: {}".format(self.change_modes[self.change_mode].capitalize()),
-        ", ".join([m.capitalize() for m in self.change_modes]))
+        f"Mode [M]: {self.change_modes[self.change_mode].capitalize()}",
+        self.list_options_str(self.change_modes))
 
     draw_hint(
         self,
-        "Affect [A]: {}".format(self.affect_modes[self.affect_mode].capitalize()),
-        ", ".join([m.capitalize() for m in self.affect_modes]))
+        f"Affect [A]: {self.affect_modes[self.affect_mode].capitalize()}",
+        self.list_options_str(self.affect_modes))
 
-    if self.change_mode == self.change_modes.index('FACTOR'):
+    if is_factor_mode:
         draw_hint(
             self,
-            "Rounding [R]: {}".format(self.round_modes[self.round_mode].capitalize()),
-            ", ".join([m.capitalize() for m in self.round_modes]))
+            f"Rounding [R]: {self.round_modes[self.round_mode].capitalize()}",
+            self.list_options_str(self.round_modes))
 
     draw_hint(
         self,
-        "Enhanced Wireframe [E]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        f"Enhanced Wireframe [E]: {self.yes_no_str(self.target_object.show_wire)}",
         "Display the object's wireframe over solid shading")
 
 

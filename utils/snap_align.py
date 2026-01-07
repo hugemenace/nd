@@ -264,10 +264,11 @@ def draw_text_callback(self):
 
     draw_hint(self, "Select Snap Point", "Hover over the selected object to view snap points")
 
+    point_capture_str = f"{len(self.capture_points)}/2 Snap points captured!" if len(self.capture_points) > 0 else "No points captured..."
     draw_property(
         self,
         "Capture Point [C]  /  Reset [R]",
-        "{}".format("{}/2 Snap points captured!".format(len(self.capture_points)) if len(self.capture_points) > 0 else "No points captured..."),
+        point_capture_str,
         active=len(self.capture_points) > 0,
         alt_mode=len(self.capture_points) == 1)
 

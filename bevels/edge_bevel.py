@@ -523,27 +523,27 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Width Type [W]: {0}".format(self.width_types[self.width_type].capitalize()),
-        "{}".format(", ".join([m.capitalize() for m in self.width_types])))
+        f"Width Type [W]: {self.width_types[self.width_type].capitalize()}",
+        self.list_options_str(self.width_types))
 
     draw_hint(
         self,
-        "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
+        f"Harden Normals [H]: {self.yes_no_str(self.harden_normals)}",
         "Match normals of new faces to adjacent faces")
 
     draw_hint(
         self,
-        "Enhanced Wireframe [E]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        f"Enhanced Wireframe [E]: {self.yes_no_str(self.target_object.show_wire)}",
         "Display the object's wireframe over solid shading")
 
     draw_hint(
         self,
-        "Clamp Overlap [C]: {0}".format("Yes" if self.clamp_overlap else "No"),
+        f"Clamp Overlap [C]: {self.yes_no_str(self.clamp_overlap)}",
         "Clamp the width to avoid overlap")
 
     draw_hint(
         self,
-        "Loop Slide [S]: {0}".format("Yes" if self.loop_slide else "No"),
+        f"Loop Slide [S]: {self.yes_no_str(self.loop_slide)}",
         "Prefer sliding along edges to having even widths")
 
 

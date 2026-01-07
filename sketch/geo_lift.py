@@ -182,14 +182,15 @@ def draw_text_callback(self):
 
     draw_hint(self, "Confirm Geometry [Space]", "Comfirm the geometry to extract")
 
+    selection_types = ['Vertex', 'Edge', 'Face']
     draw_hint(
         self,
-        "Selection Type [S,1,2,3]: {0}".format(['Vertex', 'Edge', 'Face'][self.selection_type]),
-        "Type of geometry to select (Vertex, Edge, Face)")
+        f"Selection Type [S, 1, 2, 3]: {selection_types[self.selection_type]}",
+        self.list_options_str(selection_types))
 
     draw_hint(
         self,
-        "Exclusive View [E]: {0}".format("On" if self.xray_mode else "Off"),
+        f"Exclusive View [E]: {self.yes_no_str(self.xray_mode)}",
         "Show the target object in front of all other objects")
 
 

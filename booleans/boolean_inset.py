@@ -230,9 +230,10 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.thickness_input_stream)
 
+    mode_str = "Outset" if self.outset else "Inset"
     draw_hint(
         self,
-        "Mode [M]: {0}".format('Outset' if self.outset else 'Inset'),
+        f"Mode [M]: {mode_str}",
         "Create an Inset or Outset")
 
 

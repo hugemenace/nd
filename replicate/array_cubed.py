@@ -276,7 +276,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Count: {0}".format(self.axes[self.axis][IDX_COUNT]),
+        f"Count: {self.axes[self.axis][IDX_COUNT]}",
         self.generate_step_hint(1),
         active=self.key_no_modifiers,
         alt_mode=False,
@@ -302,15 +302,17 @@ def draw_text_callback(self):
             mouse_value=True,
             input_stream=self.offset_streams[self.axis])
 
+    displacement_str = "Relative" if self.axes[self.axis][IDX_RELATIVE] else "Constant"
     draw_hint(
         self,
-        "Displacement [D]: {}".format("Relative" if self.axes[self.axis][IDX_RELATIVE] else "Constant"),
+        f"Displacement [D]: {displacement_str}",
         "Relative or constant displacement")
 
+    axes = ['X', 'Y', 'Z']
     draw_hint(
         self,
-        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Axis replicate across (X, Y, Z)")
+        f"Replication Axis [A]: {axes[self.axis]}",
+        self.list_options_str(axes))
 
 
 def register():

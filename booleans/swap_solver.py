@@ -136,10 +136,8 @@ class ND_OT_swap_solver(BaseOperator):
 def draw_text_callback(self):
     draw_header(self)
 
-    draw_hint(
-        self,
-        "Solver [S]: {0}".format(self.solve_mode.capitalize() if self.solve_mode else "Mixed"),
-        "Select the solver mode ({0})".format(", ".join([m.capitalize() for m in self.solver_options])))
+    solver_str = self.solve_mode.capitalize() if self.solve_mode else "Mixed"
+    draw_hint(self, f"Solver [S]: {solver_str}", self.list_options_str(self.solver_options))
 
 
 def register():

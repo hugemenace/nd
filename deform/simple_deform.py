@@ -254,7 +254,7 @@ def draw_text_callback(self):
     if self.is_angular[self.methods[self.current_method]]:
         draw_property(
             self,
-            "Angle: {0:.2f}°".format(self.angle),
+            f"Angle: {self.angle:.2f}°",
             self.generate_step_hint(10, 1),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -263,7 +263,7 @@ def draw_text_callback(self):
     else:
         draw_property(
             self,
-            "Factor: {0:.2f}".format(self.factor),
+            f"Factor: {self.factor:.2f}",
             self.generate_step_hint(0.1, 0.01),
             active=self.key_no_modifiers,
             alt_mode=self.key_shift_no_modifiers,
@@ -272,13 +272,14 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Method [M]: {}".format(self.methods[self.current_method].capitalize()),
-        "Deformation method ({})".format(", ".join([m.capitalize() for m in self.methods])))
+        f"Method [M]: {self.methods[self.current_method].capitalize()}",
+        self.list_options_str(self.methods))
 
+    axes = ['X', 'Y', 'Z']
     draw_hint(
         self,
-        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Deformation axis (X, Y, Z)")
+        f"Axis [A]: {axes[self.axis]}",
+        self.list_options_str(axes))
 
 
 def register():

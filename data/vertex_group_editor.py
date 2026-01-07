@@ -225,12 +225,12 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Vertex Group ({}/{}): {}".format(self.vertex_group_index + 1, len(self.vertex_groups), self.vertex_groups[self.vertex_group_index].name),
+        f"Vertex Group ({self.vertex_group_index + 1}/{len(self.vertex_groups)}): {self.vertex_groups[self.vertex_group_index].name}",
         "Cycle between vertex groups")
 
     draw_hint(
         self,
-        "Set Weight [S]: {}".format("Yes" if self.is_editing else "No"),
+        f"Set Weight [S]: {self.yes_no_str(self.is_editing)}",
         "Set the vertex weights for the selected group")
 
     if self.is_editing:

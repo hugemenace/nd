@@ -411,7 +411,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Segments: {}".format(self.segments),
+        f"Segments: {self.segments}",
         self.generate_key_hint("Alt / Scroll" if self.extend_mouse_values else "Alt", self.generate_step_hint(2, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -420,7 +420,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Profile: {0:.2f}".format(self.profile),
+        f"Profile: {self.profile:.2f}",
         self.generate_key_hint("Ctrl", self.generate_step_hint(0.1, 0.01)),
         active=self.key_ctrl,
         alt_mode=self.key_shift_ctrl,
@@ -429,7 +429,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Angle: {0:.0f}°".format(self.angle),
+        f"Angle: {self.angle:.0f}°",
         self.generate_key_hint("Ctrl + Alt", self.generate_step_hint(15, 1)),
         active=self.key_ctrl_alt,
         alt_mode=self.key_shift_ctrl_alt,
@@ -438,33 +438,33 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Width Type [W]: {0}".format(self.width_types[self.width_type].capitalize()),
-        "{}".format(", ".join([m.capitalize() for m in self.width_types])))
+        f"Width Type [W]: {self.width_types[self.width_type].capitalize()}",
+        self.list_options_str(self.width_types))
 
     draw_hint(
         self,
-        "Harden Normals [H]: {0}".format("Yes" if self.harden_normals else "No"),
+        f"Harden Normals [H]: {self.yes_no_str(self.harden_normals)}",
         "Match normals of new faces to adjacent faces")
 
     draw_hint(
         self,
-        "Enhanced Wireframe [E]: {0}".format("Yes" if self.target_object.show_wire else "No"),
+        f"Enhanced Wireframe [E]: {self.yes_no_str(self.target_object.show_wire)}",
         "Display the object's wireframe over solid shading")
 
     draw_hint(
         self,
-        "Clamp Overlap [C]: {0}".format("Yes" if self.clamp_overlap else "No"),
+        f"Clamp Overlap [C]: {self.yes_no_str(self.clamp_overlap)}",
         "Clamp the width to avoid overlap")
 
     draw_hint(
         self,
-        "Loop Slide [S]: {0}".format("Yes" if self.loop_slide else "No"),
+        f"Loop Slide [S]: {self.yes_no_str(self.loop_slide)}",
         "Prefer sliding along edges to having even widths")
 
     if len(self.current_bevel_mods) > 1:
         draw_hint(
             self,
-            "Recall bevel [R]: {0}".format(self.current_bevel_mods[self.summoned_mod_index]),
+            f"Recall bevel [R]: {self.current_bevel_mods[self.summoned_mod_index]}",
             "Switch between summoned bevels")
 
 

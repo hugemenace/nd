@@ -269,17 +269,18 @@ def draw_text_callback(self):
 
     if self.mod_cycle:
         if self.mod_count > 0:
+            modifier_str = "None" if self.mod_current_index == -1 else self.mod_names[self.mod_current_index]
             draw_property(
                 self,
-                "Modifier: {0}".format("None" if self.mod_current_index == -1 else self.mod_names[self.mod_current_index]),
-                "Active: {0}  /  Total: {1}".format(self.mod_current_index + 1, self.mod_count),
+                f"Modifier: {modifier_str}",
+                f"Active: {self.mod_current_index + 1}  /  Total: {self.mod_count}",
                 active=True,
                 mouse_value=True,
                 alt_mode=False)
 
             draw_hint(
                 self,
-                "Freeze State [F]: {0}".format("Yes" if self.freeze_mod_cycle_state else "No"),
+                f"Freeze State [F]: {self.yes_no_str(self.freeze_mod_cycle_state)}",
                 "Retain the current modifier state(s) on exit")
         else:
             draw_hint(self, "Whoops", "Looks like there are no modifiers to view.")
@@ -287,37 +288,38 @@ def draw_text_callback(self):
         if self.util_count > 0:
             draw_property(
                 self,
-                "Utility: {0}".format(self.util_mod_names[self.util_current_index]),
-                "Current: {0}  /  Total: {1}".format(self.util_current_index + 1, self.util_count),
+                f"Utility: {self.util_mod_names[self.util_current_index]}",
+                f"Current: {self.util_current_index + 1}  /  Total: {self.util_count}",
                 active=True,
                 mouse_value=True,
                 alt_mode=False)
 
             draw_hint(
                 self,
-                "Frozen [F]: {0}".format("Yes" if self.util_mods[self.util_current_index].object in self.frozen_utils else "No"),
+                f"Frozen [F]: {self.yes_no_str(self.util_mods[self.util_current_index].object in self.frozen_utils)}",
                 "Keep the current utility selected while cycling")
 
             draw_hint(
                 self,
-                "Disable Modifier [D]: {0}".format("Yes" if not self.util_mods[self.util_current_index].show_viewport else "No"),
+                f"Disable Modifier [D]: {self.yes_no_str(not self.util_mods[self.util_current_index].show_viewport)}",
                 "Disable the associated boolean modifier")
 
             draw_hint(
                 self,
-                "Apply Modifier [A]: {0}".format("Yes" if self.util_mods[self.util_current_index].object in self.applied_utils else "No"),
+                f"Apply Modifier [A]: {self.yes_no_str(self.util_mods[self.util_current_index].object in self.applied_utils)}",
                 "Apply the associated boolean modifier")
         else:
             draw_hint(self, "Whoops", "Looks like there are no utilities to cycle through.")
 
+    modes = ["Modifier", "Utility"]
     draw_hint(
         self,
-        "Mode [M]: {0}".format("Modifier" if self.mod_cycle else "Utility"),
-        "Switch modes (Modifier, Utility)")
+        f"Mode [M]: {modes[0] if self.mod_cycle else modes[1]}",
+        self.list_options_str(modes))
 
     draw_hint(
         self,
-        "Wireframe [W]: {0}".format("Yes" if self.show_wireframe else "No"),
+        f"Wireframe [W]: {self.yes_no_str(self.show_wireframe)}",
         "Display the object's wireframe while cycling")
 
 

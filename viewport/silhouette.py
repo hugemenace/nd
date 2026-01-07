@@ -119,9 +119,10 @@ class ND_OT_silhouette(BaseOperator):
 def draw_text_callback(self):
     draw_header(self)
 
+    display_str = "Inverted" if self.inverted else "Normal"
     draw_hint(
         self,
-        "Display [D]: {0}".format("Inverted" if self.inverted else "Normal"),
+        f"Display [D]: {display_str}",
         "Invert the object and viewport colors")
 
 

@@ -280,13 +280,14 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Anchor [A]: {}".format(self.anchors[self.current_anchor].capitalize()),
-        ", ".join([m.capitalize() for m in self.anchors]))
+        f"Anchor [A]: {self.anchors[self.current_anchor].capitalize()}",
+        self.list_options_str(self.anchors))
 
+    distance_types = ['Absolute', 'Offset']
     draw_hint(
         self,
-        "Distance Type [D]: {}".format('Offset' if self.offset_distance else 'Absolute'),
-        "Absolute, Offset")
+        f"Distance Type [D]: {'Offset' if self.offset_distance else 'Absolute'}",
+        self.list_options_str(distance_types))
 
 
 def register():

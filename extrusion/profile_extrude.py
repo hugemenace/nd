@@ -334,19 +334,21 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.offset_input_stream)
 
+    weightings = ['Negative', 'Neutral', 'Positive']
     draw_hint(
         self,
-        "Weighting [W]: {}".format(['Negative', 'Neutral', 'Positive'][1 + round(self.weighting)]),
-        "Negative, Neutral, Positive")
+        f"Weighting [W]: {weightings[1 + round(self.weighting)]}",
+        self.list_options_str(weightings))
+
+    axes = ['X', 'Y', 'Z']
+    draw_hint(
+        self,
+        f"Extrusion Axis [A]: {axes[self.axis]}",
+        self.list_options_str(axes))
 
     draw_hint(
         self,
-        "Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Axis to extrude along (X, Y, Z)")
-
-    draw_hint(
-        self,
-        "Calculate Edges [E]: {}".format("Yes" if self.calculate_edges else "No"),
+        f"Calculate Edges [E]: {self.yes_no_str(self.calculate_edges)}",
         "Calculate the order of edges (affects normals)")
 
 

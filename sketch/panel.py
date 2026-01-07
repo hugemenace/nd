@@ -271,12 +271,12 @@ def draw_text_callback(self):
 
         draw_hint(
             self,
-            "Individual Faces [F]: {}".format("Yes" if self.individual else "No"),
-            "Inset individual faces (Yes, No)")
+            f"Individual Faces [F]: {self.yes_no_str(self.individual)}",
+            "Inset each face individually")
 
     draw_hint(
         self,
-        "Exclusive View [E]: {0}".format("On" if self.xray_mode else "Off"),
+        f"Exclusive View [E]: {self.yes_no_str(self.xray_mode)}",
         "Show the target object in front of all other objects")
 
 

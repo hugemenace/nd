@@ -387,16 +387,17 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "Count: {}".format(self.count),
+        f"Count: {self.count}",
         self.generate_step_hint(2, 1),
         active=self.key_no_modifiers,
         alt_mode=self.key_shift_no_modifiers,
         mouse_value=True,
         input_stream=self.count_input_stream)
 
+    angle_type_str = "Circle (360°)" if abs(self.angle) == 360 else f"Arc ({self.angle:.2f}°)"
     draw_property(
         self,
-        "Angle: {}".format('Circle (360°)' if abs(self.angle) == 360 else "Arc ({0:.2f}°)".format(self.angle)),
+        f"Angle: {angle_type_str}",
         self.generate_key_hint("Alt", self.generate_step_hint(15, 1)),
         active=self.key_alt,
         alt_mode=self.key_shift_alt,
@@ -412,15 +413,17 @@ def draw_text_callback(self):
         mouse_value=True,
         input_stream=self.offset_input_stream)
 
-    draw_hint(
-        self,
-        "Rotation Axis [A]: {}".format(['X', 'Y', 'Z'][self.axis]),
-        "Axis to revolve around (X, Y, Z)")
+    axes = ['X', 'Y', 'Z']
 
     draw_hint(
         self,
-        "Displacement Axis [D]: {}".format(['X', 'Y', 'Z'][self.displace_axis]),
-        "Local axis to displace along (X, Y, Z)")
+        f"Rotation Axis [A]: {axes[self.axis]}",
+        self.list_options_str(axes))
+
+    draw_hint(
+        self,
+        f"Displacement Axis [D]: {axes[self.displace_axis]}",
+        self.list_options_str(axes))
 
 
 def register():

@@ -383,7 +383,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "U Points: {}".format(self.lattice_points_u),
+        f"U Points: {self.lattice_points_u}",
         "(±1)",
         active=(self.uniform or self.key_no_modifiers),
         alt_mode=False,
@@ -392,7 +392,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "V Points: {}".format(self.lattice_points_v),
+        f"V Points: {self.lattice_points_v}",
         "Alt (±1)",
         active=(self.uniform or self.key_alt),
         alt_mode=False,
@@ -401,7 +401,7 @@ def draw_text_callback(self):
 
     draw_property(
         self,
-        "W Points: {}".format(self.lattice_points_w),
+        f"W Points: {self.lattice_points_w}",
         "Ctrl (±1)",
         active=(self.uniform or self.key_ctrl),
         alt_mode=False,
@@ -410,14 +410,14 @@ def draw_text_callback(self):
 
     draw_hint(
         self,
-        "Uniform [U]: {}".format("Yes" if self.uniform else "No"),
+        f"Uniform [U]: {self.yes_no_str(self.uniform)}",
         "Adjust all points uniformly")
 
     interpolation_mode = self.interpolation_modes[self.interpolation_mode]
     draw_hint(
         self,
-        "Interpolation Mode [M]: {}".format(self.interpolation_labels[interpolation_mode]),
-        "Linear, Cardinal, Catmull-Rom, B-Spline")
+        f"Interpolation Mode [M]: {self.interpolation_labels[interpolation_mode]}",
+        self.list_options_str(self.interpolation_labels.values()))
 
 
 def register():

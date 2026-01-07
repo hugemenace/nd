@@ -35,6 +35,10 @@ class BaseOperator(bpy.types.Operator):
     bl_options = {'UNDO'}
 
 
+    modal_config = {}
+    key_callbacks = {}
+
+
     def generate_step_hint(self, regular, precise = None):
         if not precise:
             return f"(±{regular})"
@@ -50,7 +54,21 @@ class BaseOperator(bpy.types.Operator):
         pass
 
 
+    def revert(self, context):
+        pass
+
+
+    def finish(self, context):
+        pass
+
+
+    def do_modal(self, context, event):
+        pass
+
+
     def invoke(self, context, event):
+        self.dirty = True
+
         self.unit_factor = get_scene_unit_factor()
         self.unit_suffix = get_scene_unit_suffix()
         self.unit_scale  = get_scene_unit_scale()
@@ -80,24 +98,53 @@ class BaseOperator(bpy.types.Operator):
 
         if self.operator_passthrough:
             update_overlay(self, context, event)
-
             return {'PASS_THROUGH'}
 
-        if self.key_cancel:
-            self.revert(context)
-
+        on_cancel_fn = self.modal_config.get('ON_CANCEL', None)
+        if on_cancel_fn and self.key_cancel:
+            print("Running on_cancel_fn")
+            on_cancel_fn(self, context)
             return {'CANCELLED'}
 
-        # Subclass hook-in
-        override_return = self.do_modal(context, event)
+        on_confirm_alt_fn = self.modal_config.get('ON_CONFIRM_ALT', None)
+        if on_confirm_alt_fn and self.key_confirm_alternative:
+            print("Running on_confirm_alt_fn")
+            on_confirm_alt_fn(self, context)
+            return {'FINISHED'}
+
+        on_confirm_alt_ret_fn = self.modal_config.get('ON_CONFIRM_ALT_RET', None)
+        if on_confirm_alt_ret_fn and self.key_confirm_alternative:
+            print("Running on_confirm_alt_ret_fn")
+            return on_confirm_alt_ret_fn(self, context)
+
+        on_confirm_fn = self.modal_config.get('ON_CONFIRM', None)
+        if on_confirm_fn and self.key_confirm:
+            print("Running on_confirm_fn")
+            on_confirm_fn(self, context)
+            return {'FINISHED'}
+
+        on_confirm_ret_fn = self.modal_config.get('ON_CONFIRM_RET', None)
+        if on_confirm_ret_fn and self.key_confirm:
+            print("Running on_confirm_ret_fn")
+            return on_confirm_ret_fn(self, context)
+
+        if self.modal_config.get('MOVEMENT_PASSTHROUGH', False) and self.key_movement_passthrough:
+            return {'PASS_THROUGH'}
+
+        if self.modal_config.get('SELECT_PASSTHROUGH', False) and self.key_select:
+            return {'PASS_THROUGH'}
 
         for key, fn in self.key_callbacks.items():
             if pressed(event, {key}):
                 fn(self, context, event)
                 self.dirty = True
 
+        # Subclass hook-in
+        override_return = self.do_modal(context, event)
+
         if self.dirty:
             self.operate(context)
+            self.dirty = False
 
         update_overlay(self, context, event)
 

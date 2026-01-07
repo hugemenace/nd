@@ -57,6 +57,18 @@ CTRL — Remove existing modifiers"""
         'A': lambda cls, context, event: cls.handle_cycle_deform_axis(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_exists(target_object) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         factor_factor = 0.01 if self.key_shift else 0.1
@@ -104,14 +116,6 @@ CTRL — Remove existing modifiers"""
 
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if self.key_no_modifiers:
                 if no_stream(self.angle_input_stream) and self.is_angular[self.methods[self.current_method]]:
@@ -131,7 +135,6 @@ CTRL — Remove existing modifiers"""
             remove_modifiers_ending_with(context.selected_objects, ' — ND SD')
             return {'FINISHED'}
 
-        self.dirty = False
         self.methods = ['TWIST', 'BEND', 'TAPER', 'STRETCH']
         self.current_method = 0
         self.is_angular = {'TWIST': True, 'BEND': True, 'TAPER': False, 'STRETCH': False}
@@ -163,12 +166,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_exists(target_object) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_cycle_deform_method(self, context, event):
@@ -226,8 +223,6 @@ CTRL — Remove existing modifiers"""
             self.deform.angle = radians(self.angle)
         else:
             self.deform.factor = self.factor
-
-        self.dirty = False
 
 
     def finish(self, context):

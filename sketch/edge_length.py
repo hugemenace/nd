@@ -50,6 +50,18 @@ class ND_OT_edge_length(BaseOperator):
         'D': lambda cls, context, event: cls.handle_toggle_distance_type(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         if self.key_numeric_input:
@@ -78,14 +90,6 @@ class ND_OT_edge_length(BaseOperator):
                 self.distance = round_dec(self.distance - self.step_size)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.distance_input_stream) and self.key_no_modifiers:
                 self.distance = max(0, self.distance + self.mouse_value) if not self.offset_distance else self.distance + self.mouse_value
@@ -96,8 +100,6 @@ class ND_OT_edge_length(BaseOperator):
         if context.active_object is None:
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
-
-        self.dirty = False
 
         self.revert_distance = False
         self.anchors = ["Center", "Start", "End"]
@@ -167,12 +169,6 @@ class ND_OT_edge_length(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
-
-
     def handle_cycle_anchor(self, context, event):
         self.current_anchor = (self.current_anchor + 1) % len(self.anchors)
 
@@ -184,38 +180,6 @@ class ND_OT_edge_length(BaseOperator):
         absolute_distance = sum(self.starting_distances) / len(self.starting_distances)
 
         self.distance += absolute_distance if not self.offset_distance else offset_distance
-
-
-    def operate(self, context):
-        for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-            self.move_verts(context, vertex_pair, index)
-
-        if self.current_anchor == 0:
-            self.secondary_points = [self.world_matrix @ point for point in self.midpoints]
-            self.primary_points = []
-            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-                self.primary_points.extend([
-                    self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
-                    self.world_matrix @ self.bm.verts[vertex_pair[1]].co
-                ])
-
-        if self.current_anchor == 1:
-            self.secondary_points = [self.world_matrix @ point[0] for point in self.starting_positions]
-            self.primary_points = []
-            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-                self.primary_points.extend([
-                    self.world_matrix @ self.bm.verts[vertex_pair[1]].co,
-                ])
-
-        if self.current_anchor == 2:
-            self.secondary_points = [self.world_matrix @ point[1] for point in self.starting_positions]
-            self.primary_points = []
-            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
-                self.primary_points.extend([
-                    self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
-                ])
-
-        self.dirty = False
 
 
     def move_verts(self, context, vertex_pair, index):
@@ -256,6 +220,36 @@ class ND_OT_edge_length(BaseOperator):
     def compare_distance_to_cursor(self, context, coords_0, coords_1):
         cursor_pos = context.scene.cursor.location
         return v3_distance(cursor_pos, coords_0) < v3_distance(cursor_pos, coords_1)
+
+
+    def operate(self, context):
+        for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+            self.move_verts(context, vertex_pair, index)
+
+        if self.current_anchor == 0:
+            self.secondary_points = [self.world_matrix @ point for point in self.midpoints]
+            self.primary_points = []
+            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+                self.primary_points.extend([
+                    self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
+                    self.world_matrix @ self.bm.verts[vertex_pair[1]].co
+                ])
+
+        if self.current_anchor == 1:
+            self.secondary_points = [self.world_matrix @ point[0] for point in self.starting_positions]
+            self.primary_points = []
+            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+                self.primary_points.extend([
+                    self.world_matrix @ self.bm.verts[vertex_pair[1]].co,
+                ])
+
+        if self.current_anchor == 2:
+            self.secondary_points = [self.world_matrix @ point[1] for point in self.starting_positions]
+            self.primary_points = []
+            for index, vertex_pair in enumerate(self.selected_vertex_pairs):
+                self.primary_points.extend([
+                    self.world_matrix @ self.bm.verts[vertex_pair[0]].co,
+                ])
 
 
     def finish(self, context):

@@ -61,6 +61,18 @@ CTRL — Remove existing modifiers"""
         'D': lambda cls, context, event: cls.handle_toggle_displacement_mode(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         relative_offset_step_size = 0.1 if self.key_shift else 1
@@ -123,14 +135,6 @@ CTRL — Remove existing modifiers"""
                 self.axes[self.axis][IDX_OFFSET] = round_dec(self.axes[self.axis][IDX_OFFSET] - step)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.count_streams[self.axis]) and self.key_no_modifiers and abs(self.mouse_step) > 0:
                 if self.mouse_step > 0:
@@ -158,8 +162,6 @@ CTRL — Remove existing modifiers"""
         if event.ctrl:
             remove_modifiers_starting_with(context.selected_objects, 'Array³')
             return {'FINISHED'}
-
-        self.dirty = False
 
         self.axis = 0
         self.axes = [None, None, None]
@@ -189,12 +191,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_moddable(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_cycle_axis(self, context, event):
@@ -251,8 +247,6 @@ CTRL — Remove existing modifiers"""
             array.constant_offset_displace = [offset if i == axis else 0 for i in range(3)]
             array.use_relative_offset = relative
             array.use_constant_offset = not relative
-
-        self.dirty = False
 
 
     def finish(self, context):

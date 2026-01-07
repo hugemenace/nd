@@ -50,6 +50,18 @@ class ND_OT_bool_inset(BaseOperator):
         'M': lambda cls, context, event: cls.handle_toggle_outset(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_exists(target_object) and objs_are_mesh(context.selected_objects) and ctx_objects_selected(context, 2)
+
 
     def do_modal(self, context, event):
         if self.key_numeric_input:
@@ -75,14 +87,6 @@ class ND_OT_bool_inset(BaseOperator):
                 self.thickness = max(0, round_dec(self.thickness - self.step_size))
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.thickness_input_stream) and self.key_no_modifiers:
                 self.thickness = max(0, self.thickness + self.mouse_value)
@@ -94,9 +98,7 @@ class ND_OT_bool_inset(BaseOperator):
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
-        self.dirty = False
         self.base_thickness_factor = 0.01
-
         self.thickness = 0.02
         self.outset = False
 
@@ -180,12 +182,6 @@ class ND_OT_bool_inset(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_exists(target_object) and objs_are_mesh(context.selected_objects) and ctx_objects_selected(context, 2)
-
-
     def handle_toggle_outset(self, context, event):
         self.outset = not self.outset
 
@@ -193,8 +189,6 @@ class ND_OT_bool_inset(BaseOperator):
     def operate(self, context):
         self.solidify.thickness = self.thickness
         self.boolean_diff.operation = 'UNION' if self.outset else 'DIFFERENCE'
-
-        self.dirty = False
 
 
     def finish(self, context):

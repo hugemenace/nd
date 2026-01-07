@@ -64,6 +64,21 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         'W': lambda cls, context, event: cls.handle_cycle_width_type(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        if app_minor_version() < MIN_BLENDER_VERSION:
+            return False
+
+        target_object = context.active_object
+        return ctx_edit_mode(context) and obj_is_mesh(target_object)
+
 
     def do_modal(self, context, event):
         weight_factor = 0.01 if self.key_shift else 0.1
@@ -145,14 +160,6 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
                 self.percentage = max(0, round_dec(self.percentage - percent_factor))
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments + self.mouse_step)
@@ -206,9 +213,7 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
 
             return {'FINISHED'}
 
-        self.dirty = False
         self.early_apply = event.shift
-
         self.segments = 1
         self.width_types = ['OFFSET', 'WIDTH', 'DEPTH', 'PERCENT', 'ABSOLUTE']
         self.width_type = self.width_types.index('WIDTH')
@@ -273,15 +278,6 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        if app_minor_version() < MIN_BLENDER_VERSION:
-            return False
-
-        target_object = context.active_object
-        return ctx_edit_mode(context) and obj_is_mesh(target_object)
 
 
     def handle_toggle_harden_normals(self, context, event):
@@ -434,8 +430,6 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         self.bevel.harden_normals = self.harden_normals
         self.bevel.loop_slide = self.loop_slide
         self.bevel.use_clamp_overlap = self.clamp_overlap
-
-        self.dirty = False
 
 
     def finish(self, context):

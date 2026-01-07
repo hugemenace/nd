@@ -56,6 +56,18 @@ CTRL — Remove existing modifiers"""
         'M': lambda cls, context, event: cls.handle_cycle_interpolation_mode(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         if self.key_numeric_input:
@@ -139,14 +151,6 @@ CTRL — Remove existing modifiers"""
                     self.lattice_points_w = max(2, self.lattice_points_w - 1)
                     self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.lattice_points_u_input_stream) and self.uniform:
                 self.lattice_points_u = max(2, self.lattice_points_u + self.mouse_step)
@@ -183,8 +187,6 @@ CTRL — Remove existing modifiers"""
                 context.active_object.modifiers.remove(mod)
 
             return {'FINISHED'}
-
-        self.dirty = False
 
         self.uniform = True
 
@@ -231,12 +233,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_toggle_uniform(self, context, event):
@@ -352,8 +348,6 @@ CTRL — Remove existing modifiers"""
         self.lattice_obj.data.interpolation_type_u = interpolation_mode
         self.lattice_obj.data.interpolation_type_v = interpolation_mode
         self.lattice_obj.data.interpolation_type_w = interpolation_mode
-
-        self.dirty = False
 
 
     def finish(self, context):

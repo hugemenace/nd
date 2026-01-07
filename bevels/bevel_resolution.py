@@ -48,6 +48,17 @@ class ND_OT_bevel_resolution(BaseOperator):
         'R': lambda cls, context, event: cls.handle_cycle_rounding(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        return ctx_obj_mode(context) and objs_are_mesh(context.selected_objects)
+
 
     def do_modal(self, context, event):
         is_factor_mode = self.change_mode == self.change_modes.index("FACTOR")
@@ -81,21 +92,12 @@ class ND_OT_bevel_resolution(BaseOperator):
                 self.minimum_segments = max(self.minimum_segments + self.mouse_step, 1)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
 
     def do_invoke(self, context, event):
         self.bevel_mods = []
         self.bevel_segments_prev = []
 
         self.selected_objects = context.selected_objects
-
-        self.dirty = False
 
         self.segment_change = 0
         self.minimum_segments = 2
@@ -177,11 +179,6 @@ class ND_OT_bevel_resolution(BaseOperator):
         return "1 / {}".format(-self.segment_change + 1)
 
 
-    @classmethod
-    def poll(cls, context):
-        return ctx_obj_mode(context) and objs_are_mesh(context.selected_objects)
-
-
     rounding_funcs = {
         'ROUND': round,
         'CEIL': ceil,
@@ -199,8 +196,6 @@ class ND_OT_bevel_resolution(BaseOperator):
                 mod.segments = max(rounding_func(segment_new), self.minimum_segments)
             elif self.change_mode == self.change_modes.index('COUNT'):
                 mod.segments = max(segment_prev + self.segment_change, self.minimum_segments)
-
-        self.dirty = False
 
 
     def finish(self, context):

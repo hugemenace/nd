@@ -44,6 +44,19 @@ class ND_OT_smooth(BaseOperator):
     bl_options = {'UNDO'}
 
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        valid_objects = cls.get_valid_objects(cls, context)
+        return ctx_obj_mode(context) and list_ok(valid_objects)
+
+
     def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else self.base_angle_factor
 
@@ -74,14 +87,6 @@ class ND_OT_smooth(BaseOperator):
             self.ignore_sharpness = not self.ignore_sharpness
             self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
@@ -89,7 +94,6 @@ class ND_OT_smooth(BaseOperator):
 
 
     def do_invoke(self, context, event):
-        self.dirty = False
         self.base_angle_factor = 15
         self.angle = float(get_preferences().default_smoothing_angle)
         self.angle_input_stream = new_stream()
@@ -115,12 +119,6 @@ class ND_OT_smooth(BaseOperator):
         return [obj for obj in context.selected_objects if obj.type == 'MESH']
 
 
-    @classmethod
-    def poll(cls, context):
-        valid_objects = cls.get_valid_objects(cls, context)
-        return ctx_obj_mode(context) and list_ok(valid_objects)
-
-
     def add_smooth_shading(self, context):
         if app_minor_version() >= (4, 1):
             for obj in self.valid_objects:
@@ -141,10 +139,7 @@ class ND_OT_smooth(BaseOperator):
             for obj in context.selected_objects:
                 if obj.type != 'MESH':
                     continue
-
                 obj.data.auto_smooth_angle = radians(self.angle)
-
-        self.dirty = False
 
 
     def finish(self, context):

@@ -61,6 +61,18 @@ SHIFT — Create a stacked bevel modifier"""
         'R': lambda cls, context, event: cls.handle_recall_previous_bevel(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_exists(target_object) and obj_is_mesh(target_object)
+
 
     def do_modal(self, context, event):
         profile_factor = 0.01 if self.key_shift else 0.1
@@ -157,14 +169,6 @@ SHIFT — Create a stacked bevel modifier"""
                 self.percentage = max(0, round_dec(self.percentage - percent_factor))
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments + self.mouse_step)
@@ -209,8 +213,6 @@ SHIFT — Create a stacked bevel modifier"""
             return {'FINISHED'}
 
         self.stacked = event.shift
-        self.dirty = False
-
         self.segments = 1
         self.width_types = ['OFFSET', 'WIDTH', 'DEPTH', 'PERCENT', 'ABSOLUTE']
         self.width_type = self.width_types.index('WIDTH')
@@ -248,12 +250,6 @@ SHIFT — Create a stacked bevel modifier"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_exists(target_object) and obj_is_mesh(target_object)
 
 
     def handle_toggle_harden_normals(self, context, event):
@@ -366,8 +362,6 @@ SHIFT — Create a stacked bevel modifier"""
         self.bevel.angle_limit = radians(self.angle)
         self.bevel.loop_slide = self.loop_slide
         self.bevel.use_clamp_overlap = self.clamp_overlap
-
-        self.dirty = False
 
 
     def finish(self, context):

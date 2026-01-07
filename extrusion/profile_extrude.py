@@ -59,6 +59,22 @@ CTRL — Remove existing modifiers"""
         'E': lambda cls, context, event: cls.handle_toggle_calculate_edges(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        if ctx_obj_mode(context):
+            target_object = get_real_active_object(context)
+            return obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+        if ctx_edit_mode(context):
+            return obj_is_mesh(context.active_object)
+
 
     def do_modal(self, context, event):
         if self.key_numeric_input:
@@ -99,14 +115,6 @@ CTRL — Remove existing modifiers"""
                 self.offset = round_dec(self.offset - self.step_size)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.extrusion_length_input_stream) and self.key_no_modifiers:
                 self.extrusion_length = max(0, self.extrusion_length + self.mouse_value)
@@ -124,8 +132,6 @@ CTRL — Remove existing modifiers"""
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND PE')
             return {'FINISHED'}
-
-        self.dirty = False
 
         self.extrusion_length_input_stream = new_stream()
         self.offset_input_stream = new_stream()
@@ -155,16 +161,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        if ctx_obj_mode(context):
-            target_object = get_real_active_object(context)
-            return obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
-
-        if ctx_edit_mode(context):
-            return obj_is_mesh(context.active_object)
 
 
     def handle_cycle_extrusion_axis(self, context, event):
@@ -291,8 +287,6 @@ CTRL — Remove existing modifiers"""
         self.weighting_offset.strength = self.calculate_weighting_offset_strength()
         self.displace.direction = axis
         self.displace.strength = self.offset
-
-        self.dirty = False
 
 
     def finish(self, context):

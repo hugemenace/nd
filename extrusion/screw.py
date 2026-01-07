@@ -59,6 +59,22 @@ CTRL — Remove existing modifiers"""
         'F': lambda cls, context, event: cls.handle_toggle_flip_normals(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        if ctx_obj_mode(context):
+            target_object = get_real_active_object(context)
+            return obj_moddable(target_object) and ctx_objects_selected(context, 1)
+
+        if ctx_edit_mode(context):
+            return obj_moddable(context.active_object)
+
 
     def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
@@ -117,14 +133,6 @@ CTRL — Remove existing modifiers"""
                 self.segments = max(3, self.segments - segment_factor)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
@@ -146,7 +154,6 @@ CTRL — Remove existing modifiers"""
             remove_modifiers_ending_with(context.selected_objects, ' — ND SCR')
             return {'FINISHED'}
 
-        self.dirty = False
         self.target_object = context.active_object
         self.object_type = self.target_object.type
         self.edit_mode = context.mode == 'EDIT_MESH'
@@ -189,16 +196,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        if ctx_obj_mode(context):
-            target_object = get_real_active_object(context)
-            return obj_moddable(target_object) and ctx_objects_selected(context, 1)
-
-        if ctx_edit_mode(context):
-            return obj_moddable(context.active_object)
 
 
     def handle_cycle_screw_axis(self, context, event):
@@ -300,8 +297,6 @@ CTRL — Remove existing modifiers"""
         self.screw.render_steps = self.segments
         self.screw.angle = radians(self.angle)
         self.screw.use_normal_flip = self.flip_normals
-
-        self.dirty = False
 
 
     def finish(self, context):

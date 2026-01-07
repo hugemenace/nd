@@ -50,15 +50,20 @@ class ND_OT_snap_align(BaseOperator):
         'R': lambda cls, context, event: cls.handle_reset_points(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 2)
+
 
     def do_modal(self, context, event):
-        if self.key_confirm:
-            self.finish(context)
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if event.type == 'MOUSEMOVE':
             coords = (event.mouse_region_x, event.mouse_region_y)
             self.recalculate_points(context, coords)
@@ -69,7 +74,6 @@ class ND_OT_snap_align(BaseOperator):
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
-        self.dirty = False
         self.hit_location = None
         self.capture_points = []
         self.primary_points = []
@@ -135,12 +139,6 @@ class ND_OT_snap_align(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 2)
-
-
     def handle_capture_point(self, context, event):
         if self.snap_point and len(self.capture_points) < 2:
             self.capture_points.append(self.snap_point)
@@ -154,32 +152,6 @@ class ND_OT_snap_align(BaseOperator):
     def handle_reset_points(self, context, event):
         self.capture_points = []
         self.guide_line = ()
-
-
-    def operate(self, context):
-        self.tertiary_points = [cap[0] for cap in self.capture_points]
-
-        if len(self.capture_points) == 2:
-            self.primary_points = []
-            self.secondary_points = []
-
-            self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
-            mid_point = v3_average([self.capture_points[0][0], self.capture_points[1][0]])
-            self.reference_obj.location = mid_point
-            self.tertiary_points.append(mid_point)
-
-        elif self.snap_point:
-            vect, rotation_matrix = self.snap_point
-            self.reference_obj.location = vect
-            if len(self.capture_points) == 0:
-                self.reference_obj.rotation_euler = rotation_matrix.to_euler()
-            else:
-                self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
-
-        elif self.hit_location:
-            self.reference_obj.location = self.hit_location
-
-        self.dirty = False
 
 
     def recalculate_points(self, context, mouse_coords):
@@ -243,6 +215,30 @@ class ND_OT_snap_align(BaseOperator):
         bpy.ops.object.select_all(action='DESELECT')
         self.reference_obj.select_set(True)
         context.view_layer.objects.active = self.reference_obj
+
+
+    def operate(self, context):
+        self.tertiary_points = [cap[0] for cap in self.capture_points]
+
+        if len(self.capture_points) == 2:
+            self.primary_points = []
+            self.secondary_points = []
+
+            self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
+            mid_point = v3_average([self.capture_points[0][0], self.capture_points[1][0]])
+            self.reference_obj.location = mid_point
+            self.tertiary_points.append(mid_point)
+
+        elif self.snap_point:
+            vect, rotation_matrix = self.snap_point
+            self.reference_obj.location = vect
+            if len(self.capture_points) == 0:
+                self.reference_obj.rotation_euler = rotation_matrix.to_euler()
+            else:
+                self.reference_obj.rotation_euler = self.capture_points[0][1].to_euler()
+
+        elif self.hit_location:
+            self.reference_obj.location = self.hit_location
 
 
     def finish(self, context):

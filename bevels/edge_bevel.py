@@ -59,6 +59,18 @@ CTRL — Remove existing modifiers"""
         'W': lambda cls, context, event: cls.handle_cycle_width_type(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = context.active_object
+        return ctx_edit_mode(context) and obj_is_mesh(target_object)
+
 
     def do_modal(self, context, event):
         weight_factor = 0.01 if self.key_shift else 0.1
@@ -155,14 +167,6 @@ CTRL — Remove existing modifiers"""
                 self.weight = max(0, min(1, round_dec(self.weight - weight_factor)))
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments + self.mouse_step)
@@ -211,9 +215,7 @@ CTRL — Remove existing modifiers"""
 
             return {'FINISHED'}
 
-        self.dirty = False
         self.early_apply = event.shift
-
         self.segments = 1
         self.weight = 1
         self.width_types = ['OFFSET', 'WIDTH', 'DEPTH', 'PERCENT', 'ABSOLUTE']
@@ -258,12 +260,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = context.active_object
-        return ctx_edit_mode(context) and obj_is_mesh(target_object)
 
 
     def handle_toggle_harden_normals(self, context, event):
@@ -429,8 +425,6 @@ CTRL — Remove existing modifiers"""
 
         bmesh.update_edit_mesh(data)
         bm.free()
-
-        self.dirty = False
 
 
     def finish(self, context):

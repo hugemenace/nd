@@ -50,6 +50,18 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         'A': lambda cls, context, event: cls.handle_toggle_auto_smooth(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else self.base_angle_factor
@@ -77,14 +89,6 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
                 self.angle = max(0, self.angle - angle_factor)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.angle_input_stream) and self.key_no_modifiers:
                 self.angle = max(0, min(180, self.angle + self.mouse_value_mag))
@@ -96,9 +100,7 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
-        self.dirty = False
         self.fast_apply = event.shift
-
         self.base_angle_factor = 15
         self.angle = int(get_preferences().default_smoothing_angle)
         self.commit_auto_smooth = get_preferences().enable_auto_smooth
@@ -114,7 +116,6 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
 
         if self.fast_apply:
             self.finish(context)
-
             return {'FINISHED'}
 
         capture_modifier_keys(self, None, event.mouse_x)
@@ -125,12 +126,6 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_toggle_auto_smooth(self, context, event):
@@ -146,8 +141,6 @@ SHIFT — Skip interactive mode and immediately apply the default settings"""
         bpy.ops.mesh.mark_sharp(clear=False)
 
         bpy.ops.mesh.select_all(action='DESELECT')
-
-        self.dirty = False
 
 
     def clear_edges(self, context):

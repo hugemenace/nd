@@ -50,6 +50,19 @@ class ND_OT_circularize(BaseOperator):
     bl_options = {'UNDO'}
 
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_multi_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
+
     def do_modal(self, context, event):
         segment_factor = 1 if self.key_shift else 2
 
@@ -76,14 +89,6 @@ class ND_OT_circularize(BaseOperator):
                 self.segments = max(2, self.segments - segment_factor)
                 self.dirty = True
 
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if get_preferences().enable_mouse_values:
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = max(2, self.segments + self.mouse_step)
@@ -99,7 +104,6 @@ class ND_OT_circularize(BaseOperator):
             remove_modifiers_ending_with(context.selected_objects, ' — ND CIRC')
             return {'FINISHED'}
 
-        self.dirty = False
         self.segments = 2
         self.edit_mode = context.mode == 'EDIT_MESH'
 
@@ -130,17 +134,10 @@ class ND_OT_circularize(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_multi_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
-
-
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
         self.bevel = mods[mod_bevel]
-
         self.segments_prev = self.segments = self.bevel.segments
 
         if get_preferences().lock_overlay_parameters_on_recall:
@@ -201,8 +198,6 @@ class ND_OT_circularize(BaseOperator):
 
     def operate(self, context):
         self.bevel.segments = self.segments
-
-        self.dirty = False
 
 
     def finish(self, context):

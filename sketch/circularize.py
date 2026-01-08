@@ -46,7 +46,8 @@ mod_summon_list = [mod_bevel, mod_weld]
 class ND_OT_circularize(BaseOperator):
     bl_idname = "nd.circularize"
     bl_label = "Circularize"
-    bl_description = "Adds a vertex bevel operator to the selected plane to convert it into a circular shape"
+    bl_description = """Adds a vertex bevel operator to the selected plane to convert it into a circular shape
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
 
 

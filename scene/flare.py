@@ -50,6 +50,18 @@ class ND_OT_flare(BaseOperator):
         'E': lambda cls, context, event: cls.handle_randomise_energy(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is(target_object, {'MESH', 'EMPTY'}) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         rotation_factor = 1 if self.key_shift else 15
@@ -61,40 +73,40 @@ class ND_OT_flare(BaseOperator):
             if self.key_no_modifiers:
                 self.rotation_input_stream = update_stream(self.rotation_input_stream, event.type)
                 self.rotation = get_stream_value(self.rotation_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 self.height_offset_input_stream = update_stream(self.height_offset_input_stream, event.type)
                 self.height_offset = get_stream_value(self.height_offset_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.scale_input_stream = update_stream(self.scale_input_stream, event.type)
                 self.scale = get_stream_value(self.scale_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl_alt:
                 self.energy_offset_input_stream = update_stream(self.energy_offset_input_stream, event.type)
                 self.energy_offset = get_stream_value(self.energy_offset_input_stream)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.rotation_input_stream) and self.hard_stream_reset or no_stream(self.rotation_input_stream):
                     self.rotation = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.rotation_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.height_offset_input_stream) and self.hard_stream_reset or no_stream(self.height_offset_input_stream):
                     self.height_offset = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.height_offset_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.scale_input_stream) and self.hard_stream_reset or no_stream(self.scale_input_stream):
                     self.scale = 1
-                    self.dirty = True
+                    self.mark_dirty()
                 self.scale_input_stream = new_stream()
             elif self.key_ctrl_alt:
                 if has_stream(self.enery_offset_input_stream) and self.hard_stream_reset or no_stream(self.enery_offset_input_stream):
                     self.enery_offset = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.enery_offset_input_stream = new_stream()
 
         if self.key_step_up:
@@ -106,8 +118,7 @@ class ND_OT_flare(BaseOperator):
                 self.scale += scale_factor
             elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset += energy_factor
-
-            self.dirty = True
+            self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.rotation_input_stream) and self.key_no_modifiers:
@@ -118,16 +129,7 @@ class ND_OT_flare(BaseOperator):
                 self.scale = max(0, self.scale - scale_factor)
             elif no_stream(self.energy_offset_input_stream) and self.key_ctrl_alt:
                 self.energy_offset -= energy_factor
-
-            self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+            self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.height_offset_input_stream) and self.key_alt:
@@ -138,8 +140,7 @@ class ND_OT_flare(BaseOperator):
                 self.energy_offset += self.mouse_value * 2500
             elif no_stream(self.rotation_input_stream) and self.key_no_modifiers:
                 self.rotation = (self.rotation + self.mouse_value_mag) % 360
-
-            self.dirty = True
+            self.mark_dirty()
 
 
     def reset_values(self, context):
@@ -159,7 +160,6 @@ class ND_OT_flare(BaseOperator):
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
-        self.dirty = False
         self.summoned = False
         self.regenerated_rig = False
 
@@ -203,12 +203,6 @@ class ND_OT_flare(BaseOperator):
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is(target_object, {'MESH', 'EMPTY'}) and ctx_objects_selected(context, 1)
 
 
     def create_empty(self, context):
@@ -297,8 +291,6 @@ class ND_OT_flare(BaseOperator):
             for light, height, energy in self.lights:
                 light.data.energy = max(0, energy + self.energy_offset)
             self.last_energy_offset = self.energy_offset
-
-        self.dirty = False
 
 
     def finish(self, context):

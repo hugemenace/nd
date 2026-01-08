@@ -53,16 +53,18 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         'THREE': lambda cls, context, event: cls.handle_set_selection(context, event, 2),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'SELECT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM_ALT': lambda cls, context: cls.finish(context),
+    }
 
-    def do_modal(self, context, event):
-        if self.key_confirm_alternative:
-            return self.finish(context)
 
-        if self.key_select:
-            return {'PASS_THROUGH'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def do_invoke(self, context, event):
@@ -70,7 +72,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
 
-        self.dirty = False
         self.xray_mode = False
         self.selection_type = 2 # ['VERT', 'EDGE', 'FACE']
 
@@ -86,12 +87,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_cycle_selection_type(self, context, event):
@@ -225,7 +220,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
 
     def operate(self, context):
         context.active_object.show_in_front = self.xray_mode
-        self.dirty = False
 
 
     def finish(self, context):
@@ -235,13 +229,10 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 self.report({'INFO'}, "Ensure only a single vertex, or exactly 3 vertices are selected.")
             else:
                 self.report({'INFO'}, "Ensure only a single edge or face is selected.")
-
-            return {'CANCELLED'}
+            return
 
         self.prepare_view_align(context)
         self.clean_up(context)
-
-        return {'FINISHED'}
 
 
     def clean_up(self, context, revert=False):

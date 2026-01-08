@@ -60,6 +60,26 @@ CTRL — Remove existing modifiers"""
         'D': lambda cls, context, event: cls.handle_toggle_displacement_mode(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        if ctx_obj_mode(context) and obj_exists(target_object) and ctx_objects_selected(context, 2):
+            a, b = context.selected_objects
+            reference_obj = a if a.name != target_object.name else b
+
+            return reference_obj.type == 'MESH'
+        elif ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1):
+            return True
+        else:
+            return False
+
 
     def do_modal(self, context, event):
         angle_factor = 1 if self.key_shift else 15
@@ -69,73 +89,65 @@ CTRL — Remove existing modifiers"""
             if self.key_no_modifiers:
                 self.count_input_stream = update_stream(self.count_input_stream, event.type)
                 self.count = int(get_stream_value(self.count_input_stream, min_value=2))
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 self.angle_input_stream = update_stream(self.angle_input_stream, event.type)
                 self.angle = get_stream_value(self.angle_input_stream)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.offset_input_stream = update_stream(self.offset_input_stream, event.type)
                 self.offset = get_stream_value(self.offset_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.count_input_stream) and self.hard_stream_reset or no_stream(self.count_input_stream):
                     self.count = 2
-                    self.dirty = True
+                    self.mark_dirty()
                 self.count_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.angle_input_stream) and self.hard_stream_reset or no_stream(self.angle_input_stream):
                     self.angle = 360
-                    self.dirty = True
+                    self.mark_dirty()
                 self.angle_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.offset_input_stream) and self.hard_stream_reset or no_stream(self.offset_input_stream):
                     self.offset = self.reference_obj.dimensions[self.axis] if self.single_obj_mode else 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.offset_input_stream = new_stream()
 
         if self.key_step_up:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = min(360, self.angle + angle_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset = round_dec(self.offset + self.step_size)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = 2 if self.count == 1 else self.count + count_factor
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, self.angle - angle_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset = round_dec(self.offset - self.step_size)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.count_input_stream) and self.key_no_modifiers:
                 self.count = max(2, self.count - count_factor)
-                self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.angle_input_stream) and self.key_alt:
                 self.angle = max(-360, min(360, self.angle + self.mouse_value_mag))
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.offset_input_stream) and self.key_ctrl:
                 self.offset += self.mouse_value
-                self.dirty = True
-            elif no_stream(self.count_input_stream) and self.key_no_modifiers:
+                self.mark_dirty()
+            elif no_stream(self.count_input_stream) and self.key_no_modifiers and self.has_mouse_step:
                 self.count = max(2, self.count + self.mouse_step)
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):
@@ -146,8 +158,6 @@ CTRL — Remove existing modifiers"""
         if event.ctrl:
             remove_modifiers_ending_with(context.selected_objects, ' — ND CA')
             return {'FINISHED'}
-
-        self.dirty = False
 
         self.faux_origin = event.alt
         self.base_offset_factor = 0.001
@@ -186,20 +196,6 @@ CTRL — Remove existing modifiers"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        if ctx_obj_mode(context) and obj_exists(target_object) and ctx_objects_selected(context, 2):
-            a, b = context.selected_objects
-            reference_obj = a if a.name != target_object.name else b
-
-            return reference_obj.type == 'MESH'
-        elif ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1):
-            return True
-        else:
-            return False
 
 
     def handle_cycle_axis(self, context, event):
@@ -320,6 +316,12 @@ CTRL — Remove existing modifiers"""
         self.displace = displace
 
 
+    def select_reference_obj(self):
+        bpy.ops.object.select_all(action='DESELECT')
+        self.reference_obj.select_set(True)
+        bpy.context.view_layer.objects.active = self.reference_obj
+
+
     def operate(self, context):
         altered_count = self.count if abs(self.angle) == 360 else self.count - 1
         rotation = radians(self.angle / altered_count)
@@ -340,14 +342,6 @@ CTRL — Remove existing modifiers"""
 
         bpy.data.objects[self.reference_obj.name]["NDCA_angle"] = self.angle
         bpy.data.objects[self.reference_obj.name]["NDCA_axis"] = self.axis
-
-        self.dirty = False
-
-
-    def select_reference_obj(self):
-        bpy.ops.object.select_all(action='DESELECT')
-        self.reference_obj.select_set(True)
-        bpy.context.view_layer.objects.active = self.reference_obj
 
 
     def finish(self, context):

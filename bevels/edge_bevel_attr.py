@@ -64,6 +64,21 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         'W': lambda cls, context, event: cls.handle_cycle_width_type(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        if app_minor_version() < MIN_BLENDER_VERSION:
+            return False
+
+        target_object = context.active_object
+        return ctx_edit_mode(context) and obj_is_mesh(target_object)
+
 
     def do_modal(self, context, event):
         weight_factor = 0.01 if self.key_shift else 0.1
@@ -75,97 +90,89 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
             if not self.is_width_percent() and self.key_no_modifiers:
                 self.width_input_stream = update_stream(self.width_input_stream, event.type)
                 self.width = get_stream_value(self.width_input_stream, self.unit_scaled_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_width_percent() and self.key_no_modifiers:
                 self.percentage_input_stream = update_stream(self.percentage_input_stream, event.type)
                 self.percentage = get_stream_value(self.percentage_input_stream, min_value=0, max_value=100)
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_alt:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
                 self.segments = int(get_stream_value(self.segments_input_stream, min_value=1))
-                self.dirty = True
+                self.mark_dirty()
             elif self.key_ctrl:
                 self.profile_input_stream = update_stream(self.profile_input_stream, event.type)
                 self.profile = get_stream_value(self.profile_input_stream)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if not self.is_width_percent() and self.key_no_modifiers:
                 if has_stream(self.width_input_stream) and self.hard_stream_reset or no_stream(self.width_input_stream):
                     self.width = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.width_input_stream = new_stream()
             elif self.is_width_percent() and self.key_no_modifiers:
                 if has_stream(self.percentage_input_stream) and self.hard_stream_reset or no_stream(self.percentage_input_stream):
                     self.percentage = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.percentage_input_stream = new_stream()
             elif self.key_alt:
                 if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
                     self.segments = 1
-                    self.dirty = True
+                    self.mark_dirty()
                 self.segments_input_stream = new_stream()
             elif self.key_ctrl:
                 if has_stream(self.profile_input_stream) and self.hard_stream_reset or no_stream(self.profile_input_stream):
                     self.profile = 0.5
-                    self.dirty = True
+                    self.mark_dirty()
                 self.profile_input_stream = new_stream()
 
         if self.key_step_up:
             if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = min(1, round_dec(self.profile + profile_factor))
-                self.dirty = True
+                self.mark_dirty()
             elif not self.is_width_percent() and not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = round_dec(self.width + self.step_size)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_width_percent() and not self.extend_mouse_values and no_stream(self.percentage_input_stream) and self.key_no_modifiers:
                 self.percentage = min(100, round_dec(self.percentage + percent_factor))
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.extend_mouse_values and no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = max(1, self.segments - segment_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.segments_input_stream) and self.key_alt:
                 self.segments = max(1, self.segments - segment_factor)
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0, round_dec(self.profile - profile_factor))
-                self.dirty = True
+                self.mark_dirty()
             elif not self.is_width_percent() and not self.extend_mouse_values and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0, round_dec(self.width - self.step_size))
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_width_percent() and not self.extend_mouse_values and no_stream(self.percentage_input_stream) and self.key_no_modifiers:
                 self.percentage = max(0, round_dec(self.percentage - percent_factor))
-                self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.segments_input_stream) and self.key_alt:
+            if no_stream(self.segments_input_stream) and self.key_alt and self.has_mouse_step:
                 self.segments = max(1, self.segments + self.mouse_step)
-                self.dirty = True
+                self.mark_dirty()
             elif not self.is_width_percent() and no_stream(self.width_input_stream) and self.key_no_modifiers:
                 self.width = max(0.0, self.width + self.mouse_value)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_width_percent() and no_stream(self.percentage_input_stream) and self.key_no_modifiers:
                 self.percentage = max(0.0, min(100.0, self.percentage + self.mouse_value_mag))
-                self.dirty = True
+                self.mark_dirty()
             elif no_stream(self.profile_input_stream) and self.key_ctrl:
                 self.profile = max(0.0, min(1.0, self.profile + self.mouse_value))
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):
@@ -206,9 +213,7 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
 
             return {'FINISHED'}
 
-        self.dirty = False
         self.early_apply = event.shift
-
         self.segments = 1
         self.width_types = ['OFFSET', 'WIDTH', 'DEPTH', 'PERCENT', 'ABSOLUTE']
         self.width_type = self.width_types.index('WIDTH')
@@ -273,15 +278,6 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        if app_minor_version() < MIN_BLENDER_VERSION:
-            return False
-
-        target_object = context.active_object
-        return ctx_edit_mode(context) and obj_is_mesh(target_object)
 
 
     def handle_toggle_harden_normals(self, context, event):
@@ -434,8 +430,6 @@ Min Blender Version: """ + '.'.join([str(v) for v in MIN_BLENDER_VERSION])
         self.bevel.harden_normals = self.harden_normals
         self.bevel.loop_slide = self.loop_slide
         self.bevel.use_clamp_overlap = self.clamp_overlap
-
-        self.dirty = False
 
 
     def finish(self, context):

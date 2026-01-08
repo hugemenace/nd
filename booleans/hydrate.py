@@ -46,37 +46,38 @@ class ND_OT_hydrate(BaseOperator):
         'C': lambda cls, context, event: cls.handle_toggle_clear_parent(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        valid_objects = cls.get_valid_objects(cls, context)
+        return ctx_obj_mode(context) and list_ok(valid_objects)
+
 
     def do_modal(self, context, event):
         if self.key_step_up:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection + 1) % len(self.scene_collections)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.key_no_modifiers:
                 self.active_collection = (self.active_collection - 1) % len(self.scene_collections)
-                self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if self.key_no_modifiers:
+            if self.key_no_modifiers and self.has_mouse_step:
                 self.active_collection = (self.active_collection + self.mouse_step) % len(self.scene_collections)
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):
-        self.dirty = False
-
         self.clear_parent = True
-
         self.scene_collections = [bpy.context.scene.collection]
         self.scene_collections.extend(bpy.context.scene.collection.children_recursive)
         self.collection_names = [c.name for c in self.scene_collections]
@@ -100,16 +101,6 @@ class ND_OT_hydrate(BaseOperator):
 
     def get_valid_objects(self, context):
         return [obj for obj in context.selected_objects if obj.type == 'MESH']
-
-
-    @classmethod
-    def poll(cls, context):
-        valid_objects = cls.get_valid_objects(cls, context)
-        return ctx_obj_mode(context) and list_ok(valid_objects)
-
-
-    def operate(self, context):
-        self.dirty = False
 
 
     def finish(self, context):

@@ -95,6 +95,8 @@ def capture_modifier_keys(cls, event=None, mouse_x=0):
     else:
         cls.mouse_step = 0
 
+    cls.has_mouse_step = abs(cls.mouse_step) > 0
+
     if event == None or cls.mouse_warped:
         cls.mouse_delta = 0
         cls.mouse_value = 0

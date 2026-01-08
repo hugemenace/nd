@@ -35,6 +35,10 @@ class BaseOperator(bpy.types.Operator):
     bl_options = {'UNDO'}
 
 
+    modal_config = {}
+    key_callbacks = {}
+
+
     def generate_step_hint(self, regular, precise = None):
         if not precise:
             return f"(±{regular})"
@@ -50,7 +54,25 @@ class BaseOperator(bpy.types.Operator):
         pass
 
 
+    def revert(self, context):
+        pass
+
+
+    def finish(self, context):
+        pass
+
+
+    def do_modal(self, context, event):
+        pass
+
+
+    def mark_dirty(self):
+        self.dirty = True
+
+
     def invoke(self, context, event):
+        self.mark_dirty()
+
         self.unit_factor = get_scene_unit_factor()
         self.unit_suffix = get_scene_unit_suffix()
         self.unit_scale  = get_scene_unit_scale()
@@ -67,6 +89,16 @@ class BaseOperator(bpy.types.Operator):
         return self.do_invoke(context, event)
 
 
+    def update_if_dirty(self, context):
+        if not self.dirty:
+            return False
+
+        self.operate(context)
+        self.dirty = False
+
+        return True
+
+
     def modal(self, context, event):
         capture_modifier_keys(self, event)
 
@@ -80,28 +112,39 @@ class BaseOperator(bpy.types.Operator):
 
         if self.operator_passthrough:
             update_overlay(self, context, event)
-
             return {'PASS_THROUGH'}
 
-        if self.key_cancel:
-            self.revert(context)
+        on_cancel_fn = self.modal_config.get('ON_CANCEL', None)
+        if on_cancel_fn and self.key_cancel:
+            return on_cancel_fn(self, context) or {'CANCELLED'}
 
-            return {'CANCELLED'}
+        on_confirm_alt_fn = self.modal_config.get('ON_CONFIRM_ALT', None)
+        if on_confirm_alt_fn and self.key_confirm_alternative:
+            return on_confirm_alt_fn(self, context) or {'FINISHED'}
 
-        # Subclass hook-in
-        override_return = self.do_modal(context, event)
+        on_confirm_fn = self.modal_config.get('ON_CONFIRM', None)
+        if on_confirm_fn and self.key_confirm:
+            return on_confirm_fn(self, context) or {'FINISHED'}
+
+        if self.modal_config.get('MOVEMENT_PASSTHROUGH', False) and self.key_movement_passthrough:
+            return {'PASS_THROUGH'}
+
+        if self.modal_config.get('SELECT_PASSTHROUGH', False) and self.key_select:
+            return {'PASS_THROUGH'}
 
         for key, fn in self.key_callbacks.items():
             if pressed(event, {key}):
                 fn(self, context, event)
-                self.dirty = True
+                self.mark_dirty()
 
-        if self.dirty:
-            self.operate(context)
+        # Subclass hook-in
+        return_override = self.do_modal(context, event)
+
+        self.update_if_dirty(context)
 
         update_overlay(self, context, event)
 
-        return override_return if override_return else {'RUNNING_MODAL'}
+        return return_override or {'RUNNING_MODAL'}
 
 
     def yes_no_str(self, value):

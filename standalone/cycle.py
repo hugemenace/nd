@@ -52,47 +52,49 @@ SHIFT — Cycle through the modifier stack"""
         'W': lambda cls, context, event: cls.handle_toggle_wireframe(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         if self.key_step_up:
             if self.mod_cycle:
                 self.mod_current_index = min(self.mod_current_index + 1, self.mod_count - 1)
-                self.dirty = True
+                self.mark_dirty()
             elif not self.mod_cycle and self.util_count > 0:
                 self.util_current_index = (self.util_current_index + 1) % self.util_count
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if self.mod_cycle:
                 self.mod_current_index = max(self.mod_current_index - 1, -1)
-                self.dirty = True
+                self.mark_dirty()
             elif not self.mod_cycle and self.util_count > 0:
                 self.util_current_index = (self.util_current_index - 1) % self.util_count
-                self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if self.mod_cycle:
+            if self.mod_cycle and self.has_mouse_step:
                 self.mod_current_index = max(-1, min(self.mod_current_index + self.mouse_step, self.mod_count - 1))
-                self.dirty = True
-            elif not self.mod_cycle and self.util_count > 0:
+                self.mark_dirty()
+            elif not self.mod_cycle and self.util_count > 0 and self.has_mouse_step:
                 self.util_current_index = (self.util_current_index + self.mouse_step) % self.util_count
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
-
-        self.dirty = False
 
         self.mod_cycle = event.shift
         self.show_wireframe = False
@@ -127,12 +129,6 @@ SHIFT — Cycle through the modifier stack"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_toggle_mod_cycle(self, context, event):
@@ -188,23 +184,6 @@ SHIFT — Cycle through the modifier stack"""
         mod.show_viewport = not mod.show_viewport
 
 
-    def operate(self, context):
-        if self.mod_cycle:
-            for counter, mod in enumerate(self.target_obj.modifiers):
-                self.set_mod_visible(mod, counter <= self.mod_current_index)
-        elif self.util_count > 0:
-            util_obj = self.util_mods[self.util_current_index].object
-            hide_all_utils(True)
-            isolate_utils(self.frozen_utils.union({util_obj}))
-            bpy.ops.object.select_all(action='DESELECT')
-            util_obj.select_set(True)
-            bpy.context.view_layer.objects.active = util_obj
-
-        self.target_obj.show_wire = self.show_wireframe
-
-        self.dirty = False
-
-
     def revert_mods(self, context):
         for counter, mod in enumerate(self.target_obj.modifiers):
             mod.show_viewport = self.mod_snapshot[counter]
@@ -235,6 +214,21 @@ SHIFT — Cycle through the modifier stack"""
 
         self.util_current_index = 0
         self.frozen_utils.clear()
+
+
+    def operate(self, context):
+        if self.mod_cycle:
+            for counter, mod in enumerate(self.target_obj.modifiers):
+                self.set_mod_visible(mod, counter <= self.mod_current_index)
+        elif self.util_count > 0:
+            util_obj = self.util_mods[self.util_current_index].object
+            hide_all_utils(True)
+            isolate_utils(self.frozen_utils.union({util_obj}))
+            bpy.ops.object.select_all(action='DESELECT')
+            util_obj.select_set(True)
+            bpy.context.view_layer.objects.active = util_obj
+
+        self.target_obj.show_wire = self.show_wireframe
 
 
     def finish(self, context):

@@ -46,8 +46,22 @@ mod_summon_list = [mod_bevel, mod_weld]
 class ND_OT_circularize(BaseOperator):
     bl_idname = "nd.circularize"
     bl_label = "Circularize"
-    bl_description = "Adds a vertex bevel operator to the selected plane to convert it into a circular shape"
+    bl_description = """Adds a vertex bevel operator to the selected plane to convert it into a circular shape
+CTRL — Remove existing modifiers"""
     bl_options = {'UNDO'}
+
+
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_multi_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def do_modal(self, context, event):
@@ -57,37 +71,29 @@ class ND_OT_circularize(BaseOperator):
             if self.key_no_modifiers:
                 self.segments_input_stream = update_stream(self.segments_input_stream, event.type)
                 self.segments = int(get_stream_value(self.segments_input_stream, min_value=2))
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
                 if has_stream(self.segments_input_stream) and self.hard_stream_reset or no_stream(self.segments_input_stream):
                     self.segments = 1
-                    self.dirty = True
+                    self.mark_dirty()
                 self.segments_input_stream = new_stream()
 
         if self.key_step_up:
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = 2 if self.segments == 1 else self.segments + segment_factor
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if no_stream(self.segments_input_stream) and self.key_no_modifiers:
                 self.segments = max(2, self.segments - segment_factor)
-                self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
-            if no_stream(self.segments_input_stream) and self.key_no_modifiers:
+            if no_stream(self.segments_input_stream) and self.key_no_modifiers and self.has_mouse_step:
                 self.segments = max(2, self.segments + self.mouse_step)
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):
@@ -99,7 +105,6 @@ class ND_OT_circularize(BaseOperator):
             remove_modifiers_ending_with(context.selected_objects, ' — ND CIRC')
             return {'FINISHED'}
 
-        self.dirty = False
         self.segments = 2
         self.edit_mode = context.mode == 'EDIT_MESH'
 
@@ -130,17 +135,10 @@ class ND_OT_circularize(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_multi_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
-
-
     def summon_old_operator(self, context, mods):
         self.summoned = True
 
         self.bevel = mods[mod_bevel]
-
         self.segments_prev = self.segments = self.bevel.segments
 
         if get_preferences().lock_overlay_parameters_on_recall:
@@ -201,8 +199,6 @@ class ND_OT_circularize(BaseOperator):
 
     def operate(self, context):
         self.bevel.segments = self.segments
-
-        self.dirty = False
 
 
     def finish(self, context):

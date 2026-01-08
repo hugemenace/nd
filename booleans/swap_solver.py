@@ -44,20 +44,20 @@ class ND_OT_swap_solver(BaseOperator):
         'S': lambda cls, context, event: cls.handle_toggle_solve_mode(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
 
-    def do_modal(self, context, event):
-        if self.key_confirm:
-            self.finish(context)
 
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+    @classmethod
+    def poll(cls, context):
+        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
+        return ctx_obj_mode(context) and list_ok(mesh_objects)
 
 
     def do_invoke(self, context, event):
-        self.dirty = False
-
         self.solve_mode = None
         self.boolean_mods = set()
         self.boolean_mods_snapshot = {}
@@ -105,12 +105,6 @@ class ND_OT_swap_solver(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        mesh_objects = [obj for obj in context.selected_objects if obj.type == 'MESH']
-        return ctx_obj_mode(context) and list_ok(mesh_objects)
-
-
     def handle_toggle_solve_mode(self, context, event):
         if self.solve_mode is None:
             self.solve_mode = self.solver_options[0]
@@ -123,8 +117,6 @@ class ND_OT_swap_solver(BaseOperator):
     def operate(self, context):
         for mod in self.boolean_mods:
             mod.solver = self.solve_mode
-
-        self.dirty = False
 
 
     def finish(self, context):

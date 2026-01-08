@@ -44,16 +44,19 @@ class ND_OT_silhouette(BaseOperator):
         'D': lambda cls, context, event: cls.handle_toggle_inversion(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        return ctx_obj_mode(context)
+
 
     def do_modal(self, context, event):
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
-
         if event.type in {'WHEELUPMOUSE', 'WHEELDOWNMOUSE'}:
             return {'PASS_THROUGH'}
 
@@ -84,11 +87,6 @@ class ND_OT_silhouette(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        return ctx_obj_mode(context)
-
-
     def handle_toggle_inversion(self, context, event):
         self.inverted = not self.inverted
 
@@ -99,8 +97,6 @@ class ND_OT_silhouette(BaseOperator):
         context.space_data.shading.single_color = (0, 0, 0) if self.inverted else (1, 1, 1)
         context.space_data.shading.background_type = 'VIEWPORT'
         context.space_data.shading.background_color = (1, 1, 1) if self.inverted else (0, 0, 0)
-
-        self.dirty = False
 
 
     def finish(self, context):

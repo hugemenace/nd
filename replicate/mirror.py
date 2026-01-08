@@ -54,41 +54,36 @@ CTRL — Remove existing modifiers"""
         'A': lambda cls, context, event: cls.handle_cycle_axis(context, event),
         'F': lambda cls, context, event: cls.handle_toggle_flip(context, event),
         'S': lambda cls, context, event: cls.handle_toggle_symmetrize(context, event),
+        'ONE': lambda cls, context, event: cls.handle_set_selection(context, event, 0),
+        'TWO': lambda cls, context, event: cls.handle_set_selection(context, event, 1),
+        'THREE': lambda cls, context, event: cls.handle_set_selection(context, event, 2),
+    }
+
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.handle_on_confirm(context),
+        'ON_CONFIRM_ALT': lambda cls, context: cls.handle_on_confirm_alt(context),
     }
 
 
+    @classmethod
+    def poll(cls, context):
+        if ctx_obj_mode(context):
+            target_object = get_real_active_object(context)
+
+            if ctx_objects_selected(context, 1) and obj_moddable(target_object):
+                return True
+
+            if ctx_min_objects_selected(context, 2) and obj_exists(target_object):
+                return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != target_object.name)
+
+        if ctx_edit_mode(context):
+            return obj_moddable(context.active_object)
+
+
     def do_modal(self, context, event):
-        if self.key_one:
-            if self.geometry_mode and not self.geometry_ready:
-                self.geometry_selection_type = 0
-                self.set_selection_mode(context)
-
-        if self.key_two:
-            if self.geometry_mode and not self.geometry_ready:
-                self.geometry_selection_type = 1
-                self.set_selection_mode(context)
-
-        if self.key_three:
-            if self.geometry_mode and not self.geometry_ready:
-                self.geometry_selection_type = 2
-                self.set_selection_mode(context)
-
-        if self.key_confirm_alternative:
-            if self.geometry_mode and not self.geometry_ready:
-                return self.complete_geometry_mode(context)
-
         if self.key_select and self.geometry_mode and not self.geometry_ready:
-            return {'PASS_THROUGH'}
-
-        if self.key_confirm:
-            if self.geometry_mode and not self.geometry_ready:
-                return {'PASS_THROUGH'}
-            elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
-                self.finish(context)
-
-                return {'FINISHED'}
-
-        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
 
@@ -107,7 +102,6 @@ CTRL — Remove existing modifiers"""
         self.geometry_ready = False
         self.geometry_selection_type = 2 # ['VERT', 'EDGE', 'FACE']
 
-        self.dirty = False
         self.axis = 2 if self.geometry_mode else 0
         self.flip = self.geometry_mode
         self.symmetrize = False
@@ -148,21 +142,6 @@ CTRL — Remove existing modifiers"""
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        if ctx_obj_mode(context):
-            target_object = get_real_active_object(context)
-
-            if ctx_objects_selected(context, 1) and obj_moddable(target_object):
-                return True
-
-            if ctx_min_objects_selected(context, 2) and obj_exists(target_object):
-                return all(obj.type in ['MESH', 'CURVE'] for obj in context.selected_objects if obj.name != target_object.name)
-
-        if ctx_edit_mode(context):
-            return obj_moddable(context.active_object)
-
-
     def handle_cycle_axis(self, context, event):
         self.axis = (self.axis + 1) % 3
 
@@ -177,6 +156,25 @@ CTRL — Remove existing modifiers"""
             self.set_selection_mode(context)
         else:
             self.symmetrize = not self.symmetrize
+
+
+    def handle_set_selection(self, context, event, selection_type):
+        if self.geometry_mode and not self.geometry_ready:
+            self.geometry_selection_type = selection_type
+            self.set_selection_mode(context)
+
+
+    def handle_on_confirm(self, context):
+        if self.geometry_mode and not self.geometry_ready:
+            return {'PASS_THROUGH'}
+        elif not self.geometry_mode or (self.geometry_mode and self.geometry_ready):
+            self.finish(context)
+            return {'FINISHED'}
+
+
+    def handle_on_confirm_alt(self, context):
+        if self.geometry_mode and not self.geometry_ready:
+            return self.complete_geometry_mode(context)
 
 
     def set_selection_mode(self, context):
@@ -376,8 +374,6 @@ CTRL — Remove existing modifiers"""
                     mirror.use_axis[i] = active
                     mirror.use_bisect_axis[i] = active
                     mirror.use_bisect_flip_axis[i] = self.flip and active
-
-        self.dirty = False
 
 
     def select_reference_objs(self, context):

@@ -52,6 +52,17 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         'E': lambda cls, context, event: cls.handle_toggle_xray_mode(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         if self.key_numeric_input:
@@ -59,58 +70,52 @@ SHIFT — Do not clean duplicate mesh before extraction"""
                 if self.key_no_modifiers:
                     self.inset_input_stream = update_stream(self.inset_input_stream, event.type)
                     self.inset = get_stream_value(self.inset_input_stream, self.unit_scaled_factor)
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.key_reset:
             if self.stage == 1:
                 if self.key_no_modifiers:
                     if has_stream(self.inset_input_stream) and self.hard_stream_reset or no_stream(self.inset_input_stream):
                         self.inset = 0
-                        self.dirty = True
+                        self.mark_dirty()
                     self.inset_input_stream = new_stream()
 
         if self.key_step_up:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = round_dec(self.inset + self.step_size)
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.key_step_down:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = max(0, round_dec(self.inset - self.step_size))
-                    self.dirty = True
+                    self.mark_dirty()
 
         if self.stage == 1 and self.key_confirm:
             self.finish(context)
-
             return {'FINISHED'}
 
         if self.stage == 0 and self.key_confirm_alternative:
             if self.has_valid_selection(context):
                 self.isolate_geometry(context)
                 self.stage = 1
-                self.dirty = True
+                self.mark_dirty()
 
         if self.stage == 0 and self.key_select:
-            return {'PASS_THROUGH'}
-
-        if self.key_movement_passthrough:
             return {'PASS_THROUGH'}
 
         if get_preferences().enable_mouse_values:
             if self.stage == 1:
                 if no_stream(self.inset_input_stream) and self.key_no_modifiers:
                     self.inset = max(0, self.inset + self.mouse_value)
-                    self.dirty = True
+                    self.mark_dirty()
 
 
     def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
-
-        self.dirty = False
 
         self.xray_mode = False
         self.individual = False
@@ -133,12 +138,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         context.window_manager.modal_handler_add(self)
 
         return {'RUNNING_MODAL'}
-
-
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_obj_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
 
 
     def handle_toggle_individual_faces(self, context, event):
@@ -183,27 +182,6 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         bmesh.ops.delete(self.panel_bm, geom=faces, context='FACES')
 
 
-    def operate(self, context):
-        self.panel_obj.show_in_front = self.xray_mode
-
-        if self.stage == 1:
-            bmesh.ops.delete(self.panel_bm, geom=self.panel_bm.verts, context='VERTS')
-            self.panel_bm.from_mesh(self.panel_mesh_snapshot)
-
-            if self.individual:
-                faces = list(self.panel_bm.faces)
-                for face in faces:
-                    result = self.inset_faces([face])
-                    self.delete_panel_faces(result['faces'])
-            else:
-                result = self.inset_faces(self.panel_bm.faces)
-                self.delete_panel_faces(result['faces'])
-
-            self.update_panel_edit_mesh()
-
-        self.dirty = False
-
-
     def inset_faces(self, faces):
         return bmesh.ops.inset_region(
             self.panel_bm,
@@ -228,6 +206,25 @@ SHIFT — Do not clean duplicate mesh before extraction"""
         selected_faces = len([f for f in self.panel_bm.faces if f.select])
 
         return selected_faces > 0
+
+
+    def operate(self, context):
+        self.panel_obj.show_in_front = self.xray_mode
+
+        if self.stage == 1:
+            bmesh.ops.delete(self.panel_bm, geom=self.panel_bm.verts, context='VERTS')
+            self.panel_bm.from_mesh(self.panel_mesh_snapshot)
+
+            if self.individual:
+                faces = list(self.panel_bm.faces)
+                for face in faces:
+                    result = self.inset_faces([face])
+                    self.delete_panel_faces(result['faces'])
+            else:
+                result = self.inset_faces(self.panel_bm.faces)
+                self.delete_panel_faces(result['faces'])
+
+            self.update_panel_edit_mesh()
 
 
     def finish(self, context):

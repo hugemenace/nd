@@ -51,6 +51,18 @@ class ND_OT_vertex_group_editor(BaseOperator):
         'R': lambda cls, context, event: cls.handle_randomize_weights(context, event),
     }
 
+    modal_config = {
+        'MOVEMENT_PASSTHROUGH': True,
+        'ON_CANCEL': lambda cls, context: cls.revert(context),
+        'ON_CONFIRM': lambda cls, context: cls.finish(context),
+    }
+
+
+    @classmethod
+    def poll(cls, context):
+        target_object = get_real_active_object(context)
+        return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
+
 
     def do_modal(self, context, event):
         weight_factor = 0.01 if self.key_shift else 0.1
@@ -59,7 +71,7 @@ class ND_OT_vertex_group_editor(BaseOperator):
             if self.key_no_modifiers:
                 self.weight_input_stream = update_stream(self.weight_input_stream, event.type)
                 self.weight = get_stream_value(self.weight_input_stream)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_reset:
             if self.key_no_modifiers:
@@ -68,45 +80,35 @@ class ND_OT_vertex_group_editor(BaseOperator):
                         self.distance = sum(self.starting_distances) / len(self.starting_distances)
                     else:
                         self.distance = 0
-                    self.dirty = True
+                    self.mark_dirty()
                 self.weight_input_stream = new_stream()
 
         if self.key_step_up:
             if not self.is_editing and self.key_no_modifiers:
                 self.vertex_group_index = (self.vertex_group_index + 1) % len(self.vertex_groups)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_editing and self.key_no_modifiers:
                 self.weight = min(self.weight + weight_factor, 1.0)
-                self.dirty = True
+                self.mark_dirty()
 
         if self.key_step_down:
             if not self.is_editing and self.key_no_modifiers:
                 self.vertex_group_index = (self.vertex_group_index - 1) % len(self.vertex_groups)
-                self.dirty = True
+                self.mark_dirty()
             elif self.is_editing and self.key_no_modifiers:
                 self.weight = max(self.weight - weight_factor, 0.0)
-                self.dirty = True
-
-        if self.key_confirm:
-            self.finish(context)
-
-            return {'FINISHED'}
-
-        if self.key_movement_passthrough:
-            return {'PASS_THROUGH'}
+                self.mark_dirty()
 
         if get_preferences().enable_mouse_values:
             if no_stream(self.weight_input_stream) and self.key_no_modifiers:
                 self.weight = max(0, min(1, self.weight + self.mouse_value))
-                self.dirty = True
+                self.mark_dirty()
 
 
     def do_invoke(self, context, event):
         if context.active_object is None:
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
-
-        self.dirty = False
 
         self.target_object = context.active_object
         self.world_matrix = context.active_object.matrix_world
@@ -160,12 +162,6 @@ class ND_OT_vertex_group_editor(BaseOperator):
         return {'RUNNING_MODAL'}
 
 
-    @classmethod
-    def poll(cls, context):
-        target_object = get_real_active_object(context)
-        return ctx_edit_mode(context) and obj_is_mesh(target_object) and ctx_objects_selected(context, 1)
-
-
     def handle_toggle_set_weight(self, context, event):
         self.weight = 1.0
         self.is_editing = not self.is_editing
@@ -204,7 +200,6 @@ class ND_OT_vertex_group_editor(BaseOperator):
             self.set_vertex_weights()
 
         self.update_point_visualisation()
-        self.dirty = False
 
 
     def finish(self, context):

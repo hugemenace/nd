@@ -87,7 +87,6 @@ class ND_OT_clean_utils(bpy.types.Operator):
             for mod in remove_mods:
                 obj.modifiers.remove(mod)
 
-        for obj in all_scene_objects:
             for constraint in obj.constraints:
                 if hasattr(constraint, 'target') and constraint.target:
                     active_util_object_names.add(constraint.target.name)

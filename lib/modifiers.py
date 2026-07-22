@@ -30,6 +30,7 @@ import re
 from math import radians
 from . preferences import get_preferences
 from . polling import app_minor_version
+from . node_groups import set_node_input
 
 
 def new_modifier(object, mod_name, mod_type, rectify=True):
@@ -172,8 +173,8 @@ def set_smoothing_angle(context, object, angle, ignore_sharpness=False):
     if mod is None:
         return
 
-    mod["Input_1"] = angle
-    mod["Socket_1"] = ignore_sharpness
+    set_node_input(mod, "Input_1", angle)
+    set_node_input(mod, "Socket_1", ignore_sharpness)
 
     mod.node_group.interface_update(context)
     object.data.update()

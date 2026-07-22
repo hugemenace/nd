@@ -29,6 +29,7 @@ import bpy
 import inspect
 from .. lib.objects import get_real_active_object
 from .. lib.polling import ctx_obj_mode, obj_exists, list_gt, app_minor_version
+from .. lib.node_groups import node_input_identifiers, get_node_input, set_node_input, get_node_input_attribute_state, set_node_input_attribute_state, node_input_variable_path, add_node_input_driver, remove_node_input_driver
 
 
 hard_ignore_list = {
@@ -174,7 +175,7 @@ ALT — Override util references on all sync'd objects"""
                         key_table = self.build_gn_key_table(mod)
                         for key in key_table:
                             try:
-                                mod.driver_remove(f'["{key}"]')
+                                remove_node_input_driver(mod, key)
                             except:
                                 pass
 
@@ -221,16 +222,18 @@ ALT — Override util references on all sync'd objects"""
     def build_gn_key_table(self, mod):
         # Build a dictionary of all the properties and their optional attributes to more
         # effectively sync them as drivers cannot be added to properties with use_attribute set.
-        keys = list(mod.keys())
         key_table = dict()
-        for key in keys:
-            if not key.endswith("_use_attribute") and not key.endswith("_attribute_name"):
-                key_table[key] = {}
-                key_table[key]["value"] = mod[key]
-            if key.endswith("_use_attribute"):
-                key_table[key[:-14]]["_use_attribute"] = mod[key]
-            if key.endswith("_attribute_name"):
-                key_table[key[:-15]]["_attribute_name"] = mod[key]
+        for key in node_input_identifiers(mod):
+            key_table[key] = {}
+            key_table[key]["value"] = get_node_input(mod, key)
+
+            attribute_state = get_node_input_attribute_state(mod, key)
+
+            if "use_attribute" in attribute_state:
+                key_table[key]["_use_attribute"] = attribute_state["use_attribute"]
+
+            if "attribute_name" in attribute_state:
+                key_table[key]["_attribute_name"] = attribute_state["attribute_name"]
 
         return key_table
 
@@ -242,16 +245,16 @@ ALT — Override util references on all sync'd objects"""
         key_table = self.build_gn_key_table(master_modifier)
 
         for key in key_table:
-            mod[key] = key_table[key]["value"]
+            set_node_input(mod, key, key_table[key]["value"])
 
             if "_use_attribute" in key_table[key]:
                 use_attribute = key_table[key]["_use_attribute"]
-                mod[key + "_use_attribute"] = bool(use_attribute)
+                set_node_input_attribute_state(mod, key, {"use_attribute": bool(use_attribute)})
                 if not use_attribute:
                     self.create_gnmod_driver(master_modifier, mod, key)
 
             if "_attribute_name" in key_table[key]:
-                mod[key + "_attribute_name"] = key_table[key]["_attribute_name"]
+                set_node_input_attribute_state(mod, key, {"attribute_name": key_table[key]["_attribute_name"]})
 
 
     def sync_vanilla_mod(self, master_modifier, mod):
@@ -285,10 +288,14 @@ ALT — Override util references on all sync'd objects"""
 
     def create_gnmod_driver(self, master_mod, copy_mod, prop):
         try:
-            driver = copy_mod.driver_add(f'["{prop}"]')
+            driver = add_node_input_driver(copy_mod, prop)
+
+            if driver is None:
+                return
+
             var = driver.driver.variables.new()
             var.name = prop
-            var.targets[0].data_path = f'modifiers["{master_mod.name}"]["{prop}"]'
+            var.targets[0].data_path = node_input_variable_path(master_mod, prop)
             var.targets[0].id_type = 'OBJECT'
             var.targets[0].id = self.master_object
             driver.driver.expression = prop

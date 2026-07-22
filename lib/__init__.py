@@ -37,6 +37,7 @@ from . import assets
 from . import preferences
 from . import addons
 from . import collections
+from . import node_groups
 from . import modifiers
 from . import numeric_input
 from . import overlay_keys
@@ -56,6 +57,7 @@ registerables = (
     preferences,
     addons,
     collections,
+    node_groups,
     modifiers,
     numeric_input,
     overlay_keys,

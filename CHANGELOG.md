@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.1](https://github.com/hugemenace/nd/compare/v2.2.0...v2.2.1) (2026-07-22)
+
+
+### Bug Fixes
+
+* fix geometry node property read & write methods for Blender 5.2+ ([fbe5793](https://github.com/hugemenace/nd/commit/fbe579388e1bf3611c930bf58aac57ee8d838965))
+
 ## [2.2.0](https://github.com/hugemenace/nd/compare/v2.1.0...v2.2.0) (2026-06-30)
 
 

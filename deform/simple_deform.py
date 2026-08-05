@@ -48,13 +48,15 @@ class ND_OT_simple_deform(BaseOperator):
     bl_idname = "nd.simple_deform"
     bl_label = "Simple Deform"
     bl_description = """Twist, bend, taper, or stretch the selected object
-CTRL — Remove existing modifiers"""
+CTRL — Remove existing modifiers
+SHIFT — Create a stacked deform modifier"""
     bl_options = {'UNDO'}
 
 
     key_callbacks = {
         'M': lambda cls, context, event: cls.handle_cycle_deform_method(context, event),
         'A': lambda cls, context, event: cls.handle_cycle_deform_axis(context, event),
+        'R': lambda cls, context, event: cls.handle_recall_previous_deform(context, event),
     }
 
     modal_config = {
@@ -130,10 +132,27 @@ CTRL — Remove existing modifiers"""
         if context.active_object is None:
             self.report({'INFO'}, "No active target object selected.")
             return {'CANCELLED'}
+        
+        self.mods = context.active_object.modifiers
+        self.mod_names = list(map(lambda x: x.name, self.mods))
+        self.current_deform_mods = list(filter(lambda x: any(m in x for m in mod_summon_list), self.mod_names))
 
         if event.ctrl:
-            remove_modifiers_ending_with(context.selected_objects, ' — ND SD')
+            if len(self.current_deform_mods) == 0:
+                return {'FINISHED'}
+
+            last_deform_mod = self.current_deform_mods[-1] if self.current_deform_mods else None
+
+            if last_deform_mod == None:
+                return {'FINISHED'}
+
+            last_bevel_mod_tail = last_deform_mod.split(' — ')[-1]
+
+            remove_modifiers_ending_with(context.selected_objects, f'Deform — {last_bevel_mod_tail}', True)
+
             return {'FINISHED'}
+        
+        self.stacked = event.shift
 
         self.methods = ['TWIST', 'BEND', 'TAPER', 'STRETCH']
         self.current_method = 0
@@ -143,13 +162,12 @@ CTRL — Remove existing modifiers"""
         self.factor_input_stream = new_stream()
 
         self.target_object = context.active_object
+        self.summoned_mod_index = 0
 
-        mods = self.target_object.modifiers
-        mod_names = list(map(lambda x: x.name, mods))
-        previous_op = all(m in mod_names for m in mod_summon_list)
+        previous_op = all(m in self.mod_names for m in mod_summon_list)
 
-        if previous_op:
-            self.summon_old_operator(context, mods)
+        if not self.stacked and previous_op:
+            self.summon_old_operator(context)
         else:
             self.prepare_new_operator(context)
 
@@ -192,10 +210,20 @@ CTRL — Remove existing modifiers"""
         ensure_tail_mod_consistency(self.target_object)
 
 
-    def summon_old_operator(self, context, mods):
+    def handle_recall_previous_deform(self, context, event):
+        if len(self.current_deform_mods) <= 1:
+            return
+
+        self.summoned_mod_index = (self.summoned_mod_index + 1) % len(self.current_deform_mods)
+        self.revert(context, True)
+        self.summon_old_operator(context)
+
+
+    def summon_old_operator(self, context):
         self.summoned = True
 
-        self.deform = mods[mod_deform]
+        mod_name = self.current_deform_mods[self.summoned_mod_index]
+        self.deform = self.mods[mod_name]
 
         self.axis_prev = self.axis = {'X': 0, 'Y': 1, 'Z': 2}[self.deform.deform_axis]
         self.method_prev = self.current_method = self.methods.index(self.deform.deform_method)
@@ -230,7 +258,7 @@ CTRL — Remove existing modifiers"""
         unregister_axis_handler()
 
 
-    def revert(self, context):
+    def revert(self, context, soft=False):
         if not self.summoned:
             bpy.ops.object.modifier_remove(modifier=self.deform.name)
 
@@ -245,8 +273,9 @@ CTRL — Remove existing modifiers"""
             else:
                 self.deform.factor = self.factor_prev
 
-        unregister_draw_handler()
-        unregister_axis_handler()
+        if not soft:
+            unregister_draw_handler()
+            unregister_axis_handler()
 
 
 def draw_text_callback(self):
@@ -281,6 +310,12 @@ def draw_text_callback(self):
         self,
         f"Axis [A]: {axes[self.axis]}",
         self.list_options_str(axes))
+    
+    if len(self.current_deform_mods) > 1:
+        draw_hint(
+            self,
+            f"Recall deform [R]: {self.current_deform_mods[self.summoned_mod_index]}",
+            "Switch between summoned deform modifiers")
 
 
 def register():
